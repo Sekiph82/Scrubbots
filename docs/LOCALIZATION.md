@@ -55,5 +55,10 @@ No player-facing copy counts attempts; a future one goes through `tn`.
   guard (l08).
 - `tests/m49_touch_targets_text_stress.gd` t04 and `tests/m49_surface_stress.gd` v03 walk every
   surface in the real Turkish table (no clipped / overflowing text, Turkish glyphs present).
+- `tests/m50_accessibility_audit.gd` a06: the three labels that shrink to fit (booster Price
+  `BOOSTER_PRICE_SB`, HUD level `RESULTS_LEVEL`, Home `HOME_SC_REWARDED_ADS`) stay >= 18 design
+  px in English and Turkish with 4-digit numbers ("Bölüm 9999" 18, "9.999 SB" 19, "ÖDÜLLÜ VİDEO"
+  24). The current Turkish copy fits, so it is not shortened; a longer new translation of these
+  keys must keep a06 green (shorter copy, not a smaller font).
 
 The Turkish copy should get an owner read-through on the phone.

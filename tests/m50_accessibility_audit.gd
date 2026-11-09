@@ -4,8 +4,8 @@ extends SceneTree
 ## production level catalog and the real gameplay screen. Thresholds that are product
 ## decisions (colour-blind assist) are REPORTED, not invented as pass/fail rules.
 ##   a05 (SB-M50-010) icon families at 48 px: every same-family pair differs in silhouette or hue
-##   a06 (SB-M50-007) readable font floor FONT_FLOOR: tokens above it; fit_font's long-locale shrink
-##       below it is REPORTED (owner / localization decision)
+##   a06 (SB-M50-007) readable font floor FONT_FLOOR: tokens above it; the fit_font labels (Price,
+##       HUD level, REWARDED ADS) stay >= it in real English and Turkish
 ##   a07 (SB-M50-005) Reduced Effects: the Settings toggle reaches every live consumer, and every
 ##       effect path has its REDUCED-arm suite (ledger)
 ##   a08 (SB-M50-011) a real level with Reduced Effects ON, the feel plugins absent and colour
@@ -18,6 +18,9 @@ extends SceneTree
 const A = preload("res://tools/accessibility_audit.gd")
 const BasePopup = preload("res://scripts/ui/popup/base_popup.gd")
 const HomeStyle = preload("res://scripts/ui/home/home_style.gd")
+const HomeScreen = preload("res://scripts/ui/home/home_screen.gd")
+const GameplayScreen = preload("res://scripts/ui/gameplay_screen.gd")
+const UiText = preload("res://scripts/ui/ui_text.gd")
 const UiTokens = preload("res://scripts/ui/ui_tokens.gd")
 const LevelCatalog = preload("res://scripts/data/level_catalog.gd")
 const MainScene = preload("res://scenes/app/main.tscn")
@@ -93,7 +96,7 @@ func _initialize() -> void:
 	_a03()
 	await _a04()
 	_a05()
-	_a06()
+	await _a06()
 	await _a07()
 	await _a08()
 	_cleanup()
@@ -260,8 +263,34 @@ static func _mean(img: Image) -> Color:
 func _a06() -> void:
 	print("[a06 readable font floor %d design px (~6.9 dp on a 411 dp wide phone)]" % FONT_FLOOR)
 	_ok(UiTokens.FONT_BODY >= FONT_FLOOR and UiTokens.FONT_BUTTON >= FONT_FLOOR, "body %d / button %d tokens >= floor" % [UiTokens.FONT_BODY, UiTokens.FONT_BUTTON])
-	# Every production HomeStyle.fit_font call (SB-M49-022) starts at these design px; English never
-	# shrinks (tests/m49_touch_targets_text_stress.gd t00), a longer locale may go down to 60%.
+	# The three HomeStyle.fit_font labels (SB-M49-022) on the REAL nodes, design scale, REAL
+	# English and Turkish copy with worst-case numbers (4-digit level / price): none shrinks below
+	# the floor.
+	var b := await _boot()
+	var root = b[1]
+	var ra: Button = root.get_home().get_region("RewardedAdsButton")
+	root.play_current_frontier()
+	await _frames(6)
+	var s = root.get_gameplay_host().get_screen()
+	var lvl: Label = s.find_child("ProfileLevel", true, false)
+	var price: Label = s.get_booster_button(s.get_booster_ids()[0]).get_node("Price")
+	var price_w: float = s.get_booster_button(s.get_booster_ids()[0]).custom_minimum_size.x / s.get_shell_scale() * 0.88
+	for loc in ["en", "tr"]:
+		UiText.locale = loc
+		var got := {}
+		ra.text = UiText.t("HOME_SC_REWARDED_ADS")
+		HomeStyle.fit_font(ra, HomeScreen.REWARDED_ADS_LABEL_FONT, HomeScreen.PANEL_SIZE.x)
+		got[ra.text] = ra.get_theme_font_size("font_size")
+		lvl.text = UiText.t("RESULTS_LEVEL", [9999])
+		HomeStyle.fit_font(lvl, 22, GameplayScreen.PROFILE_LEVEL[2] - GameplayScreen.PROFILE_LEVEL[0])
+		got[lvl.text] = lvl.get_theme_font_size("font_size")
+		price.text = UiText.t("BOOSTER_PRICE_SB", [UiText.num(9999)])
+		HomeStyle.fit_font(price, 20, price_w)
+		got[price.text] = price.get_theme_font_size("font_size")
+		_ok(got.values().all(func(v): return v >= FONT_FLOOR), "%s: REWARDED ADS / HUD level / booster Price stay >= %d px %s" % [loc, FONT_FLOOR, str(got)])
+	UiText.locale = "en"
+	_free(b)
+	# fit_font itself keeps the 60% shrink for synthetic stress copy (m49 pseudo-locale), recorded.
 	var starts := {"booster Price": 20, "HUD ProfileLevel": 22, "Home REWARDED ADS": 24, "event pill": 30}
 	var below: Array = []
 	for k in starts:
@@ -273,7 +302,7 @@ func _a06() -> void:
 		_ok(fs == int(starts[k] * 0.6), "%s: fit_font floor %d px for a %d px start" % [k, fs, starts[k]])
 		if fs < FONT_FLOOR:
 			below.append("%s %d px" % [k, fs])
-	print("    FINDING (owner / localization decision, SB-M50-007): a long locale can shrink %s below the %d px floor; clamping breaks those plates (m49 stress), so it needs shorter copy or a wider plate per locale" % [str(below), FONT_FLOOR])
+	print("    note: synthetic over-long copy (not EN / TR) can still shrink %s below the %d px floor (the m49 pseudo-locale stress)" % [str(below), FONT_FLOOR])
 	_complete("a06_font_floor")
 
 func _a07() -> void:
@@ -287,7 +316,7 @@ func _a07() -> void:
 	for f in _gd_files("res://scripts/ui") + _gd_files("res://scripts/gameplay"):
 		var rel := String(f).trim_prefix("res://")
 		if FileAccess.get_file_as_string(f).to_lower().contains("reduced") and not REDUCED_LEDGER.has(rel) \
-				and not rel.get_file() in ["settings_panel.gd", "production_gameplay_host.gd", "ui_text.gd"]:   # toggle / wiring / copy only
+				and not rel.get_file() in ["settings_panel.gd", "production_gameplay_host.gd", "ui_text.gd", "ui_text_tr.gd"]:   # toggle / wiring / copy only
 			unlisted.append(rel)
 	_ok(unlisted.is_empty(), "every Reduced-aware UI / gameplay script is in the ledger %s" % str(unlisted))
 	var b := await _boot()
