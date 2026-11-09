@@ -265,10 +265,10 @@ jobs:
             echo "SB-POLISH-002 verdict=FAIL (exact 11/11 summary missing)" | tee -a "$S"; fail=1
           fi
           # SB-M43-013 meta ceremonies + Results hand-off: exact 32-case summary is mandatory.
-          if grep -qxF 'M43 master C005 meta ceremonies evidence: PASS (32/32 cases, 0 fail)' validate_logs/m43_master_c005_meta_ceremonies.log 2>/dev/null; then
-            echo "M43-C005 verdict=PASS (32/32)" | tee -a "$S"
+          if grep -qxF 'M43 master C005 meta ceremonies evidence: PASS (33/33 cases, 0 fail)' validate_logs/m43_master_c005_meta_ceremonies.log 2>/dev/null; then
+            echo "M43-C005 verdict=PASS (33/33)" | tee -a "$S"
           else
-            echo "M43-C005 verdict=FAIL (exact 32/32 summary missing)" | tee -a "$S"; fail=1
+            echo "M43-C005 verdict=FAIL (exact 33/33 summary missing)" | tee -a "$S"; fail=1
           fi
           # SB-M43-C005F-007 unlock feel: exact 8-case summary is mandatory.
           if grep -qxF 'M43 C005F phase6 unlock feel evidence: PASS (8/8 cases, 0 fail)' validate_logs/m43_c005f_phase6_unlock_feel.log 2>/dev/null; then
