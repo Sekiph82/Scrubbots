@@ -20,6 +20,9 @@ name: iOS IPA
 #   .github/scripts/app_version.py: CFBundleShortVersionString = version, CFBundleVersion = build number
 #   (run_number + build_offset). Godot/Xcode build under the fixed name Scrubbots (pack/scheme/binary lookup), then
 #   the IPA is renamed to build/ios/<build_type>/ScrubBots-iOS-<build_type>-v<ver>-b<build>.ipa.
+# SB-M43-171/172: input `local_notifications` (default false) builds the ScrubbotsNotify GDExtension
+#   (native/ios, UNUserNotificationCenter permission + local reminders) into res://bin/ before the import,
+#   so the export embeds it. false = the IPA exactly as before.
 
 on:
   workflow_dispatch:
@@ -32,6 +35,10 @@ on:
         options:
           - debug
           - release
+      local_notifications:
+        description: "SB-M43-171/172: include the ScrubbotsNotify GDExtension (local reminders + permission)."
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -122,6 +129,19 @@ jobs:
           rm -f godot.zip tpl.tpz
           echo "GODOT=$PWD/Godot.app/Contents/MacOS/Godot" >> "$GITHUB_ENV"
 
+      # SB-M43-171/172: plain C GDExtension API (header dumped from this Godot), no third-party code.
+      - name: ScrubbotsNotify GDExtension (input local_notifications)
+        if: ${{ inputs.local_notifications }}
+        run: |
+          mkdir -p bin "$RUNNER_TEMP/gdx"
+          (cd "$RUNNER_TEMP/gdx" && "$GODOT" --headless --dump-gdextension-interface)
+          xcrun --sdk iphoneos clang -dynamiclib -fobjc-arc -arch arm64 -miphoneos-version-min=12.0 \
+            -I "$RUNNER_TEMP/gdx" -framework Foundation -framework UserNotifications \
+            -install_name @rpath/libscrubbots_notify.dylib \
+            -o bin/libscrubbots_notify.dylib native/ios/scrubbots_notify/scrubbots_notify.m
+          cp native/ios/scrubbots_notify/scrubbots_notify.gdextension bin/
+          nm -gU bin/libscrubbots_notify.dylib | grep scrubbots_notify_init
+
       # export_presets.cfg repoda gitignore'da; CI icin burada uretiliyor.
       # Imza yok: xtool install telefona yuklerken kendi hesabinla imzaliyor.
       - name: iOS export preset
@@ -167,7 +187,8 @@ jobs:
           set -e
           echo "import exit code: $ec"
           # Genuine failed imports / broken resources / script errors. WARNING lines are not matched.
-          if grep -nE "Error loading|Error importing|ERR_FILE_CORRUPT|SCRIPT ERROR|Parse Error|Failed loading resource|Cannot open file|Resource file not found" out/import.log; then
+          # The ScrubbotsNotify GDExtension (input local_notifications) has only an iOS library, so its load error on macOS is expected.
+          if grep -nE "Error loading|Error importing|ERR_FILE_CORRUPT|SCRIPT ERROR|Parse Error|Failed loading resource|Cannot open file|Resource file not found" out/import.log | grep -v scrubbots_notify; then
             echo "::error::Godot import reported failed / corrupt resources (see out/import.log)"
             exit 1
           fi
@@ -253,7 +274,7 @@ jobs:
           "$GODOT" --headless --main-pack "$PCK" --quit-after 600 > "$GITHUB_WORKSPACE/out/boot.log" 2>&1 || true
           cd "$GITHUB_WORKSPACE"
           tail -15 out/boot.log
-          if grep -E "SCRIPT ERROR|Parse Error|Failed loading resource|Cannot open file|Resource file not found|Failed to load script|Error loading" out/boot.log; then
+          if grep -E "SCRIPT ERROR|Parse Error|Failed loading resource|Cannot open file|Resource file not found|Failed to load script|Error loading" out/boot.log | grep -v scrubbots_notify; then
             echo "::error::IPA pack boot reported missing / broken resources"; exit 1
           fi
           {

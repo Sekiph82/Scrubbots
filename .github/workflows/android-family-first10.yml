@@ -59,6 +59,9 @@ name: Android Family First10 APK
 #   validate also runs tools/check_release_versioning.py + m59_app_version.
 # SB-M56-001..010, 012..016 analytics taxonomy V1 (consent-gated, schema-validated, mocked sink; economy / collection / navigation / ads / notification events): + m56_analytics_taxonomy (exact 21/21 guard).
 # SB-M58-001..006 privacy inventory (docs/PRIVACY_DATA_INVENTORY.md lists every permission/network/user:// use): + m58_privacy_inventory (exact 7/7 guard).
+# SB-M43-172 local reminders: + m43_172_local_notifications (exact 12/12 guard). Input `local_notifications` (default false):
+#   true builds the ScrubbotsNotify AAR (native/android, javac only), switches the preset to the Gradle build and enables
+#   addons/scrubbots_notify (docs/RELEASE_BUILDS.md). false keeps the prebuilt-template APK path unchanged.
 
 on:
   workflow_dispatch:
@@ -80,6 +83,10 @@ on:
         options:
           - debug
           - release
+      local_notifications:
+        description: "SB-M43-172: include the ScrubbotsNotify plugin (Gradle build). Off = the prebuilt-template APK as before."
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -152,7 +159,7 @@ jobs:
                    m43_c005_c072_feature_unlock_ceremony m43_c005_c074_c077_celebrations \
                    m43_master_c005r_gift_micro_progress sb_polish_002_gift_meter sb_polish_004_006_ui_batch sb_polish_003_booster_vfx sb_m22_008_polish_013_slot_fx m43_master_c005_meta_ceremonies m43_c005f_phase6_unlock_feel \
                    m43_master_c006_shop m43_master_c007_collection m54_collection_set_master_exactly_once m43_master_c008_robots m54_regression_pack_022_027 \
-                   m43_master_c010_meta m43_master_c011_c014 m44_pending_packs_gate m44_meta_l1_unlock_ftue m44_meta_verify_achievements_gift m43_master_c007r_pity campaign_l11_l30 m43_personal_ranks real_play_levels real_play_file_cli ui_vis_006_asset_qa m59_app_version m56_analytics_taxonomy m58_privacy_inventory m54_regression_pack_028_036; do
+                   m43_master_c010_meta m43_master_c011_c014 m44_pending_packs_gate m44_meta_l1_unlock_ftue m44_meta_verify_achievements_gift m43_master_c007r_pity campaign_l11_l30 m43_personal_ranks real_play_levels real_play_file_cli ui_vis_006_asset_qa m59_app_version m56_analytics_taxonomy m58_privacy_inventory m54_regression_pack_028_036 m43_172_local_notifications; do
             L="validate_logs/$s.log"
             if [ ! -f "tests/$s.gd" ]; then echo "$s MISSING tests/$s.gd status=FAIL" | tee -a "$S"; fail=1; continue; fi
             if timeout 1500 "$GODOT" --headless --path . -s "res://tests/$s.gd" > "$L" 2>&1; then ec=0; else ec=$?; fi
@@ -344,6 +351,11 @@ jobs:
           else
             echo "M58-PRIVACY verdict=FAIL (exact 7/7 summary missing)" | tee -a "$S"; fail=1
           fi
+          if grep -qxF 'SB-M43-172 local notifications: PASS (12/12 cases, 0 fail)' validate_logs/m43_172_local_notifications.log 2>/dev/null; then
+            echo "M43-172-NOTIFY verdict=PASS (12/12)" | tee -a "$S"
+          else
+            echo "M43-172-NOTIFY verdict=FAIL (exact 12/12 summary missing)" | tee -a "$S"; fail=1
+          fi
           echo "aggregate=$([ $fail -eq 0 ] && echo PASS || echo FAIL)" | tee -a "$S"
           { echo "### validate (mode=${MODE:-<unset>}, ${GITHUB_SHA})"; echo '```'; cat "$S"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
           exit $fail
@@ -488,6 +500,21 @@ jobs:
             -e "s/@PACKAGE@/${PKG}/" -e "s/@APP_LABEL@/${LABEL}/" \
             .github/android/export_presets_family_first10.cfg > export_presets.cfg
           cat export_presets.cfg
+
+      # SB-M43-172: Android plugins need the Gradle build, so the plugin rides only on this input.
+      - name: ScrubbotsNotify plugin + Gradle build (input local_notifications)
+        if: ${{ inputs.local_notifications }}
+        run: |
+          python3 -I native/android/scrubbots_notify/build_aar.py \
+            --android-jar "$(ls -d "$ANDROID_SDK"/platforms/android-*/android.jar | sort -V | tail -1)" \
+            --android-source "$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable/android_source.zip" \
+            --out addons/scrubbots_notify/android/scrubbots_notify.aar
+          sed -i 's#^gradle_build/use_gradle_build=false#gradle_build/use_gradle_build=true#' export_presets.cfg
+          grep -qx 'gradle_build/use_gradle_build=true' export_presets.cfg
+          sed -i 's#^enabled=PackedStringArray(#enabled=PackedStringArray("res://addons/scrubbots_notify/plugin.cfg", #' project.godot
+          grep -q 'addons/scrubbots_notify/plugin.cfg' project.godot
+          "$GODOT" --headless --path . --install-android-build-template
+          test -f android/build/build.gradle
 
       - name: Import + export APK and same-preset inspection PCK
         run: |
