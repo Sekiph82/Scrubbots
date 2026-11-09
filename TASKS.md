@@ -51,6 +51,7 @@ Completed items and older status history: docs/migration/legacy-task-trackers/TA
 - DONE FACTORY-039 — main CI validation_only 39928015709 PASS (job 039)
 - DONE SB-M50-OPTIN-001 — color-assist symbols opt-in (default OFF, save migration, floor(ppc*0.4) glyphs); merged 2026-10-22 (factory job 017, 69a3f230)
 - DONE SB-M46-003..015 — verify-close 019 (technical PASS V04; physical gate given §0D.1; no on-device measurement)
+- DONE SB-M46-RM005-T4 — warm WON terminal tick back under 60 ms, factory 145 (45639202): cause = CeremonyPresenter.pending() built and freed every pending ceremony popup (textures, video hero) just to test presentability on the WON -> Results tick (60-79 ms); now MetaCeremonies.presentable() (build() gates on it, same refusals, no UI). m46_rm005 T4 warm 108-124 -> 35.3 / 37.0 ms, cold 125 -> 62 ms; remaining warm cost: Results show_model ~23 ms, host economy+save terminal ~10 ms. LOCAL_PASS m46_rm005_terminal_frame_profile 5/5 (x2), m46_performance 22/22, m43_master_c005_meta_ceremonies 33/33 (new e33 presentable == build), m43_c001a 11/11, m57_ads_cadence 6/6, m54_cloud_save_seam 7/7, m44_featured_card_onboarding 8/8, m40_save_system, m43_c005_c072 9/9, m43_c005_c074_c077 6/6; m55_long_session FAIL only on objects drift 72 > 64 (factory 144) (no CI run, no phone build)
 - DONE FACTORY-002 — dashboard + owner-answer flow (job 002)
 - DONE FACTORY-007 — light path + cheaper models (job 007)
 - DONE FACTORY-009 — TASKS.md archive/slim (job 009)
