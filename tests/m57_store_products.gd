@@ -198,10 +198,21 @@ func _c07() -> void:
 	e.store.bind_save(func(): return {"ok": false, "reason": "disk"})
 	e.store.purchase("scrubbucks_100")
 	var r: Dictionary = m.finish("scrubbucks_100", "tokS")
-	_ok(r["ok"] and m.acks.is_empty(), "save failed -> purchase left unacknowledged (store re-delivers it)")
-	e.store.bind_save(func(): return {"ok": true})
-	e.store.deliver({"product_id": "scrubbucks_100", "token": "tokS", "outcome": "purchased"})
-	_ok(m.acks == [["tokS", true]] and e.wallet.scrub_bucks() == EconomyServices.new().wallet.scrub_bucks() + 100, "re-delivery: no second grant, now acknowledged")
+	var sb1: int = e.wallet.scrub_bucks()
+	_ok(r["ok"] and m.acks.is_empty() and sb1 == EconomyServices.new().wallet.scrub_bucks() + 100, "save failed -> purchase left unacknowledged (store re-delivers it)")
+	var saves := [0]
+	e.store.bind_save(func():
+		saves[0] += 1
+		return {"ok": false, "reason": "disk"})
+	var r2: Dictionary = e.store.deliver({"product_id": "scrubbucks_100", "token": "tokS", "outcome": "purchased"})
+	_ok(r2["reason"] == "duplicate" and saves[0] == 1 and m.acks.is_empty() and e.wallet.scrub_bucks() == sb1, "duplicate re-delivery with a failing save: save retried, still NOT acknowledged, no second grant")
+	e.store.bind_save(func():
+		saves[0] += 1
+		return {"ok": true})
+	var r3: Dictionary = e.store.deliver({"product_id": "scrubbucks_100", "token": "tokS", "outcome": "purchased"})
+	_ok(r3["reason"] == "duplicate" and saves[0] == 2 and m.acks == [["tokS", true]] and e.wallet.scrub_bucks() == sb1, "later re-delivery with a successful save: acknowledged, no second grant")
+	e.store.deliver({"product_id": "scrubbucks_100", "token": "tokS", "outcome": "cancelled"})
+	_ok(saves[0] == 2 and m.acks.size() == 1, "a non-purchased delivery never saves or acknowledges")
 	_complete("c07_save_failure_no_ack")
 
 func _c08() -> void:

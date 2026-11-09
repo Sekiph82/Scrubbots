@@ -12,8 +12,9 @@ extends RefCounted
 ##   No Ads (non-consumable) persistent entitlement: ads_allowed("banner"/"interstitial") is
 ##                           false, ads_allowed("rewarded") stays true (owner 2026-10-22)
 ##
-## Only outcome "purchased" with a token commits. The grant is saved before the store is
-## acknowledged; a failed save leaves the purchase unacknowledged so the store re-delivers it.
+## Only outcome "purchased" with a token commits. Every purchased delivery (new grant or
+## duplicate re-delivery) is saved before the store is acknowledged; a failed save leaves the
+## purchase unacknowledged so the store re-delivers it.
 ## restore() re-applies the No Ads entitlement only (consumables are never restored).
 ## Prices are only the store's localized strings (price_text); this service never formats one.
 
@@ -139,14 +140,12 @@ func deliver(r: Dictionary) -> Dictionary:
 		out = {"ok": false, "reason": "no_token"}
 	else:
 		var rewards := {RES_NO_ADS: 1} if id == NO_ADS else {"scrub_bucks": scrub_bucks_of(id)}
+		out = {"ok": true} if _reward.grant(TX_PREFIX + token, rewards) else {"ok": false, "reason": "duplicate"}
+		# A duplicate may be the re-delivery after a failed save: save again before acknowledging.
 		var saved := true
-		if _reward.grant(TX_PREFIX + token, rewards):
-			out = {"ok": true}
-			if _save_cb.is_valid():
-				out["save"] = _save_cb.call()
-				saved = bool(out["save"].get("ok", false))
-		else:
-			out = {"ok": false, "reason": "duplicate"}
+		if _save_cb.is_valid():
+			out["save"] = _save_cb.call()
+			saved = bool(out["save"].get("ok", false))
 		if saved:
 			_provider.acknowledge(token, id != NO_ADS)
 	out["product_id"] = id
