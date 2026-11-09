@@ -13,6 +13,7 @@ const NavigationController = preload("res://scripts/app/navigation_controller.gd
 const GameplayLaunchResolver = preload("res://scripts/app/gameplay_launch_resolver.gd")
 const LevelCatalog = preload("res://scripts/data/level_catalog.gd")
 const LevelLoader = preload("res://scripts/data/level_loader.gd")
+const FeaturedCards = preload("res://scripts/collection/featured_cards.gd")
 const ResultsMomentum = preload("res://scripts/progression/results_momentum.gd")
 const ResultsScreen = preload("res://scripts/ui/results_screen.gd")
 const JourneyStrip = preload("res://scripts/ui/components/journey_strip.gd")
@@ -88,6 +89,11 @@ func _boot(frontier: int, size: Vector2i = Vector2i(1080, 2160), path: String = 
 		var seed = AppState.new(path, func(): return _now[0])
 		for o in seed.economy.gift.add_streak_sb("test_seed_m1", 1):
 			seed.economy.meta_ui.mark_seen("gift:" + String(o["id"]))
+		# SB-M44-026: a first clear of a featured level (L20+) grants a Featured Card whose ceremony
+		# holds the teaser too; commit it beforehand (seen), as m43_c001b does for L30.
+		var fc: Dictionary = FeaturedCards.grant_milestone(seed.economy, frontier)
+		if bool(fc["applied"]):
+			seed.economy.meta_ui.mark_seen("featured_card:L%d:%s" % [frontier, fc["card"]])
 		seed.request_save()
 		seed.economy.dispose()
 		MainScript.boot_save_path_override = path

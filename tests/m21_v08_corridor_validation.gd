@@ -216,19 +216,23 @@ func _section_C_matrix() -> void:
 	var w := 20; var h := 20
 	var bb = _all_active(w, h)
 	_ok(_route(bb, Vector2(9.5, float(h) + 1.5), bb.get_cell_index(0, h - 1)).success, "C/042: below -> far-left bottom")
-	_ok(_route(bb, Vector2(9.5, -2.5), bb.get_cell_index(w - 1, 0)).success, "C/043: above -> far-right top")
+	# Railroad V1 (M22-C001 V03) superseded the M21 one-cell ring: every outside start takes the
+	# BOTTOM connector, so an above-board start whose connector crosses the ACTIVE board fails closed.
+	var ra = _route(bb, Vector2(9.5, -2.5), bb.get_cell_index(w - 1, 0))
+	_ok(not ra.success and ra.failure_reason == RouteResult.FailureReason.NO_ROUTE, "C/043: above -> far-right top fails closed (railroad: no top lane)")
 	_ok(_route(bb, Vector2(-2.5, 1.5), bb.get_cell_index(0, h - 1)).success, "C/044: left -> far-bottom-left")
 	_ok(_route(bb, Vector2(float(w) + 2.5, float(h) - 1.5), bb.get_cell_index(w - 1, 0)).success, "C/045: right -> far-top-right")
-	# corner: below-left origin -> top-right target uses two exterior sides.
+	# corner: below-left origin -> top-right target uses two exterior sides (bottom rail, then a
+	# vertical rail side; Railroad V1 enters the top-right cell from the right rail).
 	var rc = _route(bb, Vector2(-2.5, float(h) + 2.5), bb.get_cell_index(w - 1, 0))
 	_ok(rc.success, "C/046: below-left -> top-right (corner transition)")
 	var pts: PackedVector2Array = rc.get_points()
-	var used_left := false; var used_top := false
+	var used_bottom := false; var used_side := false
 	for p in pts:
 		var cx := int(floor(p.x)); var cy := int(floor(p.y))
-		if cx < 0: used_left = true
-		if cy < 0: used_top = true
-	_ok(used_left and used_top, "C/047: corner route uses BOTH left and top exterior sides")
+		if cy >= h: used_bottom = true
+		if (cx < 0 or cx >= w) and cy >= 0 and cy < h: used_side = true
+	_ok(used_bottom and used_side, "C/047: corner route uses BOTH the bottom and a vertical exterior side")
 	# rectangular
 	_ok(_route(_all_active(30, 12), Vector2(15.5, 13.5), _all_active(30, 12).get_cell_index(0, 11)).success, "C/048: rectangular 30x12")
 	# 59x59 + timing

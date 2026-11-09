@@ -147,13 +147,14 @@ func _gap_B_corner() -> void:
 		var right_noncorner := false  # x == w  and 0<=y<=h-1
 		var top_noncorner := false    # y == -1 and 0<=x<=w-1
 		for c in crossed:
-			if c.x == -1 and c.y >= 0 and c.y <= h - 1: left_noncorner = true
-			if c.x == w and c.y >= 0 and c.y <= h - 1: right_noncorner = true
+			if c.x < 0 and c.y >= 0 and c.y <= h - 1: left_noncorner = true
+			if c.x >= w and c.y >= 0 and c.y <= h - 1: right_noncorner = true
 			if c.y == -1 and c.x >= 0 and c.x <= w - 1: top_noncorner = true
 		# It rounds either the left or the right corner up to the top; require the TOP
-		# side plus ONE distinct adjacent vertical side (corner cells excluded).
+		# side plus ONE distinct adjacent vertical side (corner cells excluded). Railroad V1 (M22-C001
+		# V03) superseded the M21 one-cell ring: the vertical side is a rail column (x < 0 or x >= w).
 		_ok(top_noncorner, "B: route crosses a TOP-side NON-corner ring cell (y=-1, 0<=x<=%d)" % (w - 1))
-		_ok(left_noncorner or right_noncorner, "B: route crosses a distinct adjacent vertical-side NON-corner ring cell (left x=-1 or right x=%d)" % w)
+		_ok(left_noncorner or right_noncorner, "B: route crosses a distinct adjacent vertical-side NON-corner exterior cell (left x<0 or right x>=%d)" % w)
 		# Planner classification domain never exceeds the one-cell ring (recording delegate).
 		var rec = _RecAccess.new(board)
 		var rr = ProductionRoutingSystem.new().compute_route(RouteRequest.for_target(board, origin, target), board, rec)

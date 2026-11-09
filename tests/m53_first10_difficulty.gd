@@ -225,7 +225,8 @@ func _static_gates() -> void:
 	var cat = LevelCatalog.new()
 	_ok(cat.load_manifest().ok, "production catalog valid")
 	var entries: Array = cat.get_entries_ordered()
-	_ok(entries.size() == 10, "catalog holds exactly orders 1..10")
+	# SB-CAMPAIGN-L11-L30: the catalog grows past the First 10; they stay orders 1..10.
+	_ok(entries.size() >= 10 and range(10).all(func(i): return int(entries[i].order) == i + 1), "catalog holds orders 1..10 first (%d entries)" % entries.size())
 	var auth = ProductionArtLevelBuilder.load_palette_authority()
 	var prog = DifficultyProgressionV1.new()
 	var seen := {}

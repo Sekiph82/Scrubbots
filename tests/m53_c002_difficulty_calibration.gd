@@ -262,10 +262,10 @@ func _no_runtime_dependency() -> void:
 	hits.erase("res://scripts/difficulty/level_difficulty_analyzer_v2_candidate.gd")
 	_ok(hits.is_empty(), "no shipping script/scene references the V2 candidate or calibration tool %s" % str(hits))
 	var cat = LevelCatalog.new()
-	var ok: bool = cat.load_manifest().ok and cat.get_entries_ordered().size() == 10
+	var ok: bool = cat.load_manifest().ok and cat.get_entries_ordered().size() >= 10
 	for e in cat.get_entries_ordered():
 		ok = ok and not String(e.id).begins_with("calib_") and not String(e.level_path).contains("difficulty_calibration")
-	_ok(ok, "calibration fixtures never enter the production catalog (still exactly the First 10)")
+	_ok(ok, "calibration fixtures never enter the production catalog")
 
 func _scan(dir: String, hits: Array) -> void:
 	var da := DirAccess.open(dir)

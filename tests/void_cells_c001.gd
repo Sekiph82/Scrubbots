@@ -145,7 +145,7 @@ func _all_fixtures() -> Array:
 
 # ------------------------------------------------------------- v1 unchanged -------
 func _v1_levels_unchanged() -> void:
-	print("[v1 levels: no VOID semantics leak]")
+	print("[committed levels: no VOID semantics leak into v1, v2 VOID never ACTIVE]")
 	var dir := DirAccess.open("res://data/levels")
 	var n := 0
 	for f in dir.get_files():
@@ -161,6 +161,13 @@ func _v1_levels_unchanged() -> void:
 		var sum := 0
 		for c in totals:
 			sum += int(totals[c])
+		if lvl.version == 2:
+			# SB-CAMPAIGN-L11-L30: shipped VOID levels (ADR-030): VOID cells are never ACTIVE or supplied.
+			_ok(lvl.get_void_cell_count() > 0 and lvl.get_artwork_cell_count() + lvl.get_void_cell_count() == lvl.get_cell_count()
+				and board.count_cells_by_state(BoardState.CellState.ACTIVE) == lvl.get_artwork_cell_count()
+				and board.get_artwork_cell_count() == lvl.get_artwork_cell_count() and sum == lvl.get_artwork_cell_count(),
+				"%s: version 2, VOID never ACTIVE, supply total == artwork cell count" % f)
+			continue
 		_ok(lvl.version == 1 and lvl.get_void_cell_count() == 0 and lvl.get_artwork_cell_count() == lvl.get_cell_count()
 			and board.count_cells_by_state(BoardState.CellState.ACTIVE) == lvl.get_cell_count()
 			and board.get_artwork_cell_count() == lvl.get_cell_count() and sum == lvl.get_cell_count(),
