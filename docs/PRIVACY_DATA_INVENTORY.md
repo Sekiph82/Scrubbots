@@ -27,6 +27,7 @@ Billing/StoreKit, Play Games/Game Center/iCloud).
 | Godot Engine | engine + export templates | 4.7.2 stable | MIT (plus its bundled third-party libraries, e.g. FreeType, mbedTLS, libogg/Vorbis/Theora, zlib, all permissive; full list in `Engine.get_copyright_info()`) | runtime | Collects nothing by itself. No engine telemetry. |
 | Game Feel Flow | `addons/game_feel_flow` | 1.0.0 | MIT (`addons/game_feel_flow/LICENSE`) | presentation effects (autoload `GameFeelFlow`) | none, no I/O beyond its own resources |
 | Saltmire Spark | `addons/saltmire_spark` | 1.0.0 | MIT (`addons/saltmire_spark/LICENSE.txt`) | particle/spark effects (autoload `Spark`) | none |
+| ScrubbotsNotify (own code, SB-M43-171/172) | `addons/scrubbots_notify` (Android export plugin) + `native/` (Android plugin Java, iOS GDExtension Objective-C) | 1.0.0 | own code | schedules / cancels ONE local reminder (Android AlarmManager + notification, iOS UNUserNotificationCenter) and asks the iOS notification permission. Only in builds made with the workflow input `local_notifications` (default off, `docs/RELEASE_BUILDS.md`). | none: no network, no identifiers; the reminder text and time stay on the device |
 
 Content assets (not code): canonical SFX generated with ElevenLabs (`assets/audio/sfx/README.md`),
 music selected by the owner (`coordination/OWNER_M33_MUSIC_SELECTION_DECISION_V03.md`), owner
@@ -57,7 +58,6 @@ here, not built.
 | Google Play Games Services (Saved Games, later Friends) | SB-M43-153..160, SB-M61 | Play Games player id, gamer profile (display name/avatar), save blobs in Google Drive app data. |
 | Apple Game Center + iCloud | SB-M43-153..160, SB-M61 | Game Center player id/alias; save data in the user's iCloud. |
 | Analytics provider | SB-M56 later / SB-M58-008 | Undecided. Events are already privacy-minimised (`docs/ANALYTICS_TAXONOMY_V1.md`); a provider adds its own identifiers. |
-| Local notifications plugin | SB-M43-172 | Undecided native plugin; local notifications only, no push server planned. |
 
 ## 2. Data the game stores or sends (SB-M58-002)
 
@@ -75,13 +75,14 @@ no ads, no purchases, no analytics provider, no crash reporter. The only network
 
 | Code | Purpose |
 |---|---|
-| `scripts/economy/notification_permission.gd` | `OS.request_permission("android.permission.POST_NOTIFICATIONS")`, only after the player turns reminders ON and taps Allow in the explainer (SB-M43-146). Never on boot. |
+| `scripts/economy/notification_permission.gd` | `OS.request_permission("android.permission.POST_NOTIFICATIONS")`, only after the player turns reminders ON and taps Allow in the explainer (SB-M43-146). Never on boot. iOS: the same explainer calls the native `ScrubbotsNotify.request_authorization()` (UNUserNotificationCenter alert + sound, SB-M43-171). |
+| `scripts/economy/local_notifications.gd` | `Engine.get_singleton("ScrubbotsNotify")` (Android plugin) / `ClassDB.instantiate("ScrubbotsNotify")` (iOS GDExtension): schedules one local reminder when the app goes to the background (reminders ON + permission granted only), cancels it on every open (SB-M43-172). No push server, nothing sent. |
 
 ### Files on the device (`user://`, app-private storage)
 
 | Path | Written by | Contents | Leaves device? |
 |---|---|---|---|
-| `user://scrubbots_save.dat` (+ temp/backup siblings) | `scripts/save/save_service.gd` via `scripts/app/app_state.gd` | settings (volumes, haptics, Reduced Effects, color symbols), level progression, economy (wallet, hearts, boosters, collection cards/packs, daily/orders, events, records, gift/streak, notification preferences and quiet hours, permission ask/decline timestamps, FTUE flags). In-game pack "receipts" are internal reward transactions, not store purchases. Timestamps are device clock values used for timers. No name, email, device id or location. | No |
+| `user://scrubbots_save.dat` (+ temp/backup siblings) | `scripts/save/save_service.gd` via `scripts/app/app_state.gd` | settings (volumes, haptics, Reduced Effects, color symbols), level progression, economy (wallet, hearts, boosters, collection cards/packs, daily/orders, events, records, gift/streak, notification preferences and quiet hours, permission ask/decline timestamps, the time of the one scheduled local reminder, FTUE flags). In-game pack "receipts" are internal reward transactions, not store purchases. Timestamps are device clock values used for timers. No name, email, device id or location. | No |
 | `user://analytics_v1.json` | `scripts/app/analytics_service.gd` | `version`, `consent` (default false), first consented local day, retention markers sent. No events are stored (NullSink). | No |
 | `user://audio_settings.cfg` | `scripts/audio/audio_settings_service.gd` | legacy M33 volume file, read once for migration into the save | No |
 | `user://haptics_settings.cfg` | `scripts/haptics/haptics_settings_service.gd` | haptics on/off (standalone service default path) | No |
@@ -125,7 +126,12 @@ params only, no ids or timestamps. In the current build no event is stored or se
 | Permission | Why | Status |
 |---|---|---|
 | `permissions/vibrate` | haptic feedback (Settings HAPTICS, default ON; `docs/M34_HAPTICS_DEVICE_VALIDATION.md`) | needed |
-| `permissions/post_notifications` | Android 13+ runtime permission, asked contextually when the player opts in to reminders | **owner decision**: the permission is requested but no notification is delivered yet (no local-notification plugin, SB-M43-172). Not a data-collection permission and not a Data safety item, but a reviewer may ask why it is requested. Options: keep (reminder opt-in flow already shipped), or drop it until delivery lands. Kept unchanged here. |
+| `permissions/post_notifications` | Android 13+ runtime permission, asked contextually when the player opts in to reminders | needed: reminders are delivered by the ScrubbotsNotify plugin (SB-M43-172) in builds with the input `local_notifications`; builds without it still ask but deliver nothing. Not a data-collection permission and not a Data safety item. |
+
+The ScrubbotsNotify AAR adds no permission: `setAndAllowWhileIdle` needs none (no
+`SCHEDULE_EXACT_ALARM` / `USE_EXACT_ALARM`), and there is no `RECEIVE_BOOT_COMPLETED` (a reboot
+drops the reminder; the next app close schedules it again). Its manifest declares `uses-sdk` so the
+merger adds no implied legacy permissions, and its receiver is not exported.
 
 No `INTERNET`, location, camera, microphone, contacts, storage, phone-state or account
 permission. Godot's export adds no other dangerous permission. Advertising ID permission
@@ -134,14 +140,15 @@ permission. Godot's export adds no other dangerous permission. Advertising ID pe
 ### iOS (`.github/workflows/ios-ipa.yml` preset)
 
 No `privacy/*` usage descriptions, no `capabilities/*`, no extra Info.plist content: the
-build asks for no protected resource. Godot 4.3+ writes a `PrivacyInfo.xcprivacy` for the
+build asks for no protected resource. Local notifications (ScrubbotsNotify, input
+`local_notifications`) need no usage description and no push capability; the OS prompt comes
+only after the in-game explainer. Godot 4.3+ writes a `PrivacyInfo.xcprivacy` for the
 engine's required-reason APIs (file timestamps, system boot time, disk space, UserDefaults);
 **unverified**: confirm it is present in the exported Xcode project before App Store
 submission (SB-M58 follow-up for the release build).
 
 Planned iOS additions: `NSUserTrackingUsageDescription` + ATT prompt only if personalised ads
-use IDFA (SB-M58-009), SKAdNetwork ids from AdMob, Game Center / iCloud entitlements,
-notification authorization (SB-M43-171).
+use IDFA (SB-M58-009), SKAdNetwork ids from AdMob, Game Center / iCloud entitlements.
 
 ## 4. Collection hygiene review (SB-M58-003)
 
@@ -152,15 +159,15 @@ Checked 2026-11-06 on `main`:
 | Network calls in game scripts/scenes | only the disabled remote-content transport (above) |
 | Device identifiers (`OS.get_unique_id`, model, locale sent anywhere) | none used |
 | Free-text analytics params / PII | impossible by schema (`docs/ANALYTICS_TAXONOMY_V1.md`, `pii_scan` case in `tests/m56_analytics_taxonomy.gd`) |
-| Unused permissions | none collect data; `post_notifications` flagged above for an owner choice |
+| Unused permissions | none collect data; `post_notifications` delivers reminders only in builds with the `local_notifications` input |
 | Editor-only Godot AI plugin in builds | not tracked, not in CI builds; now guarded by the test |
 | Dev/test trees in builds | excluded and scanned by the export workflows |
 | Debug logs with device info | `OPENING_METRICS` holds OS name and screen size only, local log, used for device validation; kept |
 
 No code change was needed: nothing collects more than gameplay needs.
 
-Needs an owner decision (not changed): `post_notifications` without delivery; the licences
-screen (SB-M59-010).
+Needs an owner decision (not changed): the licences screen (SB-M59-010). Open until the
+`local_notifications` input is the default: builds without it still ask `post_notifications` but deliver nothing.
 
 ## 5. Store declarations, DRAFT (SB-M58-005)
 

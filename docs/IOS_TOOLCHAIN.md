@@ -19,6 +19,11 @@ How Scrubbots is built for iOS and installed on the owner's iPhone. The only bui
   `build/ios/<build_type>/ScrubBots-iOS-<build_type>-v<version>-b<build>.ipa` (SB-M59,
   `docs/RELEASE_BUILDS.md`) -> scan the PCK inside the IPA (`.github/android/pck_probe`,
   verdict=PASS) -> headless boot of that PCK (`--main-pack`, no missing resources / script errors).
+- Optional input `local_notifications` (default `false`, SB-M43-171/172): builds the
+  ScrubbotsNotify GDExtension (`native/ios/scrubbots_notify`, UNUserNotificationCenter
+  permission + one local reminder) into `res://bin/` before the import; details in
+  `docs/RELEASE_BUILDS.md`. Its load error on the macOS import / headless boot (no macOS library)
+  is filtered out of those two gates.
 - Artifacts: `ScrubBots-iOS-<build_type>-v<version>-b<build>.ipa` (the IPA) and
   `ScrubBots-iOS-<build_type>-ipa-inspection` (import/export logs, SHA-256, PCK scan report).
 

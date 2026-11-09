@@ -40,6 +40,34 @@ Release:
 - The release APK is an APK, not an AAB. Google Play needs an AAB (Gradle build template);
   that belongs to the store-release work, which stays with the owner.
 
+## Local reminders (SB-M43-171/172, input `local_notifications`)
+
+Both workflows take a boolean input `local_notifications` (default `false`). Off, every build is
+exactly the earlier one. On, the build includes the ScrubbotsNotify native code (own code, no
+third-party SDK, no push server):
+
+- Android: `native/android/scrubbots_notify/build_aar.py` compiles the plugin with `javac`
+  against the SDK's `android.jar` and the Godot classes from the export templates'
+  `android_source.zip` (no Gradle project, no downloads) into
+  `addons/scrubbots_notify/android/scrubbots_notify.aar`. The run then switches the preset to
+  `gradle_build/use_gradle_build=true`, enables `addons/scrubbots_notify/plugin.cfg` in
+  `project.godot` and installs the Android build template (`--install-android-build-template`),
+  because Godot adds Android plugins only to Gradle builds. Package, signing key and version
+  stay the same, so the APK installs over the earlier one and keeps the save.
+- iOS: the run dumps `gdextension_interface.h` from the same Godot, compiles
+  `native/ios/scrubbots_notify/scrubbots_notify.m` into `bin/libscrubbots_notify.dylib` with the
+  iPhoneOS SDK and copies `scrubbots_notify.gdextension` next to it before the import, so the
+  export embeds it. The `Scrubbots` export / Xcode / binary basename is unchanged.
+
+```
+gh workflow run android-family-first10.yml -f mode=apk_only -f build_type=debug -f local_notifications=true
+gh workflow run ios-ipa.yml -f build_type=debug -f local_notifications=true
+```
+
+Not verified yet: neither path has run in CI or on a device (the Gradle build, the GDExtension
+compile and load, the OS prompt and the delivered reminder). The game side
+(`scripts/economy/local_notifications.gd`) is a no-op whenever the native class is absent.
+
 ## Versioning (single source)
 
 `data/config/app_version.json` is the only place a version lives:
