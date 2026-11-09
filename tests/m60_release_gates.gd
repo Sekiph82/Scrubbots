@@ -30,7 +30,7 @@ const MainScript = preload("res://scripts/app/main.gd")
 const AppStateScript = preload("res://scripts/app/app_state.gd")
 const NavigationController = preload("res://scripts/app/navigation_controller.gd")
 const NotificationPolicy = preload("res://scripts/economy/notification_policy.gd")
-const RewardedAdProvider = preload("res://scripts/economy/rewarded_ad_provider.gd")
+const AdProvider = preload("res://scripts/economy/ad_provider.gd")
 const StoreProvider = preload("res://scripts/economy/store_provider.gd")
 const RealPlayDriver = preload("res://scripts/gameplay/solver/real_play_driver.gd")
 const LevelCatalog = preload("res://scripts/data/level_catalog.gd")
@@ -436,8 +436,8 @@ func _g004() -> void:
 	var home = _root.get_home()
 	var e = app.economy
 	var prov = e.rewarded.get_provider()
-	_check(g, "no_provider", prov != null and prov.get_script() == RewardedAdProvider and not prov.is_available("rewarded_heart"),
-		"rewarded provider is the production default RewardedAdProvider (no SDK): every placement unavailable")
+	_check(g, "no_provider", prov != null and prov.get_script() == AdProvider and e.ads.get_provider() == prov and not prov.is_available("rewarded_heart"),
+		"ad provider (banner / interstitial / rewarded) is the production default null AdProvider (no SDK): every placement unavailable")
 	var snap := [e.wallet.scrub_bucks(), e.hearts.hearts()]
 	home.get_region("Shortcut_shop").pressed.emit()
 	await _frames(3)

@@ -98,7 +98,7 @@
       "checks": [
         {
           "check": "no_provider",
-          "evidence": "rewarded provider is the production default RewardedAdProvider (no SDK): every placement unavailable",
+          "evidence": "ad provider (banner / interstitial / rewarded) is the production default null AdProvider (no SDK): every placement unavailable",
           "result": "PASS"
         },
         {

@@ -358,6 +358,7 @@ func _econ(eco) -> Dictionary:
 	var s: Dictionary = eco.snapshot()
 	s["hearts"].erase("anchor")
 	s["speed"].erase("clock_high_water")
+	s.erase("ads")   # SB-M57-001: every finished level counts as a play (ad cadence, not a reward)
 	return s
 
 ## Shown reward-row texts (C001B rows are icon+text cards; see ResultsScreen.shown_row_texts).

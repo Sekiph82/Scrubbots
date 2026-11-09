@@ -14,6 +14,7 @@ const AppState = preload("res://scripts/app/app_state.gd")
 const RewardedDailyService = preload("res://scripts/economy/rewarded_daily_service.gd")
 const RewardedGrantService = preload("res://scripts/economy/rewarded_grant_service.gd")
 const RewardedAdProvider = preload("res://scripts/economy/rewarded_ad_provider.gd")
+const AdProvider = preload("res://scripts/economy/ad_provider.gd")
 const UiText = preload("res://scripts/ui/ui_text.gd")
 const SettingsPanel = preload("res://scripts/ui/settings_panel.gd")
 const BasePopup = preload("res://scripts/ui/popup/base_popup.gd")
@@ -124,7 +125,7 @@ func _r03() -> void:
 	print("[r03 production default provider stays honestly unavailable: nothing granted]")
 	var a = _app("r03")
 	var e = a.economy
-	_ok(e.rewarded.get_provider().get_script() == RewardedAdProvider, "default provider = base RewardedAdProvider (M57 not wired)")
+	_ok(e.rewarded.get_provider().get_script() == AdProvider, "default provider = the null AdProvider (no ad SDK wired)")
 	a.actions.claim_rewarded_daily_free()
 	var applied0: int = e.reward.applied_transaction_count()
 	var reasons: Array = []

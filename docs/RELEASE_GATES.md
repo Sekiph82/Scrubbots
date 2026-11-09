@@ -42,7 +42,7 @@ Release ready: **NO**
 
 ## SB-M60-004: PASS
 
-- PASS `no_provider`: rewarded provider is the production default RewardedAdProvider (no SDK): every placement unavailable
+- PASS `no_provider`: ad provider (banner / interstitial / rewarded) is the production default null AdProvider (no SDK): every placement unavailable
 - PASS `shop_store_gated`: Shop five SCRUB BUCKS packs + NO ADS: UNAVAILABLE / 'Available when the store opens.', press opens no confirm; store provider = null StoreProvider, RESTORE disabled
 - PASS `sb_plus_gated`: Home SB + popup: SB pack UNAVAILABLE and inert
 - PASS `life_video_gated`: Life popup FREE video blocked with no provider; press grants no Heart (4)
