@@ -190,7 +190,7 @@ const TR := {
 	"BOOSTER_USE_OWNED": "KULLAN (%s SENDE)",
 	"BOOSTER_USE_SB": "KULLAN · %s SB",
 	"BOOSTER_PRICE_SB": "%s SB",
-	"BOOSTER_LOCKED_LEVEL": "BÖL %d",
+	"BOOSTER_LOCKED_LEVEL": "BL %d",
 	"BOOSTER_NOT_USED": "Şu an kullanılamadı. Hiçbir şey harcanmadı.",
 	"BOOSTER_CHARGE_SAVED": "Güçlendirici saklandı! Uygun anda kullan.",
 	"RESULTS_CLEAN_NEXT": "SIRADAKİNİ TEMİZLE",
