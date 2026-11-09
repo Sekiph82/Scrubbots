@@ -721,10 +721,13 @@ func _drive_economy_terminal(status) -> void:
 		# M43-C009R: a committed progression win advances today's Daily Scrub Orders
 		# (saved by the terminal boundary below). Losses / replays never count.
 		if bool(last_first_clear_result.get("ok", false)):
-			_economy.orders.on_level_won({"level": progression_level,
+			var orders_done: Array = _economy.orders.on_level_won({"level": progression_level,
 				"difficulty": String(last_first_clear_result.get("difficulty", "")),
 				"boosters_used": _attempt_boosters,
 				"cells": _board.get_artwork_cell_count() if _board != null else 0})
+			for i in orders_done:   # SB-M56-020
+				var o: Dictionary = _economy.orders.orders()[i]
+				_track("daily_order_done", {"tier": o["tier"], "metric": o["metric"], "target": o["target"]})
 			catchup = _meta_terminal(true)
 	elif status == CompletionEvaluator.LOST:
 		_economy_terminal_done = true
@@ -898,8 +901,34 @@ func terminal_context() -> Dictionary:
 ## Catch-Up steps this win granted (Results receipt).
 func _meta_terminal(won: bool) -> Array:
 	var r: Dictionary = _economy.records.on_progression_terminal(progression_level, won, _attempt_boosters, _economy.streak.streak())
+	var ev_before: Array = [_economy.events.list(), _economy.events.first_try()]
 	_economy.events.on_progression_terminal(won, bool(r["first_try"]))
-	return _economy.returns.on_first_clear_win(_economy.reward) if won else []
+	_track_event_progress(ev_before, won, bool(r["first_try"]))
+	var catchup: Array = _economy.returns.on_first_clear_win(_economy.reward) if won else []
+	for c in catchup:   # SB-M56-022
+		_track("catchup_step", {"step": int(c["step"]) + 1, "complete": int(c["step"]) + 1 == int(c["steps"])})
+	return catchup
+
+## SB-M56-021: what this progression terminal did to the Weekly events (joined = first
+## counted win, milestones reached) and to a joined First-Try run (advanced / completed /
+## reset with the run depth it had). `before` = [events.list(), events.first_try()] before it.
+func _track_event_progress(before: Array, won: bool, first_try_attempt: bool) -> void:
+	for v in _economy.events.list():
+		var was := 0
+		for b in before[0]:
+			if b["id"] == v["id"]:
+				was = int(b["progress"])
+		if was == 0 and int(v["progress"]) > 0:
+			_track("weekly_event", {"step": "joined", "milestone": 0})
+		for i in range(v["milestones"].size()):
+			if was < int(v["milestones"][i]["target"]) and v["milestones"][i]["reached"]:
+				_track("weekly_event", {"step": "milestone_reached", "milestone": i + 1})
+	var f: Dictionary = before[1]
+	if f.is_empty() or not f["joined"] or f["complete"] or not first_try_attempt:
+		return
+	var now_f: Dictionary = _economy.events.first_try()
+	_track("first_try", {"step": ("completed" if now_f["complete"] else "advanced") if won else "reset",
+		"run": int(now_f["run"]) if won else int(f["run"])})
 
 ## M43-C009R: committed booster actions in the current attempt (reset per attempt / Retry).
 func get_attempt_boosters_used() -> int:

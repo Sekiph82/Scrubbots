@@ -557,6 +557,7 @@ static func open_ranks(stack, app) -> BasePopup:
 	if not stack.push(p):
 		p.free()
 		return null
+	app.analytics.track("ranks_view", {"table": "all_time", "band": int(r["index"]) + 1 if not r.is_empty() else 0})   # SB-M56-011
 	return p
 
 # --------------------------------------------------------------- COMEBACK ----

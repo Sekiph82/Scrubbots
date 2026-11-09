@@ -250,7 +250,9 @@ func unlock_next_robot() -> Dictionary:
 func claim_event_milestone(event_id: String, index: int) -> Dictionary:
 	if not feature_unlocked("events"):
 		return _locked("claim_event_milestone", "events")
-	return _finish("claim_event_milestone", _economy.events.claim_weekly(event_id, index, _economy.reward))
+	var r: Dictionary = _economy.events.claim_weekly(event_id, index, _economy.reward)
+	r["milestone"] = index   # presentation / analytics identity copied from the input
+	return _finish("claim_event_milestone", r)
 
 func join_first_try() -> Dictionary:
 	if not feature_unlocked("events"):

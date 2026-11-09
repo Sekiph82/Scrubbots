@@ -206,7 +206,7 @@ func _ready() -> void:
 		meta_feel.bind(feel, _modals, ceremonies, app_state.actions, app_state.economy.rewarded, app_state.effects)
 	# M43-C012: a genuine absence opens a return window (summary shown once on Home).
 	if app_state != null and app_state.economy != null and not app_state.is_blocked:
-		app_state.economy.returns.on_active()
+		_track_return_window(app_state.economy.returns.on_active())
 		app_state.mark_dirty()
 	ceremonies.idle.connect(func(src):
 		if src == "results" and _results != null:
@@ -302,6 +302,7 @@ func _on_route_changed(_from: int, to: int, _payload: Dictionary) -> void:
 			if String(_payload.get("status", "")) == "LOST":
 				_offer_need_a_hand()
 			elif String(_payload.get("status", "")) == "WON":
+				_track_results_momentum()
 				_begin_results_ceremonies()
 	# M44: the compulsory window settles by L3 Results (frontier past max level), and the
 	# coachmark follows the route at once (never left over a Results / Opening screen).
@@ -361,6 +362,26 @@ func _results_model(payload: Dictionary) -> Dictionary:
 	# M43-C008 (SB-M43-108): the active robot's approved victory / help pose (presentation only).
 	m["robot_id"] = app_state.economy.robots.active_robot() if app_state != null and app_state.economy != null else ""
 	return m
+
+## SB-M56-017/018: a WON Results shows its journey node and the Next Cleanup teaser state.
+func _track_results_momentum() -> void:
+	var m: Dictionary = _results.get_model()
+	var mo: Dictionary = m.get("momentum", {})
+	if not bool(mo.get("ok", false)):
+		return
+	var j: Dictionary = mo["journey"]
+	if bool(j.get("ok", false)):
+		_track("journey_progress", {"slot": j["slot"], "cycle": j["cycle"], "cycle_complete": j["slot"] == j["length"],
+			"first_clear": bool(m["receipt"].get("first_clear", false))})
+	var nx: Dictionary = mo["next"]
+	_track("next_cleanup_shown", {"available": nx["available"], "image": nx["image_ok"], "reason": "ok" if nx["available"] else nx["reason"]})
+
+## SB-M56-022: a genuine absence opened a return window (Catch-Up offered when configured).
+## Returns whether it opened.
+func _track_return_window(r: Dictionary) -> bool:
+	if r["opened"]:
+		_track("comeback_window", {"catchup_offered": not app_state.economy.returns.catchup().is_empty()})
+	return r["opened"]
 
 ## Share one validated momentum config with Results (via _results_model) and Home.
 func set_momentum_config(cfg: Dictionary) -> void:
@@ -857,7 +878,13 @@ func _terminal_bridge(host, status: String) -> void:
 ## accepted launch per Results: the first success leaves RESULTS, so every later/rapid
 ## call is refused. attempt (from ResultsScreen) must match the shown Results attempt,
 ## so a stale Continue from an earlier Results can never launch. Never grants rewards.
+## SB-M56-017: every request is one next_cleanup_tap (ok / refusal reason).
 func continue_from_results(attempt: int = -1) -> Dictionary:
+	var r := _continue_from_results(attempt)
+	_track("next_cleanup_tap", {"ok": bool(r.get("ok", false)), "reason": "ok" if r.get("ok", false) else String(r.get("reason", ""))})
+	return r
+
+func _continue_from_results(attempt: int) -> Dictionary:
 	if nav.current() != NavigationController.Route.RESULTS:
 		return {"ok": false, "reason": "not_results"}
 	var shown: Dictionary = nav.last_payload()
@@ -1020,7 +1047,7 @@ func _notification(what: int) -> void:
 				app_state.analytics.start_session("foreground")
 			if app_state != null and app_state.economy != null:
 				app_state.economy.local_notify.on_app_open()
-			if app_state != null and app_state.economy != null and not app_state.is_blocked and app_state.economy.returns.on_active()["opened"]:
+			if app_state != null and app_state.economy != null and not app_state.is_blocked and _track_return_window(app_state.economy.returns.on_active()):
 				request_home_ceremonies()
 		NOTIFICATION_APPLICATION_FOCUS_OUT:
 			flush_lifecycle("focus_out")

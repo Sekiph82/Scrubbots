@@ -182,7 +182,7 @@ func _on_wallet_changed(resource: String, delta: int, tag: String) -> void:
 ## SB-M56-008: Collection set / Master completion (their reward grants are applied exactly once).
 func _on_reward_granted(tx_id: String) -> void:
 	if tx_id.begins_with("collection_set:"):
-		analytics.track("collection_set_complete", {"set": int(tx_id.get_slice(":", 1))})
+		analytics.track("collection_set_complete", {"set": int(tx_id.get_slice(":", 1)), "level": progression.current_level()})
 	elif tx_id == "collection_master":
 		analytics.track("collection_master_complete")
 
@@ -197,6 +197,14 @@ func _on_action_committed(action: String, r: Dictionary) -> void:
 		analytics.track("robot_unlock", {"robot": RobotRoster.ids().find(String(r.get("robot_id", ""))) + 1})
 	elif action == "equip_robot":
 		analytics.track("robot_equip", {"robot": RobotRoster.ids().find(String(r.get("active", ""))) + 1})
+	elif action == "claim_daily_task":   # SB-M56-020
+		analytics.track("daily_order_claim", {"tier": economy.orders.orders()[int(r["task_index"])]["tier"]})
+	elif action == "claim_daily_all_tasks":
+		analytics.track("daily_order_claim", {"tier": "scrubbox"})
+	elif action == "claim_event_milestone":   # SB-M56-021
+		analytics.track("weekly_event", {"step": "milestone_claimed", "milestone": int(r["milestone"]) + 1})
+	elif action == "join_first_try" or action == "claim_first_try":
+		analytics.track("first_try", {"step": "joined" if action == "join_first_try" else "claimed", "run": int(economy.events.first_try()["run"])})
 
 func _on_content_changed() -> void:
 	_catalog_orders.clear()
@@ -371,19 +379,22 @@ func is_bootstrap_pending() -> bool:
 func commit_pack(kind: String, tx_id: String) -> Dictionary:
 	if is_blocked:
 		return {"ok": false, "reason": "app_blocked"}
+	var pity_due: bool = economy.pack_pity.guarantee_due(economy.collection)
 	var r: Dictionary = PackCommitTransaction.commit(economy, kind, tx_id, Callable(self, "request_save"))
 	if bool(r.get("ok", false)) and not bool(r.get("replay", false)):
-		_track_pack(kind, r["receipt"]["cards"])
+		_track_pack(kind, r["receipt"]["cards"], pity_due)
 	return r
 
-## SB-M56-008: one committed (not replayed) pack opening: new / duplicate counts, best rarity.
-func _track_pack(kind: String, cards: Array) -> void:
+## SB-M56-008/019: one committed (not replayed) pack opening: new / duplicate counts, best
+## rarity, whether the pity guarantee was due for it and the dry streak after it (pity count).
+func _track_pack(kind: String, cards: Array, pity_due: bool) -> void:
 	var fresh := cards.filter(func(c): return bool(c["is_new"])).size()
 	var best := 0
 	for c in cards:
 		best = maxi(best, CollectionInventory.RARITY_ORDER.find(String(c["rarity"])))
 	analytics.track("pack_opened", {"kind": kind, "new_cards": analytics.bucket("count", fresh),
-		"duplicates": analytics.bucket("count", cards.size() - fresh), "best_rarity": CollectionInventory.RARITY_ORDER[best]})
+		"duplicates": analytics.bucket("count", cards.size() - fresh), "best_rarity": CollectionInventory.RARITY_ORDER[best],
+		"pity": pity_due, "dry_streak": analytics.bucket("count", economy.pack_pity.count())})
 
 ## M43-C005F-PHASE2-R01: open the pending EARNED pack `id` through the canonical commit (its
 ## kind comes from the durable queue entry; the entry id is the pack tx / presentation id).
