@@ -83,7 +83,7 @@ no ads, no purchases, no analytics provider, no crash reporter. The only network
 
 | Path | Written by | Contents | Leaves device? |
 |---|---|---|---|
-| `user://scrubbots_save.dat` (+ temp/backup siblings) | `scripts/save/save_service.gd` via `scripts/app/app_state.gd` | settings (volumes, haptics, Reduced Effects, color symbols), level progression, economy (wallet, hearts, boosters, collection cards/packs, daily/orders, events, records, gift/streak, notification preferences and quiet hours, permission ask/decline timestamps, the time of the one scheduled local reminder, FTUE flags). In-game pack "receipts" are internal reward transactions, not store purchases. Timestamps are device clock values used for timers. No name, email, device id or location. | No |
+| `user://scrubbots_save.dat` (+ temp/backup siblings) | `scripts/save/save_service.gd` via `scripts/app/app_state.gd` | settings (volumes, haptics, Reduced Effects, color symbols), level progression, economy (wallet, hearts, boosters, collection cards/packs, daily/orders, events, records, the weekly Ranks count with its week start, gift/streak, notification preferences and quiet hours, permission ask/decline timestamps, the time of the one scheduled local reminder, FTUE flags). In-game pack "receipts" are internal reward transactions, not store purchases. Timestamps are device clock values used for timers. No name, email, device id or location. | No |
 | `user://analytics_v1.json` | `scripts/app/analytics_service.gd` | `version`, `consent` (default false), first consented local day, retention markers sent. No events are stored (NullSink). | No |
 | `user://audio_settings.cfg` | `scripts/audio/audio_settings_service.gd` | legacy M33 volume file, read once for migration into the save | No |
 | `user://haptics_settings.cfg` | `scripts/haptics/haptics_settings_service.gd` | haptics on/off (standalone service default path) | No |
@@ -122,7 +122,7 @@ params only, no ids or timestamps. In the current build no event is stored or se
 | `next_cleanup_shown`, `next_cleanup_tap`, `journey_progress` | teaser available / image flags, refusal reason, journey slot / cycle number, first-clear flag |
 | `daily_order_done`, `daily_order_claim` | order tier, metric, target number |
 | `weekly_event`, `first_try`, `comeback_window`, `catchup_step` | step, milestone number, run depth, Catch-Up offered flag, step number |
-| `ranks_view` | table (all-time), rank band number |
+| `ranks_view` | table (all-time / weekly), rank band number |
 
 ## 3. Permissions (SB-M58-002/003)
 

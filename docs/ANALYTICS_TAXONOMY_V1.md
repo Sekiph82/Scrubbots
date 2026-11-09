@@ -83,7 +83,7 @@ Not sent: transaction ids, tokens and receipts (forbidden names; the ad result o
 | `first_try` | 021 | `AppState` on `join_first_try` / `claim_first_try`; host progression terminal on a first attempt of a joined run (advanced / completed / reset) | step (joined, advanced, completed, reset, claimed), run (depth after the win, or the depth a first-attempt loss reset) |
 | `comeback_window` | 022 | `main.gd` boot / OS resume when `ReturnService.on_active` opens a return window | catchup_offered (a Catch-Up track runs for the window) |
 | `catchup_step` | 022 | host first-clear win (`ReturnService.on_first_clear_win` grants) | step (1..3), complete (the last step) |
-| `ranks_view` | 011 | `ProfileScreens.open_ranks` | table (all_time; `weekly` is declared for a weekly table but not sent: the RANKS screen is the personal all-time ladder only), band (1-based rank tier, 0 = ladder unavailable) |
+| `ranks_view` | 011 | `ProfileScreens.open_ranks` | table (`all_time` when the screen opens, `weekly` / `all_time` on each RANKS tab switch, SB-M43-131/132), band (the player's 1-based personal rank tier on either table, 0 = ladder unavailable) |
 
 No ids leave: weekly events, orders and cards are described by small ints and enums, never by their config ids.
 
