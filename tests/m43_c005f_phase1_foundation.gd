@@ -279,7 +279,7 @@ func _a01() -> void:
 	for p in _gd_files("res://scripts"):
 		if String(p).ends_with("feel/feedback_adapter.gd"):
 			continue
-		var code := _code(p)
+		var code := _code(p).replace("res://addons/game_feel_flow/LICENSE", "").replace("res://addons/saltmire_spark/LICENSE.txt", "")   # SB-M59 Credits shows the plugin licence texts
 		for w in PLUGIN_WORDS:
 			if code.contains(w):
 				hits.append("%s:%s" % [String(p).get_file(), w])

@@ -498,7 +498,7 @@ func _b01() -> void:
 	for f in _gd("res://scripts"):
 		if f == "res://scripts/ui/feel/feedback_adapter.gd":
 			continue
-		var s := FileAccess.get_file_as_string(f)
+		var s := FileAccess.get_file_as_string(f).replace("res://addons/game_feel_flow/LICENSE", "").replace("res://addons/saltmire_spark/LICENSE.txt", "")   # SB-M59 Credits shows the plugin licence texts
 		if PLUGIN_WORDS.any(func(w): return s.contains(w)):
 			offenders.append(f)
 	_ok(offenders.is_empty(), "no production script outside FeedbackAdapter names a plugin %s" % str(offenders))

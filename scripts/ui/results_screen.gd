@@ -735,20 +735,21 @@ func _feel_id() -> String:
 func _feel_reduced() -> bool:
 	return bool(_model.get("reduced_effects", false)) or (_feel != null and _feel.reduced())
 
-## Run `f` once the nested containers have settled (the robot slot's rect stops moving; at most
-## SETTLE_FRAMES frames), or now when outside the tree. The slot, not the robot: the robot's own
-## transform is animated by CharacterMotion and never settles while it plays.
+## Run `f` once the nested containers have settled (`watch`'s rect stops moving, default the robot
+## slot; at most SETTLE_FRAMES frames), or now when outside the tree. The slot, not the robot: the
+## robot's own transform is animated by CharacterMotion and never settles while it plays.
 const SETTLE_FRAMES := 8
-func _after_layout(f: Callable) -> void:
+func _after_layout(f: Callable, watch: Control = null) -> void:
 	if not is_inside_tree():
 		f.call()
 		return
-	var last := _robot_slot.get_global_rect()
+	var w: Control = watch if watch != null else _robot_slot
+	var last := w.get_global_rect()
 	for _i in range(SETTLE_FRAMES):
 		await get_tree().process_frame
-		if not is_instance_valid(self) or not is_inside_tree():
+		if not is_instance_valid(self) or not is_inside_tree() or not is_instance_valid(w):
 			return
-		var r := _robot_slot.get_global_rect()
+		var r := w.get_global_rect()
 		if r == last:
 			break
 		last = r
@@ -769,7 +770,14 @@ func _on_reveal_step(key: String, index: int) -> void:
 		return
 	if index >= _lines.get_child_count() or index >= ROW_FEEL_MAX:
 		return   # the momentum step (or rows beyond the bounded budget): no feel
+	# Row 0's step starts inside show_model(), before the rows are laid out: wait for its rect,
+	# so the burst lands on the row and not where it was before the first layout pass.
 	var row: Control = _lines.get_child(index)
+	_after_layout(_row_feel.bind(_feel_id(), index, row), row)
+
+func _row_feel(id: String, index: int, row: Control) -> void:
+	if _feel == null or not _victory or id != _feel_id() or not is_instance_valid(row) or row.get_parent() != _lines:
+		return
 	if not _feel_event("REWARD", row, _row_key(index, row)):
 		return
 	if not _feel_reduced():

@@ -433,7 +433,7 @@ func _s01() -> void:
 	for path in _gd_files("res://scripts"):
 		if path.ends_with("feedback_adapter.gd"):
 			continue
-		var src := FileAccess.get_file_as_string(path)
+		var src := FileAccess.get_file_as_string(path).replace("res://addons/game_feel_flow/LICENSE", "").replace("res://addons/saltmire_spark/LICENSE.txt", "")   # SB-M59 Credits shows the plugin licence texts
 		if src.contains("GameFeelFlow") or src.contains("\"Spark\"") or src.contains("/root/Spark") or src.contains("addons/saltmire_spark") or src.contains("addons/game_feel_flow"):
 			hits.append(path)
 	_ok(hits.is_empty() and FileAccess.get_file_as_string("res://scripts/app/main.gd").count("FeedbackAdapter.new()") == 1, "plugins reachable only through the single FeedbackAdapter %s" % str(hits))
