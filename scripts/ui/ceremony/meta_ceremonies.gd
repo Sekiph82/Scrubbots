@@ -70,6 +70,15 @@ static var set_video: VideoStream = load(SET_VIDEO_DIR + "set_complete_badge.ogv
 const REGION_VIDEO_DIR := "res://assets/ui/final/popups/new_region_video/"
 ## Injectable for tests (null = the world art alone, as on failure).
 static var region_video: VideoStream = load(REGION_VIDEO_DIR + "new_region_scrubby.ogv")
+## SB-VIDEO-010: each roster robot's keyed Flow signature video (robots/unlock_videos/PROVENANCE.md),
+## <id>_unlock.ogv, 5:6 crop with a soft edge fade, played in the Robot Unlock hero; still = keyed last frame.
+const CHROMA_KEY_BLUE := preload("res://scripts/ui/feel/chroma_key_blue.gdshader")
+const ROBOT_VIDEO_DIR := "res://assets/ui/final/robots/unlock_videos/"
+const ROBOT_VIDEO_SIZE := Vector2(400, 480)
+const ROBOT_VIDEO_EDGE := 0.06
+const ROBOT_VIDEO_KEY := {"bubbles": CHROMA_KEY_GREEN, "polly": CHROMA_KEY_GREEN, "clippy": CHROMA_KEY_BLUE}   # else magenta
+## Injectable for tests: robot id -> VideoStream overriding the file (null = the static roster art, as on failure).
+static var robot_video := {}
 
 ## One ceremony popup for a CeremonyEvents event, or null when the kind has no builder.
 static func build(event: Dictionary, reduced: bool = false):
@@ -155,7 +164,7 @@ static func _reward_rows(p: BasePopup, rewards: Dictionary, row_h: int = 84) -> 
 		h.add_child(l)
 	return v
 
-## Start the decorative glow turn (FULL) and a gift / set-complete hero or new-region video. Every label/value
+## Start the decorative glow turn (FULL) and a gift / set-complete / robot unlock hero or new-region video. Every label/value
 ## already exists, so Reduced Effects (no motion) shows exactly the same truth. Tweens are bound
 ## to the popup.
 static func start_motion(p: BasePopup) -> void:
@@ -172,6 +181,11 @@ static func start_motion(p: BasePopup) -> void:
 		var h := box.get_node("HeroArt") as TextureRect
 		if art == "set_complete":
 			play_hero_video(p, h, set_video, load(SET_VIDEO_DIR + "set_complete_badge_still.png"), SET_VIDEO_SIZE, CHROMA_KEY_MAGENTA, SET_VIDEO_EDGE)
+		elif art.begins_with("robot:"):
+			var id := art.substr(6)
+			var path := ROBOT_VIDEO_DIR + id + "_unlock"
+			var stream = robot_video[id] if robot_video.has(id) else (load(path + ".ogv") if ResourceLoader.exists(path + ".ogv") else null)
+			play_hero_video(p, h, stream, load(path + "_still.png") if ResourceLoader.exists(path + "_still.png") else null, ROBOT_VIDEO_SIZE, ROBOT_VIDEO_KEY.get(id, CHROMA_KEY_MAGENTA), ROBOT_VIDEO_EDGE)
 		else:
 			play_hero_video(p, h, gift_video.get(art), load(GIFT_VIDEO_DIR + art + "_opening_still.png"), GIFT_VIDEO_SIZE[art], CHROMA_KEY_GREEN)
 	for slot in p.find_children("WorldArtSlot", "PanelContainer", true, false):
@@ -184,7 +198,7 @@ static func start_motion(p: BasePopup) -> void:
 			slot.remove_child(r)
 			r.free()
 
-## SB-VIDEO-006..009, SB-POLISH-011B: one keyed VideoStreamPlayer over hero art `h` (its own texture hidden while
+## SB-VIDEO-006..010, SB-POLISH-011B: one keyed VideoStreamPlayer over hero art `h` (its own texture hidden while
 ## it plays), then `h` holds the keyed last frame `still` at `size`. A stream that is missing or
 ## does not start leaves `h` exactly as built. The decoder is freed when it finishes or the
 ## popup closes; it never blocks the rows or the CTA (mouse ignored, no input / economy touched).
@@ -281,7 +295,9 @@ static func robot_unlock(event: Dictionary, reduced: bool):
 	var name := String(r["name"]).to_upper()
 	var p := _popup("robot_unlock", "reward", UiText.t("CEREMONY_ROBOT_TITLE"), event)
 	p.context["robot_id"] = id
-	_hero(p, RobotRoster.asset(id, "master"), Vector2(330, 396), reduced, ART["robot_burst"])
+	var hero := _hero(p, RobotRoster.asset(id, "master"), Vector2(330, 396), reduced, ART["robot_burst"])
+	if not reduced:
+		hero.set_meta("video", "robot:" + id)   # SB-VIDEO-010: played by start_motion
 	p.add_body_line(name, "RobotName", BasePopup.ROYAL_EDGE, 52)
 	p.add_body_line(UiText.data("ROBOT_ROLE_" + id.to_upper(), String(r["role"])), "RobotRole", BasePopup.INK, 26)
 	var perk := PanelContainer.new()

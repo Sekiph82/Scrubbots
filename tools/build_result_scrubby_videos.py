@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""SB-VIDEO-001/002/005/006/007/008/009, SB-POLISH-011B: Results WIN / LOSE, Level Intro Scrubby, Gift Meter box,
-Collection set complete badge, Welcome back, New region and Need a Hand Scrubby videos from the owner's Flow masters.
+"""SB-VIDEO-001/002/005/006/007/008/009/010, SB-POLISH-011B: Results WIN / LOSE, Level Intro Scrubby, Gift Meter box,
+Collection set complete badge, Welcome back, New region, Need a Hand Scrubby and robot unlock videos from the owner's Flow masters.
 
 For each master (720x1280, magenta chroma background) this crops every frame to the robot's
 bounding box over ALL frames plus a margin, encodes Theora .ogv (magenta kept; the Results
@@ -16,6 +16,9 @@ frame (the open glowing box the popup holds after playback).
 set_complete: magenta like results, but a fixed square crop (badge + star burst) with the same soft
 edge fade (chroma_key_magenta.gdshader edge_fade uniform) and the LAST frame (glowing badge) as still.
 welcome_back, new_region, need_a_hand: exactly like results (bbox crop, no fade) except the still is the LAST frame.
+robots: one video per roster robot on a MAGENTA, GREEN or BLUE background (ROBOT_KEY; blue is keyed by
+chroma_key_blue.gdshader); crop = 5:6 box around everything that is foreground in >= 5 % of the frames (robot,
+tool swings, recurring bubbles / water / sparkles), soft edge fade for the bursts it cuts, still = LAST frame.
 
 Usage: python tools/build_result_scrubby_videos.py <flow_videos dir> [results|level_start|gift]
   results      result_scrubby_{win,lose}_master.mp4 -> assets/ui/final/popups/videos/ (default)
@@ -25,6 +28,7 @@ Usage: python tools/build_result_scrubby_videos.py <flow_videos dir> [results|le
   welcome_back welcome_back_master.mp4 -> assets/ui/final/popups/welcome_video/
   new_region   new_region_master.mp4 -> assets/ui/final/popups/new_region_video/
   need_a_hand  need_a_hand_master.mp4 -> assets/ui/final/popups/need_a_hand_video/
+  robots       robot_<id>_master.mp4 -> assets/ui/final/robots/unlock_videos/<id>_unlock.ogv
 """
 import hashlib
 import subprocess
@@ -108,12 +112,36 @@ SETS = {
                      "0-181 are used (the last 8 frames dim the eyes and fade the \"?\" out, so the hold pose is frame",
                      "181). The MP4 master stays in the owner checkout (`flow_videos/`, not committed) and is read-only.", "",
                      "Built by `python tools/build_result_scrubby_videos.py flow_videos need_a_hand` (ffmpeg libtheora,"]),
+    "robots": (Path("assets/ui/final/robots/unlock_videos"),
+               [(r, f"robot_{r}_master.mp4", f"{r}_unlock") for r in
+                ("scrubby", "moppy", "bubbles", "spark", "squeegee", "dusty", "rinse", "polly", "clippy", "atlas")],
+               ["# Robot unlock signature videos: provenance (SB-VIDEO-010)", "",
+                "Owner Flow videos (Google Flow, Veo 3.1 Lite, Frames to Video from the",
+                "`flow_start_frame_robot_<id>_<key>_1080x1920.png` start frames, prompts in",
+                "`flow_videos/ROBOT_VIDEO_PROMPTS.md`): each roster robot powers on and does its signature move,",
+                "720x1280, 24 fps, 190 frames. Background per robot (ROBOT_KEY): magenta drifting from ~#F802FA",
+                "towards ~#DE2BCD (scrubby ends ~#C843B1), flat green ~#01FD04 (bubbles, polly), or blue drifting",
+                "from ~#0003F8 to ~#0F1FAB (clippy). The MP4 masters stay in the owner checkout (`flow_videos/`, not",
+                "committed) and are read-only.", "",
+                "Built by `python tools/build_result_scrubby_videos.py flow_videos robots` (ffmpeg libtheora, numpy,",
+                "Pillow). Crop = 5:6 box (the Robot Unlock hero aspect) around every pixel that is foreground in",
+                ">= 5 % of the frames (robot, tool swings, recurring bubbles / water / sparkles) + 16 px, clamped to",
+                "the frame (shifted to keep the robot body inside), then scaled to 480x576 (lanczos); short",
+                "full-frame bursts (sparkle rain, speed lines) the crop cuts fade out over 6 % of each side.",
+                "The .ogv keeps the background colour (keyed at runtime by",
+                "`scripts/ui/feel/chroma_key_{magenta,green,blue}.gdshader`, edge fade 0.06); the still is the",
+                "LAST frame used, keyed to transparent with the same key at build time (the hold pose).", ""]),
 }
+ROBOT_KEY = {"bubbles": "green", "polly": "green", "clippy": "blue"}   # every other robot: magenta
 W, H = 720, 1280
 MARGIN = 16
 KEY_LO, KEY_HI = 0.15, 0.45   # keep in sync with chroma_key_magenta.gdshader / chroma_key_green.gdshader
 TRIM = {"set_complete": 182,  # frames kept: the master's last 8 frames dissolve the wings and turn the gold copper
-        "need_a_hand": 182}   # the last 8 frames dim the eyes and fade the "?" out
+        "need_a_hand": 182,   # the last 8 frames dim the eyes and fade the "?" out
+        "polly": 180,         # the last 10 frames power the face screen down and blur the polisher away
+        "spark": 185}         # the last 5 frames swing the brush down and morph its head
+ROBOT_OUT = (480, 576)        # robots: every crop is scaled to this (>= the 400x480 hero box, keeps the APK small)
+BLUE_LO, BLUE_HI = 0.30, 0.45 # keep in sync with chroma_key_blue.gdshader (purple armour stays below B - max(R, G) 0.3)
 EDGE = 0.06                   # gift / set_complete edge fade (UV fraction per side), keep in sync with the shaders
 
 
@@ -171,6 +199,34 @@ def key_green(rgb: np.ndarray) -> np.ndarray:
     return (np.dstack([c, a]) * 255.0 + 0.5).clip(0, 255).astype(np.uint8)
 
 
+def key_blue(rgb: np.ndarray, edge: float) -> np.ndarray:
+    """Blue -> alpha (soft edge) + despill: B clamped to max(R, G) + BLUE_LO (purple stays purple), x the edge fade."""
+    c = rgb.astype(np.float32) / 255.0
+    m = c[..., 2] - np.maximum(c[..., 0], c[..., 1])
+    c[..., 2] -= np.maximum(m - BLUE_LO, 0.0)
+    a = (1.0 - smoothstep(BLUE_LO, BLUE_HI, m)) * fade(m.shape, edge)
+    return (np.dstack([c, a]) * 255.0 + 0.5).clip(0, 255).astype(np.uint8)
+
+
+def robot_box(f: np.ndarray, k: str) -> tuple[int, int, int, int]:
+    """5:6 box (multiples of 20 x 24) around what is foreground in >= 5 % of the frames + MARGIN, clamped to the
+    frame; when that is too big, it is shifted to keep the robot body (foreground in >= 30 % of the frames) inside."""
+    fg = np.zeros((H, W), np.int32)
+    for c in f:
+        c = c.astype(np.int16)
+        m = {"magenta": np.minimum(c[..., 0], c[..., 2]) - c[..., 1], "green": c[..., 1] - np.maximum(c[..., 0], c[..., 2]),
+             "blue": c[..., 2] - np.maximum(c[..., 0], c[..., 1])}[k]
+        fg += m <= 80
+    ys, xs = np.where(fg >= 0.05 * len(f))
+    x0, x1, y0, y1 = xs.min() - MARGIN, xs.max() + MARGIN, ys.min() - MARGIN, ys.max() + MARGIN
+    w = min(W, int(-(-max(x1 - x0 + 1, (y1 - y0 + 1) * 5 / 6) // 20)) * 20)
+    h = w * 6 // 5
+    bys, bxs = np.where(fg >= 0.3 * len(f))
+    x = min(max(0, bxs.max() + MARGIN + 1 - w, min((x0 + x1 + 1 - w) // 2, bxs.min() - MARGIN)), W - w)
+    y = min(max(0, bys.max() + MARGIN + 1 - h, min((y0 + y1 + 1 - h) // 2, bys.min() - MARGIN)), H - h)
+    return int(x), int(y), int(w), int(h)
+
+
 def sha(p: Path) -> str:
     return hashlib.sha256(p.read_bytes()).hexdigest()
 
@@ -180,20 +236,25 @@ def main(src: Path, which: str) -> None:
     out.mkdir(parents=True, exist_ok=True)
     rows = []
     gift = which == "gift"
-    edge = EDGE if which == "set_complete" else 0.0
-    last = which in ("gift", "set_complete", "welcome_back", "new_region", "need_a_hand")
+    robots = which == "robots"
+    edge = EDGE if which in ("set_complete", "robots") else 0.0
+    last = which in ("gift", "set_complete", "welcome_back", "new_region", "need_a_hand", "robots")
     for name, master_name, stem, *fixed in items:
         master = src / master_name
         f = frames(master)[:TRIM.get(name)]
-        x, y, w, h = fixed[0] if fixed else crop_box(f)
+        k = ROBOT_KEY.get(name, "magenta")
+        x, y, w, h = fixed[0] if fixed else robot_box(f, k) if robots else crop_box(f)
         ogv = out / f"{stem}.ogv"
         still = out / f"{stem}_still.png"
         cmd = ["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-i", str(master), "-map", "0:v:0", "-an",
-               *(["-frames:v", str(TRIM[name])] if name in TRIM else []), "-vf", f"crop={w}:{h}:{x}:{y}", "-c:v", "libtheora", "-q:v", "8", "-pix_fmt", "yuv420p",
+               *(["-frames:v", str(TRIM[name])] if name in TRIM else []), "-vf", f"crop={w}:{h}:{x}:{y}" + (f",scale={ROBOT_OUT[0]}:{ROBOT_OUT[1]}:flags=lanczos" if robots else ""), "-c:v", "libtheora", "-q:v", "8", "-pix_fmt", "yuv420p",
                "-map_metadata", "-1", str(ogv)]
         subprocess.run(cmd, check=True)
         hold = f[-1 if last else 0, y:y + h, x:x + w]
-        Image.fromarray(key_green(hold) if gift else key(hold, edge), "RGBA").save(still, optimize=True)
+        if robots:
+            hold = np.asarray(Image.fromarray(hold).resize(ROBOT_OUT, Image.LANCZOS))
+        keyed = key_green(hold) if gift or k == "green" else key_blue(hold, edge) if k == "blue" else key(hold, edge)
+        Image.fromarray(keyed, "RGBA").save(still, optimize=True)
         rows.append((name, master, f.shape[0], (x, y, w, h), ogv, still, cmd))
     lines = header + ([] if gift or edge else [
              "numpy, Pillow). Crop = robot bounding box over all frames + 16 px, sides rounded up to 16.",
@@ -201,7 +262,7 @@ def main(src: Path, which: str) -> None:
              "`scripts/ui/feel/chroma_key_magenta.gdshader`); the still is " + ("the LAST frame" if last else "frame 0") + " keyed to",
              "transparent with the same key at build time.", ""])
     for name, master, n, (x, y, w, h), ogv, still, cmd in rows:
-        lines += [f"## {name.upper()}", "",
+        lines += [f"## {name.upper()}", ""] + ([f"- key {ROBOT_KEY.get(name, 'magenta')}"] if robots else []) + [
                   f"- master `{master.name}` sha256 `{sha(master)}` ({n} frames{' used' if name in TRIM else ''})",
                   f"- crop x={x} y={y} w={w} h={h}",
                   f"- `{ogv.name}` sha256 `{sha(ogv)}` ({ogv.stat().st_size} bytes)",

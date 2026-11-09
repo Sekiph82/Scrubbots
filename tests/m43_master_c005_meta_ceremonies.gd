@@ -367,7 +367,9 @@ func _e16_robot_ceremony_truth() -> void:
 	var p = pr.current()
 	var e := RobotRoster.entry("moppy")
 	_ok(p != null and _label(p, "RobotName") == "MOPPY" and _label(p, "RobotRole") == e["role"] and _label(p, "PerkName") == e["perk_name"] and _label(p, "PerkText") == e["perk_text"], "name / role / perk from the canonical roster")
-	_ok(p.find_child("HeroArt", true, false).texture.resource_path == e["assets"]["master"] and p.find_child("PerkIcon", true, false).texture.resource_path == e["perk_icon"], "canonical master art + perk icon")
+	# SB-VIDEO-010: in FULL effects the hero plays Moppy's own video and holds its keyed last frame.
+	var hero_ok: bool = p.find_child("HeroArt", true, false).texture.resource_path in [e["assets"]["master"], MetaCeremonies.ROBOT_VIDEO_DIR + "moppy_unlock_still.png"]
+	_ok(hero_ok and p.find_child("PerkIcon", true, false).texture.resource_path == e["perk_icon"], "canonical master art (or Moppy's video still) + perk icon")
 	_ok(p.find_child("PartsLeft", true, false).get_node("Text").text == "Bot Parts left: 37", "Bot Parts carryover shown from the wallet")
 	_ok(p.get_action_ids() == ["equip", "keep"] and p.get_action_button("equip").text == "EQUIP MOPPY", "EQUIP MOPPY / KEEP CURRENT")
 	_close_cta(p)

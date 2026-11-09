@@ -55,9 +55,10 @@ func _events() -> Dictionary:
 	for e in CeremonyEvents.events(app.economy):
 		if e["kind"] == "gift_milestone" and int(e["milestone"]) == 1000:
 			out["gift_milestone_1000"] = e
-	# Robot: the next canonical robot unlocked through the real facade (Bot Parts spent once).
+	# Robot: the next canonical robot unlocked through the real authority (Bot Parts spent once; the
+	# facade's unlock_next_robot is feature-gated on a fresh save).
 	app.economy.wallet.credit("bot_parts", 287)
-	app.actions.unlock_next_robot()
+	app.economy.robots.unlock("moppy")
 	# Master: every set completed through the real authority (exactly-once Master grant).
 	for n in range(1, 16):
 		for k in range(9):
