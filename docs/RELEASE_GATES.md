@@ -10,7 +10,7 @@ Release ready: **NO**
 | SB-M60-002 | PASS | Bound surfaces: every manifest surface is bound to live data or explicitly not built; no placeholder copy |
 | SB-M60-003 | PASS | Fresh-save FTUE: first Home, Welcome task, L1 -> L3 played for real, no debug tools |
 | SB-M60-004 | PASS | Shop / ads / IAP with no provider: honest UNAVAILABLE states, nothing granted or charged |
-| SB-M60-005 | FAIL | Events / Ranks shipping policy (owner: Events L30, Ranks L40, RANKS all-time + weekly) |
+| SB-M60-005 | PASS | Events / Ranks shipping policy (owner: Events L30, Ranks L40, RANKS all-time + weekly) |
 | SB-M60-006 | FAIL | Release build passes the full M49..M58 player-experience, economy, device, compliance and regression gates |
 | OWNER-SIGNING | BLOCKED (owner) | Store signing secrets (Android release keystore, Apple distribution certificate + profile) |
 | OWNER-STORE-SUBMISSION | BLOCKED (owner) | Store submission / public production release |
@@ -31,7 +31,7 @@ Release ready: **NO**
 
 - PASS `manifest_bound`: 42 surfaces: 40 bound (script + live data + evidence suite exist), 2 explicitly not built: ["account_cloud_sync_conflict (provider decision SB-M43-153)", "friends_postlaunch (post-launch)"]; unbound / broken []
 - PASS `registry_covered`: every ui_surface_registry screen / popup has a manifest surface; missing []
-- PASS `no_placeholder_copy`: 530 English UiText strings, none contains placeholder / dummy / lorem / TODO / TBD / FIXME copy []
+- PASS `no_placeholder_copy`: 553 English UiText strings, none contains placeholder / dummy / lorem / TODO / TBD / FIXME copy []
 
 ## SB-M60-003: PASS
 
@@ -49,12 +49,12 @@ Release ready: **NO**
 - PASS `rewarded_ads_gated`: Rewarded Ads: video slots show NO VIDEO and are blocked ["CLAIM", "NO VIDEO", "LOCKED", "LOCKED", "LOCKED"]
 - PASS `nothing_charged`: SB 1000 -> 1100 (free daily slot grants only), Hearts 4 after the one consumed -> 4: no purchase, no ad reward
 
-## SB-M60-005: FAIL
+## SB-M60-005: PASS
 
 - PASS `unlock_table`: feature_unlocks_v1.json: events 30, ranks 40
 - PASS `unlock_edges`: frontier 29/30/39/40 [unlocked, tab enabled, tap opens]: { 29: { "level": 29, "events": [false, false, false], "ranks": [false, false, false], "events_link": "home" }, 30: { "level": 30, "events": [true, true, true], "ranks": [false, false, false], "events_link": "events" }, 39: { "level": 39, "events": [true, true, true], "ranks": [false, false, false], "events_link": "events" }, 40: { "level": 40, "events": [true, true, true], "ranks": [true, true, true], "events_link": "events" } }
 - PASS `ranks_metric`: Ranks count only cleared campaign levels (PersonalRank.METRIC campaign_levels_cleared): nothing bought with money or boosters counts
-- FAIL `ranks_two_tables`: owner 2026-10-22 RANKS = all-time (highest level) + weekly (levels this week, Monday 00:00 UTC) tables: NOT built - the live Ranks tab is the personal rank ladder (SB-M43-122); SB-M43-131..133 READY
+- PASS `ranks_two_tables`: owner 2026-10-22 RANKS = all-time (highest level) + weekly (levels this week, Monday 00:00 UTC) tables: built
 
 ## SB-M60-006: FAIL
 

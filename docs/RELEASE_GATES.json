@@ -57,7 +57,7 @@
         },
         {
           "check": "no_placeholder_copy",
-          "evidence": "530 English UiText strings, none contains placeholder / dummy / lorem / TODO / TBD / FIXME copy []",
+          "evidence": "553 English UiText strings, none contains placeholder / dummy / lorem / TODO / TBD / FIXME copy []",
           "result": "PASS"
         }
       ],
@@ -151,13 +151,13 @@
         },
         {
           "check": "ranks_two_tables",
-          "evidence": "owner 2026-10-22 RANKS = all-time (highest level) + weekly (levels this week, Monday 00:00 UTC) tables: NOT built - the live Ranks tab is the personal rank ladder (SB-M43-122); SB-M43-131..133 READY",
-          "result": "FAIL"
+          "evidence": "owner 2026-10-22 RANKS = all-time (highest level) + weekly (levels this week, Monday 00:00 UTC) tables: built",
+          "result": "PASS"
         }
       ],
       "id": "SB-M60-005",
       "kind": "automated",
-      "status": "FAIL",
+      "status": "PASS",
       "title": "Events / Ranks shipping policy (owner: Events L30, Ranks L40, RANKS all-time + weekly)"
     },
     {
