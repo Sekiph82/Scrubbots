@@ -80,10 +80,40 @@ func _removed_economies_absent() -> void:
 	print("[removed economies]")
 	var e = _mk()
 	var snap = e.snapshot()
-	var text := JSON.stringify(snap).to_lower()
-	_ok(text.find("star") == -1, "no star currency key in snapshot")
-	_ok(text.find("event_point") == -1, "no event points key in snapshot")
-	_ok(text.find("profile_xp") == -1 and text.find("xp_bar") == -1, "no profile-XP economy key in snapshot")
+	# Whole-word match on every key and string value (recursive), not a JSON substring:
+	# legitimate words like ranks "week_start" or "restart" are not a Star currency.
+	_ok(_removed_hits(snap, STAR_RE).is_empty(), "no star currency key in snapshot %s" % str(_removed_hits(snap, STAR_RE)))
+	_ok(_removed_hits(snap, EVENT_POINT_RE).is_empty(), "no event points key in snapshot %s" % str(_removed_hits(snap, EVENT_POINT_RE)))
+	_ok(_removed_hits(snap, PROFILE_XP_RE).is_empty(), "no profile-XP economy key in snapshot %s" % str(_removed_hits(snap, PROFILE_XP_RE)))
+	# Negative self-check: the precise rule still catches a real removed-economy key or value.
+	_ok(not _removed_hits({"stars": 1}, STAR_RE).is_empty() and not _removed_hits({"a": [{"star_currency": 0}]}, STAR_RE).is_empty() \
+		and not _removed_hits({"res": "Gold_Stars"}, STAR_RE).is_empty() and _removed_hits({"week_start": 0, "restart": "started"}, STAR_RE).is_empty(),
+		"self-check: stars / nested star_currency / gold_stars value caught, week_start / restart / started not")
+	_ok(not _removed_hits({"event_points": 1}, EVENT_POINT_RE).is_empty() and not _removed_hits({"x": {"profile_xp": 1}}, PROFILE_XP_RE).is_empty() \
+		and not _removed_hits({"xp_bar_fill": 1}, PROFILE_XP_RE).is_empty(), "self-check: event_points / nested profile_xp / xp_bar_fill caught")
+
+const STAR_RE := "(^|_)stars?(_|$)"
+const EVENT_POINT_RE := "(^|_)event_points?(_|$)"
+const PROFILE_XP_RE := "(^|_)(profile_xp|xp_bar)(_|$)"
+
+## Keys and string values (any depth) that contain the removed-economy word as a whole
+## "_"-delimited word, case-insensitive.
+func _removed_hits(v, pattern: String) -> Array:
+	var re := RegEx.create_from_string(pattern)
+	var out: Array = []
+	var stack: Array = [v]
+	while not stack.is_empty():
+		var x = stack.pop_back()
+		if typeof(x) == TYPE_DICTIONARY:
+			for k in x:
+				if re.search(String(k).to_lower()) != null:
+					out.append(k)
+				stack.append(x[k])
+		elif typeof(x) == TYPE_ARRAY:
+			stack.append_array(x)
+		elif typeof(x) == TYPE_STRING and re.search(String(x).to_lower()) != null:
+			out.append(x)
+	return out
 
 func _snapshot_relaunch_no_regrant() -> void:
 	print("[relaunch]")
