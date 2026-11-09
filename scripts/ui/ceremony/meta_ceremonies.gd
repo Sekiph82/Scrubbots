@@ -390,10 +390,10 @@ static func feature_unlock(event: Dictionary, reduced: bool):
 	p.add_action("got_it", UiText.t("CEREMONY_FEATURE_GOT_IT"), "primary", true)
 	return p
 
-## SB-M43-073 (prerequisite only): the owner-accepted World Transition shell for ONE world
-## registry entry {world_id, title, subtitle, art}. World ranges / unlock conditions are not
-## owner-defined, so no world event exists; the builder refuses an entry without real title /
-## art (never a fabricated world). Never grants, never changes progression or difficulty.
+## SB-M43-073: the owner-accepted World Transition shell for ONE world entry {world_id, title,
+## subtitle, art}; CeremonyPresenter.world_events() derives it from the owner world table
+## (worlds_v1.json). The builder refuses an entry without real title / art (never a fabricated
+## world). Never grants, never changes progression or difficulty.
 static func world_unlock(event: Dictionary, reduced: bool):
 	var art := String(event.get("art", ""))
 	if String(event.get("title", "")).is_empty() or art.is_empty() or not ResourceLoader.exists(art):

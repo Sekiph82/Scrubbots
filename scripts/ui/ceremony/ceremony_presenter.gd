@@ -20,6 +20,12 @@ extends RefCounted
 ## existing promoted icon (FEATURE_ICONS) are presentable; the rest are skipped (no art invented).
 ## Established (non-new) saves get none. A save failure on acknowledge keeps the event pending: it is
 ## snoozed for this session only (no re-open loop) and shown again on the next launch.
+##
+## SB-M43-073: once the frontier has passed the LAST level of a world (worlds_v1.json: its first
+## clear, or a CP06 skip of a disabled remote level) and the next world's first level is in the
+## playable catalog, the World Transition ceremony for that (current) world is pending once, key
+## "world:<id>" (acknowledged in MetaUiState, so it survives relaunch / save import). Only the current world: an imported save far ahead never replays a
+## backlog. Grants nothing (no owner-approved world reward exists).
 
 signal ceremony_shown(key: String, kind: String)
 signal ceremony_acknowledged(key: String, kind: String)
@@ -29,6 +35,7 @@ signal ceremony_action(key: String, kind: String, action_id: String, result: Dic
 const CeremonyEvents = preload("res://scripts/economy/ceremony_events.gd")
 const MetaCeremonies = preload("res://scripts/ui/ceremony/meta_ceremonies.gd")
 const UiText = preload("res://scripts/ui/ui_text.gd")
+const WorldService = preload("res://scripts/progression/world_service.gd")
 
 const FEATURE_ICONS := {
 	"daily": "res://assets/ui/final/home/shortcuts/icon_shortcut_daily.png",
@@ -62,7 +69,7 @@ func pending() -> Array:
 	if _app == null or _app.economy == null or _app.is_blocked:
 		return []
 	var reduced := _reduced()
-	return (CeremonyEvents.pending(_app.economy, _app.economy.meta_ui) + feature_events()).filter(func(e):
+	return (CeremonyEvents.pending(_app.economy, _app.economy.meta_ui) + feature_events() + world_events()).filter(func(e):
 		if _snoozed.has(String(e["key"])):
 			return false
 		var p = MetaCeremonies.build(e, reduced)
@@ -87,6 +94,21 @@ func feature_events() -> Array:
 				"name": UiText.t("FEATURE_%s_NAME" % n), "body": UiText.t("FEATURE_%s_BODY" % n), "icon": String(FEATURE_ICONS.get(id, ""))})
 	out.sort_custom(func(a, b): return a["level"] < b["level"] or (a["level"] == b["level"] and a["feature_id"] < b["feature_id"]))
 	return out
+
+## SB-M43-073: the unseen World Transition event for the current world (read-only), or [].
+func world_events() -> Array:
+	if _app == null or _app.economy == null or _app.is_blocked:
+		return []
+	var w := WorldService.world_for_level(int(_app.progression.current_level()))
+	if w.is_empty() or int(w["number"]) == 1:
+		return []
+	var key := "world:" + String(w["id"])
+	if _app.economy.meta_ui.is_seen(key) or not _app.catalog_has_level(int(w["first"])):
+		return []
+	return [{"key": key, "kind": "world_unlock", "world_id": String(w["id"]),
+		"title": UiText.data("WORLD_NAME_%d" % int(w["number"]), String(w["name"])),
+		"subtitle": UiText.t("HOME_AREA_NUMBER", [int(w["number"])]),
+		"art": String(w["art"]) if not String(w["art"]).is_empty() else String(WorldService.load_table()["fallback_art"])}]
 
 ## Open the next pending ceremony. True when one was opened by this call.
 func drain(source: String = "") -> bool:

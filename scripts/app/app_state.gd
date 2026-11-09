@@ -259,11 +259,7 @@ func reconcile_disabled_frontier() -> Dictionary:
 ## its class lookup and how many catalog levels are playable from the frontier on.
 func orders_context() -> Dictionary:
 	var frontier := int(progression.current_level())
-	if _catalog_orders.is_empty():
-		var cat = playable_catalog()
-		if cat != null:
-			for e in cat.get_entries_ordered():
-				_catalog_orders.append(int(e.order))
+	_fill_catalog_orders()
 	# CP06: a disabled level ahead is skipped, never played, so it is not counted as playable.
 	var disabled_orders := {}
 	if content != null and not content.disabled_level_ids().is_empty():
@@ -279,6 +275,18 @@ func orders_context() -> Dictionary:
 			ahead += 1
 		n += 1
 	return {"frontier": frontier, "playable_ahead": ahead, "class_for": Callable(progression, "class_for")}
+
+func _fill_catalog_orders() -> void:
+	if _catalog_orders.is_empty():
+		var cat = playable_catalog()
+		if cat != null:
+			for e in cat.get_entries_ordered():
+				_catalog_orders.append(int(e.order))
+
+## SB-M43-073: true when campaign level `n` is in the playable catalog (builtin + remote).
+func catalog_has_level(n: int) -> bool:
+	_fill_catalog_orders()
+	return _catalog_orders.has(n)
 
 ## SB-M44-031/032 — the ONE feature-unlock gate every UI and entry point asks. Owner
 ## 2026-11-03: the same rule for EVERY profile (fresh, existing, migrated, imported, debug; no
