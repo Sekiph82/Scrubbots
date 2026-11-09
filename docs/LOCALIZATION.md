@@ -29,7 +29,7 @@ and rebuilds the app root (screens take their copy when built).
 - Product and character names: ScrubBots, Scrubbot(s), Scrubby, Moppy, Bubbles, Spark,
   Squeegee, Dusty, Rinse, Polly, Clippy, Atlas, ScrubBox, and card names.
 - Currency: **Scrub Bucks** is a brand name and stays "Scrub Bucks" in Turkish too; its short
-  form stays **SB**. Hearts = Kalp, Bot Parts = Robot Parçası, Level = Bölüm.
+  form stays **SB**. Hearts = Can (owner 2026-11-09), Bot Parts = Robot Parçası, Level = Bölüm.
 
 ## Plurals (SB-M51-008)
 
