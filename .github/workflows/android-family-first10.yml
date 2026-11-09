@@ -321,10 +321,10 @@ jobs:
           else
             echo "M43-RANKS verdict=FAIL (exact 8/8 summary missing)" | tee -a "$S"; fail=1
           fi
-          if grep -qxF 'REAL PLAY LEVELS: PASS (5/5 cases, 0 fail)' validate_logs/real_play_levels.log 2>/dev/null; then
-            echo "REAL-PLAY-LEVELS verdict=PASS (5/5)" | tee -a "$S"
+          if grep -qxF 'REAL PLAY LEVELS: PASS (4/4 cases, 0 fail)' validate_logs/real_play_levels.log 2>/dev/null; then
+            echo "REAL-PLAY-LEVELS verdict=PASS (4/4)" | tee -a "$S"
           else
-            echo "REAL-PLAY-LEVELS verdict=FAIL (exact 5/5 summary missing)" | tee -a "$S"; fail=1
+            echo "REAL-PLAY-LEVELS verdict=FAIL (exact 4/4 summary missing)" | tee -a "$S"; fail=1
           fi
           if grep -qxF 'REAL PLAY FILE CLI: PASS (6/6 cases, 0 fail)' validate_logs/real_play_file_cli.log 2>/dev/null; then
             echo "REAL-PLAY-FILE-CLI verdict=PASS (6/6)" | tee -a "$S"

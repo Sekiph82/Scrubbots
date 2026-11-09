@@ -254,7 +254,7 @@ func _j_presentation() -> void:
 	_ok(not MetaCeremonies.REWARD_ROWS.has(Picker.LEGACY_RESOURCE) and MetaCeremonies.REWARD_ROWS.has(Picker.RESOURCE), "ceremony rows bind the canonical key")
 	var spec: Array = MetaCeremonies.REWARD_ROWS[Picker.RESOURCE]
 	_ok(MetaCeremonies.ART[spec[0]] == GIFT_ICON and MetaCeremonies.ART.values().count(RANDOM_ICON) == 0, "generic row icon = neutral gift box, RANDOM icon not bound by ceremonies")
-	_ok(UiText.t(spec[1], ["1"]) == "+1 Mystery Booster", "ceremony row text: %s" % UiText.t(spec[1], ["1"]))
+	_ok(UiText.tn(spec[1], 1, ["1"]) == "+1 Mystery Booster" and UiText.tn(spec[1], 2, ["2"]) == "+2 Mystery Boosters", "ceremony row text: %s / %s" % [UiText.tn(spec[1], 1, ["1"]), UiText.tn(spec[1], 2, ["2"])])
 	_ok(UiText.reward_text({Picker.RESOURCE: 1}) == "Mystery Booster x1" and UiText.reward_text({Picker.LEGACY_RESOURCE: 1}) == "Mystery Booster x1", "Daily / list wording: Mystery Booster")
 	_ok(UiText.reward_text({"selected_booster_charges": 1}) == "Booster of choice x1" and MetaCeremonies.ART[MetaCeremonies.REWARD_ROWS["selected_booster_charges"][0]] == CHOICE_ICON, "Booster-of-choice wording/art unchanged")
 	var cfg := EconomyConfig.new()
