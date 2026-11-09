@@ -7,7 +7,7 @@ Tests: `tests/m56_analytics_taxonomy.gd` (CI validate, exact 27/27 guard).
 ## Rules
 
 - **No provider, no network.** The default sink is `NullSink` (drops everything). `MemorySink` exists for tests. A real provider is a later, owner-approved sink (CLAUDE.md §3.6, §0D.5); it must keep these rules.
-- **Consent gate.** Nothing is validated, queued or stored until `AnalyticsService.set_consent(true)`. Default is OFF until the M58 consent screen exists (SB-M58-008). Revoking consent drops the queue and the local retention markers.
+- **Consent gate.** Nothing is validated, queued or stored until `AnalyticsService.set_consent(true)`. Default is OFF; the only switch is Settings -> PRIVACY (`scripts/ui/privacy_screen.gd`, SB-M58-008). Revoking consent drops the queue and the local retention markers.
 - **Privacy-minimized.** Params are only `int`, `bool`, `enum` or `enum_list`. There is no free-text type, so no names, emails, device or advertising ids, tokens, receipts, board or save data can be sent. `privacy.forbidden_param_names` lists names that may never be declared. Times and counts go out as coarse buckets (`buckets` table). No timestamps or ids are added to events. Each event carries only `event`, `v` (taxonomy version) and `params`.
 - **Schema validation.** An unknown event, an undeclared param, a wrong type, an out-of-range int, a disallowed enum value or a missing required param drops the whole event and prints a debug-build warning. An enum with a `fallback` maps unknown values to the fallback (`other` / `UNKNOWN`). A missing or invalid taxonomy file drops everything. Validation never crashes.
 - **Write-only (SB-M56-014).** No gameplay, economy, difficulty, solver or save code reads analytics. Events never grant rewards or change difficulty. Offline play never depends on them. Economy services only expose two signals for it (`EconomyWallet.changed`, `RewardGrantService.granted`); every other call site is one `track` line after the existing logic. `no_economy_change` plays the same session (level, spends, pack, Collection, robots, navigation, rewarded ads, reminders) with consent OFF and ON and requires identical economy and progression snapshots.
@@ -131,7 +131,7 @@ Definitions only; there is no dashboard server. "Player-day" = one installation 
 A production provider (a real sink) may only be switched on when all of these hold:
 
 1. The owner has chosen the provider (CLAUDE.md §0D.5: new service) and SB-M58-008 records the consent / legal basis per region for it.
-2. The M58 consent screen exists and is the only caller of `AnalyticsService.set_consent`. Default stays OFF; no event, queue or local marker exists before consent; revoking drops the queue and the markers.
+2. The M58 consent screen (Settings -> PRIVACY, `scripts/ui/privacy_screen.gd`, done in factory 135; guard `tests/m58_privacy_consent.gd` p05) is the only caller of `AnalyticsService.set_consent`. Default stays OFF; no event, queue or local marker exists before consent; revoking drops the queue and the markers.
 3. Age: until an age gate exists, the provider runs in its most restrictive mode (no advertising id, no cross-app tracking, no personalised ads), and an under-age or unknown-age answer leaves consent OFF.
 4. The store privacy forms (`docs/PRIVACY_DATA_INVENTORY.md` §6) are updated in the same change ("App interactions -> Analytics").
 5. The provider adds no identifiers beyond what its own SDK requires, and `forbidden_param_names` and the int/bool/enum-only rule still apply to every event.

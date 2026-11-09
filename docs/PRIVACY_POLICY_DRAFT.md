@@ -25,15 +25,21 @@ daily rewards, reminder preferences and settings such as sound, haptics and colo
 This data never leaves your device through the game. Your phone's own backup (Google or
 iCloud device backup) may include it, under your account's settings.
 
-**Analytics.** The game contains an analytics feature that is off unless you agree to it. In
-this version no analytics data is sent anywhere.
+**Analytics.** The game contains an analytics feature that is off unless you turn it on in
+Settings -> PRIVACY (SHARE ANALYTICS), and you can turn it off there at any time. In this
+version no analytics data is sent anywhere.
 
 **Permissions.** On Android the game may use vibration for haptic feedback, and asks for
 permission to show notifications only if you turn reminders on. The game does not access
 your location, camera, microphone, contacts or files.
 
+**Notifications.** Reminders are created on your device and contain no personal
+information. You can turn them off in the game or in your device settings.
+
 **Children.** The game does not knowingly collect personal information from anyone,
-including children. [Final wording after the child-directed review, SB-M58-007.]
+including children. [Final wording after the owner sets the target audience, see
+`docs/PRIVACY_DATA_INVENTORY.md` 7.1; before ads or an analytics provider ship, a neutral age
+question keeps under-16 players on non-personalised ads with analytics off.]
 
 **Deleting your data.** Uninstalling the game deletes all of its data from your device.
 
@@ -48,12 +54,14 @@ stays fully playable if you refuse. See Google's policy: https://policies.google
 Transparency).]
 
 **Purchases.** Purchases are handled by Google Play or the Apple App Store. We receive a
-transaction confirmation to deliver your items; we never see your payment details. [Retention
-of transaction identifiers: SB-M58-013.]
+transaction confirmation to deliver your items; we never see your payment details. We keep
+only the transaction identifier, on your device and in your cloud save, so each purchase is
+delivered exactly once and can be restored.
 
 **Cloud save.** If you sign in to Google Play Games (Android) or Game Center / iCloud (iOS),
 your game progress is stored in your own Google or Apple account so you can restore it. We do
-not run our own server for this. [How to delete cloud data: SB-M58-011.]
+not run our own server for this. Signing in is optional. You can delete the cloud copy in
+Settings -> PRIVACY; signing out keeps the copy on your device.
 
 **Analytics provider.** [Only if one is chosen, SB-M58-008: name, data, purpose, opt-out.]
 

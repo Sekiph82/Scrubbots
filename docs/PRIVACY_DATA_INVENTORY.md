@@ -5,9 +5,10 @@ App Store Connect or IARC. The owner submits; the factory never does (CLAUDE.md 
 
 Covers: third-party components (001), data the game stores or sends (002), collection
 hygiene (003), privacy disclosures (004, policy text in `docs/PRIVACY_POLICY_DRAFT.md`),
-store declarations (005) and the age-rating questionnaire (006). The child-directed review is
-SB-M58-007; consent strategy SB-M58-008/009; notification privacy SB-M58-010; account data
-SB-M58-011.
+store declarations (005) and the age-rating questionnaire (006). Section 7 covers the
+child-directed review (007), analytics / ads consent (008/009, Settings -> PRIVACY),
+notification privacy (010), account / cloud data and display names (011/012), receipt
+retention (013) and localization / accessibility of the privacy screens (014).
 
 Guard: `tests/m58_privacy_inventory.gd` (CI validate) fails when a game script or scene uses
 a network / native-permission API, writes a new `user://` path, or the Android/iOS export
@@ -84,7 +85,7 @@ no ads, no purchases, no analytics provider, no crash reporter. The only network
 | Path | Written by | Contents | Leaves device? |
 |---|---|---|---|
 | `user://scrubbots_save.dat` (+ temp/backup siblings) | `scripts/save/save_service.gd` via `scripts/app/app_state.gd` | settings (volumes, haptics, Reduced Effects, color symbols), level progression, economy (wallet, hearts, boosters, collection cards/packs, daily/orders, events, records, the weekly Ranks count with its week start, gift/streak, notification preferences and quiet hours, permission ask/decline timestamps, the time of the one scheduled local reminder, FTUE flags). In-game pack "receipts" are internal reward transactions, not store purchases. Timestamps are device clock values used for timers. No name, email, device id or location. | No |
-| `user://analytics_v1.json` | `scripts/app/analytics_service.gd` | `version`, `consent` (default false), first consented local day, retention markers sent. No events are stored (NullSink). | No |
+| `user://analytics_v1.json` | `scripts/app/analytics_service.gd` | `version`, `consent` (default false; set only by the Settings -> PRIVACY switch, section 7.2), first consented local day, retention markers sent. No events are stored (NullSink). | No |
 | `user://audio_settings.cfg` | `scripts/audio/audio_settings_service.gd` | legacy M33 volume file, read once for migration into the save | No |
 | `user://haptics_settings.cfg` | `scripts/haptics/haptics_settings_service.gd` | haptics on/off (standalone service default path) | No |
 | `user://__scratch_haptics.cfg` | `scripts/save/save_service.gd` | scratch path for validating a candidate save's haptics block (not written during validation) | No |
@@ -252,7 +253,7 @@ Apple 4+), with the interactive-elements notices "In-Game Purchases (Includes Ra
 once paid currency ships. Apple's age rating is answered separately in App Store Connect with
 the same facts.
 
-### Child-directed considerations (full review: SB-M58-007)
+### Child-directed considerations (full review: section 7.1)
 
 - Cute robots and bright pixel art may appeal to children; Google Play's target-audience
   question decides whether Families policy applies. If the target audience includes under-13s,
@@ -261,3 +262,128 @@ the same facts.
 - Paid random items next to children is the main regulatory risk (several regions restrict
   loot boxes for minors). The owner decides the target audience (13+ vs mixed) in SB-M58-007.
 - The current build is safe for any audience: no data collected, no ads, no purchases.
+
+## 7. Child-directed, consent, notifications, accounts, receipts (SB-M58-007..014)
+
+Status: **DRAFT for owner/legal review.** 7.1 and 7.5 are analysis and requirements for
+features that do not exist yet; 7.2, 7.3, 7.4, 7.6 and 7.7 describe shipped code, guarded by
+`tests/m58_privacy_consent.gd` (CI validate, exact 7/7).
+
+### 7.1 Child-directed review (SB-M58-007)
+
+Facts: bright pixel art and cute robots can appeal to children, so the game must be treated
+as mixed audience unless the owner declares a 13+ (or 16+) target audience in Play Console
+and App Store Connect. The current build collects nothing, shows no ads and sells nothing,
+so no rule below is triggered today.
+
+| Law / policy | Applies when | What it would require |
+|---|---|---|
+| US COPPA | the game is directed to under-13s, or mixed audience and personal information (an advertising id or other persistent id counts) is collected from a user known or treated as under 13 | verifiable parental consent, or collect nothing: AdMob `tag_for_child_directed_treatment`, no personalised ads, no analytics provider id for those users |
+| GDPR Art. 8 / UK Age Appropriate Design Code ("GDPR-K") | consent is the legal basis for processing a child's data in the EU / UK (age of digital consent 13 to 16, by country) | parental consent below that age, or no consent-based processing (no personalised ads, no consent-based analytics); high-privacy defaults |
+| Google Play Families policy | the Play Console target audience includes under-13s | Families-certified ad SDKs only, no personalised ads or advertising id for children, Families-compliant Data safety |
+| Apple Kids category (guideline 1.3) | only if the game is listed in the Kids category | no third-party analytics or ads outside Apple's limits; parental gate for links and purchases |
+| Loot-box rules (Belgium, Netherlands guidance, PEGI / ESRB descriptors) | real-money purchasable random items (Random Booster, card packs once ScrubBucks are sold, SB-M57-012) | "In-Game Purchases (Includes Random Items)" descriptor; some regions restrict sale to minors; odds disclosure |
+
+Recommendation (owner / legal decide; one line under `## Questions for Şekip` in TASKS.md
+when the first trigger below is about to ship):
+
+1. Declare a **13+ target audience** in both stores (not Kids, not Families) and keep the
+   game safe for younger players anyway (no chat, no user content, no social exposure).
+2. Before any ads SDK or analytics provider is enabled, add a **neutral age screen** (year of
+   birth, no default, no hint which answer unlocks anything), shown once before the first
+   consent prompt. Under 16 or unknown: analytics consent stays OFF and is not offered, ads
+   are non-personalised with `tag_for_under_age_of_consent` / child-directed treatment, no
+   IDFA / ATT prompt.
+3. Real-money random items: block for under-16 answers or show odds, per the owner's region list.
+
+**No age gate is implemented now, and none is required yet**: analytics is OFF by default and
+sends nothing (`NullSink`), and there is no ads SDK, purchase or account. The age screen
+becomes required with the first of: an ads SDK (SB-M57-001..011), an analytics provider (the
+SB-M56-015 gate in `docs/ANALYTICS_TAXONOMY_V1.md`), real-money purchases (SB-M57-012).
+
+### 7.2 Analytics consent (SB-M58-008)
+
+- Screen: Settings -> PRIVACY (`scripts/ui/privacy_screen.gd`, opened by
+  `scripts/app/main.gd` `open_privacy()`; the button shares the Settings CLOSE row so the
+  panel keeps its height). Its SHARE ANALYTICS switch is the only production caller of
+  `AnalyticsService.set_consent` (guarded).
+- Default **OFF** (opt-in). Without consent nothing is validated, queued or stored; turning it
+  off drops the queue and the local retention markers. The choice is written at once to
+  `user://analytics_v1.json` (separate from the game save).
+- Legal basis by region, for when a provider exists (draft): EU / EEA / UK consent (ePrivacy:
+  an SDK reads / writes device storage), so opt-in; US state laws (CCPA / CPRA and similar)
+  allow opt-out, but one global opt-in is simpler and stricter; Türkiye (KVKK) explicit
+  consent for non-essential processing fits opt-in. No region detection is needed while the
+  default is OFF everywhere.
+- Today the switch changes nothing outside the device: the sink is `NullSink`, and the screen
+  says "In this version nothing is sent anywhere".
+
+### 7.3 Ads consent (SB-M58-009)
+
+No ads SDK exists, so the PRIVACY screen shows one text line and no switch ("this version
+shows no ads, so there is no ad choice to make"); there is no placeholder toggle that does
+nothing. When AdMob ships (SB-M57-001..011): Google UMP consent form on first launch where
+UMP requires it (EEA / UK / US states), a "privacy options" entry on the PRIVACY screen when
+UMP reports it required, the iOS ATT prompt only after the UMP form, and refusing
+personalised ads keeps the game fully playable (non-personalised ads; rewarded ads stay
+optional). Under-16 or unknown age: 7.1.
+
+### 7.4 Notification privacy (SB-M58-010)
+
+- Reminders are local only (`scripts/economy/local_notifications.gd`, SB-M43-172): no push
+  server, no token, nothing sent. The native call carries exactly (title = app name, body =
+  one fixed reminder copy, seconds until it fires). No name, level, amount or other value is
+  inserted into any reminder copy, English or Turkish; the guard fails on a `%` placeholder.
+- Tapping a reminder opens the app's launcher activity; no deep-link payload is attached.
+  In-app deep links (`NotificationPolicy.deep_link`) accept only allowlisted destinations;
+  anything else lands on Home.
+- The OS permission is asked only after the player turns reminders ON and taps Allow in the
+  explainer (SB-M43-146). The copy is safe on a lock screen (no personal data).
+
+### 7.5 Account, cloud data and display name (SB-M58-011 / 012)
+
+- **Today there is no account, login, cloud save or server**: nothing to export, delete
+  remotely or sign out of; uninstalling deletes everything (the PRIVACY summary says so).
+  Ranks is a personal ladder: the player is shown as "You", no name is stored or shown to
+  anyone and no other players exist (SB-M43-122), so 012 is not triggered.
+- Planned cloud save (SB-M43-153..160: Play Games Saved Games / Game Center + iCloud) stores
+  exactly the game save content (settings, progression, economy, collection, FTUE flags) in
+  the player's own Google / Apple account, adding no name, email or device id. Requirements
+  before it ships: sign-in optional and the game fully playable without it; a "delete cloud
+  save" action on the PRIVACY screen (removes the remote snapshot, keeps the local save);
+  sign-out keeps the local save; export through the platform (Google Takeout / Apple data
+  request); recovery = restore the latest cloud snapshot after sign-in on a new device, with
+  a player-visible conflict choice; the policy names the deletion path (Play Data safety
+  "deletion request path").
+- Display names (012), only if a real leaderboard or Friends ships (SB-M61): platform alias
+  (Play Games / Game Center) by default; never a free-text in-game name without a profanity
+  filter, a report action and block / hide; no public names for under-16 answers; no chat.
+
+### 7.6 Receipt / transaction id retention (SB-M58-013)
+
+- No store purchase exists: no Google Play / App Store receipt, order id or purchase token is
+  stored. The save holds two internal ledgers:
+  - `reward.applied`: ids of reward transactions already granted (e.g. `daily_login:<day>`).
+    Strings only: no amounts, times or device data.
+  - `pack_receipts`: one receipt per opened card pack (schema, tx id, kind, status and the 3
+    or 5 card rows; under 1 KB each). No time, device or store data.
+- Retention: **kept for the life of the save, never pruned.** They are the exactly-once
+  guarantee: dropping an id would let the same reward or pack be granted / drawn again. Growth
+  is bounded by content (one entry per level reward, day, task or pack). The guard pins the
+  key sets and the per-receipt size and proves a committed tx replays after a relaunch. Least
+  data: nothing in either ledger identifies the player, and they never leave the device
+  (except inside the planned cloud save, 7.5).
+- When real-money purchases ship (SB-M57-012..016): keep only the store transaction id needed
+  for idempotent delivery and restore; never payment details, and not the full receipt blob
+  after validation.
+
+### 7.7 Localization and accessibility of privacy screens (SB-M58-014)
+
+The PRIVACY popup and its Settings button are fully keyed (`PRIVACY_*` in
+`scripts/ui/ui_text.gd`, Turkish in `scripts/ui/ui_text_tr.gd`). The guard checks, in English
+and Turkish, that every label shows its key's copy and the popup fits 1080x1920, plus touch
+targets >= 88 px, fonts >= the M50 floor (18 px; the popup uses 24 / 30 / 34) and INK /
+ROYAL_EDGE text contrast on the cream card >= 4.5:1. The reminder explainer (SB-M43-146) and
+the save-blocked message are keyed the same way (`tests/m51_localization_readiness.gd`).
+There is no consent error screen: `set_consent` cannot fail visibly (a failed state-file
+write keeps the in-memory choice for the session).
