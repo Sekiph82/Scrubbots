@@ -153,7 +153,8 @@ func _init(id: String = "popup") -> void:
 	_close = Button.new()
 	_close.name = "CloseButton"
 	_close.text = "X"
-	_close.focus_mode = Control.FOCUS_NONE
+	_close.accessibility_name = UiText.t("POPUP_CLOSE")
+	_close.focus_mode = Control.FOCUS_ACCESSIBILITY
 	_close.custom_minimum_size = Vector2(UiTokens.TOUCH_MIN, UiTokens.TOUCH_MIN)
 	_close.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	for st in ["normal", "hover", "pressed", "disabled"]:
@@ -252,7 +253,7 @@ func add_action(id: String, text: String, style: String = "secondary", closes: b
 	var b := Button.new()
 	b.name = ("Action_" + id).validate_node_name()
 	b.text = text
-	b.focus_mode = Control.FOCUS_NONE
+	b.focus_mode = Control.FOCUS_ACCESSIBILITY
 	b.add_theme_font_size_override("font_size", UiTokens.FONT_BUTTON)
 	if style == "primary":
 		HomeStyle.style_play_button(b)

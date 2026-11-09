@@ -259,6 +259,7 @@ static func open_set(stack, app, n: int, on_close: Callable = Callable(), cache 
 	center.minimum_size_changed.connect(func(): pager.custom_minimum_size = center.get_combined_minimum_size())
 	for side in [["prev", "COLLECTION_PREV_SET", 0.0, -1], ["next", "COLLECTION_NEXT_SET", 1.0, 1]]:
 		var b := p.add_action(side[0], UiText.t(side[1]), "secondary", false, "", pager)
+		b.accessibility_name = UiText.t("A11Y_PREV_SET" if side[3] < 0 else "A11Y_NEXT_SET")
 		b.custom_minimum_size = Vector2(UiTokens.TOUCH_MIN, UiTokens.TOUCH_MIN)
 		b.anchor_left = side[2]
 		b.anchor_right = side[2]

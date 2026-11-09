@@ -31,7 +31,7 @@ func _init(id: String = "shortcut", label_text: String = "") -> void:
 	text = label_text
 	custom_minimum_size = Vector2(UiTokens.TOUCH_MIN * 2, UiTokens.TOUCH_MIN)
 	add_theme_font_size_override("font_size", UiTokens.FONT_BODY)
-	focus_mode = Control.FOCUS_NONE
+	focus_mode = Control.FOCUS_ACCESSIBILITY
 	clip_text = false
 	autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING

@@ -84,7 +84,7 @@ func set_content(title: String, rows: Array, note: String = "") -> void:
 			b.disabled = not bool(r.get("action_enabled", true))
 			b.custom_minimum_size = Vector2(UiTokens.TOUCH_MIN * 2, UiTokens.TOUCH_MIN)
 			b.add_theme_font_size_override("font_size", UiTokens.FONT_BUTTON)
-			b.focus_mode = Control.FOCUS_NONE
+			b.focus_mode = Control.FOCUS_ACCESSIBILITY
 			var aid := String(r["action_id"])
 			b.pressed.connect(func():
 				if not b.disabled:

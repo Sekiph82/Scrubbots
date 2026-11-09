@@ -431,12 +431,13 @@ func _build_targets(p, v: Dictionary) -> void:
 			break
 		var b := Button.new()
 		b.name = ("Target_" + str(t["key"])).validate_node_name()
-		b.focus_mode = Control.FOCUS_NONE
+		b.focus_mode = Control.FOCUS_ACCESSIBILITY
 		b.toggle_mode = true
 		b.custom_minimum_size = Vector2(UiTokens.TOUCH_MIN + 16, UiTokens.TOUCH_MIN)
 		b.text = String(t.get("label", ""))
 		b.add_theme_font_size_override("font_size", 34)
 		var col: Color = t.get("color", Color(0.5, 0.5, 0.5))
+		b.accessibility_name = UiText.t("A11Y_COLOR_TARGET", [ColorSymbols.cid_for_color(col)])
 		b.add_theme_stylebox_override("normal", HomeStyle.box(col, Color(1, 1, 1, 0.55), 3, 22, 4, 2))
 		b.add_theme_stylebox_override("hover", HomeStyle.box(col, Color(1, 1, 1, 0.8), 3, 22, 4, 2))
 		b.add_theme_stylebox_override("pressed", HomeStyle.box(col, BasePopup.ROYAL_EDGE, 8, 22, 6, 2))

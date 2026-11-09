@@ -114,7 +114,8 @@ func _build() -> void:
 	_help.name = "HelpTipsButton"
 	_help.text = "?"
 	_help.tooltip_text = UiText.t("HELP_BUTTON")
-	_help.focus_mode = Control.FOCUS_NONE
+	_help.accessibility_name = _help.tooltip_text
+	_help.focus_mode = Control.FOCUS_ACCESSIBILITY
 	_help.custom_minimum_size = Vector2(TOUCH_MIN, TOUCH_MIN)
 	_help.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	for st in ["normal", "hover", "pressed", "disabled"]:
@@ -137,7 +138,8 @@ func _build() -> void:
 	var x := Button.new()
 	x.name = "CloseX"
 	x.text = "X"
-	x.focus_mode = Control.FOCUS_NONE
+	x.accessibility_name = UiText.t("SETTINGS_CLOSE")
+	x.focus_mode = Control.FOCUS_ACCESSIBILITY
 	x.custom_minimum_size = Vector2(TOUCH_MIN, TOUCH_MIN)
 	x.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	for st in ["normal", "hover", "pressed", "disabled"]:
@@ -197,7 +199,7 @@ func _build() -> void:
 		b.name = "Language_" + code
 		b.text = UiText.t("LANGUAGE_NAME_" + code.to_upper())
 		b.toggle_mode = true
-		b.focus_mode = Control.FOCUS_NONE
+		b.focus_mode = Control.FOCUS_ACCESSIBILITY
 		b.custom_minimum_size = Vector2(0, TOUCH_MIN)
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		b.add_theme_font_size_override("font_size", FONT_BODY)
@@ -250,7 +252,8 @@ static func _make_row_button(n: String, text: String) -> Button:
 	var b := Button.new()
 	b.name = n
 	b.text = text
-	b.focus_mode = Control.FOCUS_NONE
+	b.accessibility_name = text
+	b.focus_mode = Control.FOCUS_ACCESSIBILITY
 	b.custom_minimum_size = Vector2(0, TOUCH_MIN)
 	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	b.add_theme_font_size_override("font_size", FONT_BUTTON)
@@ -299,7 +302,7 @@ static func _ink(l: Control) -> void:
 func _make_toggle(text: String) -> CheckButton:
 	var t := CheckButton.new()
 	t.text = text
-	t.focus_mode = Control.FOCUS_NONE
+	t.focus_mode = Control.FOCUS_ACCESSIBILITY
 	t.custom_minimum_size = Vector2(0, TOUCH_MIN)
 	t.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	t.add_theme_font_size_override("font_size", FONT_BUTTON)

@@ -529,6 +529,12 @@ AKTİF",
 	"CREDITS_NAME_GAME_FEEL_FLOW": "Game Feel Flow",
 	"CREDITS_NAME_SALTMIRE_SPARK": "Saltmire Spark",
 	"CREDITS_GODOT_COMPONENTS": "Godot Engine üçüncü taraf bileşenleri",
+	"A11Y_GET_SCRUB_BUCKS": "Daha fazla Scrub Bucks al",
+	"A11Y_GET_HEARTS": "Daha fazla can al",
+	"A11Y_PAUSE": "Duraklat",
+	"A11Y_PREV_SET": "Önceki set",
+	"A11Y_NEXT_SET": "Sonraki set",
+	"A11Y_COLOR_TARGET": "Renk %s",
 }
 
 const DATA := {

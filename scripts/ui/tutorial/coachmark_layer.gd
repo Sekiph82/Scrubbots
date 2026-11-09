@@ -107,7 +107,7 @@ func _button(n: String, key: String, bg: Color, edge: Color, ink: Color) -> Butt
 	var b := Button.new()
 	b.name = n
 	b.text = UiText.t(key)
-	b.focus_mode = Control.FOCUS_NONE
+	b.focus_mode = Control.FOCUS_ACCESSIBILITY
 	b.mouse_filter = Control.MOUSE_FILTER_STOP
 	b.custom_minimum_size = Vector2(0, BUTTON_H)
 	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL

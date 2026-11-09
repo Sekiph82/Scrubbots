@@ -367,6 +367,7 @@ func _build_top() -> void:
 	# Pause / 2x: flat hit areas exactly over the baked boxes; glyph/state/text only.
 	_pause_btn = _flat_button("PauseButton")
 	_pause_btn.text = "II"
+	_pause_btn.accessibility_name = UiText.t("A11Y_PAUSE")
 	_top_region.add_child(_pause_btn)
 	_pause_glyph = Control.new()
 	_pause_glyph.name = "PauseGlyph"
@@ -375,6 +376,7 @@ func _build_top() -> void:
 	_pause_glyph.draw.connect(_draw_pause_glyph)
 	_pause_btn.add_child(_pause_glyph)
 	_speed_btn = _flat_button("SpeedControl")
+	_speed_btn.accessibility_name = UiText.t("SPEED_TITLE")
 	_top_region.add_child(_speed_btn)
 	_speed_main = HomeStyle.label("2x", 56)
 	_speed_main.name = "SpeedMain"
@@ -440,7 +442,7 @@ func _new_region(node_name: String) -> Control:
 func _flat_button(node_name: String) -> Button:
 	var b := Button.new()
 	b.name = node_name
-	b.focus_mode = Control.FOCUS_NONE
+	b.focus_mode = Control.FOCUS_ACCESSIBILITY
 	for st in ["normal", "hover", "pressed", "disabled", "hover_pressed", "focus"]:
 		b.add_theme_stylebox_override(st, StyleBoxEmpty.new())
 	# Button text stays the semantic/accessibility value; the visible content is the
@@ -472,7 +474,8 @@ func _draw_pause_glyph() -> void:
 func _make_booster(spec: Dictionary) -> Button:
 	var b := Button.new()
 	b.name = "Booster_" + String(spec["id"])
-	b.focus_mode = Control.FOCUS_NONE
+	b.accessibility_name = UiText.t("BOOSTER_NAME_" + String(spec["id"]).to_upper())
+	b.focus_mode = Control.FOCUS_ACCESSIBILITY
 	b.custom_minimum_size = Vector2(UiTokens.TOUCH_MIN, UiTokens.TOUCH_MIN)
 	b.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
 	var glow := HomeStyle.art("RewardGlow")
@@ -1032,6 +1035,7 @@ func _apply_booster_visual(id: String) -> void:
 	b.get_node("LockedPlate").visible = state == BOOSTER_LOCKED
 	(b.get_node("LockedPlate/LockedLevel") as Label).text = UiText.t("BOOSTER_LOCKED_LEVEL", [int(st.get("unlock_level", 1))])
 	b.tooltip_text = UiText.t("HOME_UNLOCKS_AT_LEVEL", [int(st.get("unlock_level", 1))]) if state == BOOSTER_LOCKED else ""
+	b.accessibility_description = b.tooltip_text
 	b.disabled = state == BOOSTER_LOCKED
 	b.modulate = Color(0.72, 0.72, 0.78) if state == BOOSTER_UNAVAILABLE else Color(1, 1, 1)
 

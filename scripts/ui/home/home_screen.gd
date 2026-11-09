@@ -484,8 +484,9 @@ func _build_hud(hud: MarginContainer) -> void:
 	# M43-C010 (SB-M43-124): the profile card opens Profile (invisible hit area over the card).
 	var hit := Button.new()
 	hit.name = "ProfileButton"
+	hit.accessibility_name = UiText.t("PROFILE_TITLE")
 	hit.flat = true
-	hit.focus_mode = Control.FOCUS_NONE
+	hit.focus_mode = Control.FOCUS_ACCESSIBILITY
 	for st in ["normal", "hover", "pressed", "focus", "disabled"]:
 		hit.add_theme_stylebox_override(st, StyleBoxEmpty.new())
 	hit.pressed.connect(func(): _shortcut_pressed("profile"))
@@ -581,10 +582,11 @@ func _build_hud(hud: MarginContainer) -> void:
 		# reference: bold white plus, dark navy outline, cyan outer glow, no circle).
 		var plus := Button.new()
 		plus.name = spec[1]
+		plus.accessibility_name = UiText.t("A11Y_GET_SCRUB_BUCKS" if spec[1] == "ScrubBucksPlus" else "A11Y_GET_HEARTS")
 		plus.flat = true
 		plus.custom_minimum_size = Vector2(UiTokens.TOUCH_MIN, UiTokens.TOUCH_MIN)
 		plus.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		plus.focus_mode = Control.FOCUS_NONE
+		plus.focus_mode = Control.FOCUS_ACCESSIBILITY
 		for st in ["normal", "hover", "pressed", "disabled", "focus"]:
 			plus.add_theme_stylebox_override(st, StyleBoxEmpty.new())
 		var glyph := PlusGlyph.new()
@@ -703,8 +705,9 @@ func _build_gift_meter(gm: MarginContainer) -> void:
 	# controls while a modal is open.
 	var hit := Button.new()
 	hit.name = "GiftMeterButton"
+	hit.accessibility_name = UiText.t("GIFTS_TITLE")
 	hit.flat = true
-	hit.focus_mode = Control.FOCUS_NONE
+	hit.focus_mode = Control.FOCUS_ACCESSIBILITY
 	for st in ["normal", "hover", "pressed", "focus", "disabled"]:
 		hit.add_theme_stylebox_override(st, StyleBoxEmpty.new())
 	hit.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -948,7 +951,7 @@ func _build_play(parent: VBoxContainer) -> void:
 	play.text = UiText.t("HOME_PLAY")
 	play.custom_minimum_size = PLAY_SIZE
 	play.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	play.focus_mode = Control.FOCUS_NONE
+	play.focus_mode = Control.FOCUS_ACCESSIBILITY
 	play.add_theme_font_size_override("font_size", 76)
 	HomeStyle.style_play_button(play)
 	HomeStyle.style_play_label_navy(play)
@@ -1124,7 +1127,7 @@ func _build_bottom_nav(nav: PanelContainer) -> void:
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		b.custom_minimum_size = Vector2(0, 150)
 		b.add_theme_font_size_override("font_size", 26)
-		b.focus_mode = Control.FOCUS_NONE
+		b.focus_mode = Control.FOCUS_ACCESSIBILITY
 		HomeStyle.style_nav_button(b, id == "home")
 		for st in ["normal", "hover", "pressed", "disabled"]:
 			var sb: StyleBoxFlat = b.get_theme_stylebox(st)
@@ -1156,6 +1159,10 @@ func _build_bottom_nav(nav: PanelContainer) -> void:
 		_nodes["Nav_" + id] = b
 		# M43-C010 (SB-M43-134): one attention count per tab, from HomeBadges.
 		b.add_child(_reg(_badge_label("NavBadge_" + id)))
+		# SB-M50-015: a locked tab says "LV N" in text (not only the dimmed plate), like the booster bar.
+		var lock := _badge_label("NavLock_" + id)
+		lock.add_theme_stylebox_override("normal", HomeStyle.box(HomeStyle.NAVY, HomeStyle.EDGE_DIM, 3, 18, 0))
+		b.add_child(_reg(lock))
 
 ## Red top-right count pill (hidden until it has text).
 func _badge_label(n: String) -> Label:
@@ -1331,6 +1338,10 @@ func _render_values() -> void:
 		var served: bool = nid == "robots" or _app_nav.has(nid)
 		nb.disabled = _locked(nid) or not served
 		nb.tooltip_text = _unlock_text(nid) if _locked(nid) else ("" if served else UiText.t("HOME_COMING_LATER"))
+		nb.accessibility_description = nb.tooltip_text
+		var lock: Label = _nodes["NavLock_" + nid]
+		lock.visible = _locked(nid)
+		lock.text = UiText.t("BOOSTER_LOCKED_LEVEL", [_app.feature_unlock_level(GATED_ENTRIES[nid])]) if lock.visible else ""
 	# SB-M42-024: Daily badge = 1 when today's login reward is claimable.
 	var counts := {"daily": 0 if _vm["daily_claimed_today"] or _locked("daily") else 1}
 	# M43-C010 (SB-M43-134): Tasks / Collection shortcuts + ROBOTS / EVENTS tabs.
@@ -1359,6 +1370,7 @@ func _render_values() -> void:
 		var sc: Button = _nodes["Shortcut_" + id[0]]
 		sc.disabled = _locked(id[0]) or not (LIVE_SHORTCUTS.has(id[0]) or _app_shortcuts.has(id[0]))
 		sc.tooltip_text = _unlock_text(id[0]) if _locked(id[0]) else ""
+		sc.accessibility_description = sc.tooltip_text
 	(_nodes["RewardedAdsButton"] as Button).disabled = not _app_shortcuts.has("rewarded_ads")
 	for pid in _popups:
 		if (_popups[pid] as Control).visible:

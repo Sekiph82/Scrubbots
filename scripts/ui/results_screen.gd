@@ -370,7 +370,7 @@ func _button(n: String, cb: Callable) -> Button:
 	b.name = n
 	b.custom_minimum_size = Vector2(0, UiTokens.TOUCH_MIN)
 	b.add_theme_font_size_override("font_size", UiTokens.FONT_BUTTON)
-	b.focus_mode = Control.FOCUS_NONE
+	b.focus_mode = Control.FOCUS_ACCESSIBILITY
 	b.pressed.connect(cb)
 	return b
 

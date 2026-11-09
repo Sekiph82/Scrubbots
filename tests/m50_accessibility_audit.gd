@@ -10,6 +10,17 @@ extends SceneTree
 ##       effect path has its REDUCED-arm suite (ledger)
 ##   a08 (SB-M50-011) a real level with Reduced Effects ON, the feel plugins absent and colour
 ##       symbols OFF: board / slots / supply / Scrubbots render and the level is WON
+##   a09 (SB-M50-012/015/016) a fresh L1 profile in English and Turkish: icon-only / glyph
+##       buttons carry a screen-reader name, Home + HUD buttons take screen-reader focus, locked
+##       Home tabs and boosters say "LV N" in text and describe their unlock level
+##   a10 (SB-M50-014) rewarded ads with a provider double: nothing plays until WATCH AD is
+##       pressed, every slot has a text state, cancel / no answer grant nothing and free the
+##       popup (bounded wait), CLOSE and back decline, no audio player; a Heart is also sold for SB
+##   a11 (SB-M50-013/017/018) motion / flash: the feel gateway can reach no flash / camera /
+##       shake effect and its REDUCED rows are empty; every Reduced-aware script has a row in the
+##       docs/ACCESSIBILITY.md FULL vs REDUCED table
+## Assistive walk of every surface (names, focus, text scale x1.15 / x1.3, state text cues):
+## tests/m50_a11y_surfaces.gd (local). Flash rate of videos / effects: tools/flash_audit.py.
 ## Rendered text contrast on every M43/M44 surface: tests/m50_contrast_surfaces.gd (windowed).
 ## Touch sizes (SB-M50-006): tests/m49_touch_targets_text_stress.gd t01 + m49_surface_matrix v02.
 ##
@@ -29,6 +40,11 @@ const AppStateScript = preload("res://scripts/app/app_state.gd")
 const SupplyPlanLoader = preload("res://scripts/gameplay/supply/supply_plan_loader.gd")
 const ColorSymbols = preload("res://scripts/ui/color_symbols.gd")
 const LevelIntroOverlay = preload("res://scripts/ui/level_intro_overlay.gd")
+const UiTextTr = preload("res://scripts/ui/ui_text_tr.gd")
+const HomeBadges = preload("res://scripts/ui/home/home_badges.gd")
+const RewardedAdsScreen = preload("res://scripts/ui/daily/rewarded_ads_screen.gd")
+const ProviderDouble = preload("res://tests/support/rewarded_provider_double.gd")
+const FeedbackAdapter = preload("res://scripts/ui/feel/feedback_adapter.gd")
 
 ## Smallest readable text on the 1080-wide design canvas: 18 design px = ~6.9 dp on a 411 dp wide
 ## phone, the smallest size the shipped English UI uses (tests/m50_contrast_surfaces.gd c02).
@@ -84,7 +100,8 @@ const REDUCED_LEDGER := {
 const WCAG_AA := 4.5
 
 var EXPECTED_CASES := ["a01_math_reference_values", "a02_ui_text_contrast", "a03_level_cvd_report", "a04_non_colour_cues_live",
-	"a05_icon_families_48px", "a06_font_floor", "a07_reduced_effects_wiring", "a08_plain_gameplay_completes"]
+	"a05_icon_families_48px", "a06_font_floor", "a07_reduced_effects_wiring", "a08_plain_gameplay_completes",
+	"a09_names_focus_lock_text", "a10_rewarded_ad_path", "a11_motion_flash_table"]
 var _fail := 0
 var _completed: Dictionary = {}
 var _tmp: Array = []
@@ -99,6 +116,9 @@ func _initialize() -> void:
 	await _a06()
 	await _a07()
 	await _a08()
+	await _a09()
+	await _a10()
+	_a11()
 	_cleanup()
 	_done()
 
@@ -396,16 +416,122 @@ func _a08() -> void:
 	_free(b)
 	_complete("a08_plain_gameplay_completes")
 
-## [SubViewport, main root] on a throw-away save, every feature unlocked.
-func _boot() -> Array:
-	AppStateScript.test_unlock_all = true
+func _a09() -> void:
+	print("[a09 screen-reader names, focus and locked-state text on a fresh L1 profile, EN + TR]")
+	var keys: Array = UiText.EN.keys().filter(func(k): return String(k).begins_with("A11Y_"))
+	_ok(keys.size() >= 6 and keys.all(func(k): return not String(UiTextTr.TR.get(k, "")).is_empty() and UiTextTr.TR[k].count("%s") == UiText.EN[k].count("%s")),
+		"%d A11Y_ name keys have a Turkish entry with the same placeholders" % keys.size())
+	var b := await _boot(false)
+	var save: String = MainScript.boot_save_path_override
+	b[1].get_app_state().set_language("tr")
+	b[1].flush_lifecycle("test")
+	_free(b)
+	for loc in ["tr", "en"]:
+		b = await _boot(false, save)
+		var root = b[1]
+		var app = root.get_app_state()
+		var home = root.get_home()
+		_ok(UiText.locale == loc, "%s: the saved language is active" % loc)
+		var names := {}
+		for n in ["ProfileButton", "ScrubBucksPlus", "HeartsPlus", "GiftMeterButton"]:
+			names[n] = String(home.get_region(n).accessibility_name)
+		_ok(names.values().all(func(v): return not v.is_empty()) and names["HeartsPlus"] == UiText.t("A11Y_GET_HEARTS"), "%s: Home icon-only buttons are named %s" % [loc, str(names)])
+		var unfocus: Array = home.find_children("*", "BaseButton", true, false).filter(func(x): return x.focus_mode == Control.FOCUS_NONE).map(func(x): return x.name)
+		_ok(unfocus.is_empty(), "%s: every Home button takes screen-reader focus (FOCUS_ACCESSIBILITY) %s" % [loc, str(unfocus)])
+		var locks := {}
+		var lock_ok := true
+		for nid in ["robots", "events", "leaderboard"]:
+			var lvl: int = app.feature_unlock_level(HomeBadges.GATED_ENTRIES[nid])
+			var lab: Label = home.get_region("NavLock_" + nid)
+			var nb: Button = home.get_region("Nav_" + nid)
+			locks[nid] = lab.text
+			lock_ok = lock_ok and nb.disabled and lab.is_visible_in_tree() and lab.text == UiText.t("BOOSTER_LOCKED_LEVEL", [lvl]) \
+				and nb.accessibility_description == UiText.t("HOME_UNLOCKS_AT_LEVEL", [lvl])
+		_ok(lock_ok and not (home.get_region("NavLock_home") as Label).visible, "%s: locked tabs show their unlock level as text + description %s" % [loc, str(locks)])
+		root.play_current_frontier()
+		await _frames(6)
+		var s = root.get_gameplay_host().get_screen()
+		root.get_gameplay_host().get_runtime().set_process(false)
+		var hud := {}
+		var hud_ok := true
+		for id in s.get_booster_ids():
+			var bb: Button = s.get_booster_button(id)
+			hud[id] = [bb.accessibility_name, (bb.get_node("LockedPlate/LockedLevel") as Label).text if bb.disabled else ""]
+			hud_ok = hud_ok and bb.accessibility_name == UiText.t("BOOSTER_NAME_" + String(id).to_upper()) and bb.focus_mode == Control.FOCUS_ACCESSIBILITY \
+				and (not bb.disabled or ((bb.get_node("LockedPlate") as Control).visible and not bb.accessibility_description.is_empty()))
+		_ok(hud_ok and s.get_booster_ids().any(func(id): return s.get_booster_button(id).disabled), "%s: boosters named; locked ones show LV N and describe their unlock %s" % [loc, str(hud)])
+		var pause: Button = s.find_child("PauseButton", true, false)
+		var speed: Button = s.get_speed_button()
+		_ok(pause.accessibility_name == UiText.t("A11Y_PAUSE") and speed.accessibility_name == UiText.t("SPEED_TITLE"), "%s: HUD Pause '%s' / 2x '%s' named" % [loc, pause.accessibility_name, speed.accessibility_name])
+		if loc == "tr":
+			app.set_language("en")
+			root.flush_lifecycle("test")
+		_free(b)
+	_complete("a09_names_focus_lock_text")
+
+func _a10() -> void:
+	print("[a10 rewarded ads: player-started, text states, declinable, bounded wait, silent; SB alternative]")
+	var b := await _boot()
+	var root = b[1]
+	var app = root.get_app_state()
+	var stack = root.get_modal_stack()
+	var tp = ProviderDouble.new()
+	app.economy.rewarded.set_provider(tp)
+	var p = RewardedAdsScreen.open(stack, app, 0.3)
+	await _frames(3)
+	_ok(p != null and tp.requests.is_empty(), "opening the screen starts no video (no auto-play)")
+	var rows_ok := true
+	for slot in range(1, 6):
+		var row: Control = p.find_child("Slot_%d" % slot, true, false)
+		rows_ok = rows_ok and not (row.find_child("State", true, false) as Label).text.is_empty() and not (row.find_child("RewardText", true, false) as Label).text.is_empty() \
+			and not p.get_action_button("slot:%d" % slot).text.is_empty()
+	_ok(rows_ok, "every slot shows its reward, state and button as text")
+	_ok(p.get_action_button("close").text == UiText.t("SHOP_CLOSE") and p.find_children("*", "AudioStreamPlayer", true, false).is_empty(), "a CLOSE button declines; the screen owns no audio player")
+	p.get_action_button("slot:1").pressed.emit()
+	await create_timer(0.5).timeout
+	_ok(tp.requests.is_empty() and app.economy.rewarded_daily.slot_state(2) == "ready_ad" and p.get_action_button("slot:2").text == UiText.t("RADS_WATCH"), "reward 1 is free (no video); reward 2 offers WATCH AD")
+	p.get_action_button("slot:2").pressed.emit()
+	_ok(tp.requests.size() == 1 and p.is_busy(), "the video starts only on the WATCH AD press")
+	tp.deliver_last({"outcome": "cancelled", "verified": false})
+	await _frames(2)
+	var note: Label = p.find_child("Note", true, false)
+	_ok(not p.is_busy() and app.economy.rewarded_daily.slot_state(2) == "ready_ad" and not note.text.is_empty(), "cancelling the video grants nothing, says so in text and frees the popup ('%s')" % note.text)
+	p.rearm()
+	p.get_action_button("slot:2").pressed.emit()
+	_ok(p.is_busy() and not p.request_back(), "while a video is out, back waits for its answer")
+	await create_timer(0.6).timeout
+	_ok(not p.is_busy() and app.economy.rewarded_daily.slot_state(2) == "ready_ad", "no provider answer: the UI timeout frees the popup, nothing granted (shipping wait %.0f s)" % RewardedAdsScreen.UI_TIMEOUT_S)
+	var was_open: bool = p.is_open()
+	stack.handle_back()
+	_ok(was_open and stack.top() == null and (not is_instance_valid(p) or not p.is_open()), "back closes the screen")
+	app.economy.wallet.credit("scrub_bucks", 5000)
+	app.economy.hearts.consume()
+	_ok(bool(app.actions.buy_heart().get("ok", false)), "a Heart is also sold for Scrub Bucks (no video needed)")
+	_free(b)
+	_complete("a10_rewarded_ad_path")
+
+func _a11() -> void:
+	print("[a11 motion / flash: feel gateway allow-list, REDUCED rows, FULL vs REDUCED table]")
+	_ok(FeedbackAdapter.GFF_ALLOWED == ["punch_scale"] and FeedbackAdapter.SPARK_ALLOWED == ["spark", "pickup", "confetti"], "GameFeelFlow reaches only punch_scale, Spark only spark / pickup / confetti (no flash / camera / shake / freeze)")
+	_ok(FeedbackAdapter.REDUCED.values().all(func(r): return r["gff"] == "" and r["spark"] == "" and int(r["amount"]) == 0), "every REDUCED intent row plans no motion and no particles")
+	_ok(FeedbackAdapter.DURATION_CEILING_S.values().all(func(d): return d <= 1.3), "every FULL intent ends within 1.3 s (no loops)")
+	var doc := FileAccess.get_file_as_string("res://docs/ACCESSIBILITY.md")
+	var missing: Array = REDUCED_LEDGER.keys().filter(func(f): return not doc.contains(String(f).get_file()))
+	_ok(not doc.is_empty() and missing.is_empty(), "docs/ACCESSIBILITY.md has a FULL vs REDUCED row for each of the %d Reduced-aware scripts %s" % [REDUCED_LEDGER.size(), str(missing)])
+	_complete("a11_motion_flash_table")
+
+## [SubViewport, main root] on a throw-away save (or `path`), every feature unlocked unless
+## `unlock_all` is false.
+func _boot(unlock_all := true, path := "") -> Array:
+	AppStateScript.test_unlock_all = unlock_all
 	MainScript.boot_opening_override = 0
 	var sub := SubViewport.new()
 	sub.size = Vector2i(1080, 2160)
 	sub.disable_3d = true
 	get_root().add_child(sub)
-	var path := "user://m50_%d.save" % Time.get_ticks_usec()
-	_tmp.append(path)
+	if path.is_empty():
+		path = "user://m50_%d.save" % Time.get_ticks_usec()
+		_tmp.append(path)
 	MainScript.boot_save_path_override = path
 	var root = MainScene.instantiate()
 	sub.add_child(root)

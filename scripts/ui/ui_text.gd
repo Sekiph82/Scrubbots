@@ -559,6 +559,13 @@ ACTIVE",
 	"CREDITS_NAME_GAME_FEEL_FLOW": "Game Feel Flow",
 	"CREDITS_NAME_SALTMIRE_SPARK": "Saltmire Spark",
 	"CREDITS_GODOT_COMPONENTS": "Godot Engine third-party components",
+	# M50 (SB-M50-016): screen-reader names (Control.accessibility_name) of icon-only / glyph buttons.
+	"A11Y_GET_SCRUB_BUCKS": "Get more Scrub Bucks",
+	"A11Y_GET_HEARTS": "Get more Hearts",
+	"A11Y_PAUSE": "Pause",
+	"A11Y_PREV_SET": "Previous set",
+	"A11Y_NEXT_SET": "Next set",
+	"A11Y_COLOR_TARGET": "Color %s",
 }
 
 ## M51 (SB-M51-003/004): developer pseudo-localization. When true, every t() result is
