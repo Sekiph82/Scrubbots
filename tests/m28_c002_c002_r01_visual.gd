@@ -37,6 +37,7 @@ var _host
 func _initialize() -> void:
 	await process_frame
 	MainScript.boot_opening_override = 0
+	AppState.test_unlock_all = true   # boosters / +1 Slot unlock at L6+ (SB-M44-032); this suite plays L2..4
 	await _boot_main(2)
 	await _body_span_2_4()
 	await _route_unchanged_by_scale()

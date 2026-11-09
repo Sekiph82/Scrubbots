@@ -27,6 +27,7 @@ var _settles := 0
 func _initialize() -> void:
 	OS.low_processor_usage_mode_sleep_usec = 0
 	await process_frame
+	AppState.test_unlock_all = true   # boosters / +1 Slot unlock at L6..21 (SB-M44-031/032); these fixtures start at L1
 	var pal = JSON.parse_string(FileAccess.get_file_as_string("res://data/palettes/scrubbots_palette_v3.json"))
 	for c in pal["colors"]:
 		_v3.append("#%sFF" % String(c["hex"]).trim_prefix("#").to_upper())
@@ -173,6 +174,7 @@ func _s1b_fair_cursor() -> void:
 		a.offframe_budget_ms = 600
 		var deepest: Array = []
 		var starts: Array = []
+		var resumes: Array = []   ## the cursor each step must resume at (the last cut, mod the new list size)
 		var seen := {}
 		var ok_rows := true
 		for step in range(4):
@@ -180,6 +182,7 @@ func _s1b_fair_cursor() -> void:
 				await _evolve(h)
 			if mode == "control_reset0":
 				a._list_offset = 0   # the pre-RM006 behaviour: every worker starts at batch 0
+			resumes.append(a._list_offset % _supply_ids(h).size())
 			var s0 := _settles
 			var r := await _offframe_list(h)
 			var v = r[0]
@@ -193,23 +196,33 @@ func _s1b_fair_cursor() -> void:
 			var reproven: int = _reproven(h, ids)
 			ok_rows = ok_rows and v != null and v["partial"] and not ids.is_empty() and ids.size() < _supply_ids(h).size() and no_rerun and reproven == ids.size()
 			deepest.append(pos.max() if not pos.is_empty() else -1)
-			starts.append(pos.min() if not pos.is_empty() else -1)
+			starts.append(_cyclic_start(pos, _supply_ids(h).size()))
 			for b in ids:
 				seen[b] = true
 			print("    %s step %d: %d batches, proven %d at positions %d..%d, offset now %d, same-state rerun %s, re-proven %d/%d" % [
 				mode, step, _supply_ids(h).size(), ids.size(), pos.min() if not pos.is_empty() else -1, pos.max() if not pos.is_empty() else -1,
 				a._list_offset, str(not no_rerun), reproven, ids.size()])
-		runs[mode] = {"deepest": deepest, "starts": starts, "distinct": seen.size(), "ok": ok_rows}
+		runs[mode] = {"deepest": deepest, "starts": starts, "resumes": resumes, "distinct": seen.size(), "ok": ok_rows}
 		_free(h)
 	var fair: Dictionary = runs["rm006"]
 	var ctl: Dictionary = runs["control_reset0"]
 	_ok(fair["ok"] and ctl["ok"], "every partial list non-empty, every chip re-proven, no second worker on an unchanged state")
-	_ok(int(fair["starts"][1]) > int(fair["deepest"][0]) - 2 and int(fair["starts"][2]) > int(fair["starts"][1]) and int(fair["distinct"]) > int(ctl["distinct"]),
-		"fair cursor: each new state's list starts after the last cut (starts %s, deepest %s, %d distinct) vs reset-0 control (starts %s, %d distinct)" % [
-			str(fair["starts"]), str(fair["deepest"]), fair["distinct"], str(ctl["starts"]), ctl["distinct"]])
+	# The cursor wraps past the list end (a fast machine proves more per cap), so a step's start
+	# is where its contiguous (cyclic) run begins, not its lowest position.
+	var resumed := range(1, 4).all(func(i): return absi(int(fair["starts"][i]) - int(fair["resumes"][i])) <= 1)
+	_ok(resumed and int(fair["distinct"]) > int(ctl["distinct"]),
+		"fair cursor: each new state's list starts after the last cut (starts %s, cuts %s, deepest %s, %d distinct) vs reset-0 control (starts %s, %d distinct)" % [
+			str(fair["starts"]), str(fair["resumes"]), str(fair["deepest"]), fair["distinct"], str(ctl["starts"]), ctl["distinct"]])
 	_ok(ctl["starts"] == [0, 0, 0, 0], "control: the old reset-to-0 cursor restarts at batch 0 every time (the prefix)")
 	if _fail == f0:
 		_groups += 1
+
+## First position of the contiguous cyclic run `pos` covers in a list of `n` (-1 when empty).
+func _cyclic_start(pos: Array, n: int) -> int:
+	for p in pos:
+		if not pos.has((int(p) - 1 + n) % n):
+			return int(p)
+	return pos.min() if not pos.is_empty() else -1
 
 # ------------------------------------------------------------------ S2 --------
 

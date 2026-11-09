@@ -30,6 +30,7 @@ var _tmp: Array = []
 
 func _initialize() -> void:
 	await process_frame
+	AppState.test_unlock_all = true   # boosters / +1 Slot unlock at L6..21 (SB-M44-031/032); this suite plays early levels
 	_five_blue_one_wave()
 	_runtime_lane_wave()
 	_five_colors_one_wave()

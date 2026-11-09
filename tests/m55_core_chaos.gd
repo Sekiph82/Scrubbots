@@ -32,6 +32,7 @@ var _completed := {}
 
 func _initialize() -> void:
 	await process_frame
+	AppState.test_unlock_all = true   # boosters / +1 Slot unlock at L6..21 (SB-M44-031/032); this suite plays early levels
 	await _spam_fixture()
 	await _spam_level2()
 	await _restart_in_flight()

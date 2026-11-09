@@ -69,6 +69,7 @@ var _prov = null
 func _initialize() -> void:
 	OS.low_processor_usage_mode_sleep_usec = 0
 	await process_frame
+	AppState.test_unlock_all = true   # boosters / +1 Slot unlock at L6..21 (SB-M44-031/032); these fixtures start at L1
 	var pal = JSON.parse_string(FileAccess.get_file_as_string("res://data/palettes/scrubbots_palette_v3.json"))
 	for c in pal["colors"]:
 		_v3.append("#%sFF" % String(c["hex"]).trim_prefix("#").to_upper())

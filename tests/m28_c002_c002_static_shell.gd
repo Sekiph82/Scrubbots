@@ -45,6 +45,7 @@ var _host
 func _initialize() -> void:
 	await process_frame
 	MainScript.boot_opening_override = 0
+	AppState.test_unlock_all = true   # boosters / +1 Slot unlock at L6+ (SB-M44-032); this suite plays L2..4
 	MainScript.boot_clock_override = func(): return _now[0]
 	_masters_locked()
 	await _shell_selection_matrix()

@@ -10,6 +10,7 @@ extends SceneTree
 
 const MainScript = preload("res://scripts/app/main.gd")
 const MainScene = preload("res://scenes/app/main.tscn")
+const AppState = preload("res://scripts/app/app_state.gd")
 const SpeedAcquisitionPopup = preload("res://scripts/ui/speed_acquisition_popup.gd")
 const BasePopup = preload("res://scripts/ui/popup/base_popup.gd")
 const AcquisitionFlow = preload("res://scripts/ui/popup/acquisition_flow.gd")
@@ -42,6 +43,7 @@ var _host
 
 func _initialize() -> void:
 	await process_frame
+	AppState.test_unlock_all = true   # boosters / +1 Slot unlock at L6..21 (SB-M44-031/032); this suite plays early levels
 	MainScript.boot_opening_override = 0
 	MainScript.boot_clock_override = func(): return _now[0]
 	await _boot(2)
