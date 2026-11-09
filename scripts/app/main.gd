@@ -182,9 +182,13 @@ func _ready() -> void:
 	_home.set_app_shortcuts(APP_SHORTCUTS)
 	_home.set_app_nav(APP_NAV)
 	# SB-M57-013: the No Ads entitlement collapses the Home bottom banner slot (live after a buy / restore).
+	# SB-M57-001: the same check shows / hides the ad provider's bottom banner.
 	if app_state != null and app_state.economy != null:
 		var store = app_state.economy.store
-		var banner := func(): _home.set_ad_slot_enabled(store.ads_allowed("banner"))
+		var ads = app_state.economy.ads
+		var banner := func():
+			_home.set_ad_slot_enabled(store.ads_allowed("banner"))
+			ads.update_banner()
 		banner.call()
 		store.resolved.connect(banner.unbind(2))
 		store.restored.connect(banner.unbind(1))
@@ -925,6 +929,7 @@ func _continue_from_results(attempt: int) -> Dictionary:
 	if _zero_heart_gate("attempt_gate", "results_continue"):
 		_results.show_model(_results.get_model())   # re-arm Continue
 		return {"ok": false, "reason": "no_hearts"}
+	_between_levels_ad()
 	var r := launch_gameplay()
 	if r.get("ok", false):
 		nav.go(NavigationController.Route.GAMEPLAY, {"level": r["launch"]["level"], "entry_id": r["launch"]["entry_id"]})
@@ -945,12 +950,20 @@ func retry_from_results() -> bool:
 		return false
 	if _zero_heart_gate("attempt_gate", "results_retry"):
 		return false
+	_between_levels_ad()
 	if not _gameplay_host.retry():
 		return false
 	if not nav.resume_gameplay_after_retry():
 		return false
 	_show_level_intro(_gameplay_host)
 	return true
+
+## SB-M57-001: the every-5-plays interstitial, only here (Results -> next attempt), never
+## during gameplay. AdService decides (No Ads, cadence); the null provider shows nothing.
+func _between_levels_ad() -> void:
+	if app_state != null and app_state.economy != null:
+		if app_state.economy.ads.try_interstitial():
+			app_state.mark_dirty()   # the shown-at count is saved with the next attempt's state
 
 ## SB-VIDEO-005: the Level Intro over the just-started level (presentation only; the overlay
 ## consumes taps while it is up, then frees itself). Not over a live coachmark (L1-L3 FTUE).

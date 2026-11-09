@@ -140,6 +140,8 @@ func rewarded_available(product: String) -> bool:
 func start_rewarded(product: String, token: String = "") -> Dictionary:
 	if product.begins_with("booster:") and not feature_unlocked(product.substr(8)):
 		return {"ok": false, "action": "start_rewarded", "reason": "locked"}
+	if not _economy.ads.allowed("rewarded"):
+		return {"ok": false, "action": "start_rewarded", "reason": "ads_disallowed"}
 	var r: Dictionary = _economy.rewarded.start(product, token)
 	r["action"] = "start_rewarded"
 	return r
@@ -151,6 +153,8 @@ func claim_rewarded_daily_free() -> Dictionary:
 	return _finish("claim_rewarded_daily", _economy.rewarded_daily.claim_free())
 
 func start_rewarded_daily(slot: int, token: String = "") -> Dictionary:
+	if not _economy.ads.allowed("rewarded"):
+		return {"ok": false, "action": "start_rewarded_daily", "reason": "ads_disallowed"}
 	var r: Dictionary = _economy.rewarded_daily.start_ad(slot, token)
 	r["action"] = "start_rewarded_daily"
 	return r
