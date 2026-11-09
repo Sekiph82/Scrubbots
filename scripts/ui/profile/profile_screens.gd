@@ -538,7 +538,7 @@ static func open_ranks(stack, app) -> BasePopup:
 		b.toggle_mode = true
 		b.button_group = group
 		b.button_pressed = t[2] == all_time
-		b.focus_mode = Control.FOCUS_NONE
+		b.focus_mode = Control.FOCUS_ACCESSIBILITY
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		b.custom_minimum_size = Vector2(0, UiTokens.TOUCH_MIN)
 		b.add_theme_font_size_override("font_size", 26)
