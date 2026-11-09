@@ -43,6 +43,7 @@ const RewardedAdsScreen = preload("res://scripts/ui/daily/rewarded_ads_screen.gd
 const FtueDirector = preload("res://scripts/app/ftue_director.gd")
 const CoachmarkLayer = preload("res://scripts/ui/tutorial/coachmark_layer.gd")
 const HelpTipsScreen = preload("res://scripts/ui/tutorial/help_tips_screen.gd")
+const CreditsScreen = preload("res://scripts/ui/credits_screen.gd")
 const MetaCeremonies = preload("res://scripts/ui/ceremony/meta_ceremonies.gd")
 const LevelIntroOverlay = preload("res://scripts/ui/level_intro_overlay.gd")
 ## M44: coachmark refresh cadence (presentation poll; not per frame).
@@ -513,6 +514,7 @@ func _build_settings_entry() -> void:
 	_settings_panel.bind(app_state)
 	_settings_panel.closed.connect(func(): nav.close_settings())
 	_settings_panel.help_requested.connect(open_help)
+	_settings_panel.credits_requested.connect(open_credits)
 	_settings_panel.language_changed.connect(_on_language_changed)
 
 ## M44: Settings "?" -> the read-only HELP & TIPS popup on the app ModalStack (Home only;
@@ -524,6 +526,14 @@ func open_help():
 		nav.close_settings()
 	_track("screen_view", {"screen": "help"})
 	return HelpTipsScreen.open(_modals, app_state)
+
+## SB-M59-010: Settings CREDITS -> the read-only third-party notices popup (same rules as Help).
+func open_credits():
+	if nav == null or nav.current() != NavigationController.Route.HOME:
+		return null
+	if nav.is_settings_open():
+		nav.close_settings()
+	return CreditsScreen.open(_modals)
 
 # ------------------------------------------------------------------ M44 FTUE --
 

@@ -523,6 +523,12 @@ AKTİF",
 	"SETTINGS_LANGUAGE": "DİL",
 	"LANGUAGE_NAME_EN": "ENGLISH",
 	"LANGUAGE_NAME_TR": "TÜRKÇE",
+	"CREDITS_TITLE": "EMEĞİ GEÇENLER",
+	"CREDITS_INTRO": "SCRUBBOTS aşağıdaki açık kaynak yazılımlarla yapıldı. Lisansları bu bildirimlerin oyunla birlikte sunulmasını ister.",
+	"CREDITS_NAME_GODOT": "Godot Engine",
+	"CREDITS_NAME_GAME_FEEL_FLOW": "Game Feel Flow",
+	"CREDITS_NAME_SALTMIRE_SPARK": "Saltmire Spark",
+	"CREDITS_GODOT_COMPONENTS": "Godot Engine üçüncü taraf bileşenleri",
 }
 
 const DATA := {

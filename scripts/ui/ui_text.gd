@@ -552,6 +552,13 @@ ACTIVE",
 	"SETTINGS_LANGUAGE": "LANGUAGE",
 	"LANGUAGE_NAME_EN": "ENGLISH",
 	"LANGUAGE_NAME_TR": "TÜRKÇE",
+	# SB-M59-010: Settings CREDITS row + third-party notices popup (component names are proper nouns).
+	"CREDITS_TITLE": "CREDITS",
+	"CREDITS_INTRO": "SCRUBBOTS is made with the open-source software below. Their licenses ask for these notices to ship with the game.",
+	"CREDITS_NAME_GODOT": "Godot Engine",
+	"CREDITS_NAME_GAME_FEEL_FLOW": "Game Feel Flow",
+	"CREDITS_NAME_SALTMIRE_SPARK": "Saltmire Spark",
+	"CREDITS_GODOT_COMPONENTS": "Godot Engine third-party components",
 }
 
 ## M51 (SB-M51-003/004): developer pseudo-localization. When true, every t() result is

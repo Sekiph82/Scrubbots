@@ -20,6 +20,8 @@ signal help_requested
 ## M51 (SB-M51-005): the player picked another language (already applied + saved); the app root
 ## rebuilds its screens in it.
 signal language_changed(code: String)
+## SB-M59-010: the read-only CREDITS (third-party notices) popup was requested (the app root opens it).
+signal credits_requested
 
 const BasePopup = preload("res://scripts/ui/popup/base_popup.gd")
 const HomeStyle = preload("res://scripts/ui/home/home_style.gd")
@@ -46,6 +48,7 @@ var _reduced_toggle: CheckButton
 var _symbols_toggle: CheckButton
 var _lang_buttons: Dictionary = {}   ## language code -> Button
 var _help: Button
+var _credits: Button
 var _status: Label
 var _built := false
 var _frame = null
@@ -222,21 +225,17 @@ func _build() -> void:
 	_ink(_status)
 	col.add_child(_status)
 
-	var close := Button.new()
-	close.name = "CloseButton"
-	close.text = UiText.t("SETTINGS_CLOSE")
-	close.focus_mode = Control.FOCUS_NONE
-	close.custom_minimum_size = Vector2(0, TOUCH_MIN)
-	close.add_theme_font_size_override("font_size", FONT_BUTTON)
-	var tan := HomeStyle.box(BasePopup.ROW, BasePopup.ROW_EDGE, 4, 30, 4, 4)
-	for st in ["normal", "hover", "pressed", "disabled"]:
-		close.add_theme_stylebox_override(st, tan)
-	close.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
-	for c in ["font_color", "font_hover_color", "font_pressed_color", "font_hover_pressed_color"]:
-		close.add_theme_color_override(c, BasePopup.INK)
-	close.add_theme_constant_override("outline_size", 0)
+	# SB-M59-010: CREDITS (third-party notices popup) shares the CLOSE row, so the panel keeps its height.
+	var actions := HBoxContainer.new()
+	actions.name = "ActionRow"
+	actions.add_theme_constant_override("separation", 16)
+	col.add_child(actions)
+	_credits = _make_row_button("CreditsButton", UiText.t("CREDITS_TITLE"))
+	_credits.pressed.connect(func(): credits_requested.emit())
+	actions.add_child(_credits)
+	var close := _make_row_button("CloseButton", UiText.t("SETTINGS_CLOSE"))
 	close.pressed.connect(close_panel)
-	col.add_child(close)
+	actions.add_child(close)
 
 	var ver := Label.new()
 	ver.name = "VersionLabel"
@@ -245,6 +244,24 @@ func _build() -> void:
 	ver.add_theme_font_size_override("font_size", FONT_BODY)
 	_ink(ver)
 	col.add_child(ver)
+
+## Tan row button (CREDITS / CLOSE share one row).
+static func _make_row_button(n: String, text: String) -> Button:
+	var b := Button.new()
+	b.name = n
+	b.text = text
+	b.focus_mode = Control.FOCUS_NONE
+	b.custom_minimum_size = Vector2(0, TOUCH_MIN)
+	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	b.add_theme_font_size_override("font_size", FONT_BUTTON)
+	var tan := HomeStyle.box(BasePopup.ROW, BasePopup.ROW_EDGE, 4, 30, 4, 4)
+	for st in ["normal", "hover", "pressed", "disabled"]:
+		b.add_theme_stylebox_override(st, tan)
+	b.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
+	for c in ["font_color", "font_hover_color", "font_pressed_color", "font_hover_pressed_color"]:
+		b.add_theme_color_override(c, BasePopup.INK)
+	b.add_theme_constant_override("outline_size", 0)
+	return b
 
 ## "VERSION <version>[-debug] · BUILD <n>"; every channel but release carries -debug.
 static func version_text(d = null) -> String:
@@ -536,3 +553,6 @@ func get_color_symbols_toggle() -> CheckButton:
 
 func get_language_button(code: String) -> Button:
 	return _lang_buttons.get(code)
+
+func get_credits_button() -> Button:
+	return _credits

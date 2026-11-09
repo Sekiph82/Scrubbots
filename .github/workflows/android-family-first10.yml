@@ -67,6 +67,7 @@ name: Android Family First10 APK
 #   (tools/validate_content.gd); clean_clone (tools/clean_clone_check.py) proves a fresh clone imports and passes
 #   a smoke suite. A release export needs validate + clean_clone green, also with apk_only; debug apk_only stays
 #   the owner's untested quick path. addons/godot_ai (editor-only, untracked) is in the export exclusions.
+#   + m59_credits (exact 3/3 guard): Settings CREDITS row + third-party notices popup.
 
 on:
   workflow_dispatch:
@@ -164,7 +165,7 @@ jobs:
                    m39a_economy_core m39b_hearts_speed m39c_boosters m39d_daily_collection m39e_full_matrix \
                    m39_v02_atomicity m39_v02_capacity m39_v02_integration m39_v03_full_surface m39_v03_integration \
                    m39_v04_integration m39_v04_tornado_inflight m39_c003_random_any_booster_rewards \
-                   m41_settings m43_master_c009_daily m43_r15_owner_remediation m43_r15_001_r01_sequential_unlock \
+                   m41_settings m59_credits m43_master_c009_daily m43_r15_owner_remediation m43_r15_001_r01_sequential_unlock \
                    m45_debug_tooling m49_responsive_matrix m50_accessibility_audit m51_localization_readiness \
                    m50_color_symbols m28_c002_c004_tile_visual m28_c002_c001_gameplay_v02 m47_touch_r01_mobile_ux \
                    m43_c003_c001_acquisition m46_performance m44_unlock_gate m44_contextual_coach m44_new_badge \
@@ -372,6 +373,11 @@ jobs:
             echo "M54-WORLDS verdict=PASS (7/7)" | tee -a "$S"
           else
             echo "M54-WORLDS verdict=FAIL (exact 7/7 summary missing)" | tee -a "$S"; fail=1
+          fi
+          if grep -qxF 'SB-M59 credits evidence: PASS (3/3 cases, 0 fail)' validate_logs/m59_credits.log 2>/dev/null; then
+            echo "M59-CREDITS verdict=PASS (3/3)" | tee -a "$S"
+          else
+            echo "M59-CREDITS verdict=FAIL (exact 3/3 summary missing)" | tee -a "$S"; fail=1
           fi
           echo "aggregate=$([ $fail -eq 0 ] && echo PASS || echo FAIL)" | tee -a "$S"
           { echo "### validate (mode=${MODE:-<unset>}, ${GITHUB_SHA})"; echo '```'; cat "$S"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
