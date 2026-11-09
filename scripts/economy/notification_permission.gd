@@ -22,13 +22,10 @@ var platform := OS.get_name()
 ## Native ScrubbotsNotify (SB-M43-171/172): iOS authorization; on Android the OS truth for every
 ## API level (areNotificationsEnabled). null = built-in Android path only.
 var native = LocalNotifications.native_backend()
-var granted_fn := func() -> bool:
-	return bool(native.notifications_enabled()) if native != null else OS.get_granted_permissions().has(PERMISSION)
-var request_fn := func() -> void:
-	if platform == "iOS":
-		native.request_authorization()
-	else:
-		OS.request_permission(PERMISSION)
+## Built-in Android path (used when there is no native backend). The lambdas must not touch
+## members: a self-capturing lambda stored on self is a reference cycle (leak).
+var granted_fn := func() -> bool: return OS.get_granted_permissions().has(PERMISSION)
+var request_fn := func() -> void: OS.request_permission(PERMISSION)
 var _clock: Callable
 var _asked_at := 0       ## last "Allow" (OS request made) ts, 0 = never
 var _declined_at := 0    ## last "Not now" ts, 0 = never
@@ -44,7 +41,7 @@ func supported() -> bool:
 	return platform == "Android" or (platform == "iOS" and native != null)
 
 func granted() -> bool:
-	return supported() and bool(granted_fn.call())
+	return supported() and bool(native.notifications_enabled() if native != null else granted_fn.call())
 
 ## True when the explainer should show now: supported, not granted, outside the cooldown after
 ## the last "Not now" / "Allow" (an OS-level denial is never re-asked inside it either).
@@ -59,7 +56,10 @@ func decline() -> void:
 
 func allow() -> void:
 	_asked_at = int(_clock.call())
-	request_fn.call()
+	if platform == "iOS":
+		native.request_authorization()
+	else:
+		request_fn.call()
 
 func snapshot() -> Dictionary:
 	return {"version": SNAPSHOT_VERSION, "asked_at": _asked_at, "declined_at": _declined_at}
