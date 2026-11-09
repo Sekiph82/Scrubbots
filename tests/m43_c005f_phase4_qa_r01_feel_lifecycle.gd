@@ -206,6 +206,8 @@ func _l04() -> void:
 
 func _cleanup() -> void:
 	MainScript.boot_save_path_override = ""
+	MainScript.boot_clock_override = Callable()
+	MainScript.boot_local_day_override = Callable()
 	for p in _tmp:
 		for suffix in ["", ".bak", ".tmp"]:
 			if FileAccess.file_exists(p + suffix):

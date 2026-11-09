@@ -547,6 +547,8 @@ func _r02() -> void:
 func _cleanup() -> void:
 	MainScript.boot_save_path_override = ""
 	MainScript.boot_opening_override = -1
+	MainScript.boot_clock_override = Callable()
+	MainScript.boot_local_day_override = Callable()
 	Input.emulate_touch_from_mouse = false
 	for p in _tmp:
 		for suffix in ["", ".bak", ".tmp"]:
