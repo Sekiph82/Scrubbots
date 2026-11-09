@@ -138,11 +138,11 @@ func _walk(phys: Vector2i) -> void:
 	_ok(top != null and String(top.popup_id) == "comeback", "%s: a returning player lands on Welcome Back" % str(phys))
 	if top != null and String(top.popup_id) == "comeback":
 		await _frames(2)
-		_scan(phys, lv, "comeback", top)
+		await _scan(phys, lv, "comeback", top)
 		_track_comeback(phys, top)
 	stack.clear("test")
 	await _frames(2)
-	_scan(phys, lv, "home", _root.get_home())
+	await _scan(phys, lv, "home", _root.get_home())
 	_journey_ok(phys, "home", _root.get_home().get_journey_strip(), [_root.get_home().get_region("PlayButton").get_global_rect()])
 	for d in POPUPS + HOME_EXTRA:
 		if d == "comeback":
@@ -154,7 +154,7 @@ func _walk(phys: Vector2i) -> void:
 		if p == null:
 			_ok(false, "%s %s did not open" % [str(phys), d])
 		else:
-			_scan(phys, lv, d, p)
+			await _scan(phys, lv, d, p)
 			if d == "events":
 				_track_events(phys, p)
 			elif d == "tasks":
@@ -171,23 +171,23 @@ func _walk(phys: Vector2i) -> void:
 		_ok(false, "%s: gameplay did not start" % str(phys))
 		return
 	host.get_runtime().set_process(false)
-	_scan(phys, lv, "gameplay", host.get_screen(), _fronts(host.get_screen()))
+	await _scan(phys, lv, "gameplay", host.get_screen(), _fronts(host.get_screen()))
 	var pause = host.open_pause()
 	await _frames(4)
-	_scan(phys, lv, "pause", pause)
+	await _scan(phys, lv, "pause", pause)
 	host.modal_stack.clear("test")
 	await _frames(2)
 	var acq = _root.get_acquisition()
 	for id in BOOSTERS:
 		var bp = acq.open_booster(host, id)
 		await _frames(4)
-		_scan(phys, lv, "booster_" + id, bp)
+		await _scan(phys, lv, "booster_" + id, bp)
 		stack.clear("test")
 		host.modal_stack.clear("test")
 		await _frames(2)
 	host.get_screen().get_speed_button().pressed.emit()
 	await _frames(4)
-	_scan(phys, lv, "speed_acquire", host.get_speed_acquisition_popup())
+	await _scan(phys, lv, "speed_acquire", host.get_speed_acquisition_popup())
 	stack.clear("test")
 	host.modal_stack.clear("test")
 	await _frames(2)
@@ -196,7 +196,7 @@ func _walk(phys: Vector2i) -> void:
 	intro.reduced = true
 	host.add_child(intro)
 	await _frames(3)
-	_scan(phys, lv, "level_intro", intro)
+	await _scan(phys, lv, "level_intro", intro)
 	intro.free()
 	var res = _root.get_results_screen()
 	for status in ["WON", "LOST"]:
@@ -207,19 +207,20 @@ func _walk(phys: Vector2i) -> void:
 		await _frames(4)
 		res.finish_reveal()
 		await create_timer(0.5).timeout   # the CLEAN NEXT emphasis bump (0.40 s) settles
-		_scan(phys, lv, "results_" + status, res)
+		await _scan(phys, lv, "results_" + status, res)
 		if status == "WON":
 			_track_results(phys, lv, res, Rect2(Vector2.ZERO, Vector2(lv)))
 		else:
 			var nah = acq.open_need_a_hand({"show": true, "level": 1, "picks": [{"id": "tornado"}, {"id": "random"}]})
 			await _frames(4)
-			_scan(phys, lv, "need_a_hand", nah)
+			await _scan(phys, lv, "need_a_hand", nah)
 			stack.clear("test")
 			await _frames(2)
 	res.visible = false
 
 ## Measure one surface: popup frame (or the control) inside the screen + factory 115 touch +
-## text checks. A null surface is a failure.
+## text checks. A null surface is a failure. Awaited by _walk: tests/m50_contrast_surfaces.gd
+## overrides it with a coroutine that renders between captures.
 func _scan(phys: Vector2i, lv: Vector2i, surf: String, node, extra: Array = []) -> void:
 	if node == null or not is_instance_valid(node):
 		_ok(false, "%s %s: surface missing" % [str(phys), surf])

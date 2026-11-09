@@ -73,7 +73,7 @@ static func _slot_row(p: BasePopup, slot: int, reward: Dictionary) -> Control:
 	rt.name = "RewardText"
 	rt.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	info.add_child(rt)
-	var st := BasePopup.body_label("", 20, Color(0.2, 0.55, 0.12))
+	var st := BasePopup.body_label("", 20, Color(0.12, 0.40, 0.07))   # SB-M50-004: >= 4.5:1 on the cream / cyan cards
 	st.name = "State"
 	st.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	info.add_child(st)

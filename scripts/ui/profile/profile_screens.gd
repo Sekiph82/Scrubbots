@@ -542,7 +542,7 @@ static func open_ranks(stack, app) -> BasePopup:
 			if i == cur:
 				card.add_theme_stylebox_override("panel", HomeStyle.pad(HomeStyle.box(BasePopup.GOLD_BODY, BasePopup.GOLD_EDGE, 4, 22, 0), UiTokens.SPACE_SM, UiTokens.SPACE_XS))
 			elif i > cur:
-				card.modulate.a = 0.6
+				card.modulate.a = 0.75   # SB-M50-004: faded future tier text stays >= 4.5:1
 			var h := HBoxContainer.new()
 			card.get_child(0).add_child(h)
 			var nl := _label("Name", UiText.t("RANKS_TIER_ROW", [UiText.t(t["name_key"]), UiText.num(int(t["min_cleared"]))]), 24, BasePopup.INK)

@@ -295,7 +295,7 @@ static func _day_card(day: int, reward: Dictionary) -> Control:
 	r.name = "RewardText"
 	r.custom_minimum_size = Vector2(DAY_CARD_SIZE.x - 2 * DAY_CARD_INSET["side"], 0)
 	v.add_child(r)
-	var s := BasePopup.body_label("", 18, Color(0.2, 0.55, 0.12))
+	var s := BasePopup.body_label("", 18, Color(0.12, 0.40, 0.07))   # SB-M50-004: >= 4.5:1 on the cream / cyan cards
 	s.name = "State"
 	v.add_child(s)
 	return card
