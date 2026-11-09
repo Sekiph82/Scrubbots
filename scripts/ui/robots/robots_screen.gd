@@ -6,6 +6,9 @@ extends RefCounted
 ##   - per robot: portrait, name, role, canonical 20% meta perk (meta only — never puzzle power),
 ##     ACTIVE / UNLOCKED / LOCKED, NEW until first seen here after its unlock;
 ##   - Bot Parts N / 250 toward the next robot, with the overflow that carries over;
+##   - SB-M44-027: 5-stage assembly of the next robot (50/100/150/200/250 parts): its existing
+##     portrait revealed bottom-up by one shader uniform + "Assembly N / 5". Visual only;
+##     Bot Parts stay one plain wallet balance (no per-part inventory, no new currency);
 ##   - EQUIP (unlocked) -> ProductionActionFacade.equip_robot; UNLOCK (only the next robot in
 ##     canonical order, only with enough Bot Parts) -> unlock_next_robot -> the shared ceremony
 ##     presenter shows the owner-accepted Robot Unlock ceremony on top;
@@ -28,6 +31,14 @@ const ART := {
 	"lock": "res://assets/ui/final/robots/robot_lock_emblem.png",
 }
 const LIST_H := 1060.0
+const ASSEMBLY_STAGES := 5
+## Bottom-up reveal: rows above (1 - reveal) of the portrait stay a dark silhouette.
+const ASSEMBLY_SHADER := """shader_type canvas_item;
+uniform float reveal = 0.0;
+void fragment() {
+	if (UV.y < 1.0 - reveal) { COLOR.rgb = vec3(dot(COLOR.rgb, vec3(0.3, 0.59, 0.11)) * 0.25); }
+}
+"""
 
 static func seen_key(id: String) -> String:
 	return "robot_seen:" + id
@@ -54,6 +65,19 @@ static func open(stack, app, ceremonies = null) -> BasePopup:
 	pl.name = "Parts"
 	pl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	parts.add_child(pl)
+	var asm := VBoxContainer.new()
+	asm.name = "Assembly"
+	parts.add_child(asm)
+	var aa := HomeStyle.art("AssemblyArt")
+	aa.custom_minimum_size = Vector2(96, 96)
+	var sh := Shader.new()
+	sh.code = ASSEMBLY_SHADER
+	aa.material = ShaderMaterial.new()
+	aa.material.shader = sh
+	asm.add_child(aa)
+	var al := BasePopup.body_label("", 18, BasePopup.INK)
+	al.name = "AssemblyStage"
+	asm.add_child(al)
 	var scroll := ScrollContainer.new()
 	scroll.name = "RobotList"
 	scroll.custom_minimum_size = Vector2(0, LIST_H)
@@ -156,6 +180,11 @@ static func row_state(e, id: String) -> Dictionary:
 		return {"state": "next", "action": "unlock", "can_unlock": bool(prog["can_unlock"])}
 	return {"state": "locked", "action": "details"}
 
+## SB-M44-027: assembly stage 0..5 for `parts` toward a `cost`-part robot (50/100/150/200/250
+## at cost 250); overflow beyond `cost` stays at the final stage.
+static func assembly_stage(parts: int, cost: int) -> int:
+	return clampi(parts * ASSEMBLY_STAGES / cost, 0, ASSEMBLY_STAGES)
+
 static func refresh(p: BasePopup, e) -> void:
 	var prog: Dictionary = e.robots.next_robot_progress()
 	var next := RobotRoster.next_locked(e.robots)
@@ -165,6 +194,14 @@ static func refresh(p: BasePopup, e) -> void:
 	if not next.is_empty() and parts >= cost:
 		text += "\n" + UiText.tn("ROBOTS_OVERFLOW", parts - cost, [UiText.num(parts - cost)])
 	(p.find_child("Parts", true, false) as Label).text = text
+	var asm: Control = p.find_child("Assembly", true, false)
+	asm.visible = not next.is_empty()
+	if asm.visible:
+		var stage := assembly_stage(parts, cost)
+		var aa: TextureRect = asm.get_node("AssemblyArt")
+		aa.texture = load(RobotRoster.asset(next, "portrait"))
+		aa.material.set_shader_parameter("reveal", float(stage) / ASSEMBLY_STAGES)
+		(asm.get_node("AssemblyStage") as Label).text = UiText.t("ROBOTS_ASSEMBLY", [UiText.num(stage), UiText.num(ASSEMBLY_STAGES)])
 	for card in p.find_children("Robot_*", "PanelContainer", true, false):
 		var id := String(card.get_meta("robot_id"))
 		var st := row_state(e, id)
