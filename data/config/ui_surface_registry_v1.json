@@ -10,6 +10,7 @@
     "collection",
     "collection_set",
     "robots",
+    "rewarded_ads",
     "tasks",
     "daily",
     "gift_bar",
@@ -30,9 +31,11 @@
     "booster_acquire",
     "speed_acquire",
     "insufficient_sb",
+    "scrub_bucks",
     "reward",
     "confirm",
     "card_detail",
+    "cards_exchange",
     "pack_open",
     "robot_unlock",
     "feature_unlock",
@@ -61,12 +64,24 @@
     },
     {
       "source": "home.scrub_bucks_plus",
-      "destination": "shop",
+      "destination": "popup:scrub_bucks",
       "context": "currency_acquisition"
     },
     {
       "source": "home.heart_plus",
       "destination": "popup:life"
+    },
+    {
+      "source": "home.gift_meter",
+      "destination": "gift_bar"
+    },
+    {
+      "source": "home.rewarded_ads",
+      "destination": "rewarded_ads"
+    },
+    {
+      "source": "home.play",
+      "destination": "gameplay"
     },
     {
       "source": "bottom_nav.events",
@@ -127,6 +142,18 @@
     {
       "source": "reward.world_unlock",
       "destination": "popup:world_unlock"
+    },
+    {
+      "source": "results.clean_next",
+      "destination": "gameplay"
+    },
+    {
+      "source": "results.retry",
+      "destination": "gameplay"
+    },
+    {
+      "source": "results.home",
+      "destination": "home"
     }
   ]
 }

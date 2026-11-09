@@ -1,0 +1,334 @@
+{
+  "gates": [
+    {
+      "checks": [
+        {
+          "check": "home_buttons",
+          "evidence": "14 enabled Home buttons pressed, each opened a surface: [\"collection\", \"daily\", \"events\", \"gameplay\", \"gift_bar\", \"life\", \"profile\", \"ranks\", \"rewarded_ads\", \"robots\", \"scrub_bucks\", \"settings\", \"shop\", \"tasks\"]; dead []",
+          "result": "PASS"
+        },
+        {
+          "check": "nav_tabs_live",
+          "evidence": "with every feature unlocked no BottomNav tab is disabled / COMING LATER []",
+          "result": "PASS"
+        },
+        {
+          "check": "deep_links",
+          "evidence": "every notification deep link opens its surface { \"home\": \"\", \"daily\": \"daily\", \"tasks\": \"tasks\", \"gift_bar\": \"gift_bar\", \"events\": \"events\", \"shop\": \"shop\", \"collection\": \"collection\", \"robots\": \"robots\", \"profile\": \"profile\" }; dead []",
+          "result": "PASS"
+        },
+        {
+          "check": "gameplay_hud",
+          "evidence": "Home PLAY -> GAMEPLAY; HUD controls -> { \"pause\": \"pause\", \"speed\": \"speed_acquire\", \"booster_plus_one_slot\": \"booster_acquire\", \"booster_random\": \"booster_acquire\", \"booster_selector\": \"booster_acquire\", \"booster_tornado\": \"booster_acquire\" }; dead []",
+          "result": "PASS"
+        },
+        {
+          "check": "results_buttons",
+          "evidence": "WON -> Results, CLEAN NEXT -> next level; LOST -> Results, RETRY -> same level; LOST -> Results, HOME -> Home { \"won\": true, \"clean_next\": true, \"lost\": true, \"retry\": true, \"lost_again\": true, \"home\": true }",
+          "result": "PASS"
+        },
+        {
+          "check": "registry_routes",
+          "evidence": "27 ui_surface_registry routes, each walked here or by its suite [\"progression.third_consecutive_fail\", \"collection.cards_exchange\", \"collection.pack_open\", \"reward.robot_unlock\", \"reward.world_unlock\"]; failing / unwalked []; walked but not in the registry []; reached surfaces / route destinations outside the registry []",
+          "result": "PASS"
+        },
+        {
+          "check": "no_debug_surface",
+          "evidence": "no shipping script under [\"scripts/app\", \"scripts/ui\", \"scripts/economy\", \"scripts/progression\", \"scripts/gameplay\", \"scripts/save\"] reaches a debug scene / debug UI script []",
+          "result": "PASS"
+        }
+      ],
+      "id": "SB-M60-001",
+      "kind": "automated",
+      "status": "PASS",
+      "title": "No dead routes: every Home / BottomNav / HUD + / deep link / gameplay control / Results route leads to a live surface"
+    },
+    {
+      "checks": [
+        {
+          "check": "manifest_bound",
+          "evidence": "42 surfaces: 39 bound (script + live data + evidence suite exist), 3 explicitly not built: [\"world_unlock_transition (not live: no world table yet (SB-M43-136..141 / 073), CeremonyEvents never emits world_unlock)\", \"account_cloud_sync_conflict (provider decision SB-M43-153)\", \"friends_postlaunch (post-launch)\"]; unbound / broken []",
+          "result": "PASS"
+        },
+        {
+          "check": "registry_covered",
+          "evidence": "every ui_surface_registry screen / popup has a manifest surface; missing []",
+          "result": "PASS"
+        },
+        {
+          "check": "no_placeholder_copy",
+          "evidence": "530 English UiText strings, none contains placeholder / dummy / lorem / TODO / TBD / FIXME copy []",
+          "result": "PASS"
+        }
+      ],
+      "id": "SB-M60-002",
+      "kind": "automated",
+      "status": "PASS",
+      "title": "Bound surfaces: every manifest surface is bound to live data or explicitly not built; no placeholder copy"
+    },
+    {
+      "checks": [
+        {
+          "check": "first_home",
+          "evidence": "fresh profile boots to Home at L1 with the first-Home DAILY tip (route HOME, step home_daily)",
+          "result": "PASS"
+        },
+        {
+          "check": "welcome_task",
+          "evidence": "TASKS at first Home shows the Welcome task; CLAIM through the popup button: 1000 -> 1100 SB",
+          "result": "PASS"
+        },
+        {
+          "check": "l1_l3_real_play",
+          "evidence": "L1..L3 under the human policy on the shipped host, Results CLEAN NEXT / HOME buttons: [\"L1 tip l1_tap_front: WON -> RESULTS\", \"L2 tip -: WON -> RESULTS\", \"L3 tip l3_speed: WON -> RESULTS\"]; at Home L4, FTUE window closed true",
+          "result": "PASS"
+        },
+        {
+          "check": "no_debug_tools",
+          "evidence": "no test unlock, no debug_set_current_level, no injected terminal: the shipped unlock table and real wins only",
+          "result": "PASS"
+        }
+      ],
+      "id": "SB-M60-003",
+      "kind": "automated",
+      "status": "PASS",
+      "title": "Fresh-save FTUE: first Home, Welcome task, L1 -> L3 played for real, no debug tools"
+    },
+    {
+      "checks": [
+        {
+          "check": "no_provider",
+          "evidence": "rewarded provider is the production default RewardedAdProvider (no SDK): every placement unavailable",
+          "result": "PASS"
+        },
+        {
+          "check": "shop_store_gated",
+          "evidence": "Shop SCRUB BUCKS packs + NO ADS: UNAVAILABLE / 'Available when the store opens.', press opens no confirm",
+          "result": "PASS"
+        },
+        {
+          "check": "sb_plus_gated",
+          "evidence": "Home SB + popup: SB pack UNAVAILABLE and inert",
+          "result": "PASS"
+        },
+        {
+          "check": "life_video_gated",
+          "evidence": "Life popup FREE video blocked with no provider; press grants no Heart (4)",
+          "result": "PASS"
+        },
+        {
+          "check": "rewarded_ads_gated",
+          "evidence": "Rewarded Ads: video slots show NO VIDEO and are blocked [\"CLAIM\", \"NO VIDEO\", \"LOCKED\", \"LOCKED\", \"LOCKED\"]",
+          "result": "PASS"
+        },
+        {
+          "check": "nothing_charged",
+          "evidence": "SB 1000 -> 1100 (free daily slot grants only), Hearts 4 after the one consumed -> 4: no purchase, no ad reward",
+          "result": "PASS"
+        }
+      ],
+      "id": "SB-M60-004",
+      "kind": "automated",
+      "status": "PASS",
+      "title": "Shop / ads / IAP with no provider: honest UNAVAILABLE states, nothing granted or charged"
+    },
+    {
+      "checks": [
+        {
+          "check": "unlock_table",
+          "evidence": "feature_unlocks_v1.json: events 30, ranks 40",
+          "result": "PASS"
+        },
+        {
+          "check": "unlock_edges",
+          "evidence": "frontier 29/30/39/40 [unlocked, tab enabled, tap opens]: { 29: { \"level\": 29, \"events\": [false, false, false], \"ranks\": [false, false, false], \"events_link\": \"home\" }, 30: { \"level\": 30, \"events\": [true, true, true], \"ranks\": [false, false, false], \"events_link\": \"events\" }, 39: { \"level\": 39, \"events\": [true, true, true], \"ranks\": [false, false, false], \"events_link\": \"events\" }, 40: { \"level\": 40, \"events\": [true, true, true], \"ranks\": [true, true, true], \"events_link\": \"events\" } }",
+          "result": "PASS"
+        },
+        {
+          "check": "ranks_metric",
+          "evidence": "Ranks count only cleared campaign levels (PersonalRank.METRIC campaign_levels_cleared): nothing bought with money or boosters counts",
+          "result": "PASS"
+        },
+        {
+          "check": "ranks_two_tables",
+          "evidence": "owner 2026-10-22 RANKS = all-time (highest level) + weekly (levels this week, Monday 00:00 UTC) tables: NOT built - the live Ranks tab is the personal rank ladder (SB-M43-122); SB-M43-131..133 READY",
+          "result": "FAIL"
+        }
+      ],
+      "id": "SB-M60-005",
+      "kind": "automated",
+      "status": "FAIL",
+      "title": "Events / Ranks shipping policy (owner: Events L30, Ranks L40, RANKS all-time + weekly)"
+    },
+    {
+      "checks": [
+        {
+          "check": "open_rows",
+          "evidence": "SB-M50-012..018, SB-M54-031/032/037/038, SB-M56-011/017..023, SB-M57-001..016/022, SB-M58-007..014, SB-M59-006..011 are READY (not done); no CI validation run on a release-candidate commit was made for this report (no workflow run in factory 132).",
+          "result": "FAIL"
+        }
+      ],
+      "id": "SB-M60-006",
+      "kind": "aggregate",
+      "status": "FAIL",
+      "title": "Release build passes the full M49..M58 player-experience, economy, device, compliance and regression gates"
+    },
+    {
+      "blocked_by": "owner",
+      "checks": [
+        {
+          "check": "owner",
+          "evidence": "`gh secret list` 2026-11-09 shows only ANDROID_DEBUG_KEYSTORE_*; ANDROID_RELEASE_KEYSTORE_* and IOS_DIST_CERT_* / IOS_PROVISIONING_PROFILE_BASE64 / IOS_TEAM_ID are missing (docs/RELEASE_BUILDS.md Owner-only steps). Release runs stop before export until the owner adds them.",
+          "result": "BLOCKED"
+        }
+      ],
+      "id": "OWNER-SIGNING",
+      "kind": "owner",
+      "status": "BLOCKED",
+      "title": "Store signing secrets (Android release keystore, Apple distribution certificate + profile)"
+    },
+    {
+      "blocked_by": "owner",
+      "checks": [
+        {
+          "check": "owner",
+          "evidence": "CLAUDE.md 0D.5: a public production store release is owner-only. No workflow uploads to Google Play or the App Store; the release APK is not an AAB (store-release work stays with the owner).",
+          "result": "BLOCKED"
+        }
+      ],
+      "id": "OWNER-STORE-SUBMISSION",
+      "kind": "owner",
+      "status": "BLOCKED",
+      "title": "Store submission / public production release"
+    },
+    {
+      "blocked_by": "owner",
+      "checks": [
+        {
+          "check": "owner",
+          "evidence": "No manifest surface is OWNER_ACCEPTED (see the SB-M43-170 lists below); most still need a visual master first (MASTER_REQUIRED, factory work). Masters approved by Claude under delegated authority are not owner visual review.",
+          "result": "BLOCKED"
+        }
+      ],
+      "id": "OWNER-VISUAL-SIGNOFF",
+      "kind": "owner",
+      "status": "BLOCKED",
+      "title": "Owner visual sign-off of the M43 player-facing surfaces"
+    },
+    {
+      "blocked_by": "owner",
+      "checks": [
+        {
+          "check": "owner",
+          "evidence": "TASKS.md OWNER rows SB-M42-032, SB-M47-005..010, SB-M47-011..015 wait for the Galaxy A10 to be plugged in; SB-M57-022 sandbox purchases / rewarded ads need a real device and live providers.",
+          "result": "BLOCKED"
+        }
+      ],
+      "id": "OWNER-DEVICE-TESTS",
+      "kind": "owner",
+      "status": "BLOCKED",
+      "title": "Real-device tests (Android Galaxy A10, iPhone)"
+    }
+  ],
+  "m43_closure_gate": {
+    "by_status": {
+      "MASTER_OWNER_APPROVED": 5,
+      "MASTER_REQUIRED": 31,
+      "MASTER_REQUIRED_POSTLAUNCH": 1,
+      "REFERENCE_SELECTED": 5
+    },
+    "debug_only": [],
+    "master_required": [
+      "pause",
+      "fail_retry",
+      "booster_acquire",
+      "speed_2x_acquire",
+      "insufficient_sb",
+      "shop",
+      "collection_album",
+      "collection_set_detail",
+      "card_detail",
+      "cards_exchange",
+      "standard_pack_open",
+      "premium_pack_open",
+      "collection_set_complete",
+      "master_collection_complete",
+      "robots_main",
+      "robot_detail_locked",
+      "robot_unlock",
+      "tasks",
+      "daily",
+      "gift_bar",
+      "gift_meter_milestone",
+      "ranks",
+      "comeback_summary",
+      "feature_unlock",
+      "world_unlock_transition",
+      "account_cloud_sync_conflict",
+      "generic_reward_confirmation",
+      "generic_error_offline_loading",
+      "notification_education_settings",
+      "friends_postlaunch",
+      "settings",
+      "rewarded_ads"
+    ],
+    "not_built": [
+      "account_cloud_sync_conflict",
+      "friends_postlaunch"
+    ],
+    "not_live": [
+      "world_unlock_transition"
+    ],
+    "not_owner_accepted": [
+      "gameplay_v02:REFERENCE_SELECTED",
+      "pause:MASTER_REQUIRED",
+      "level_intro:REFERENCE_SELECTED",
+      "victory_results:MASTER_OWNER_APPROVED",
+      "fail_retry:MASTER_REQUIRED",
+      "life_heart_refill:REFERENCE_SELECTED",
+      "need_a_hand:REFERENCE_SELECTED",
+      "booster_acquire:MASTER_REQUIRED",
+      "speed_2x_acquire:MASTER_REQUIRED",
+      "insufficient_sb:MASTER_REQUIRED",
+      "shop:MASTER_REQUIRED",
+      "collection_album:MASTER_REQUIRED",
+      "collection_set_detail:MASTER_REQUIRED",
+      "card_detail:MASTER_REQUIRED",
+      "cards_exchange:MASTER_REQUIRED",
+      "standard_pack_open:MASTER_REQUIRED",
+      "premium_pack_open:MASTER_REQUIRED",
+      "collection_set_complete:MASTER_REQUIRED",
+      "master_collection_complete:MASTER_REQUIRED",
+      "robots_main:MASTER_REQUIRED",
+      "robot_detail_locked:MASTER_REQUIRED",
+      "robot_unlock:MASTER_REQUIRED",
+      "tasks:MASTER_REQUIRED",
+      "daily:MASTER_REQUIRED",
+      "gift_bar:MASTER_REQUIRED",
+      "gift_meter_milestone:MASTER_REQUIRED",
+      "profile:MASTER_OWNER_APPROVED",
+      "achievements:MASTER_OWNER_APPROVED",
+      "events_main:MASTER_OWNER_APPROVED",
+      "event_detail:MASTER_OWNER_APPROVED",
+      "ranks:MASTER_REQUIRED",
+      "comeback_summary:MASTER_REQUIRED",
+      "feature_unlock:MASTER_REQUIRED",
+      "world_unlock_transition:MASTER_REQUIRED",
+      "account_cloud_sync_conflict:MASTER_REQUIRED",
+      "generic_reward_confirmation:MASTER_REQUIRED",
+      "generic_error_offline_loading:MASTER_REQUIRED",
+      "notification_education_settings:MASTER_REQUIRED",
+      "friends_postlaunch:MASTER_REQUIRED_POSTLAUNCH",
+      "home:REFERENCE_SELECTED",
+      "settings:MASTER_REQUIRED",
+      "rewarded_ads:MASTER_REQUIRED"
+    ],
+    "rule": "No M43 program closure while any required surface is missing, visually unreviewed (not OWNER_ACCEPTED), wired to dummy data or reachable only through debug tooling.",
+    "status": "OPEN",
+    "surfaces": 42,
+    "task": "SB-M43-170"
+  },
+  "release_ready": false,
+  "schema": "scrubbots.release_gates.v1",
+  "suite": "tests/m60_release_gates.gd"
+}
