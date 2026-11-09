@@ -9,7 +9,8 @@ extends RefCounted
 ##   - states: signed_out / syncing / synced / conflict / error / offline;
 ##   - CloudSave.resolve decides: equal / local ahead -> keep (upload when ahead); a proven
 ##     descendant cloud copy (built on exactly this device's last synced state) replaces the
-##     local one (the previous local save stays as the M40 .bak); anything else is a CONFLICT
+##     local one (its progress is provably contained; the M40 .bak holds the replaced save only
+##     until the next save); anything else is a CONFLICT
 ##     that waits for choose(KEEP_DEVICE | KEEP_CLOUD) — never merged, never auto-picked;
 ##   - a restore applies the WHOLE payload, so its applied reward-tx set (incl. store:<token>)
 ##     comes with it and a replayed grant / store re-delivery is refused (no double grant);
@@ -199,10 +200,18 @@ func _on_written(r: Dictionary, env: Dictionary) -> void:
 	_set_state(SYNCED)
 
 ## Whole-save restore through the M40 rules, then the canonical save. A failed restore or save
-## leaves the local save exactly as it was.
+## leaves the local save exactly as it was. The 2x anti-rollback mark never goes down: the copy
+## is restored with max(this device's mark, the cloud copy's mark) (the mark is outside the
+## CloudSave authority, so it is never a reason to accept or reject a copy).
 func _apply_remote(remote: Dictionary) -> void:
 	var pre: Dictionary = _save.collect()
-	var r: Dictionary = CloudSave.restore(_save, remote)
+	var cand := remote.duplicate(true)
+	var speed = (cand["payload"].get("economy", {}) as Dictionary).get("speed") if typeof(cand.get("payload")) == TYPE_DICTIONARY else null
+	if typeof(speed) == TYPE_DICTIONARY:
+		var mine := int(pre["economy"]["speed"]["clock_high_water"])
+		var theirs = speed.get("clock_high_water", 0)
+		speed["clock_high_water"] = maxi(mine, int(theirs)) if typeof(theirs) == TYPE_INT or typeof(theirs) == TYPE_FLOAT else theirs
+	var r: Dictionary = CloudSave.restore(_save, cand)
 	if not bool(r["ok"]):
 		_set_state(ERROR, "restore:" + String(r["reason"]))
 		return

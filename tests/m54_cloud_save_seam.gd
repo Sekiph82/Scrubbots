@@ -259,7 +259,40 @@ func _c05() -> void:
 	c.save.set_fault_injector(Callable())
 	c.cloud.sync()
 	_ok(c.cloud.state() == CloudSaveService.SYNCED and _same(a, c), "retry after the fault: descendant taken (%s %s)" % [c.cloud.state(), c.cloud.reason()])
+	_anti_rollback()
 	_complete("c05_failures_untouched")
+
+## Review 142 r1: a restore never lowers the 2x anti-rollback mark (auto descendant + KEEP_CLOUD).
+func _anti_rollback() -> void:
+	var t: int = _now[0]
+	var mock := MockProvider.new()
+	var a := _app("c05ra", mock)
+	a.economy.wallet.credit("scrub_bucks", 5000)
+	var secs := int(a.economy.config.speed_timed_products()[0]["seconds"])
+	_ok(bool(a.economy.speed.purchase_timed(secs)["ok"]), "timed 2x bought (%d s)" % secs)
+	a.request_save()
+	a.cloud.sync()   # cloud rev 1, mark t
+	var b := _app("c05rb", mock)
+	b.cloud.sync()
+	b.cloud.choose(CloudSaveService.KEEP_CLOUD)
+	_now[0] = t + 10
+	b.progression.record_win(1)
+	b.cloud.sync()   # cloud rev 2 built on rev 1, mark t + 10
+	_now[0] = t + secs + 1000
+	_ok(a.economy.speed.timed_seconds_remaining() == 0, "device A: timed 2x expired, mark %d" % a.economy.speed.clock_high_water())
+	var c := _app("c05rc", mock)   # a fresh device that also saw the late clock
+	c.economy.speed.timed_seconds_remaining()
+	var late: int = a.economy.speed.clock_high_water()
+	_now[0] = t + 100   # clock rolled back, before the cloud copy's timed 2x expiry
+	a.cloud.sync()
+	_ok(a.cloud.state() == CloudSaveService.SYNCED and _same(a, b), "rolled-back clock: proven descendant (rev 2, mark t+10) applied (%s %s)" % [a.cloud.state(), a.cloud.reason()])
+	_ok(a.economy.speed.clock_high_water() >= late and a.economy.speed.timed_seconds_remaining() == 0,
+		"auto apply: mark kept %d >= %d, expired timed 2x stays expired" % [a.economy.speed.clock_high_water(), late])
+	c.cloud.sync()
+	c.cloud.choose(CloudSaveService.KEEP_CLOUD)
+	_ok(c.cloud.state() == CloudSaveService.SYNCED and c.economy.speed.clock_high_water() >= late and c.economy.speed.timed_seconds_remaining() == 0,
+		"KEEP_CLOUD: mark kept %d >= %d, the cloud's timed 2x stays expired" % [c.economy.speed.clock_high_water(), late])
+	_now[0] = t + secs + 2000
 
 func _c06() -> void:
 	print("[c06 conflict screen + confirm fit, choice flow]")
