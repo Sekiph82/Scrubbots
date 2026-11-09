@@ -43,10 +43,12 @@ No player-facing copy counts attempts; a future one goes through `tn`.
 ## Numbers and prices (SB-M51-007)
 
 - `UiText.num(n)` groups thousands: `1,000` in English, `1.000` in Turkish.
-- Real-money prices are never formatted in code. When the store integration lands, the
-  platform's localized price string (Google Play `ProductDetails` formatted price, StoreKit
-  `displayPrice`) is passed as a `%s` argument. Until then the store rows show the localized
-  "store unavailable" copy (`SHOP_STORE_LATER`, `SHOP_UNAVAILABLE`, `SHOP_SOON`).
+- Real-money prices are never formatted in code. The store provider's localized price string
+  (Google Play `ProductDetails` formatted price, StoreKit `displayPrice`) is shown verbatim as
+  the Shop button text (`StoreService.price_text`, SB-M57-012). Without a store provider the
+  store rows show the localized "store unavailable" copy (`SHOP_STORE_LATER`, `SHOP_UNAVAILABLE`,
+  `SHOP_SOON`). `tests/m57_store_products.gd` c09 guards the store code against currency
+  symbols / `%.2f` / USD.
 
 ## Tests
 
