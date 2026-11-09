@@ -139,10 +139,15 @@ func _s06() -> void:
 	_complete("s06_hearts_states")
 
 func _s07() -> void:
-	print("[s07 real-money packs + No Ads: present, explicitly gated by M57]")
+	print("[s07 real-money packs + No Ads: present, UNAVAILABLE without a store provider]")
 	await _boot("s07")
 	var s = await _open_shop()
-	_ok(_top().get_action_button("buy:sb_pack").disabled and _top().get_action_button("buy:no_ads").disabled and _detail("Item_sb_pack") == UiText.t("SHOP_STORE_LATER") and _detail("Item_no_ads") == UiText.t("SHOP_STORE_LATER"), "both disabled with an honest store-later state")
+	var gated := true
+	for id in ["scrubbucks_100", "scrubbucks_550", "scrubbucks_1200", "scrubbucks_2600", "scrubbucks_7000", "no_ads"]:
+		var b: Button = _top().get_action_button("buy:store:" + id)
+		gated = gated and b != null and b.disabled and b.text == UiText.t("SHOP_UNAVAILABLE") and _detail("Item_store_" + id) == UiText.t("SHOP_STORE_LATER")
+	_ok(gated, "five SB packs + No Ads disabled with an honest store-later state")
+	_ok(_top().get_action_button("restore").disabled, "RESTORE PURCHASES disabled without a store")
 	var words := " ".join(_top().find_children("*", "Label", true, false).map(func(l): return l.text.to_lower()))
 	_ok(not words.contains("gem") and not words.contains("star") and not words.contains("coin") and not words.contains("$"), "one SB economy: no second currency, no cash price")
 	var src := FileAccess.get_file_as_string("res://scripts/ui/shop/shop_screen.gd")
@@ -230,8 +235,9 @@ func _s13() -> void:
 	await _boot("s13")
 	var s = await _open_shop()
 	var sb0: int = _eco().wallet.scrub_bucks()
-	_tap("buy:sb_pack")
-	_tap("buy:no_ads")
+	_tap("buy:store:scrubbucks_100")
+	_tap("buy:store:no_ads")
+	_tap("restore")
 	await _frames(2)
 	_ok(_top_id() == "shop" and _eco().wallet.scrub_bucks() == sb0 and s.purchase_log().is_empty() and _root.get_modal_stack().ids().count("shop_confirm") == 0, "no confirm, no feedback popup, no balance change, no purchase record")
 	_complete("s13_gated_cards_inert")

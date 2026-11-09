@@ -410,7 +410,7 @@ func _c13_home_sb_plus_shop() -> void:
 	# M43-C006 replaced the C003 coming-soon placeholder with the real Shop: still no SB pack is
 	# sold (the Scrub Bucks entry is M57-gated and disabled) and BACK returns the ticket.
 	_ok(_eco().wallet.scrub_bucks() == sb0 and _stack().top().find_child("Action_back", true, false) != null
-		and _stack().top().get_action_ids().has("back") and _stack().top().get_action_button("buy:sb_pack").disabled, "no SB pack sold (M57-gated entry disabled), BACK present")
+		and _stack().top().get_action_ids().has("back") and _stack().top().get_action_button("buy:store:scrubbucks_100").disabled, "no SB pack sold (no store provider: entry disabled), BACK present")
 	_press(_stack().top(), "back")
 	await _settle()
 	_ok(_root.shop.open_tickets().is_empty() and _stack().depth() == 0 and _root.get_navigation().current() == R.HOME, "returned to Home, ticket closed")

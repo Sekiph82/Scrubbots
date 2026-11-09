@@ -9,8 +9,11 @@ extends RefCounted
 ##   BOOSTERS     one saved charge of each booster  -> buy_booster_charge(id)
 ##   2X SPEED     15 / 30 / 60 min (+ "this level"   -> buy_timed_2x(seconds); per-level 2x is a
 ##                only inside a level)                  gameplay purchase, shown as such
-##   SCRUB BUCKS  real-money packs                   -> DISABLED: gated by M57 products/provider
-##   NO ADS       entitlement                        -> DISABLED: gated by M57 product definition
+##   SCRUB BUCKS  five real-money packs (SB-M57-012) -> StoreService.purchase(id) (store sheet)
+##   NO ADS       one-time entitlement (SB-M57-013)  -> StoreService.purchase("no_ads")
+##                + RESTORE PURCHASES                -> StoreService.restore()
+## Store cards show only the store's localized price string; with the shipping null provider
+## they stay UNAVAILABLE / "Available when the store opens." (release gate SB-M60-004).
 ##
 ## One SB economy only (no second premium currency). The UI never mutates a balance: every buy
 ## is confirmed, then committed by the facade (atomic service debit + canonical save), then the
@@ -106,13 +109,26 @@ func _build() -> void:
 		_item(list, "speed:%d" % secs, ART["speed"], UiText.t("SPEED_ITEM", [UiText.t("SPEED_LABEL_MINUTES", [secs / 60])]))
 	_item(list, "speed:level", ART["speed"], UiText.t("SPEED_ITEM", [UiText.t("SPEED_LABEL_LEVEL")]))
 	_section(list, "SHOP_SECTION_SB")
-	_item(list, "sb_pack", ART["sb_bundle"], UiText.t("SHOP_SB_PACKS"))
+	for id in _economy.store.sb_pack_ids():
+		_item(list, "store:" + id, ART["sb_bundle"], _label_of("store:" + id))
 	_section(list, "SHOP_SECTION_NO_ADS")
-	_item(list, "no_ads", ART["no_ads"], UiText.t("SHOP_NO_ADS"))
+	_item(list, "store:no_ads", ART["no_ads"], _label_of("store:no_ads"))
+	popup.add_action("restore", UiText.t("SHOP_RESTORE"), "secondary", false, "", list)
 	popup.add_action("back", UiText.t("SHOP_BACK_TO", [want]) if not want.is_empty() else UiText.t("SHOP_CLOSE"), "secondary", true)
 	popup.action_selected.connect(_on_action)
 	popup.closed.connect(func(_r): _finish.call(String(_ticket.get("ticket_id", "")), "cancelled"), CONNECT_ONE_SHOT)
+	var store = _economy.store
+	store.prices_changed.connect(refresh)
+	store.resolved.connect(_on_store_resolved)
+	store.restored.connect(_on_restored)
+	popup.closed.connect(_unbind_store.unbind(1), CONNECT_ONE_SHOT)
+	store.refresh_prices()
 	refresh()
+
+func _unbind_store() -> void:
+	_economy.store.prices_changed.disconnect(refresh)
+	_economy.store.resolved.disconnect(_on_store_resolved)
+	_economy.store.restored.disconnect(_on_restored)
 
 func _section(list: VBoxContainer, key: String) -> void:
 	var l := BasePopup.body_label(UiText.t(key), 28, BasePopup.ROYAL_EDGE)
@@ -176,10 +192,13 @@ func offer(product: String) -> Dictionary:
 			o["reason"] = "" if o["available"] else "hearts_full"
 		"speed:level":
 			o["reason"] = "in_level_only"
-		"sb_pack", "no_ads":
-			o["reason"] = "store_gated"
 		_:
-			if product.begins_with("booster:"):
+			if product.begins_with("store:"):
+				var c: Dictionary = e.store.can_purchase(product.substr(6))
+				o["price_text"] = e.store.price_text(product.substr(6))
+				o["available"] = c["ok"]
+				o["reason"] = "store_gated" if c.get("reason") == "unavailable" else String(c.get("reason", ""))
+			elif product.begins_with("booster:"):
 				var id := product.substr(8)
 				o["price"] = int(e.config.booster_price(id))
 				o["available"] = true
@@ -224,23 +243,47 @@ func refresh() -> void:
 				text = UiText.t("SHOP_SPEED_IN_LEVEL")
 			"store_gated":
 				text = UiText.t("SHOP_STORE_LATER")
+			"owned":
+				text = UiText.t("SHOP_NO_ADS_OWNED")
+			"pending":
+				text = UiText.t("SHOP_STORE_PENDING")
+			"":
+				if product == "store:no_ads":
+					text = UiText.t("SHOP_NO_ADS_DETAIL")
 			"locked":
 				var fu := FeatureUnlocks.new()
 				fu.load_config()
 				text = UiText.t("HOME_UNLOCKS_AT_LEVEL", [fu.unlock_level(product.substr(8))])
 		detail.text = text
-		b.text = UiText.t("SHOP_PRICE", [UiText.num(int(o["price"]))]) if int(o["price"]) > 0 else UiText.t("SHOP_UNAVAILABLE")
+		if o.has("price_text"):
+			b.text = UiText.t("SHOP_OWNED") if reason == "owned" else (String(o["price_text"]) if not String(o["price_text"]).is_empty() else UiText.t("SHOP_UNAVAILABLE"))
+		else:
+			b.text = UiText.t("SHOP_PRICE", [UiText.num(int(o["price"]))]) if int(o["price"]) > 0 else UiText.t("SHOP_UNAVAILABLE")
 		popup.set_action_blocked("buy:" + product, not (bool(o["available"]) and reason.is_empty()))
+	popup.set_action_blocked("restore", not _economy.store.is_available())
 
 # --------------------------------------------------------------------- buying ----
 
 func _on_action(id: String, _ctx: Dictionary) -> void:
+	if id == "restore":
+		_economy.store.restore()
+		popup.rearm()
+		return
 	if not id.begins_with("buy:"):
 		return
 	var product := id.substr(4)
 	var o := offer(product)
 	if not (bool(o["available"]) and String(o["reason"]).is_empty()):
 		popup.rearm()
+		return
+	if product.begins_with("store:"):
+		# Real money: the store's own purchase sheet is the confirmation; the grant arrives
+		# through StoreService.resolved (_on_store_resolved) only after it committed.
+		var r: Dictionary = _economy.store.purchase(product.substr(6))
+		if not bool(r.get("ok", false)):
+			_feedback(product, r)
+		popup.rearm()
+		refresh()
 		return
 	var c = Popups.confirm({"id": "shop_confirm", "title": UiText.t("SHOP_CONFIRM_TITLE"),
 		"body": UiText.t("SHOP_CONFIRM_BODY", [_label_of(product), UiText.num(int(o["price"]))]),
@@ -265,12 +308,34 @@ func _buy(product: String) -> Dictionary:
 	else:
 		r = {"ok": false, "reason": "unavailable"}
 	_log.append([product, r.duplicate()])
-	var fb = Popups.feedback({"ok": bool(r.get("ok", false)), "reason": String(r.get("reason", "failed")),
-		"text": UiText.t("SHOP_BOUGHT", [_label_of(product)]) if bool(r.get("ok", false)) else ""})
+	_feedback(product, r)
+	refresh()
+	return r
+
+func _feedback(product: String, r: Dictionary) -> void:
+	var text := ""
+	if bool(r.get("ok", false)):
+		text = UiText.t("SHOP_BOUGHT", [_label_of(product)])
+	elif product.begins_with("store:"):
+		text = UiText.t("SHOP_STORE_PENDING" if r.get("reason") == "pending" else "SHOP_STORE_FAILED")
+	var fb = Popups.feedback({"ok": bool(r.get("ok", false)), "reason": String(r.get("reason", "failed")), "text": text})
+	if not _stack.push(fb):
+		fb.free()
+
+## A store result (any time while the Shop is open). Cancel / duplicate stay silent.
+func _on_store_resolved(id: String, r: Dictionary) -> void:
+	_log.append(["store:" + id, r.duplicate()])
+	if popup != null and is_instance_valid(popup) and popup.is_open() and not ["cancelled", "duplicate"].has(r.get("reason")):
+		_feedback("store:" + id, r)
+	refresh()
+
+func _on_restored(r: Dictionary) -> void:
+	if popup == null or not is_instance_valid(popup) or not popup.is_open():
+		return
+	var fb = Popups.feedback({"ok": true, "text": UiText.t("SHOP_RESTORED" if int(r.get("restored", 0)) > 0 else "SHOP_RESTORE_NONE")})
 	if not _stack.push(fb):
 		fb.free()
 	refresh()
-	return r
 
 func _after() -> void:
 	if popup != null and is_instance_valid(popup) and popup.is_open():
@@ -286,6 +351,10 @@ func _label_of(product: String) -> String:
 		return UiText.t("BOOSTER_NAME_" + product.substr(8).to_upper())
 	if product.begins_with("speed:"):
 		return UiText.t("SPEED_ITEM", [UiText.t("SPEED_LABEL_MINUTES", [int(product.substr(6)) / 60])])
+	if product == "store:no_ads":
+		return UiText.t("SHOP_NO_ADS")
+	if product.begins_with("store:"):
+		return UiText.t("SHOP_SB_PACK_ITEM", [UiText.num(_economy.store.scrub_bucks_of(product.substr(6)))])
 	return product
 
 func purchase_log() -> Array:

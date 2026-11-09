@@ -31,6 +31,7 @@ const AppStateScript = preload("res://scripts/app/app_state.gd")
 const NavigationController = preload("res://scripts/app/navigation_controller.gd")
 const NotificationPolicy = preload("res://scripts/economy/notification_policy.gd")
 const RewardedAdProvider = preload("res://scripts/economy/rewarded_ad_provider.gd")
+const StoreProvider = preload("res://scripts/economy/store_provider.gd")
 const RealPlayDriver = preload("res://scripts/gameplay/solver/real_play_driver.gd")
 const LevelCatalog = preload("res://scripts/data/level_catalog.gd")
 const PersonalRank = preload("res://scripts/progression/personal_rank.gd")
@@ -443,15 +444,16 @@ func _g004() -> void:
 	var shop = ms.top()
 	var shop_ok: bool = shop != null and String(shop.popup_id) == "shop"
 	if shop_ok:
-		for pid in ["sb_pack", "no_ads"]:
-			var b: Button = shop.get_action_button("buy:" + pid)
-			var card = shop.find_child("Item_" + pid, true, false)
+		for pid in ["scrubbucks_100", "scrubbucks_550", "scrubbucks_1200", "scrubbucks_2600", "scrubbucks_7000", "no_ads"]:
+			var b: Button = shop.get_action_button("buy:store:" + pid)
+			var card = shop.find_child("Item_store_" + pid, true, false)
 			var detail: Label = card.find_child("Detail", true, false) if card != null else null
 			shop_ok = shop_ok and b.disabled and b.text == UiText.t("SHOP_UNAVAILABLE") and detail != null and detail.text == UiText.t("SHOP_STORE_LATER")
 			b.pressed.emit()
 			await _frames(2)
 			shop_ok = shop_ok and ms.top() == shop
-	_check(g, "shop_store_gated", shop_ok, "Shop SCRUB BUCKS packs + NO ADS: UNAVAILABLE / 'Available when the store opens.', press opens no confirm")
+		shop_ok = shop_ok and e.store.get_provider().get_script() == StoreProvider and shop.get_action_button("restore").disabled
+	_check(g, "shop_store_gated", shop_ok, "Shop five SCRUB BUCKS packs + NO ADS: UNAVAILABLE / 'Available when the store opens.', press opens no confirm; store provider = null StoreProvider, RESTORE disabled")
 	ms.clear("test")
 	await _frames(2)
 	home.get_region("ScrubBucksPlus").pressed.emit()
