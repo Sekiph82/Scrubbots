@@ -47,7 +47,7 @@
       "checks": [
         {
           "check": "manifest_bound",
-          "evidence": "42 surfaces: 39 bound (script + live data + evidence suite exist), 3 explicitly not built: [\"world_unlock_transition (not live: no world table yet (SB-M43-136..141 / 073), CeremonyEvents never emits world_unlock)\", \"account_cloud_sync_conflict (provider decision SB-M43-153)\", \"friends_postlaunch (post-launch)\"]; unbound / broken []",
+          "evidence": "42 surfaces: 40 bound (script + live data + evidence suite exist), 2 explicitly not built: [\"account_cloud_sync_conflict (provider decision SB-M43-153)\", \"friends_postlaunch (post-launch)\"]; unbound / broken []",
           "result": "PASS"
         },
         {
@@ -276,9 +276,7 @@
       "account_cloud_sync_conflict",
       "friends_postlaunch"
     ],
-    "not_live": [
-      "world_unlock_transition"
-    ],
+    "not_live": [],
     "not_owner_accepted": [
       "gameplay_v02:REFERENCE_SELECTED",
       "pause:MASTER_REQUIRED",

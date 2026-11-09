@@ -69,7 +69,7 @@
         "evidence": "tests/sb_video_005_level_intro.gd",
         "live_data": true,
         "gap": "shown on each gameplay start except under an L1-L3 coachmark (SB-VIDEO-005); no dedicated visual master",
-        "recorded_by": "factory 132 (Claude): implementation facts re-verified for the release gates (tests/m60_release_gates.gd); status unchanged, no owner visual review recorded"
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT; factory 132 (Claude): implementation facts re-verified for the release gates (tests/m60_release_gates.gd); status unchanged, no owner visual review recorded"
       }
     },
     {
@@ -187,7 +187,7 @@
         "evidence": "tests/m43_master_c006_shop.gd",
         "live_data": true,
         "gap": null,
-        "recorded_by": "factory 132 (Claude): implementation facts re-verified for the release gates (tests/m60_release_gates.gd); status unchanged, no owner visual review recorded"
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT; factory 132 (Claude): implementation facts re-verified for the release gates (tests/m60_release_gates.gd); status unchanged, no owner visual review recorded"
       }
     },
     {
@@ -202,7 +202,7 @@
         "evidence": "tests/m43_master_c006_shop.gd",
         "live_data": true,
         "gap": "owner visual master (SB-M43-079)",
-        "recorded_by": "factory 132 (Claude): implementation facts re-verified for the release gates (tests/m60_release_gates.gd); status unchanged, no owner visual review recorded"
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT; factory 132 (Claude): implementation facts re-verified for the release gates (tests/m60_release_gates.gd); status unchanged, no owner visual review recorded"
       }
     },
     {
@@ -220,7 +220,7 @@
         "evidence": "tests/m43_master_c007_collection.gd",
         "live_data": true,
         "gap": "owner visual master (SB-M43-091)",
-        "recorded_by": "factory 132 (Claude): implementation facts re-verified for the release gates (tests/m60_release_gates.gd); status unchanged, no owner visual review recorded"
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT; factory 132 (Claude): implementation facts re-verified for the release gates (tests/m60_release_gates.gd); status unchanged, no owner visual review recorded"
       }
     },
     {
@@ -238,7 +238,7 @@
         "evidence": "tests/m43_master_c007_collection.gd",
         "live_data": true,
         "gap": "owner visual master (SB-M43-091)",
-        "recorded_by": "factory 132 (Claude): implementation facts re-verified for the release gates (tests/m60_release_gates.gd); status unchanged, no owner visual review recorded"
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT; factory 132 (Claude): implementation facts re-verified for the release gates (tests/m60_release_gates.gd); status unchanged, no owner visual review recorded"
       }
     },
     {
@@ -253,7 +253,7 @@
         "evidence": "tests/m43_master_c007_collection.gd",
         "live_data": true,
         "gap": "owner visual master (SB-M43-091)",
-        "recorded_by": "factory 132 (Claude): implementation facts re-verified for the release gates (tests/m60_release_gates.gd); status unchanged, no owner visual review recorded"
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT; factory 132 (Claude): implementation facts re-verified for the release gates (tests/m60_release_gates.gd); status unchanged, no owner visual review recorded"
       }
     },
     {
@@ -268,7 +268,7 @@
         "evidence": "tests/m43_master_c007_collection.gd",
         "live_data": true,
         "gap": "owner visual master (SB-M43-091)",
-        "recorded_by": "factory 132 (Claude): implementation facts re-verified for the release gates (tests/m60_release_gates.gd); status unchanged, no owner visual review recorded"
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT; factory 132 (Claude): implementation facts re-verified for the release gates (tests/m60_release_gates.gd); status unchanged, no owner visual review recorded"
       }
     },
     {
@@ -286,7 +286,7 @@
         "evidence": "tests/m43_c005_c006_standard_pack_presentation.gd",
         "live_data": true,
         "gap": null,
-        "recorded_by": "factory 132 (Claude): implementation facts re-verified for the release gates (tests/m60_release_gates.gd); status unchanged, no owner visual review recorded"
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT; factory 132 (Claude): implementation facts re-verified for the release gates (tests/m60_release_gates.gd); status unchanged, no owner visual review recorded"
       }
     },
     {
@@ -304,7 +304,7 @@
         "evidence": "tests/m43_c005_c007_premium_pack_presentation.gd",
         "live_data": true,
         "gap": null,
-        "recorded_by": "factory 132 (Claude): implementation facts re-verified for the release gates (tests/m60_release_gates.gd); status unchanged, no owner visual review recorded"
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT; factory 132 (Claude): implementation facts re-verified for the release gates (tests/m60_release_gates.gd); status unchanged, no owner visual review recorded"
       }
     },
     {
@@ -319,7 +319,7 @@
         "evidence": "tests/m43_master_c005_meta_ceremonies.gd",
         "live_data": true,
         "gap": null,
-        "recorded_by": "factory 132 (Claude): implementation facts re-verified for the release gates (tests/m60_release_gates.gd); status unchanged, no owner visual review recorded"
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT; factory 132 (Claude): implementation facts re-verified for the release gates (tests/m60_release_gates.gd); status unchanged, no owner visual review recorded"
       }
     },
     {
@@ -334,7 +334,7 @@
         "evidence": "tests/m43_master_c005_meta_ceremonies.gd",
         "live_data": true,
         "gap": null,
-        "recorded_by": "factory 132 (Claude): implementation facts re-verified for the release gates (tests/m60_release_gates.gd); status unchanged, no owner visual review recorded"
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT; factory 132 (Claude): implementation facts re-verified for the release gates (tests/m60_release_gates.gd); status unchanged, no owner visual review recorded"
       }
     },
     {
@@ -352,7 +352,7 @@
         "evidence": "tests/m43_master_c008_robots.gd",
         "live_data": true,
         "gap": "owner visual master (SB-M43-103)",
-        "recorded_by": "factory 132 (Claude): implementation facts re-verified for the release gates (tests/m60_release_gates.gd); status unchanged, no owner visual review recorded"
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT; factory 132 (Claude): implementation facts re-verified for the release gates (tests/m60_release_gates.gd); status unchanged, no owner visual review recorded"
       }
     },
     {
@@ -367,7 +367,7 @@
         "evidence": "tests/m43_master_c008_robots.gd",
         "live_data": true,
         "gap": "owner visual master (SB-M43-103)",
-        "recorded_by": "factory 132 (Claude): implementation facts re-verified for the release gates (tests/m60_release_gates.gd); status unchanged, no owner visual review recorded"
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT; factory 132 (Claude): implementation facts re-verified for the release gates (tests/m60_release_gates.gd); status unchanged, no owner visual review recorded"
       }
     },
     {
@@ -382,7 +382,7 @@
         "evidence": "tests/m43_master_c005_meta_ceremonies.gd",
         "live_data": true,
         "gap": null,
-        "recorded_by": "factory 132 (Claude): implementation facts re-verified for the release gates (tests/m60_release_gates.gd); status unchanged, no owner visual review recorded"
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT; factory 132 (Claude): implementation facts re-verified for the release gates (tests/m60_release_gates.gd); status unchanged, no owner visual review recorded"
       }
     },
     {
@@ -397,7 +397,7 @@
         "evidence": "tests/m43_master_c009_daily.gd",
         "live_data": true,
         "gap": "owner visual master (SB-M43-113)",
-        "recorded_by": "factory 132 (Claude): implementation facts re-verified for the release gates (tests/m60_release_gates.gd); status unchanged, no owner visual review recorded"
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT; factory 132 (Claude): implementation facts re-verified for the release gates (tests/m60_release_gates.gd); status unchanged, no owner visual review recorded"
       }
     },
     {
@@ -412,7 +412,7 @@
         "evidence": "tests/m43_master_c009_daily.gd",
         "live_data": true,
         "gap": "owner visual master (SB-M43-116)",
-        "recorded_by": "factory 132 (Claude): implementation facts re-verified for the release gates (tests/m60_release_gates.gd); status unchanged, no owner visual review recorded"
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT; factory 132 (Claude): implementation facts re-verified for the release gates (tests/m60_release_gates.gd); status unchanged, no owner visual review recorded"
       }
     },
     {
@@ -427,7 +427,7 @@
         "evidence": "tests/m43_master_c009_daily.gd",
         "live_data": true,
         "gap": "owner visual master (SB-M43-119)",
-        "recorded_by": "factory 132 (Claude): implementation facts re-verified for the release gates (tests/m60_release_gates.gd); status unchanged, no owner visual review recorded"
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT; factory 132 (Claude): implementation facts re-verified for the release gates (tests/m60_release_gates.gd); status unchanged, no owner visual review recorded"
       }
     },
     {
@@ -442,7 +442,7 @@
         "evidence": "tests/m43_master_c005_meta_ceremonies.gd",
         "live_data": true,
         "gap": null,
-        "recorded_by": "factory 132 (Claude): implementation facts re-verified for the release gates (tests/m60_release_gates.gd); status unchanged, no owner visual review recorded"
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT; factory 132 (Claude): implementation facts re-verified for the release gates (tests/m60_release_gates.gd); status unchanged, no owner visual review recorded"
       }
     },
     {
@@ -458,7 +458,7 @@
         "evidence": "tests/m43_master_c010_meta.gd",
         "live_data": true,
         "gap": "master exists (assets/ui/generated/masters/scrubbots_profile_master_v01.png, approved by Claude under owner-delegated authority 2026-10-31, not owner visual review); remaining: rebuild the screen to match it (SB-M43-125-REBUILD)",
-        "recorded_by": "factory 132 (Claude): implementation facts re-verified for the release gates (tests/m60_release_gates.gd); status unchanged, no owner visual review recorded"
+        "recorded_by": "factory 075 (Claude): master approved by Claude under owner-delegated authority 2026-10-31, not owner visual review; factory 132 (Claude): implementation facts re-verified for the release gates (tests/m60_release_gates.gd); status unchanged, no owner visual review recorded"
       }
     },
     {
@@ -474,7 +474,7 @@
         "evidence": "tests/m43_master_c010_meta.gd",
         "live_data": true,
         "gap": "master exists (assets/ui/generated/masters/scrubbots_achievements_master_v01.png, approved by Claude under owner-delegated authority 2026-10-31, not owner visual review); remaining: rebuild the screen to match it (SB-M43-127-REBUILD)",
-        "recorded_by": "factory 132 (Claude): implementation facts re-verified for the release gates (tests/m60_release_gates.gd); status unchanged, no owner visual review recorded"
+        "recorded_by": "factory 075 (Claude): master approved by Claude under owner-delegated authority 2026-10-31, not owner visual review; factory 132 (Claude): implementation facts re-verified for the release gates (tests/m60_release_gates.gd); status unchanged, no owner visual review recorded"
       }
     },
     {
@@ -493,7 +493,7 @@
         "evidence": "tests/m43_master_c010_meta.gd",
         "live_data": true,
         "gap": "master exists (assets/ui/generated/masters/scrubbots_events_master_v01.png, approved by Claude under owner-delegated authority 2026-10-31, not owner visual review); remaining: rebuild the screen to match it (SB-M43-130-REBUILD); no event scheduled",
-        "recorded_by": "factory 132 (Claude): implementation facts re-verified for the release gates (tests/m60_release_gates.gd); status unchanged, no owner visual review recorded"
+        "recorded_by": "factory 075 (Claude): master approved by Claude under owner-delegated authority 2026-10-31, not owner visual review; factory 132 (Claude): implementation facts re-verified for the release gates (tests/m60_release_gates.gd); status unchanged, no owner visual review recorded"
       }
     },
     {
@@ -524,7 +524,7 @@
         "evidence": "tests/m43_personal_ranks.gd",
         "live_data": true,
         "gap": "personal rank ladder only (SB-M43-122, levels cleared, unlocks L40); the owner two-table RANKS (all-time + weekly, SB-M43-131..133) and its visual master are not built",
-        "recorded_by": "factory 132 (Claude): implementation facts re-verified for the release gates (tests/m60_release_gates.gd); status unchanged, no owner visual review recorded"
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT; factory 132 (Claude): implementation facts re-verified for the release gates (tests/m60_release_gates.gd); status unchanged, no owner visual review recorded"
       }
     },
     {
@@ -557,7 +557,7 @@
         "evidence": "tests/m43_c005_c072_feature_unlock_ceremony.gd",
         "live_data": true,
         "gap": null,
-        "recorded_by": "factory 132 (Claude): implementation facts re-verified for the release gates (tests/m60_release_gates.gd); status unchanged, no owner visual review recorded"
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT; factory 132 (Claude): implementation facts re-verified for the release gates (tests/m60_release_gates.gd); status unchanged, no owner visual review recorded"
       }
     },
     {
@@ -571,11 +571,11 @@
       "responsive_gate": true,
       "production_scene_required": true,
       "implementation": {
-        "production_scene": "scripts/ui/ceremony/meta_ceremonies.gd (world_unlock shell)",
-        "evidence": "tests/m43_master_c005_meta_ceremonies.gd (builder only)",
-        "live_data": false,
-        "gap": "not live: no world table yet (SB-M43-136..141 / 073), CeremonyEvents never emits world_unlock",
-        "recorded_by": "factory 132 (Claude): implementation facts re-verified for the release gates (tests/m60_release_gates.gd); status unchanged, no owner visual review recorded"
+        "production_scene": "scripts/ui/ceremony/meta_ceremonies.gd (world_unlock) via CeremonyPresenter",
+        "evidence": "tests/m54_world_regression.gd",
+        "live_data": true,
+        "gap": "live World Transition at a world's last level (factory 133, worlds_v1.json); no dedicated visual master",
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT; factory 132 (Claude): implementation facts re-verified for the release gates (tests/m60_release_gates.gd); status unchanged, no owner visual review recorded"
       }
     },
     {
@@ -631,7 +631,7 @@
         "evidence": "tests/m49_surface_matrix.gd",
         "live_data": true,
         "gap": "no dedicated master",
-        "recorded_by": "factory 132 (Claude): implementation facts re-verified for the release gates (tests/m60_release_gates.gd); status unchanged, no owner visual review recorded"
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT; factory 132 (Claude): implementation facts re-verified for the release gates (tests/m60_release_gates.gd); status unchanged, no owner visual review recorded"
       }
     },
     {
