@@ -14,3 +14,4 @@ content_pipeline
 assets/art/references
 assets/ui/candidates
 assets/ui/generated
+addons/godot_ai

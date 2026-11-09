@@ -17,7 +17,15 @@ Asserts:
     picks --export-release only for release;
   - outputs go to build/<platform>/<build_type>/ with version+build in the artifact name; iOS
     exports and builds under the fixed basename Scrubbots and is renamed only afterwards;
-  - no store upload anywhere.
+  - no store upload anywhere;
+  - SB-M59-006/007/009 release gate: a release export (Android build_apk or apk_only, iOS) runs only
+    after the full validate suites, the content validator (tools/validate_content.gd) and the
+    clean-clone check (tools/clean_clone_check.py) succeeded; only debug apk_only skips them;
+  - SB-M59-010 export hygiene: every tree in the export exclusions file (tests, tools, editor-only
+    addons/godot_ai, ...) is in both presets' exclude_filter and absent from both export
+    workspaces; every shipped addon has its licence file in-repo, included in both exports and shown
+    by the CREDITS screen; project.godot registers each addon autoload exactly once and never
+    loads godot_ai.
 """
 import json
 import os
@@ -31,6 +39,19 @@ IOS = ".github/workflows/ios-ipa.yml"
 PRESET = ".github/android/export_presets_family_first10.cfg"
 STAMP = ".github/scripts/app_version.py"
 SETTINGS = "scripts/ui/settings_panel.gd"
+EXCLUSIONS = ".github/android/family_first10_export_exclusions.txt"
+PROJECT = "project.godot"
+CREDITS = "scripts/ui/credits_screen.gd"
+# Shipped addons: autoload name -> licence file (MIT).
+ADDONS = {"GameFeelFlow": "addons/game_feel_flow/LICENSE", "Spark": "addons/saltmire_spark/LICENSE.txt"}
+GATE_IF = "!github.event.repository.private && (inputs.mode != 'apk_only' || inputs.build_type == 'release')"
+EXPORT_IF = ("always() && !github.event.repository.private && ((inputs.mode == 'apk_only' && inputs.build_type != 'release') || "
+             "((inputs.mode == 'build_apk' || inputs.mode == 'apk_only') && needs.validate.result == 'success' && "
+             "(inputs.build_type != 'release' || needs.clean_clone.result == 'success')))")
+IOS_GATE_IF = "!github.event.repository.private && inputs.build_type == 'release'"
+IOS_IPA_IF = "always() && !github.event.repository.private && (inputs.build_type != 'release' || needs.release_gate.result == 'success')"
+CONTENT_STEP = "res://tools/validate_content.gd"
+CONTENT_PASS = "grep -q '^CONTENT_VALIDATION PASS' content_validation.log"
 DEBUG_KEY = re.compile(r"ANDROID_DEBUG_KEYSTORE|GODOT_ANDROID_KEYSTORE_DEBUG|debug_keystore|keytool -genkeypair|androiddebugkey")
 UPLOAD = re.compile(r"upload-google-play|r0adkll|altool|notarytool|fastlane|xcrun\s+upload|<string>upload</string>|play.googleapis", re.I)
 LITERAL_VERSION = re.compile(r"(version/(code|name)|short_version|application/version)\s*=\s*\"?\d")
@@ -98,6 +119,77 @@ def check_inputs(text, wf):
     return []
 
 
+def job(text, name):
+    """The body of one top-level job (`  name:` up to the next job), or ""."""
+    m = re.search(r"^  %s:\n(.*?)(?=^  [A-Za-z_]+:\n|\Z)" % re.escape(name), text, re.M | re.S)
+    return m.group(1) if m else ""
+
+
+def job_if(body):
+    m = re.search(r"^    if: \$\{\{ (.*?) \}\}", body, re.M)
+    return m.group(1) if m else None
+
+
+def check_gate(android, ios):
+    """SB-M59-006/007/009: release exports only after validate + content validator + clean clone."""
+    errs = []
+    v, cc, ex = job(android, "validate"), job(android, "clean_clone"), job(android, "export")
+    if job_if(v) != GATE_IF:
+        errs.append("%s validate must run for everything but debug apk_only: if %r" % (ANDROID, GATE_IF))
+    for need in ("tools/check_release_versioning.py", CONTENT_STEP, CONTENT_PASS, "for s in "):
+        if need not in v:
+            errs.append("%s validate does not run %r" % (ANDROID, need))
+    if job_if(cc) != GATE_IF or "python3 -I tools/clean_clone_check.py" not in cc:
+        errs.append("%s clean_clone job (tools/clean_clone_check.py, if %r) missing" % (ANDROID, GATE_IF))
+    if "    needs: [validate, clean_clone]\n" not in ex or job_if(ex) != EXPORT_IF:
+        errs.append("%s export must need [validate, clean_clone] with if %r" % (ANDROID, EXPORT_IF))
+    g, ipa = job(ios, "release_gate"), job(ios, "ipa")
+    if job_if(g) != IOS_GATE_IF:
+        errs.append("%s release_gate must run for release: if %r" % (IOS, IOS_GATE_IF))
+    for need in ("python3 -I tools/clean_clone_check.py", "python3 -I tools/check_release_versioning.py", CONTENT_STEP, CONTENT_PASS,
+                 "python3 -I tools/run_suites.py"):
+        if need not in g:
+            errs.append("%s release_gate does not run %r" % (IOS, need))
+    if "    needs: release_gate\n" not in ipa or job_if(ipa) != IOS_IPA_IF:
+        errs.append("%s ipa must need release_gate with if %r" % (IOS, IOS_IPA_IF))
+    return errs
+
+
+def filter_line(text, key):
+    m = re.search(r'^\s*%s="([^"]*)"' % key, text, re.M)
+    return [x.strip() for x in m.group(1).split(",")] if m else []
+
+
+def check_hygiene(android, ios, preset, exclusions, project, credits):
+    """SB-M59-010: exclusions in both presets + export workspaces, addon licences shipped, autoloads once."""
+    errs = []
+    trees = [l.strip() for l in exclusions.splitlines() if l.strip() and not l.startswith("#")]
+    for must in ("tests", "tools", "addons/godot_ai"):
+        if must not in trees:
+            errs.append("%s does not exclude %s" % (EXCLUSIONS, must))
+    for name, text, ws in ((PRESET, preset, job(android, "export")), (IOS, ios, job(ios, "ipa"))):
+        excl, incl = filter_line(text, "exclude_filter"), filter_line(text, "include_filter")
+        for t in trees:
+            if t + "/*" not in excl:
+                errs.append("%s exclude_filter misses %s/*" % (name, t))
+            if "            !/%s/\n" % t not in ws:
+                errs.append("%s export checkout does not leave out %s" % (name, t))
+        for lic in ADDONS.values():
+            if lic not in incl:
+                errs.append("%s include_filter does not ship %s" % (name, lic))
+    for auto, lic in ADDONS.items():
+        n = len(re.findall(r"^%s=" % auto, project, re.M))
+        if n != 1:
+            errs.append("%s registers autoload %s %d times (exactly once)" % (PROJECT, auto, n))
+        if not os.path.isfile(os.path.join(ROOT, lic)) or "MIT License" not in read(lic):
+            errs.append("%s missing or not an MIT licence" % lic)
+        if "res://" + lic not in credits:
+            errs.append("%s does not show res://%s" % (CREDITS, lic))
+    if "godot_ai" in project:
+        errs.append("%s references godot_ai (editor-only, never shipped)" % PROJECT)
+    return errs
+
+
 def check_repo():
     errs = []
     d = json.loads(read(VERSION_JSON))
@@ -131,6 +223,8 @@ def check_repo():
     errs += check_signing(android, "ANDROID_RELEASE_KEYSTORE_")
     errs += check_signing(ios, "IOS_DIST_CERT_")
     errs += check_android_export(android)
+    errs += check_gate(android, ios)
+    errs += check_hygiene(android, ios, preset, read(EXCLUSIONS), read(PROJECT), read(CREDITS))
     return errs
 
 
@@ -160,6 +254,44 @@ def selftest():
         print("FAIL selftest: versioned iOS export basename not caught"); fails += 1
     else:
         print("ok selftest: caught versioned iOS export basename")
+    fails += selftest_gate_hygiene()
+    return fails
+
+
+def selftest_gate_hygiene():
+    android, ios, preset, excl, project, credits = read(ANDROID), read(IOS), read(PRESET), read(EXCLUSIONS), read(PROJECT), read(CREDITS)
+    real = (android, ios, preset, excl, project, credits)
+    fails = 0
+    if check_gate(android, ios) or check_hygiene(*real):
+        print("FAIL selftest: the real gate/hygiene does not pass"); fails += 1
+    old_export_if = "always() && !github.event.repository.private && ((inputs.mode == 'build_apk' && needs.validate.result == 'success') || inputs.mode == 'apk_only')"
+    gate = {
+        "validate skipped for release apk_only": (android.replace(GATE_IF, "!github.event.repository.private && inputs.mode != 'apk_only'", 1), ios),
+        "release apk_only exports without validate": (android.replace(EXPORT_IF, old_export_if), ios),
+        "export does not need clean_clone": (android.replace("needs: [validate, clean_clone]", "needs: validate"), ios),
+        "content validator dropped": (android.replace(CONTENT_PASS, "true", 1), ios),
+        "clean_clone job dropped": (android.replace("python3 -I tools/clean_clone_check.py", "true"), ios),
+        "iOS release without the gate": (android, ios.replace("needs.release_gate.result == 'success'", "true")),
+        "iOS gate without the suites": (android, ios.replace("python3 -I tools/run_suites.py", "true")),
+    }
+    for label, (a, i) in gate.items():
+        if (a, i) == (android, ios) or not check_gate(a, i):
+            print("FAIL selftest: not caught: " + label); fails += 1
+        else:
+            print("ok selftest: caught " + label)
+    hyg = {
+        "godot_ai not excluded by the Android preset": (android, ios, preset.replace("addons/godot_ai/*, ", ""), excl, project, credits),
+        "tools tree in the iOS workspace": (android, ios.replace("            !/tools/\n", "", 1), preset, excl, project, credits),
+        "licence not shipped by iOS": (android, ios.replace("addons/saltmire_spark/LICENSE.txt\"", "\""), preset, excl, project, credits),
+        "duplicate autoload": (android, ios, preset, excl, project.replace("Spark=", "Spark=\"*res://x.gd\"\nSpark=", 1), credits),
+        "godot_ai loaded": (android, ios, preset, excl, project + "\nGodotAI=\"*res://addons/godot_ai/x.gd\"\n", credits),
+        "credits lacks a licence": (android, ios, preset, excl, project, credits.replace("res://addons/game_feel_flow/LICENSE", "")),
+    }
+    for label, args in hyg.items():
+        if args == real or not check_hygiene(*args):
+            print("FAIL selftest: not caught: " + label); fails += 1
+        else:
+            print("ok selftest: caught " + label)
     return fails
 
 

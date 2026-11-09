@@ -23,6 +23,9 @@ name: iOS IPA
 # SB-M43-171/172: input `local_notifications` (default false) builds the ScrubbotsNotify GDExtension
 #   (native/ios, UNUserNotificationCenter permission + local reminders) into res://bin/ before the import,
 #   so the export embeds it. false = the IPA exactly as before.
+# SB-M59-006/007/009 (docs/RELEASE_BUILDS.md): a release IPA first needs the release_gate job green: the
+#   release/versioning check, the content validator, every Android validate suite with its exact guard
+#   (tools/run_suites.py reads the list from android-family-first10.yml) and the clean-clone check. Debug skips it.
 
 on:
   workflow_dispatch:
@@ -48,8 +51,59 @@ env:
   APP_NAME: Scrubbots   # fixed Godot export / Xcode project / binary / .pck basename; renamed to ARTIFACT only at the end
 
 jobs:
+  release_gate:
+    if: ${{ !github.event.repository.private && inputs.build_type == 'release' }} # public repo only: free standard runners
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Godot ${{ env.GODOT_VERSION }} (Linux editor, headless)
+        run: |
+          curl -fsSL -o "$RUNNER_TEMP/godot.zip" "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          unzip -q "$RUNNER_TEMP/godot.zip" -d "$RUNNER_TEMP/godot"
+          echo "GODOT=$RUNNER_TEMP/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64" >> "$GITHUB_ENV"
+
+      - name: Clean clone import + smoke suite
+        run: python3 -I tools/clean_clone_check.py --godot "$GODOT" --work "$RUNNER_TEMP/clean_clone"
+
+      - name: Workspace = the Android validate checkout (no session evidence, no dev-art trees)
+        run: git sparse-checkout set --no-cone '/*' '!/coordination/sessions/' '!/assets/art/references/' '!/assets/ui/candidates/' '!/assets/ui/generated/'
+
+      - name: Import (fail closed on script diagnostics)
+        run: |
+          "$GODOT" --headless --path . --import > import.log 2>&1 || true
+          git checkout -- project.godot
+          ! grep -E '^(ERROR: )?(SCRIPT ERROR|Parse Error|Failed to load script)' import.log
+
+      - name: Release/versioning static check
+        run: python3 -I tools/check_release_versioning.py
+
+      - name: Content validator
+        run: |
+          if "$GODOT" --headless --path . -s res://tools/validate_content.gd > content_validation.log 2>&1; then ec=0; else ec=$?; fi
+          cat content_validation.log
+          [ $ec -eq 0 ] && ! grep -qE '^(ERROR: )?(SCRIPT ERROR|Parse Error|Failed to load script)' content_validation.log             && grep -q '^CONTENT_VALIDATION PASS' content_validation.log
+
+      - name: Every Android validate suite (exact guards)
+        run: python3 -I tools/run_suites.py
+
+      - name: Release gate logs
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ScrubBots-iOS-release-gate-logs
+          path: |
+            validate_logs/
+            import.log
+            content_validation.log
+          retention-days: 30
+
   ipa:
-    if: ${{ !github.event.repository.private }} # public repo only: free standard runners
+    needs: release_gate
+    # Debug builds without the gate; release only after release_gate succeeded.
+    if: ${{ always() && !github.event.repository.private && (inputs.build_type != 'release' || needs.release_gate.result == 'success') }}
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
@@ -67,6 +121,7 @@ jobs:
             !/assets/art/references/
             !/assets/ui/candidates/
             !/assets/ui/generated/
+            !/addons/godot_ai/
 
       - name: Import workspace has only runtime sources
         run: |
@@ -152,9 +207,9 @@ jobs:
           platform="iOS"
           runnable=true
           export_filter="all_resources"
-          include_filter=""
+          include_filter="addons/game_feel_flow/LICENSE, addons/saltmire_spark/LICENSE.txt"
           ; Gelistirme/denetim dosyalari oyuna girmesin (coordination 1.7 GB); workspace'te de yoklar
-          exclude_filter="coordination/*, docs/*, tests/*, tools/*, level_factory/*, content_pipeline/*, assets/art/references/*, assets/ui/generated/*, assets/ui/candidates/*, .github/*"
+          exclude_filter="coordination/*, docs/*, tests/*, tools/*, level_factory/*, content_pipeline/*, assets/art/references/*, assets/ui/generated/*, assets/ui/candidates/*, addons/godot_ai/*, .github/*"
           export_path="${OUT_DIR}/${APP_NAME}.ipa"
 
           [preset.0.options]

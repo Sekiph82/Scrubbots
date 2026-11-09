@@ -63,6 +63,10 @@ name: Android Family First10 APK
 #   true builds the ScrubbotsNotify AAR (native/android, javac only), switches the preset to the Gradle build and enables
 #   addons/scrubbots_notify (docs/RELEASE_BUILDS.md). false keeps the prebuilt-template APK path unchanged.
 # SB-M43-136..141 + 073 + SB-M54-032 owner world table (20 x 150 = 3000), WorldService, World Transition trigger: + m54_world_regression (exact 7/7 guard).
+# SB-M59-006..010 release gate (docs/RELEASE_BUILDS.md): validate also runs the content validator
+#   (tools/validate_content.gd); clean_clone (tools/clean_clone_check.py) proves a fresh clone imports and passes
+#   a smoke suite. A release export needs validate + clean_clone green, also with apk_only; debug apk_only stays
+#   the owner's untested quick path. addons/godot_ai (editor-only, untracked) is in the export exclusions.
 
 on:
   workflow_dispatch:
@@ -102,7 +106,7 @@ env:
 
 jobs:
   validate:
-    if: ${{ !github.event.repository.private && inputs.mode != 'apk_only' }} # public repo only: free standard runners
+    if: ${{ !github.event.repository.private && (inputs.mode != 'apk_only' || inputs.build_type == 'release') }} # public repo only: free standard runners
     runs-on: ubuntu-latest
     timeout-minutes: 120
     steps:
@@ -131,6 +135,13 @@ jobs:
 
       - name: Release/versioning static check (single version source, release never debug-signed)
         run: python3 -I tools/check_release_versioning.py
+
+      - name: Content validator (production catalog, every level, every supply plan; fail closed)
+        run: |
+          if "$GODOT" --headless --path . -s res://tools/validate_content.gd > content_validation.log 2>&1; then ec=0; else ec=$?; fi
+          cat content_validation.log
+          [ $ec -eq 0 ] && ! grep -qE '^(ERROR: )?(SCRIPT ERROR|Parse Error|Failed to load script)' content_validation.log \
+            && grep -q '^CONTENT_VALIDATION PASS' content_validation.log
 
       - name: Focused suites (fail closed; every suite logged)
         env:
@@ -374,12 +385,33 @@ jobs:
           path: |
             validate_logs/
             import.log
+            content_validation.log
           retention-days: 30
 
+  # SB-M59-009: a fresh clone of the commit (tracked files only: no .godot cache, no untracked or
+  # editor-only addon) imports without script errors and passes a smoke suite.
+  clean_clone:
+    if: ${{ !github.event.repository.private && (inputs.mode != 'apk_only' || inputs.build_type == 'release') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Godot ${{ env.GODOT_VERSION }} (Linux editor, headless)
+        run: |
+          curl -fsSL -o "$RUNNER_TEMP/godot.zip" "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          unzip -q "$RUNNER_TEMP/godot.zip" -d "$RUNNER_TEMP/godot"
+          echo "GODOT=$RUNNER_TEMP/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64" >> "$GITHUB_ENV"
+
+      - name: Clean clone import + smoke suite
+        run: python3 -I tools/clean_clone_check.py --godot "$GODOT" --work "$RUNNER_TEMP/clean_clone"
+
   export:
-    needs: validate
-    # Job-level guard: only an explicit build_apk dispatch exports; validation_only / unset / unknown skip.
-    if: ${{ always() && !github.event.repository.private && ((inputs.mode == 'build_apk' && needs.validate.result == 'success') || inputs.mode == 'apk_only') }}
+    needs: [validate, clean_clone]
+    # Job-level guard: build_apk exports after validate; release (build_apk or apk_only) also needs clean_clone;
+    # debug apk_only is the owner's untested quick path. validation_only / unset / unknown skip.
+    if: ${{ always() && !github.event.repository.private && ((inputs.mode == 'apk_only' && inputs.build_type != 'release') || ((inputs.mode == 'build_apk' || inputs.mode == 'apk_only') && needs.validate.result == 'success' && (inputs.build_type != 'release' || needs.clean_clone.result == 'success'))) }}
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
@@ -399,6 +431,7 @@ jobs:
             !/assets/art/references/
             !/assets/ui/candidates/
             !/assets/ui/generated/
+            !/addons/godot_ai/
 
       - name: Prove excluded trees are absent from the export workspace
         run: |
