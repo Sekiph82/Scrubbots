@@ -53,6 +53,7 @@ var _help: Button
 var _credits: Button
 var _privacy: Button
 var _status: Label
+var _cloud: Label
 var _built := false
 var _frame = null
 
@@ -229,6 +230,15 @@ func _build() -> void:
 	_status.add_theme_font_size_override("font_size", FONT_BODY)
 	_ink(_status)
 	col.add_child(_status)
+
+	# SB-M43-156: one read-only cloud save status line ("NOT AVAILABLE" while no provider exists).
+	_cloud = Label.new()
+	_cloud.name = "CloudStatus"
+	_cloud.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_cloud.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_cloud.add_theme_font_size_override("font_size", FONT_BODY)
+	_ink(_cloud)
+	col.add_child(_cloud)
 
 	# SB-M59-010 / SB-M58-008: CREDITS and PRIVACY share the CLOSE row, so the panel keeps its height.
 	var actions := HBoxContainer.new()
@@ -460,6 +470,9 @@ func _sync_from_state() -> void:
 		_status.text = UiText.t("SETTINGS_SAVE_BLOCKED")
 	else:
 		_status.text = ""
+	var cloud = _app.cloud if _app != null else null
+	var cs: String = cloud.state() if cloud != null and cloud.is_available() else "unavailable"
+	_cloud.text = UiText.t("SETTINGS_CLOUD", [UiText.t("CLOUD_STATE_" + cs.to_upper())])
 
 func _bus_volume(bus: String) -> float:
 	match bus:

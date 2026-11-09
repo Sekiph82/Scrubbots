@@ -45,6 +45,7 @@ const CoachmarkLayer = preload("res://scripts/ui/tutorial/coachmark_layer.gd")
 const HelpTipsScreen = preload("res://scripts/ui/tutorial/help_tips_screen.gd")
 const CreditsScreen = preload("res://scripts/ui/credits_screen.gd")
 const PrivacyScreen = preload("res://scripts/ui/privacy_screen.gd")
+const CloudConflictScreen = preload("res://scripts/ui/cloud_conflict_screen.gd")
 const MetaCeremonies = preload("res://scripts/ui/ceremony/meta_ceremonies.gd")
 const LevelIntroOverlay = preload("res://scripts/ui/level_intro_overlay.gd")
 ## M44: coachmark refresh cadence (presentation poll; not per frame).
@@ -192,6 +193,9 @@ func _ready() -> void:
 		banner.call()
 		store.resolved.connect(banner.unbind(2))
 		store.restored.connect(banner.unbind(1))
+	# SB-M49-030: a cloud conflict (only with a real cloud provider) asks the player to choose.
+	if app_state != null and app_state.cloud != null:
+		app_state.cloud.conflict_found.connect(func(_info): open_cloud_conflict())
 	# M50-BOARD: the persisted COLOR SYMBOLS setting drives every symbol surface, live.
 	if app_state != null and app_state.effects != null:
 		ColorSymbols.set_enabled(app_state.effects.is_color_symbols(), get_tree())
@@ -555,6 +559,12 @@ func open_privacy():
 	if nav.is_settings_open():
 		nav.close_settings()
 	return PrivacyScreen.open(_modals, app_state)
+
+## SB-M49-030: the account/cloud conflict choice (keep this device / keep cloud) on the app ModalStack.
+func open_cloud_conflict():
+	if app_state == null or _modals.has_popup(CloudConflictScreen.POPUP_ID):
+		return null
+	return CloudConflictScreen.open(_modals, app_state.cloud)
 
 # ------------------------------------------------------------------ M44 FTUE --
 
