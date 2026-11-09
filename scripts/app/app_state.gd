@@ -45,6 +45,7 @@ const FeatureUnlocks = preload("res://scripts/progression/feature_unlocks.gd")
 const AnalyticsService = preload("res://scripts/app/analytics_service.gd")
 const RobotRoster = preload("res://scripts/progression/robot_roster.gd")
 const CollectionInventory = preload("res://scripts/collection/collection_inventory.gd")
+const CloudSaveService = preload("res://scripts/save/cloud_save_service.gd")
 
 ## M44 owner V03: the ONE ledger tx of the new-profile starter booster grant.
 const STARTER_TX := "ftue_starter_boosters:v1"
@@ -73,6 +74,8 @@ var actions: ProductionActionFacade
 var assist: FailureAssistanceService
 ## SB-M56-001..006: the ONE analytics seam (consent-gated, NullSink by default; write-only).
 var analytics: AnalyticsService
+## SB-M43-152..157: the ONE cloud-sync authority (null provider by default: signed out, local only).
+var cloud: CloudSaveService
 var _dirty: bool = false
 var _catalog_orders: Array = []
 var _builtin_catalog = null
@@ -134,6 +137,8 @@ func _init(save_path: String = CANONICAL_SAVE_PATH, clock: Callable = Callable()
 	economy.rewarded.bind_save(Callable(self, "request_save"))
 	# SB-M57-012/013: a committed store grant is saved before the store is acknowledged.
 	economy.store.bind_save(Callable(self, "request_save"))
+	cloud = CloudSaveService.new(save, CloudSaveService.DEFAULT_PATH if save_path == CANONICAL_SAVE_PATH else save_path.get_basename() + "_cloud.json", wall)
+	cloud.bind_save(Callable(self, "request_save"))
 	var croot := content_root
 	if croot.is_empty():
 		croot = RemoteContentManager.DEFAULT_ROOT if save_path == CANONICAL_SAVE_PATH else save_path.get_basename() + "_content/"

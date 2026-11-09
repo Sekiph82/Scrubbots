@@ -17,7 +17,8 @@ extends RefCounted
 ## refuses to decide (invalid_local). Then, conservatively:
 ##   1. exact canonical payload equality -> keep_local / "equal" (the ONLY "equal" case);
 ##   2. identical AUTHORITY (progression + every economy section except presentation-only
-##      `meta_ui`) with only device settings / meta_ui differing -> keep_local / "same_authority";
+##      `meta_ui` and the wall-clock bookkeeping CLOCK_FIELDS) with only device settings /
+##      meta_ui / clock bookkeeping differing -> keep_local / "same_authority";
 ##   3. one side a strict descendant -> that whole side wins, only when ALL hold:
 ##      - its completed-level set and reward-tx set are supersets (at least one strictly larger);
 ##      - every append-only history (robot unlocks, win-streak processed levels, gift tx,
@@ -40,6 +41,11 @@ const LINEAGE_MAX := 64
 
 ## Presentation-only economy sections: never economy truth (MetaUiState is acknowledgements).
 const TRANSIENT_ECONOMY := ["meta_ui"]
+## Wall-clock bookkeeping that moves with time alone (factory 142): the full-Hearts regen anchor
+## (re-stamped to "now" on every read) and the 2x anti-rollback high-water mark. Not player
+## progress, so an untouched device keeps the authority fingerprint it last synced.
+## ponytail: a Heart regenerated while idle still changes authority (-> explicit conflict, safe).
+const CLOCK_FIELDS := [["hearts", "anchor"], ["speed", "clock_high_water"]]
 ## Order-free id sets inside the payload (canonicalised as sorted sets).
 const SET_PATHS := [["progression", "completed"], ["economy", "reward", "applied"], ["economy", "robots", "unlocked"],
 	["economy", "streak", "processed"], ["economy", "gift", "applied"], ["economy", "collection", "set_reward_claimed"]]
@@ -63,8 +69,11 @@ static func envelope(save_service, device_id: String, revision: int, now_ts: int
 static func summary(payload: Dictionary) -> Dictionary:
 	var prog: Dictionary = payload.get("progression", {})
 	var econ: Dictionary = payload.get("economy", {})
+	var reward: Dictionary = econ.get("reward", {})
 	return {"completed": (prog.get("completed", []) as Array).size(), "level": int(prog.get("current_level", 1)),
-		"tx": ((econ.get("reward", {}) as Dictionary).get("applied", []) as Array).size()}
+		"tx": (reward.get("applied", []) as Array).size(),
+		"scrub_bucks": int((reward.get("wallet", {}) as Dictionary).get("scrub_bucks", 0)),
+		"robots": ((econ.get("robots", {}) as Dictionary).get("unlocked", []) as Array).size()}
 
 ## Deterministic canonical form: integral floats -> int (JSON round trips), dictionary keys
 ## sorted by JSON.stringify, order-free id sets sorted. Arrays elsewhere keep their order.
@@ -96,6 +105,9 @@ static func authority(payload: Dictionary) -> Dictionary:
 	var econ: Dictionary = (payload.get("economy", {}) as Dictionary).duplicate(true)
 	for k in TRANSIENT_ECONOMY:
 		econ.erase(k)
+	for f in CLOCK_FIELDS:
+		if typeof(econ.get(f[0])) == TYPE_DICTIONARY:
+			(econ[f[0]] as Dictionary).erase(f[1])
 	return {"progression": payload.get("progression", {}), "economy": econ}
 
 ## Validates the envelope shape and its payload (M40 dry-run). {ok, reason}.
