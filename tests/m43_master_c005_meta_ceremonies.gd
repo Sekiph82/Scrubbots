@@ -35,6 +35,7 @@ var EXPECTED_CASES := [
 	"e23_gift_queued_truth", "e24_gift_1000_fallback", "e25_gift_claimed_note", "e26_gift_all_five_once",
 	"e27_results_handoff", "e28_results_no_event_no_hold",
 	"e29_feature_builder_truth", "e30_feature_no_authority", "e31_world_builder_truth", "e32_world_no_authority",
+	"e33_presentable_matches_build",
 ]
 
 var _fail := 0
@@ -73,6 +74,7 @@ func _initialize() -> void:
 	_e30_feature_no_authority()
 	_e31_world_builder_truth()
 	_e32_world_no_authority()
+	_e33_presentable_matches_build()
 	await _e23_gift_queued_truth()
 	_e24_gift_1000_fallback()
 	await _e25_gift_claimed_note()
@@ -454,6 +456,39 @@ func _e22_robot_reduced() -> void:
 	full.free()
 	red.free()
 	_complete("e22_robot_reduced")
+
+## Factory 145: CeremonyPresenter.pending() asks presentable() (no UI built on the WON
+## terminal tick); it must agree with build() for every kind, valid and refused.
+func _e33_presentable_matches_build() -> void:
+	print("[e33 presentable(e) == (build(e) != null), no popup built]")
+	var icon: String = CeremonyPresenter.FEATURE_ICONS["daily"]
+	var evs := [
+		{"key": "set:1", "kind": "set_complete", "set": 1, "rewards": {}},
+		{"key": "master", "kind": "master_complete", "sets": 15, "rewards": {}},
+		{"key": "gift:1", "kind": "gift_milestone", "milestone": 1, "rewards": {}},
+		{"key": "robot:atlas", "kind": "robot_unlock", "robot_id": "atlas", "parts_left": 0},
+		{"key": "robot:robot_2", "kind": "robot_unlock", "robot_id": "robot_2"},
+		{"key": "featured_card:L30:s1_c0", "kind": "featured_card", "level": 30, "card": "s1_c0"},
+		{"key": "featured_card:L20:s99_c0", "kind": "featured_card", "level": 20, "card": "s99_c0"},
+		{"key": "unlock:daily", "kind": "feature_unlock", "name": "DAILY", "icon": icon},
+		{"key": "unlock:x", "kind": "feature_unlock", "name": "", "icon": icon},
+		{"key": "unlock:y", "kind": "feature_unlock", "name": "Y", "icon": "res://missing.png"},
+		{"key": "world:a", "kind": "world_unlock", "title": "A", "subtitle": "", "art": icon},
+		{"key": "world:b", "kind": "world_unlock", "title": "", "art": icon},
+		{"key": "world:c", "kind": "world_unlock", "title": "C", "art": ""},
+		{"key": "x", "kind": "no_such_kind"},
+	]
+	var bad: Array = []
+	var yes := 0
+	for e in evs:
+		var p = MetaCeremonies.build(e, true)
+		if MetaCeremonies.presentable(e) != (p != null):
+			bad.append(e["key"])
+		if p != null:
+			yes += 1
+			p.free()
+	_ok(bad.is_empty() and yes == 7, "presentable agrees with build on %d events (%d presentable), mismatches %s" % [evs.size(), yes, str(bad)])
+	_complete("e33_presentable_matches_build")
 
 # ------------------------------------------------------------------- SB-M43-074 ----
 

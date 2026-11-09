@@ -68,15 +68,8 @@ func presented_log() -> Array:
 func pending() -> Array:
 	if _app == null or _app.economy == null or _app.is_blocked:
 		return []
-	var reduced := _reduced()
 	return (CeremonyEvents.pending(_app.economy, _app.economy.meta_ui) + feature_events() + world_events()).filter(func(e):
-		if _snoozed.has(String(e["key"])):
-			return false
-		var p = MetaCeremonies.build(e, reduced)
-		if p == null:
-			return false
-		p.free()
-		return true)
+		return not _snoozed.has(String(e["key"])) and MetaCeremonies.presentable(e))
 
 static func feature_key(feature_id: String) -> String:
 	return "unlock:" + feature_id

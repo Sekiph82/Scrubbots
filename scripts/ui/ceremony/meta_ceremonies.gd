@@ -81,8 +81,30 @@ const ROBOT_VIDEO_KEY := {"bubbles": CHROMA_KEY_GREEN, "polly": CHROMA_KEY_GREEN
 ## Injectable for tests: robot id -> VideoStream overriding the file (null = the static roster art, as on failure).
 static var robot_video := {}
 
+## True when build(event) returns a popup: the builders' own refusals, without constructing
+## any UI (the WON terminal tick asks this for every pending event, factory 145).
+static func presentable(event: Dictionary) -> bool:
+	match String(event.get("kind", "")):
+		"set_complete", "master_complete", "gift_milestone":
+			return true
+		"robot_unlock":
+			return not RobotRoster.entry(String(event.get("robot_id", ""))).is_empty()
+		"featured_card":
+			return not CollectionCardCatalog.entry(String(event.get("card", ""))).is_empty()
+		"feature_unlock":
+			return _named_art(event, "name", "icon")
+		"world_unlock":
+			return _named_art(event, "title", "art")
+	return false
+
+static func _named_art(event: Dictionary, name_key: String, art_key: String) -> bool:
+	var art := String(event.get(art_key, ""))
+	return not String(event.get(name_key, "")).is_empty() and not art.is_empty() and ResourceLoader.exists(art)
+
 ## One ceremony popup for a CeremonyEvents event, or null when the kind has no builder.
 static func build(event: Dictionary, reduced: bool = false):
+	if not presentable(event):
+		return null
 	match String(event.get("kind", "")):
 		"set_complete":
 			return set_complete(event, reduced)
