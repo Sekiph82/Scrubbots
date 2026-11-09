@@ -58,8 +58,12 @@ func _initialize() -> void:
 	var base := await _transitions(root)
 	# Lap 1: first play of all LEVELS levels (first-load content caching happens here).
 	var lap1: Dictionary = await _long_session(root, base, 1)
+	# Freeing the app root releases its whole AppState graph (main.gd disposes the economy's
+	# self-capturing reward handlers on PREDELETE); otherwise every boot leaks the graph.
+	var graph := [weakref(root.get_app_state()), weakref(root.get_app_state().economy), weakref(root.get_app_state().economy.store)]
 	root.free()
 	await process_frame
+	_ok(graph.all(func(w): return w.get_ref() == null), "freed app root releases AppState / EconomyServices / StoreService")
 	# Lap 2 (M55-C001 steady-state leak check): a fresh profile replays the SAME LEVELS
 	# levels in the same process, so every per-attempt leak shows up as growth over the
 	# end of lap 1 while one-time content caches do not.

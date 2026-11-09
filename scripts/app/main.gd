@@ -1106,3 +1106,7 @@ func _notification(what: int) -> void:
 			flush_lifecycle("close_request")
 			if app_state != null:
 				app_state.analytics.end_session("close")
+		NOTIFICATION_PREDELETE:
+			# The economy's reward handlers capture their own graph: break the cycle or every freed root leaks it.
+			if app_state != null and app_state.economy != null:
+				app_state.economy.dispose()
