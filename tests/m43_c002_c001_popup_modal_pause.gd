@@ -34,6 +34,8 @@ var _root
 var _host
 
 func _initialize() -> void:
+	# SB-M44-032 (no grandfather): boosters are gated on this L2 fixture; the stack cases need them live.
+	preload("res://scripts/app/app_state.gd").test_unlock_all = true
 	await process_frame
 	MainScript.boot_opening_override = 0
 	await _boot(2)
@@ -62,6 +64,7 @@ func _initialize() -> void:
 	_frames_promoted_unchanged()
 	_shutdown()
 	MainScript.boot_opening_override = -1
+	preload("res://scripts/app/app_state.gd").test_unlock_all = false
 	_cleanup()
 	_done()
 
