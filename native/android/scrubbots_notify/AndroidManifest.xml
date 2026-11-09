@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SB-M43-172. uses-sdk is declared so the manifest merger adds no implied legacy permissions.
+     No permission is declared here: POST_NOTIFICATIONS comes from the export preset. -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.scrubbots.notify">
+    <uses-sdk android:minSdkVersion="24" android:targetSdkVersion="36" />
+    <application>
+        <meta-data
+            android:name="org.godotengine.plugin.v2.ScrubbotsNotify"
+            android:value="com.scrubbots.notify.ScrubbotsNotifyPlugin" />
+        <receiver android:name="com.scrubbots.notify.ReminderReceiver" android:exported="false" />
+    </application>
+</manifest>

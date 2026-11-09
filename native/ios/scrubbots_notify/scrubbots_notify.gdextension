@@ -1,0 +1,11 @@
+; SB-M43-171/172: copied with the built dylib to res://bin/ by .github/workflows/ios-ipa.yml
+; (input local_notifications). Never committed under res:// so desktop / headless runs load nothing.
+[configuration]
+
+entry_symbol = "scrubbots_notify_init"
+compatibility_minimum = "4.4"
+
+[libraries]
+
+ios.debug = "res://bin/libscrubbots_notify.dylib"
+ios.release = "res://bin/libscrubbots_notify.dylib"

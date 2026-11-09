@@ -42,3 +42,7 @@ content_pipeline/secrets/
 
 # Local suite runner logs (tools/run_suites.py)
 validate_logs/
+
+# SB-M43-172 native notification binaries are built in CI, never committed
+addons/scrubbots_notify/android/
+/bin/
