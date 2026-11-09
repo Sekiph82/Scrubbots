@@ -1,11 +1,13 @@
 extends SceneTree
-## SB-M56-001..010, 012..016 — analytics taxonomy V1 evidence. The versioned catalogue
+## SB-M56-001..023 — analytics taxonomy V1 evidence. The versioned catalogue
 ## (data/config/analytics_taxonomy_v1.json) + AnalyticsService (consent gate, schema
 ## validation, NullSink default / MemorySink here, batching, local retention markers), and
 ## the real call sites: app root session lifecycle, ProductionGameplayHost level funnel /
 ## booster use, FailureAssistanceService + AcquisitionFlow Need a Hand / booster acquisition,
 ## wallet sources / sinks, Hearts gate, packs / Collection / robots, Home navigation, Shop,
-## rewarded offers / requests / results (provider double), reminders + permission, deep links.
+## rewarded offers / requests / results (provider double), reminders + permission, deep links,
+## and the feature measures (SB-M56-011, 017..022): Next Cleanup / journey on WON Results, pack
+## pity, Daily Scrub Orders, Weekly / First-Try, Comeback Catch-Up, Ranks view.
 ## Real app root (main.tscn) on throw-away save paths only (boot_save_path_override).
 ##
 ## Run: godot --headless --path . -s res://tests/m56_analytics_taxonomy.gd
@@ -20,6 +22,7 @@ const RewardedAdsScreen = preload("res://scripts/ui/daily/rewarded_ads_screen.gd
 const ProfileScreens = preload("res://scripts/ui/profile/profile_screens.gd")
 const NotificationPermission = preload("res://scripts/economy/notification_permission.gd")
 const PendingPackQueue = preload("res://scripts/collection/pending_pack_queue.gd")
+const ResultsMomentum = preload("res://scripts/progression/results_momentum.gd")
 const R = NavigationController.Route
 const T0 := 1_900_000_000
 const LEVEL := 2
@@ -29,7 +32,8 @@ var EXPECTED_CASES := [
 	"batching", "retention_markers", "consent_persist_revoke", "session_events", "level_funnel",
 	"pause_restart_and_exit", "assistance", "booster_acquire_rewarded", "booster_use",
 	"economy_events", "collection_robot_events", "navigation_events", "ads_store_events",
-	"notification_events", "provider_offline", "no_economy_change", "pii_scan",
+	"notification_events", "next_cleanup_journey", "collection_pity", "daily_orders", "weekly_first_try",
+	"comeback_catchup", "ranks_view", "provider_offline", "no_economy_change", "pii_scan",
 ]
 
 var _fail := 0
@@ -69,6 +73,7 @@ func _initialize() -> void:
 	await _navigation_events()
 	await _ads_store_events()
 	await _notification_events()
+	await _feature_events()
 	_provider_offline()
 	await _no_economy_change()
 	_pii_scan()
@@ -196,8 +201,9 @@ func _config_schema() -> void:
 			if p.has("fallback") and not (p["values"] if p.has("values") else _cfg["enums"][p["enum"]]).has(p["fallback"]):
 				bad.append("%s.%s fallback" % [ev, k])
 	_ok(bad.is_empty(), "every param is int/bool/enum/enum_list, no forbidden (PII) name, enums + fallbacks resolve: %s" % str(bad))
-	var want: Array = ["SB-M56-002", "SB-M56-003", "SB-M56-004", "SB-M56-005", "SB-M56-006", "SB-M56-007", "SB-M56-008", "SB-M56-009", "SB-M56-010", "SB-M56-012"]
-	_ok(tasks.keys().size() == want.size() and want.all(func(t): return tasks.has(t)), "events cover SB-M56-002..010 + 012: %s" % str(tasks.keys()))
+	var want: Array = ["SB-M56-002", "SB-M56-003", "SB-M56-004", "SB-M56-005", "SB-M56-006", "SB-M56-007", "SB-M56-008", "SB-M56-009", "SB-M56-010", "SB-M56-011", "SB-M56-012",
+		"SB-M56-017", "SB-M56-018", "SB-M56-020", "SB-M56-021", "SB-M56-022"]
+	_ok(tasks.keys().size() == want.size() and want.all(func(t): return tasks.has(t)), "events cover SB-M56-002..012 + 017..022 (019 extends pack_opened): %s" % str(tasks.keys()))
 	_ok(not types.has("string"), "no free-text param type exists")
 	var tax_doc := FileAccess.get_file_as_string("res://" + String(_cfg["doc"]))
 	var inv_doc := FileAccess.get_file_as_string("res://docs/PRIVACY_DATA_INVENTORY.md")
@@ -486,10 +492,11 @@ func _no_economy_change() -> void:
 		await _tour_navigation()
 		await _tour_ads()
 		await _tour_notifications()
+		await _tour_features()   # SB-M56-011, 017..022
 		var eco: Dictionary = _eco().snapshot()
 		eco.erase("packs")   # the card-pack RNG state is seeded per fresh profile, not by play
 		runs.append([eco, _app().progression.snapshot()])
-	_ok(runs[0] == runs[1], "same play + spends / pack / Collection / robots / navigation / ads / reminders with consent OFF vs ON: identical economy + progression snapshots (differing: %s)" % str((runs[0][0] as Dictionary).keys().filter(func(k): return runs[0][0][k] != runs[1][0][k])))
+	_ok(runs[0] == runs[1], "same play + spends / pack / Collection / robots / navigation / ads / reminders / feature measures with consent OFF vs ON: identical economy + progression snapshots (differing: %s)" % str((runs[0][0] as Dictionary).keys().filter(func(k): return runs[0][0][k] != runs[1][0][k])))
 	var before: Array = [_eco().snapshot(), _app().progression.snapshot()]
 	_expect_drops = true   # the 50 bogus level_end calls below are dropped on purpose
 	for i in range(50):
@@ -668,6 +675,7 @@ func _collection_robot_events() -> void:
 	var sets: Array = _params("collection_set_complete").map(func(p): return p["set"])
 	sets.sort()
 	_ok(sets == range(1, 16) and _named("collection_master_complete").size() == 1, "15 sets complete once each + Master once: %s" % str(sets))
+	_ok(_params("collection_set_complete").all(func(p): return p["level"] == LEVEL), "019: set completion carries the campaign level (Set-1 completion level)")
 	_ok(_params("robot_unlock") == [{"robot": 2}] and _params("robot_equip") == [{"robot": 2}], "next robot (roster #2) unlock + equip")
 	_ok(_params("economy_sink").any(func(p): return p["sink"] == "robot_unlock" and p["currency"] == "bot_parts")
 		and _params("economy_source").any(func(p): return p["source"] == "collection"), "robot unlock -> bot_parts sink; set rewards -> collection source")
@@ -707,6 +715,111 @@ func _notification_events() -> void:
 	_ok(_params("notify_toggle") == [{"category": "all", "on": true}, {"category": "daily", "on": _eco().notify.categories["daily"]}], "REMINDERS ON + one category toggle: %s" % str(_params("notify_toggle")))
 	_ok(_params("notification_prompt").map(func(p): return p["step"]) == ["explainer_shown", "allowed", "os_denied"], "explainer shown -> Allow -> OS denied: %s" % str(_params("notification_prompt")))
 	_complete("notification_events")
+
+# ====================================================== SB-M56-011, 017..022 ====
+
+## A Weekly event (milestones at 1 and 2 counted wins, running now) + a 2-level First-Try.
+func _load_events() -> void:
+	var path: String = _tmp_path("events").get_basename() + ".json"
+	_tmp.append(path)
+	var f := FileAccess.open(path, FileAccess.WRITE)
+	f.store_string(JSON.stringify({"schema": "scrubbots.events.v1", "version": 1, "approved_reward_types": ["scrub_bucks"],
+		"weekly_events": [{"id": "wk1", "start_ts": _now[0] - 3600, "unclaimed_on_expiry": "forfeit",
+			"milestones": [{"target": 1, "reward": {"scrub_bucks": 20}}, {"target": 2, "reward": {"scrub_bucks": 30}}]}],
+		"first_try_cleanup": {"id": "ft1", "levels": 2, "reward": {"scrub_bucks": 40}}}))
+	f.close()
+	_eco().events.load_config(path)
+
+## Real first action + WON on the current host, then the WON Results route.
+func _win_current() -> void:
+	_host = _root.get_gameplay_host()
+	_host.get_runtime().set_process(false)
+	_first_action()
+	await _terminal(&"WON")
+	_root.get_modal_stack().clear("t")
+	await _settle()
+
+## 011 + 017..022 on their real paths, from Home at frontier F with Hearts: a 3-day absence
+## (return window + Catch-Up), Weekly + First-Try joined, today's orders win_1 / win_2 / win_3
+## one win from done, a pity-due pack, WON F -> CLEAN NEXT (+ a stale second tap) -> WON F+1,
+## then the order / First-Try / milestone claims and the Ranks screen.
+func _tour_features() -> void:
+	_load_events()
+	_app().actions.join_first_try()
+	_eco().orders.import_snapshot({"version": 1, "day": _eco().daily.local_day(), "ids": ["win_1", "win_2", "win_3"], "progress": [0, 1, 1]})
+	_eco().returns.import_snapshot({"version": 1, "last": _now[0] - 3 * 86400, "high": _now[0] - 3 * 86400, "window": 0, "window_ts": 0, "summary_shown": 0, "catchup": {}})
+	_root._notification(Node.NOTIFICATION_APPLICATION_RESUMED)
+	_eco().pack_pity.threshold_override = 1
+	_eco().pack_pity.import_snapshot({"version": 1, "count": 1})
+	_eco().reward.grant("m56:pity", {"standard_card_packs": 1})
+	_app().open_earned_pack(PendingPackQueue.entry_id("m56:pity", "standard", 0))
+	_eco().pack_pity.threshold_override = -1
+	_root.get_modal_stack().clear("t")
+	await _settle()
+	_root.play_current_frontier()
+	await _settle()
+	await _win_current()
+	_root.continue_from_results()
+	await _settle()
+	_root.continue_from_results()
+	await _win_current()
+	for i in range(3):
+		_app().actions.claim_daily_task(i)
+	_app().actions.claim_daily_all_tasks()
+	_app().actions.claim_first_try()
+	_app().actions.claim_event_milestone("wk1", 0)
+	ProfileScreens.open_ranks(_root.get_modal_stack(), _app())
+	_root.get_modal_stack().clear("t")
+	await _settle()
+
+func _feature_events() -> void:
+	print("[011 / 017..022 feature measures]")
+	await _boot()
+	await _tour_features()
+	print("[017 Next Cleanup + 018 journey]")
+	_ok(_params("journey_progress") == [{"slot": LEVEL, "cycle": 1, "cycle_complete": false, "first_clear": true},
+		{"slot": LEVEL + 1, "cycle": 1, "cycle_complete": false, "first_clear": true}], "two WON Results -> journey node (cadence slot, cycle): %s" % str(_params("journey_progress")))
+	var shown: Array = _params("next_cleanup_shown")
+	_ok(shown.size() == 2 and shown.all(func(p): return p["available"] and p["reason"] == "ok"), "WON Results -> teaser shown, next frontier available: %s" % str(shown))
+	_ok(_params("next_cleanup_tap") == [{"ok": true, "reason": "ok"}, {"ok": false, "reason": "not_results"}], "CLEAN NEXT -> ok; stale second tap -> refusal reason: %s" % str(_params("next_cleanup_tap")))
+	var st: Array = _params("level_start")
+	_ok(st.size() == 2 and st[1]["level"] == LEVEL + 1 and st[1]["entry"] == "launch", "the accepted tap starts the next level (conversion)")
+	var j := ResultsMomentum.journey(_app().progression, "results", 10, ResultsMomentum.load_config())
+	_ok(j["slot"] == 10 and j["slot"] == j["length"], "cycle_complete = slot 10 of 10 (the L10 Results journey)")
+	_complete("next_cleanup_journey")
+	print("[019 pack pity / dry streak / set level]")
+	var pk: Array = _params("pack_opened")
+	_ok(pk.size() >= 1 and pk[0]["pity"] and pk[0]["new_cards"] != "0" and pk[0]["dry_streak"] == "0", "pity-due pack -> pity true, guarantee fulfilled (new card), dry streak reset: %s" % str(pk))
+	_ok(pk.slice(1).all(func(p): return not p["pity"]), "later packs: pity false")
+	_complete("collection_pity")
+	print("[020 Daily Scrub Orders]")
+	_ok(_params("daily_order_done") == [{"tier": "easy", "metric": "levels_won", "target": 1}, {"tier": "normal", "metric": "levels_won", "target": 2},
+		{"tier": "stretch", "metric": "levels_won", "target": 3}], "orders done on the committed wins: %s" % str(_params("daily_order_done")))
+	_ok(_params("daily_order_claim").map(func(p): return p["tier"]) == ["easy", "normal", "stretch", "scrubbox"], "three order claims + ScrubBox: %s" % str(_params("daily_order_claim")))
+	_complete("daily_orders")
+	print("[021 Weekly / First-Try]")
+	_ok(_params("weekly_event") == [{"step": "joined", "milestone": 0}, {"step": "milestone_reached", "milestone": 1}, {"step": "milestone_reached", "milestone": 2},
+		{"step": "milestone_claimed", "milestone": 1}], "Weekly: joined on the first counted win, milestones 1 / 2 reached, 1 claimed: %s" % str(_params("weekly_event")))
+	_ok(_params("first_try") == [{"step": "joined", "run": 0}, {"step": "advanced", "run": 1}, {"step": "completed", "run": 2}, {"step": "claimed", "run": 2}],
+		"First-Try: joined -> run 1 -> complete at 2 -> claimed: %s" % str(_params("first_try")))
+	print("[022 Comeback / Catch-Up]")
+	_ok(_params("comeback_window") == [{"catchup_offered": true}], "3-day absence -> one return window with Catch-Up offered")
+	_ok(_params("catchup_step") == [{"step": 1, "complete": false}, {"step": 2, "complete": false}], "two first-clear wins -> Catch-Up steps 1, 2: %s" % str(_params("catchup_step")))
+	_root._notification(Node.NOTIFICATION_APPLICATION_RESUMED)
+	_ok(_params("comeback_window").size() == 1, "a resume without a new absence opens nothing")
+	_complete("comeback_catchup")
+	print("[011 Ranks view]")
+	_ok(_params("ranks_view") == [{"table": "all_time", "band": 1}], "RANKS screen -> all_time table, rank band 1 (Bronze): %s" % str(_params("ranks_view")))
+	_complete("ranks_view")
+	await _boot()
+	_load_events()
+	_app().actions.join_first_try()
+	await _play()
+	_first_action()
+	await _terminal(&"LOST")
+	_ok(_params("first_try") == [{"step": "joined", "run": 0}, {"step": "reset", "run": 0}], "first-attempt loss -> reset (run depth 0): %s" % str(_params("first_try")))
+	_ok(_params("weekly_event").is_empty(), "a loss counts nothing for the Weekly event")
+	_complete("weekly_first_try")
 
 ## 016: a provider that is offline (drops every batch) never blocks or grows the queue.
 func _provider_offline() -> void:

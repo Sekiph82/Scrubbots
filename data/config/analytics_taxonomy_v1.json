@@ -2,7 +2,7 @@
   "schema": "scrubbots.analytics_taxonomy.v1",
   "version": 1,
   "doc": "docs/ANALYTICS_TAXONOMY_V1.md",
-  "tasks": ["SB-M56-001", "SB-M56-002", "SB-M56-003", "SB-M56-004", "SB-M56-005", "SB-M56-006", "SB-M56-007", "SB-M56-008", "SB-M56-009", "SB-M56-010", "SB-M56-012", "SB-M56-014", "SB-M56-015", "SB-M56-016"],
+  "tasks": ["SB-M56-001", "SB-M56-002", "SB-M56-003", "SB-M56-004", "SB-M56-005", "SB-M56-006", "SB-M56-007", "SB-M56-008", "SB-M56-009", "SB-M56-010", "SB-M56-011", "SB-M56-012", "SB-M56-014", "SB-M56-015", "SB-M56-016", "SB-M56-017", "SB-M56-018", "SB-M56-019", "SB-M56-020", "SB-M56-021", "SB-M56-022", "SB-M56-023"],
   "privacy": {
     "consent_default": false,
     "param_types": ["int", "bool", "enum", "enum_list"],
@@ -158,13 +158,16 @@
         "kind": {"type": "enum", "values": ["standard", "premium"], "required": true},
         "new_cards": {"type": "enum", "enum": "count", "required": true},
         "duplicates": {"type": "enum", "enum": "count", "required": true},
-        "best_rarity": {"type": "enum", "enum": "rarity", "required": true}
+        "best_rarity": {"type": "enum", "enum": "rarity", "required": true},
+        "pity": {"type": "bool", "required": false},
+        "dry_streak": {"type": "enum", "enum": "count", "required": false}
       }
     },
     "collection_set_complete": {
       "task": "SB-M56-008",
       "params": {
-        "set": {"type": "int", "min": 1, "max": 15, "required": true}
+        "set": {"type": "int", "min": 1, "max": 15, "required": true},
+        "level": {"type": "int", "min": 1, "max": 100000, "required": false}
       }
     },
     "collection_master_complete": {
@@ -240,6 +243,78 @@
       "task": "SB-M56-012",
       "params": {
         "dest": {"type": "enum", "values": ["home", "daily", "tasks", "gift_bar", "events", "shop", "collection", "robots", "profile", "none"], "fallback": "home", "required": true}
+      }
+    },
+    "next_cleanup_shown": {
+      "task": "SB-M56-017",
+      "params": {
+        "available": {"type": "bool", "required": true},
+        "image": {"type": "bool", "required": true},
+        "reason": {"type": "enum", "values": ["ok", "CONTENT_MISSING", "CATALOG_INVALID", "LEVEL_DISABLED", "APP_BLOCKED", "other"], "fallback": "other", "required": true}
+      }
+    },
+    "next_cleanup_tap": {
+      "task": "SB-M56-017",
+      "params": {
+        "ok": {"type": "bool", "required": true},
+        "reason": {"type": "enum", "values": ["ok", "not_results", "stale_results", "not_won", "no_next_content", "no_hearts", "APP_BLOCKED", "CONTENT_MISSING", "CATALOG_INVALID", "LEVEL_DISABLED", "other"], "fallback": "other", "required": true}
+      }
+    },
+    "journey_progress": {
+      "task": "SB-M56-018",
+      "params": {
+        "slot": {"type": "int", "min": 1, "max": 10, "required": true},
+        "cycle": {"type": "int", "min": 1, "max": 10000, "required": true},
+        "cycle_complete": {"type": "bool", "required": true},
+        "first_clear": {"type": "bool", "required": true}
+      }
+    },
+    "daily_order_done": {
+      "task": "SB-M56-020",
+      "params": {
+        "tier": {"type": "enum", "values": ["easy", "normal", "stretch"], "required": true},
+        "metric": {"type": "enum", "values": ["levels_won", "levels_won_no_booster", "levels_won_min_class", "cells_cleared"], "required": true},
+        "target": {"type": "int", "min": 1, "max": 100000, "required": true}
+      }
+    },
+    "daily_order_claim": {
+      "task": "SB-M56-020",
+      "params": {
+        "tier": {"type": "enum", "values": ["easy", "normal", "stretch", "scrubbox"], "required": true}
+      }
+    },
+    "weekly_event": {
+      "task": "SB-M56-021",
+      "params": {
+        "step": {"type": "enum", "values": ["joined", "milestone_reached", "milestone_claimed"], "required": true},
+        "milestone": {"type": "int", "min": 0, "max": 50, "required": true}
+      }
+    },
+    "first_try": {
+      "task": "SB-M56-021",
+      "params": {
+        "step": {"type": "enum", "values": ["joined", "advanced", "completed", "reset", "claimed"], "required": true},
+        "run": {"type": "int", "min": 0, "max": 100, "required": true}
+      }
+    },
+    "comeback_window": {
+      "task": "SB-M56-022",
+      "params": {
+        "catchup_offered": {"type": "bool", "required": true}
+      }
+    },
+    "catchup_step": {
+      "task": "SB-M56-022",
+      "params": {
+        "step": {"type": "int", "min": 1, "max": 3, "required": true},
+        "complete": {"type": "bool", "required": true}
+      }
+    },
+    "ranks_view": {
+      "task": "SB-M56-011",
+      "params": {
+        "table": {"type": "enum", "values": ["all_time", "weekly"], "required": true},
+        "band": {"type": "int", "min": 0, "max": 20, "required": true}
       }
     }
   }

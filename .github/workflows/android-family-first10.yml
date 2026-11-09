@@ -57,7 +57,7 @@ name: Android Family First10 APK
 #   Version from data/config/app_version.json via .github/scripts/app_version.py: version/code = build number =
 #   run_number + build_offset; outputs build/android/<build_type>/ScrubBots-Android-<build_type>-v<ver>-b<build>.*
 #   validate also runs tools/check_release_versioning.py + m59_app_version.
-# SB-M56-001..010, 012..016 analytics taxonomy V1 (consent-gated, schema-validated, mocked sink; economy / collection / navigation / ads / notification events): + m56_analytics_taxonomy (exact 21/21 guard).
+# SB-M56-001..023 analytics taxonomy V1 (consent-gated, schema-validated, mocked sink; economy / collection / navigation / ads / notification events, feature measures): + m56_analytics_taxonomy (exact 27/27 guard).
 # SB-M58-001..006 privacy inventory (docs/PRIVACY_DATA_INVENTORY.md lists every permission/network/user:// use): + m58_privacy_inventory (exact 7/7 guard).
 # SB-M43-172 local reminders: + m43_172_local_notifications (exact 12/12 guard). Input `local_notifications` (default false):
 #   true builds the ScrubbotsNotify AAR (native/android, javac only), switches the preset to the Gradle build and enables
@@ -341,10 +341,10 @@ jobs:
           else
             echo "M54-COLLECTION verdict=FAIL (exact PASS line missing)" | tee -a "$S"; fail=1
           fi
-          if grep -qxF 'M56 analytics taxonomy evidence: PASS (21/21 cases, 0 fail)' validate_logs/m56_analytics_taxonomy.log 2>/dev/null; then
-            echo "M56-ANALYTICS verdict=PASS (21/21)" | tee -a "$S"
+          if grep -qxF 'M56 analytics taxonomy evidence: PASS (27/27 cases, 0 fail)' validate_logs/m56_analytics_taxonomy.log 2>/dev/null; then
+            echo "M56-ANALYTICS verdict=PASS (27/27)" | tee -a "$S"
           else
-            echo "M56-ANALYTICS verdict=FAIL (exact 21/21 summary missing)" | tee -a "$S"; fail=1
+            echo "M56-ANALYTICS verdict=FAIL (exact 27/27 summary missing)" | tee -a "$S"; fail=1
           fi
           if grep -qxF 'M58 privacy inventory evidence: PASS (7/7 cases, 0 fail)' validate_logs/m58_privacy_inventory.log 2>/dev/null; then
             echo "M58-PRIVACY verdict=PASS (7/7)" | tee -a "$S"
