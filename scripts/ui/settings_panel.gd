@@ -22,6 +22,8 @@ signal help_requested
 signal language_changed(code: String)
 ## SB-M59-010: the read-only CREDITS (third-party notices) popup was requested (the app root opens it).
 signal credits_requested
+## SB-M58-008: the PRIVACY popup (analytics consent + policy summary) was requested (the app root opens it).
+signal privacy_requested
 
 const BasePopup = preload("res://scripts/ui/popup/base_popup.gd")
 const HomeStyle = preload("res://scripts/ui/home/home_style.gd")
@@ -49,6 +51,7 @@ var _symbols_toggle: CheckButton
 var _lang_buttons: Dictionary = {}   ## language code -> Button
 var _help: Button
 var _credits: Button
+var _privacy: Button
 var _status: Label
 var _built := false
 var _frame = null
@@ -227,7 +230,7 @@ func _build() -> void:
 	_ink(_status)
 	col.add_child(_status)
 
-	# SB-M59-010: CREDITS (third-party notices popup) shares the CLOSE row, so the panel keeps its height.
+	# SB-M59-010 / SB-M58-008: CREDITS and PRIVACY share the CLOSE row, so the panel keeps its height.
 	var actions := HBoxContainer.new()
 	actions.name = "ActionRow"
 	actions.add_theme_constant_override("separation", 16)
@@ -235,6 +238,9 @@ func _build() -> void:
 	_credits = _make_row_button("CreditsButton", UiText.t("CREDITS_TITLE"))
 	_credits.pressed.connect(func(): credits_requested.emit())
 	actions.add_child(_credits)
+	_privacy = _make_row_button("PrivacyButton", UiText.t("PRIVACY_TITLE"))
+	_privacy.pressed.connect(func(): privacy_requested.emit())
+	actions.add_child(_privacy)
 	var close := _make_row_button("CloseButton", UiText.t("SETTINGS_CLOSE"))
 	close.pressed.connect(close_panel)
 	actions.add_child(close)
@@ -247,7 +253,7 @@ func _build() -> void:
 	_ink(ver)
 	col.add_child(ver)
 
-## Tan row button (CREDITS / CLOSE share one row).
+## Tan row button (CREDITS / PRIVACY / CLOSE share one row).
 static func _make_row_button(n: String, text: String) -> Button:
 	var b := Button.new()
 	b.name = n
@@ -288,7 +294,7 @@ func _ref_width() -> float:
 	return vp.get_visible_rect().size.x if vp != null else 1080.0
 
 ## Cream setting card (BasePopup ROW family) around one control group.
-func _card(inner: Control) -> Control:
+static func _card(inner: Control) -> Control:
 	var card := PanelContainer.new()
 	card.name = "Card_" + String(inner.name)
 	card.add_theme_stylebox_override("panel", HomeStyle.pad(HomeStyle.box(BasePopup.ROW, BasePopup.ROW_EDGE, 4, 26, 4, 4), 20, 6))
@@ -299,7 +305,7 @@ static func _ink(l: Control) -> void:
 	l.add_theme_color_override("font_color", BasePopup.INK)
 	l.add_theme_constant_override("outline_size", 0)
 
-func _make_toggle(text: String) -> CheckButton:
+static func _make_toggle(text: String) -> CheckButton:
 	var t := CheckButton.new()
 	t.text = text
 	t.focus_mode = Control.FOCUS_ACCESSIBILITY
@@ -559,3 +565,6 @@ func get_language_button(code: String) -> Button:
 
 func get_credits_button() -> Button:
 	return _credits
+
+func get_privacy_button() -> Button:
+	return _privacy

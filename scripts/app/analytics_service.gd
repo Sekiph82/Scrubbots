@@ -4,7 +4,8 @@ extends RefCounted
 ## SB-M56-001..006: the ONE local analytics seam. Events are declared in the versioned
 ## taxonomy data/config/analytics_taxonomy_v1.json (docs/ANALYTICS_TAXONOMY_V1.md):
 ##   - consent gate: nothing is validated, queued or stored unless consent is granted
-##     (default OFF until the M58 consent screen exists; set_consent() persists it);
+##     (default OFF; set_consent() is called only by the Settings -> PRIVACY switch,
+##     scripts/ui/privacy_screen.gd, SB-M58-008, and persists it);
 ##   - schema validation: an unknown event, an undeclared param, a wrong type or a missing
 ##     required param drops the WHOLE event with a debug warning (never a crash);
 ##     params are only int / bool / enum / enum_list, so no free text can leave;
