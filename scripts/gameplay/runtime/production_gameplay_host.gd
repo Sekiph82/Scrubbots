@@ -905,6 +905,8 @@ func _meta_terminal(won: bool) -> Array:
 	_economy.events.on_progression_terminal(won, bool(r["first_try"]))
 	_track_event_progress(ev_before, won, bool(r["first_try"]))
 	var catchup: Array = _economy.returns.on_first_clear_win(_economy.reward) if won else []
+	if won:
+		_economy.ranks.on_level_won()   # SB-M43-131 weekly table
 	for c in catchup:   # SB-M56-022
 		_track("catchup_step", {"step": int(c["step"]) + 1, "complete": int(c["step"]) + 1 == int(c["steps"])})
 	return catchup

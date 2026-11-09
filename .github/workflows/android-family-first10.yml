@@ -45,6 +45,7 @@ name: Android Family First10 APK
 # SB-M43-R07-001..006 earned-pack pity + First Collection Sprint tuning: + m43_master_c007r_pity (60 total, exact 11/11 guard).
 # SB-CAMPAIGN-L11-L30 20 release-pool levels as campaign L11..L30: + campaign_l11_l30 (61 total, exact 5/5 guard).
 # SB-M43-122 RANKS personal rank ladder: + m43_personal_ranks (62 total, exact 8/8 guard).
+# SB-M43-131/132 RANKS two tables (all-time + weekly, Monday 00:00 UTC reset): + m43_ranks_weekly (exact 7/7 guard).
 # SB-CAMPAIGN-RUNTIME-KERNEL-DIVERGENCE real-play shippability gate: + real_play_levels (63 total, exact 5/5 guard).
 # SB-STUDIO-REAL-PLAY-GATE file-mode real-play CLI (tools/real_play_file.gd): + real_play_file_cli (64 total, exact 6/6 guard).
 # SB-M44-032/033 + SB-M44-031 part 2 (owner 2026-11-03 meta at L1, no grandfather, Welcome at first Home, booster intros): + m44_meta_l1_unlock_ftue (exact 6/6 guard).
@@ -172,7 +173,7 @@ jobs:
                    m43_c005_c072_feature_unlock_ceremony m43_c005_c074_c077_celebrations \
                    m43_master_c005r_gift_micro_progress sb_polish_002_gift_meter sb_polish_004_006_ui_batch sb_polish_003_booster_vfx sb_m22_008_polish_013_slot_fx m43_master_c005_meta_ceremonies m43_c005f_phase6_unlock_feel \
                    m43_master_c006_shop m43_master_c007_collection m54_collection_set_master_exactly_once m43_master_c008_robots m54_regression_pack_022_027 \
-                   m43_master_c010_meta m43_master_c011_c014 m44_pending_packs_gate m44_meta_l1_unlock_ftue m44_meta_verify_achievements_gift m43_master_c007r_pity campaign_l11_l30 m43_personal_ranks real_play_levels real_play_file_cli ui_vis_006_asset_qa m59_app_version m56_analytics_taxonomy m58_privacy_inventory m54_regression_pack_028_036 m43_172_local_notifications m54_world_regression m60_release_gates; do
+                   m43_master_c010_meta m43_master_c011_c014 m44_pending_packs_gate m44_meta_l1_unlock_ftue m44_meta_verify_achievements_gift m43_master_c007r_pity campaign_l11_l30 m43_personal_ranks real_play_levels real_play_file_cli ui_vis_006_asset_qa m59_app_version m56_analytics_taxonomy m58_privacy_inventory m54_regression_pack_028_036 m43_172_local_notifications m54_world_regression m60_release_gates m43_ranks_weekly; do
             L="validate_logs/$s.log"
             if [ ! -f "tests/$s.gd" ]; then echo "$s MISSING tests/$s.gd status=FAIL" | tee -a "$S"; fail=1; continue; fi
             if timeout 1500 "$GODOT" --headless --path . -s "res://tests/$s.gd" > "$L" 2>&1; then ec=0; else ec=$?; fi
@@ -333,6 +334,11 @@ jobs:
             echo "M43-RANKS verdict=PASS (8/8)" | tee -a "$S"
           else
             echo "M43-RANKS verdict=FAIL (exact 8/8 summary missing)" | tee -a "$S"; fail=1
+          fi
+          if grep -qxF 'M43 ranks weekly evidence: PASS (7/7 cases, 0 fail)' validate_logs/m43_ranks_weekly.log 2>/dev/null; then
+            echo "M43-RANKS-WEEKLY verdict=PASS (7/7)" | tee -a "$S"
+          else
+            echo "M43-RANKS-WEEKLY verdict=FAIL (exact 7/7 summary missing)" | tee -a "$S"; fail=1
           fi
           if grep -qxF 'REAL PLAY LEVELS: PASS (4/4 cases, 0 fail)' validate_logs/real_play_levels.log 2>/dev/null; then
             echo "REAL-PLAY-LEVELS verdict=PASS (4/4)" | tee -a "$S"

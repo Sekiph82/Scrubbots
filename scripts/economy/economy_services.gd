@@ -33,6 +33,7 @@ const CardsExchangeService = preload("res://scripts/economy/cards_exchange_servi
 const RewardedGrantService = preload("res://scripts/economy/rewarded_grant_service.gd")
 const DailyOrders = preload("res://scripts/economy/daily_orders.gd")
 const PlayerRecords = preload("res://scripts/economy/player_records.gd")
+const WeeklyRanks = preload("res://scripts/progression/weekly_ranks.gd")
 const EventService = preload("res://scripts/economy/event_service.gd")
 const ReturnService = preload("res://scripts/economy/return_service.gd")
 const NotificationPolicy = preload("res://scripts/economy/notification_policy.gd")
@@ -72,6 +73,8 @@ var rewarded: RewardedGrantService
 var orders: DailyOrders
 ## M43-C010R personal bests; C010 events; C012 return windows / Catch-Up; C012 notification policy.
 var records: PlayerRecords
+## SB-M43-131: RANKS weekly table (levels completed this UTC week).
+var ranks: WeeklyRanks
 var events: EventService
 var returns: ReturnService
 var notify: NotificationPolicy
@@ -101,6 +104,7 @@ func _init(config_path: String = EconomyConfig.DEFAULT_PATH, clock: Callable = C
 	daily = DailyService.new(config, reward, clock, local_day)
 	orders = DailyOrders.new(daily)
 	records = PlayerRecords.new()
+	ranks = WeeklyRanks.new(clock)
 	events = EventService.new(clock)
 	returns = ReturnService.new(clock)
 	notify = NotificationPolicy.new()
@@ -190,6 +194,7 @@ func snapshot() -> Dictionary:
 		"pack_pity": pack_pity.snapshot(),
 		"daily_orders": orders.snapshot(),
 		"records": records.snapshot(),
+		"ranks": ranks.snapshot(),
 		"events": events.snapshot(),
 		"return": returns.snapshot(),
 		"notifications": notify.snapshot(),
@@ -237,8 +242,8 @@ func _apply_sections(s) -> bool:
 	# M43-C009R: absent = older save (orders generated on demand); present = strict.
 	if not orders.import_snapshot(s["daily_orders"] if s.has("daily_orders") else null):
 		return false
-	# M43-C010 / C012: absent = older save (fresh); present = strict.
-	for pair in [["records", records], ["events", events], ["return", returns], ["notifications", notify], ["notify_permission", notify_permission], ["local_notify", local_notify]]:
+	# M43-C010 / C012 / SB-M43-131: absent = older save (fresh); present = strict.
+	for pair in [["records", records], ["ranks", ranks], ["events", events], ["return", returns], ["notifications", notify], ["notify_permission", notify_permission], ["local_notify", local_notify]]:
 		if not pair[1].import_snapshot(s[pair[0]] if s.has(pair[0]) else null):
 			return false
 	# M44: absent = a pre-M44 save (established player, never a beginner); present = strict.

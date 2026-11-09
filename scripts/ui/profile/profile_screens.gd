@@ -11,7 +11,8 @@ extends RefCounted
 ##     countdown, progress, fixed milestone rewards, ended/claimed) and the opt-in First-Try
 ##     Cleanup; an honest empty state when nothing is scheduled. No event currency;
 ##     SB-M43-130-REBUILD master v01: one UiEventCard per weekly view in a touch-scrollable list;
-##   - RANKS (SB-M43-122): the player's own rank ladder from campaign levels cleared.
+##   - RANKS (SB-M43-122, SB-M43-131/132): ALL-TIME (highest level + own rank ladder) and WEEKLY
+##     (levels completed this UTC week) tables; "You" only, other players offline (no server).
 ## Claims / joins go through ProductionActionFacade. These screens own no rule or value.
 
 const TouchScroll = preload("res://scripts/ui/components/touch_scroll.gd")
@@ -508,20 +509,66 @@ static func _button(p: BasePopup, stash: Control, aid: String, parent: Control) 
 # ------------------------------------------------------------------ RANKS ----
 
 ## SB-M43-122 (owner 2026-10-31): the player's personal rank ladder (PersonalRank), derived
-## from campaign levels cleared. Read-only: no other players, no server, grants nothing.
+## from campaign levels cleared. SB-M43-131/132 (owner 2026-10-22): two tables, ALL-TIME
+## (highest campaign level reached + the ladder) and WEEKLY (levels completed in this Monday
+## 00:00 UTC week, WeeklyRanks). There is no server: each table shows only "You" and an honest
+## offline note stands in for ranks against other players. Read-only, grants nothing.
 static func open_ranks(stack, app) -> BasePopup:
 	var p := BasePopup.new("ranks")
 	p.set_frame("large")
 	p.set_title(UiText.t("RANKS_TITLE"))
+	var tabs := HBoxContainer.new()
+	tabs.name = "Tabs"
+	tabs.add_theme_constant_override("separation", UiTokens.SPACE_SM)
+	p.get_content().add_child(tabs)
+	var all_time := VBoxContainer.new()
+	all_time.name = "AllTimeTable"
+	var weekly := VBoxContainer.new()
+	weekly.name = "WeeklyTable"
+	weekly.visible = false
 	var n := int(app.progression.completed_count())
 	var tiers := PersonalRank.load_tiers()
 	var r := PersonalRank.for_cleared(n)
+	var band := int(r["index"]) + 1 if not r.is_empty() else 0
+	var group := ButtonGroup.new()
+	for t in [["AllTimeTab", "RANKS_TAB_ALL_TIME", all_time, "all_time"], ["WeeklyTab", "RANKS_TAB_WEEKLY", weekly, "weekly"]]:
+		var b := Button.new()
+		b.name = t[0]
+		b.text = UiText.t(t[1])
+		b.toggle_mode = true
+		b.button_group = group
+		b.button_pressed = t[2] == all_time
+		b.focus_mode = Control.FOCUS_NONE
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		b.custom_minimum_size = Vector2(0, UiTokens.TOUCH_MIN)
+		b.add_theme_font_size_override("font_size", 26)
+		var off := HomeStyle.box(BasePopup.ROW, BasePopup.ROW_EDGE, 3, 22, 0)
+		var on := HomeStyle.box(BasePopup.GOLD_BODY, BasePopup.GOLD_EDGE, 4, 22, 0)
+		for st in [["normal", off], ["hover", off], ["pressed", on], ["hover_pressed", on], ["focus", StyleBoxEmpty.new()]]:
+			b.add_theme_stylebox_override(st[0], st[1])
+		for c in ["font_color", "font_hover_color", "font_pressed_color", "font_hover_pressed_color"]:
+			b.add_theme_color_override(c, BasePopup.INK)
+		b.add_theme_constant_override("outline_size", 0)
+		var shown: Control = t[2]
+		var table: String = t[3]
+		b.toggled.connect(func(pressed: bool):
+			if pressed and not shown.visible:
+				all_time.visible = shown == all_time
+				weekly.visible = shown == weekly
+				app.analytics.track("ranks_view", {"table": table, "band": band}))   # SB-M56-011
+		tabs.add_child(b)
+	p.get_content().add_child(all_time)
+	p.get_content().add_child(weekly)
+	# ALL-TIME: highest campaign level reached, then the personal ladder.
+	var top := int(app.progression.current_level())
+	all_time.add_child(_label("HighestLevel", UiText.t("RANKS_HIGHEST", [UiText.num(top)]), 30, BasePopup.ROYAL_EDGE))
+	all_time.add_child(_you_row(UiText.t("RANKS_YOU_LEVEL", [UiText.num(top)])))
 	if r.is_empty():
-		p.add_body_line(UiText.t("RANKS_UNAVAILABLE"), "Unavailable", BasePopup.INK, 24)
+		all_time.add_child(_label("Unavailable", UiText.t("RANKS_UNAVAILABLE"), 24, BasePopup.INK))
 	else:
 		var cur := int(r["index"])
-		p.add_body_line(UiText.t("RANKS_CURRENT", [UiText.t(r["name_key"])]), "CurrentRank", BasePopup.ROYAL_EDGE, 34)
-		p.add_body_line(UiText.t("PROFILE_CLEARED", [UiText.num(n)]), "Cleared", BasePopup.INK, 24)
+		all_time.add_child(_label("CurrentRank", UiText.t("RANKS_CURRENT", [UiText.t(r["name_key"])]), 30, BasePopup.ROYAL_EDGE))
+		all_time.add_child(_label("Cleared", UiText.t("PROFILE_CLEARED", [UiText.num(n)]), 24, BasePopup.INK))
 		var meter := UiProgressMeter.new("NextMeter")
 		meter.caption.add_theme_color_override("font_color", BasePopup.INK)
 		meter.caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -529,11 +576,11 @@ static func open_ranks(stack, app) -> BasePopup:
 			meter.set_progress(r["into"], r["span"], UiText.tn("RANKS_NEXT", int(r["next_min"]) - n, [UiText.num(int(r["next_min"]) - n), UiText.t(tiers[cur + 1]["name_key"])]))
 		else:
 			meter.set_progress(1, 1, UiText.t("RANKS_TOP"))
-		p.get_content().add_child(meter)
+		all_time.add_child(meter)
 		var list := VBoxContainer.new()
 		list.name = "Ladder"
 		list.add_theme_constant_override("separation", UiTokens.SPACE_XS)
-		p.get_content().add_child(list)
+		all_time.add_child(list)
 		for i in range(tiers.size()):
 			var t: Dictionary = tiers[i]
 			var card := _card("Tier_" + String(t["id"]))
@@ -550,15 +597,39 @@ static func open_ranks(stack, app) -> BasePopup:
 			nl.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 			h.add_child(nl)
 			var st := "RANKS_STATE_CURRENT" if i == cur else ("RANKS_STATE_REACHED" if i < cur else "")
-			h.add_child(_label("State", UiText.t(st) if st != "" else "", 22, BasePopup.ROYAL_EDGE))
+			var sl := _label("State", UiText.t(st) if st != "" else "", 22, BasePopup.ROYAL_EDGE)
+			sl.autowrap_mode = TextServer.AUTOWRAP_OFF   # sized by its text beside the expanding name
+			h.add_child(sl)
 			list.add_child(card)
+	# WEEKLY: this UTC week's window (Monday .. Sunday) and the levels completed in it.
+	var wk: Dictionary = app.economy.ranks.window()
+	var count := int(app.economy.ranks.weekly_count())
+	weekly.add_child(_label("WeekWindow", UiText.t("RANKS_WEEK_WINDOW", [Time.get_date_string_from_unix_time(int(wk["start"])), Time.get_date_string_from_unix_time(int(wk["end"]) - 1)]), 26, BasePopup.ROYAL_EDGE))
+	weekly.add_child(_label("WeeklyCount", UiText.t("RANKS_WEEK_COUNT", [UiText.num(count)]), 30, BasePopup.INK))
+	weekly.add_child(_you_row(UiText.tn("RANKS_YOU_WEEKLY", count, [UiText.num(count)])))
+	weekly.add_child(_label("WeekReset", UiText.t("RANKS_WEEK_RESET"), 22, BasePopup.INK))
+	p.add_body_line(UiText.t("RANKS_ONLINE_SOON"), "OnlineSoon", BasePopup.INK, 20)
 	p.add_body_line(UiText.t("RANKS_SELF_ONLY"), "SelfOnly", BasePopup.INK, 20)
 	p.add_action("close", UiText.t("SHOP_CLOSE"), "secondary", true)
 	if not stack.push(p):
 		p.free()
 		return null
-	app.analytics.track("ranks_view", {"table": "all_time", "band": int(r["index"]) + 1 if not r.is_empty() else 0})   # SB-M56-011
+	app.analytics.track("ranks_view", {"table": "all_time", "band": band})   # SB-M56-011
 	return p
+
+## SB-M43-132: the player's own row in a table. Privacy-safe identity "You" (no name / id).
+static func _you_row(value: String) -> PanelContainer:
+	var card := _card("YouRow")
+	var h := HBoxContainer.new()
+	card.get_child(0).add_child(h)
+	var you := _label("You", UiText.t("RANKS_YOU"), 26, BasePopup.INK)
+	you.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	you.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	h.add_child(you)
+	var v := _label("Value", value, 26, BasePopup.ROYAL_EDGE)
+	v.autowrap_mode = TextServer.AUTOWRAP_OFF
+	h.add_child(v)
+	return card
 
 # --------------------------------------------------------------- COMEBACK ----
 

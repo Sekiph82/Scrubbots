@@ -768,7 +768,7 @@ func _tour_features() -> void:
 	_app().actions.claim_daily_all_tasks()
 	_app().actions.claim_first_try()
 	_app().actions.claim_event_milestone("wk1", 0)
-	ProfileScreens.open_ranks(_root.get_modal_stack(), _app())
+	ProfileScreens.open_ranks(_root.get_modal_stack(), _app()).find_child("WeeklyTab", true, false).button_pressed = true
 	_root.get_modal_stack().clear("t")
 	await _settle()
 
@@ -809,7 +809,7 @@ func _feature_events() -> void:
 	_ok(_params("comeback_window").size() == 1, "a resume without a new absence opens nothing")
 	_complete("comeback_catchup")
 	print("[011 Ranks view]")
-	_ok(_params("ranks_view") == [{"table": "all_time", "band": 1}], "RANKS screen -> all_time table, rank band 1 (Bronze): %s" % str(_params("ranks_view")))
+	_ok(_params("ranks_view") == [{"table": "all_time", "band": 1}, {"table": "weekly", "band": 1}], "RANKS screen -> all_time table, WEEKLY tab -> weekly table, rank band 1 (Bronze): %s" % str(_params("ranks_view")))
 	_complete("ranks_view")
 	await _boot()
 	_load_events()
