@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "authority": "coordination/sessions/M28-C002-C003-R01/CHATGPT_PROMPT_V02.md (owner-selected Home background, finding 5); supersedes coordination/OWNER_M42_HOME_REBUILD_V04_SINGLE_WORLD_BACKGROUND.md for the background asset only",
-  "notes": "Home world backgrounds: one complete owner-approved background per world in that image's native pixel space (World 01 = 940x1672, displayed at a uniform scale, never stretched). Level-number -> world mapping is intentionally absent until the owner defines progression ranges. Rects are [x, y, w, h] in that canvas's pixels.",
+  "notes": "Home world backgrounds: one complete owner-approved background per world in that image's native pixel space (World 01 = 940x1672, displayed at a uniform scale, never stretched). Level-number -> world mapping lives in data/config/worlds_v1.json (SB-M43-136); a world without its own approved Home background shows the default world's. Rects are [x, y, w, h] in that canvas's pixels.",
   "default_world": "world_01",
   "worlds": {
     "world_01": {

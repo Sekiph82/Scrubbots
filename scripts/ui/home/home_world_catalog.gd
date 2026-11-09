@@ -3,8 +3,8 @@ extends RefCounted
 ##
 ## M42 V04 data-driven Home world seam: world_id -> complete background asset (by
 ## approved manifest slug) + Scrubby placement contract, read from
-## data/config/home_worlds_v1.json. No level-range mapping exists (owner-gated); Home
-## always shows the catalog's default world until the owner defines one.
+## data/config/home_worlds_v1.json. Level ranges live in worlds_v1.json (WorldService); only
+## World 01 has an approved background, so Home shows the catalog's default world for every world.
 
 const PATH := "res://data/config/home_worlds_v1.json"
 

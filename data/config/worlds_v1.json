@@ -1,0 +1,171 @@
+{
+  "schema": "scrubbots.worlds.v1",
+  "version": 1,
+  "authority": "TASKS.md SB-M43-136 owner decision 2026-10-22: 20 worlds x 150 levels = 3000; a world ends at its last campaign level, the next starts at the following level",
+  "notes": "English names are the owner's; Turkish copy is UiTextTr.DATA WORLD_NAME_<number>. art null = no approved art yet: the ceremony shows fallback_art with the world name.",
+  "first_level": 1,
+  "last_level": 3000,
+  "fallback_art": "res://assets/ui/final/home/worlds/world_01_whispering_park_1080x2160.png",
+  "worlds": [
+    {
+      "id": "world_01",
+      "number": 1,
+      "name": "Whispering Park",
+      "first": 1,
+      "last": 150,
+      "art": "res://assets/ui/final/home/worlds/world_01_whispering_park_1080x2160.png"
+    },
+    {
+      "id": "world_02",
+      "number": 2,
+      "name": "Bubble District",
+      "first": 151,
+      "last": 300,
+      "art": null
+    },
+    {
+      "id": "world_03",
+      "number": 3,
+      "name": "Neon Sewers",
+      "first": 301,
+      "last": 450,
+      "art": null
+    },
+    {
+      "id": "world_04",
+      "number": 4,
+      "name": "Crystal Laundry",
+      "first": 451,
+      "last": 600,
+      "art": null
+    },
+    {
+      "id": "world_05",
+      "number": 5,
+      "name": "Toxic Docks",
+      "first": 601,
+      "last": 750,
+      "art": null
+    },
+    {
+      "id": "world_06",
+      "number": 6,
+      "name": "Clockwork Carnival",
+      "first": 751,
+      "last": 900,
+      "art": null
+    },
+    {
+      "id": "world_07",
+      "number": 7,
+      "name": "Rustwood Railway",
+      "first": 901,
+      "last": 1050,
+      "art": null
+    },
+    {
+      "id": "world_08",
+      "number": 8,
+      "name": "Frostbyte Factory",
+      "first": 1051,
+      "last": 1200,
+      "art": null
+    },
+    {
+      "id": "world_09",
+      "number": 9,
+      "name": "Midnight Metro",
+      "first": 1201,
+      "last": 1350,
+      "art": null
+    },
+    {
+      "id": "world_10",
+      "number": 10,
+      "name": "Sunken Harbor",
+      "first": 1351,
+      "last": 1500,
+      "art": null
+    },
+    {
+      "id": "world_11",
+      "number": 11,
+      "name": "Ember Foundry",
+      "first": 1501,
+      "last": 1650,
+      "art": null
+    },
+    {
+      "id": "world_12",
+      "number": 12,
+      "name": "Mosslight Ruins",
+      "first": 1651,
+      "last": 1800,
+      "art": null
+    },
+    {
+      "id": "world_13",
+      "number": 13,
+      "name": "Candy Circuit",
+      "first": 1801,
+      "last": 1950,
+      "art": null
+    },
+    {
+      "id": "world_14",
+      "number": 14,
+      "name": "Stormglass Heights",
+      "first": 1951,
+      "last": 2100,
+      "art": null
+    },
+    {
+      "id": "world_15",
+      "number": 15,
+      "name": "Phantom Museum",
+      "first": 2101,
+      "last": 2250,
+      "art": null
+    },
+    {
+      "id": "world_16",
+      "number": 16,
+      "name": "Moonbeam Observatory",
+      "first": 2251,
+      "last": 2400,
+      "art": null
+    },
+    {
+      "id": "world_17",
+      "number": 17,
+      "name": "Steamcloud Summit",
+      "first": 2401,
+      "last": 2550,
+      "art": null
+    },
+    {
+      "id": "world_18",
+      "number": 18,
+      "name": "Prism Powerplant",
+      "first": 2551,
+      "last": 2700,
+      "art": null
+    },
+    {
+      "id": "world_19",
+      "number": 19,
+      "name": "Shadowbyte Citadel",
+      "first": 2701,
+      "last": 2850,
+      "art": null
+    },
+    {
+      "id": "world_20",
+      "number": 20,
+      "name": "Grimeheart Core",
+      "first": 2851,
+      "last": 3000,
+      "art": null
+    }
+  ]
+}

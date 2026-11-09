@@ -8,7 +8,7 @@ extends SceneTree
 const MainScene = preload("res://scenes/app/main.tscn")
 const MainScript = preload("res://scripts/app/main.gd")
 const AppState = preload("res://scripts/app/app_state.gd")
-const WorldRegistry = preload("res://scripts/progression/world_registry.gd")
+const WorldService = preload("res://scripts/progression/world_service.gd")
 const ReturnService = preload("res://scripts/economy/return_service.gd")
 const NotificationPolicy = preload("res://scripts/economy/notification_policy.gd")
 const CloudSave = preload("res://scripts/save/cloud_save.gd")
@@ -69,30 +69,36 @@ func _initialize() -> void:
 # ------------------------------------------------------------------ worlds ----
 
 func _w01() -> void:
-	print("[w01 World 01 Whispering Park stays the default Home world]")
-	var d := WorldRegistry.load_worlds()
-	_ok(d["ok"] and d["default"] == "world_01" and String(d["worlds"]["world_01"]["background_slug"]) == "home_background_whispering_park", "world_01 default, owner background slug")
-	_ok(WorldRegistry.current_world(1) == "world_01" and WorldRegistry.current_world(500) == "world_01", "no owner range -> world_01 at every level")
+	print("[w01 World 01 Whispering Park: owner table L1-150, still the Home world]")
+	var w := WorldService.world_for_level(1)
+	_ok(w["id"] == "world_01" and w["name"] == "Whispering Park" and w["first"] == 1 and w["last"] == 150, "world_01 Whispering Park 1-150")
+	var home = JSON.parse_string(FileAccess.get_file_as_string("res://data/config/home_worlds_v1.json"))
+	_ok(home["default_world"] == "world_01" and String(home["worlds"]["world_01"]["background_slug"]) == "home_background_whispering_park", "Home world_01 default, owner background slug")
 	_complete("w01_world01_default_preserved")
 
 func _w02() -> void:
-	print("[w02 ranges are data; malformed / overlapping ranges fail closed]")
-	var d := WorldRegistry.load_worlds()
-	_ok(WorldRegistry.ranged(d).is_empty(), "shipped data defines no range (SB-M43-136 open)")
-	var bad := {"default": "world_01", "worlds": {"world_01": {"range": {"first": 1, "last": 30}}, "world_02": {"range": {"first": 20, "last": 60}}}}
-	_ok(WorldRegistry.ranged(bad).is_empty() and WorldRegistry.current_world(25, bad) == "world_01", "overlap -> no ranges, default")
+	print("[w02 world ranges are data; an overlapping table fails closed]")
+	_ok(WorldService.load_worlds().size() == 20, "shipped table: 20 worlds (SB-M43-136)")
+	var path := "user://m43_c011_worlds_overlap.json"
+	var d = JSON.parse_string(FileAccess.get_file_as_string(WorldService.PATH))
+	d["worlds"][1]["first"] = 140
+	var f := FileAccess.open(path, FileAccess.WRITE)
+	f.store_string(JSON.stringify(d))
+	f.close()
+	_ok(WorldService.load_worlds(path).is_empty() and WorldService.world_for_level(145, WorldService.load_worlds(path)).is_empty(), "overlap -> no worlds")
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 	_complete("w02_registry_ranges_fail_closed")
 
 func _w03() -> void:
 	print("[w03 current world derived from progression (never stored)]")
-	var d := {"default": "world_01", "worlds": {"world_01": {"range": {"first": 1, "last": 30}}, "world_02": {"range": {"first": 31, "last": 60}}}}
-	_ok(WorldRegistry.current_world(30, d) == "world_01" and WorldRegistry.current_world(31, d) == "world_02", "boundary 30 / 31")
-	_ok(WorldRegistry.states(31, d) == {"world_01": "completed", "world_02": "current"} and WorldRegistry.states(5, d) == {"world_01": "current", "world_02": "locked"}, "locked / current / completed")
+	_ok(WorldService.world_for_level(150)["id"] == "world_01" and WorldService.world_for_level(151)["id"] == "world_02", "boundary 150 / 151")
+	var st := WorldService.states(151)
+	_ok(st["world_01"] == "completed" and st["world_02"] == "current" and st["world_03"] == "locked" and WorldService.states(5)["world_01"] == "current", "locked / current / completed")
 	_complete("w03_current_world_derived")
 
 func _w04() -> void:
 	print("[w04 world data is presentation only]")
-	var s := _code(FileAccess.get_file_as_string("res://scripts/progression/world_registry.gd"))
+	var s := _code(FileAccess.get_file_as_string("res://scripts/progression/world_service.gd"))
 	_ok(not s.contains("Solver") and not s.contains("BoardState") and not s.contains("difficulty") and not s.contains("LevelData"), "no solver / board / difficulty access")
 	_complete("w04_worlds_presentation_only")
 

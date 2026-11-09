@@ -183,8 +183,10 @@ func _l05() -> void:
 			need.append(f + String(id).to_upper())
 	for n in range(1, 16):
 		need.append("SET_NAME_%d" % n)
+	for w in JSON.parse_string(FileAccess.get_file_as_string("res://data/config/worlds_v1.json"))["worlds"]:
+		need.append("WORLD_NAME_%d" % int(w["number"]))
 	var lacking: Array = need.filter(func(k): return not UiTextTr.DATA.has(k) or String(UiTextTr.DATA[k]).is_empty())
-	_ok(lacking.is_empty() and UiTextTr.DATA.size() == need.size(), "%d data copy entries (achievements, robots, sets) all translated %s" % [need.size(), str(lacking)])
+	_ok(lacking.is_empty() and UiTextTr.DATA.size() == need.size(), "%d data copy entries (achievements, robots, sets, worlds) all translated %s" % [need.size(), str(lacking)])
 	UiText.locale = "tr"
 	var tr_ok := UiText.t("HOME_PLAY") == "OYNA" and UiText.num(1234567) == "1.234.567" and UiText.data("ACH_NAME_CLEAN_START", "Clean Start") == "Temiz Başlangıç"
 	UiText.locale = "en"

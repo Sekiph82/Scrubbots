@@ -621,4 +621,12 @@ const DATA := {
 	"SET_NAME_13": "Su Altı Kahramanları",
 	"SET_NAME_14": "Uzay Temizlikçileri",
 	"SET_NAME_15": "Efsane Temizlikçiler",
+	# SB-M43-136: world names (data/config/worlds_v1.json, by world number).
+	"WORLD_NAME_1": "Fısıltılı Park", "WORLD_NAME_2": "Köpük Mahallesi", "WORLD_NAME_3": "Neon Kanalizasyonu",
+	"WORLD_NAME_4": "Kristal Çamaşırhane", "WORLD_NAME_5": "Zehirli Rıhtım", "WORLD_NAME_6": "Kurmalı Karnaval",
+	"WORLD_NAME_7": "Paslı Orman Demiryolu", "WORLD_NAME_8": "Ayaz Fabrikası", "WORLD_NAME_9": "Gece Yarısı Metrosu",
+	"WORLD_NAME_10": "Batık Liman", "WORLD_NAME_11": "Kor Dökümhanesi", "WORLD_NAME_12": "Yosun Işığı Harabeleri",
+	"WORLD_NAME_13": "Şeker Devresi", "WORLD_NAME_14": "Fırtına Camı Tepeleri", "WORLD_NAME_15": "Hayalet Müzesi",
+	"WORLD_NAME_16": "Ay Işığı Gözlemevi", "WORLD_NAME_17": "Buhar Bulutu Zirvesi", "WORLD_NAME_18": "Prizma Santrali",
+	"WORLD_NAME_19": "Gölgebayt Kalesi", "WORLD_NAME_20": "Kirli Kalp Çekirdeği",
 }
