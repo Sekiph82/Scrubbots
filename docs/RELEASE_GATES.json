@@ -57,7 +57,7 @@
         },
         {
           "check": "no_placeholder_copy",
-          "evidence": "563 English UiText strings, none contains placeholder / dummy / lorem / TODO / TBD / FIXME copy []",
+          "evidence": "574 English UiText strings, none contains placeholder / dummy / lorem / TODO / TBD / FIXME copy []",
           "result": "PASS"
         }
       ],
@@ -103,7 +103,7 @@
         },
         {
           "check": "shop_store_gated",
-          "evidence": "Shop SCRUB BUCKS packs + NO ADS: UNAVAILABLE / 'Available when the store opens.', press opens no confirm",
+          "evidence": "Shop five SCRUB BUCKS packs + NO ADS: UNAVAILABLE / 'Available when the store opens.', press opens no confirm; store provider = null StoreProvider, RESTORE disabled",
           "result": "PASS"
         },
         {

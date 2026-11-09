@@ -31,7 +31,7 @@ Release ready: **NO**
 
 - PASS `manifest_bound`: 42 surfaces: 40 bound (script + live data + evidence suite exist), 2 explicitly not built: ["account_cloud_sync_conflict (provider decision SB-M43-153)", "friends_postlaunch (post-launch)"]; unbound / broken []
 - PASS `registry_covered`: every ui_surface_registry screen / popup has a manifest surface; missing []
-- PASS `no_placeholder_copy`: 563 English UiText strings, none contains placeholder / dummy / lorem / TODO / TBD / FIXME copy []
+- PASS `no_placeholder_copy`: 574 English UiText strings, none contains placeholder / dummy / lorem / TODO / TBD / FIXME copy []
 
 ## SB-M60-003: PASS
 
@@ -43,7 +43,7 @@ Release ready: **NO**
 ## SB-M60-004: PASS
 
 - PASS `no_provider`: rewarded provider is the production default RewardedAdProvider (no SDK): every placement unavailable
-- PASS `shop_store_gated`: Shop SCRUB BUCKS packs + NO ADS: UNAVAILABLE / 'Available when the store opens.', press opens no confirm
+- PASS `shop_store_gated`: Shop five SCRUB BUCKS packs + NO ADS: UNAVAILABLE / 'Available when the store opens.', press opens no confirm; store provider = null StoreProvider, RESTORE disabled
 - PASS `sb_plus_gated`: Home SB + popup: SB pack UNAVAILABLE and inert
 - PASS `life_video_gated`: Life popup FREE video blocked with no provider; press grants no Heart (4)
 - PASS `rewarded_ads_gated`: Rewarded Ads: video slots show NO VIDEO and are blocked ["CLAIM", "NO VIDEO", "LOCKED", "LOCKED", "LOCKED"]
