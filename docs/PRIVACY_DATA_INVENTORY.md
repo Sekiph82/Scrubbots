@@ -114,10 +114,14 @@ params only, no ids or timestamps. In the current build no event is stored or se
 | `level_start`, `level_first_action`, `level_end` | level number, attempt / duration / progress buckets, outcome, difficulty class, cadence slot |
 | `assist_shown`, `assist_fail_closed`, `assist_dismissed`, `booster_acquire`, `booster_use` | level, booster ids, acquisition path, ok / reason |
 | `economy_source`, `economy_sink`, `hearts_empty` | currency, amount bucket, source / sink category, gate place |
-| `pack_opened`, `collection_set_complete`, `collection_master_complete`, `robot_unlock`, `robot_equip` | pack kind, new / duplicate count buckets, best rarity, set number, robot roster order |
+| `pack_opened`, `collection_set_complete`, `collection_master_complete`, `robot_unlock`, `robot_equip` | pack kind, new / duplicate count buckets, best rarity, pity flag, dry-streak bucket, set number, campaign level, robot roster order |
 | `screen_view`, `shop_open`, `launch_failed` | screen name, Shop entry source, launch refusal reason |
 | `ad_offer_shown`, `ad_request`, `ad_result` | placement, product, available / ok, refusal reason, outcome (no tokens or transaction ids) |
 | `notify_toggle`, `notification_prompt`, `deep_link_open` | reminder category on / off, explainer step and OS answer, deep link destination |
+| `next_cleanup_shown`, `next_cleanup_tap`, `journey_progress` | teaser available / image flags, refusal reason, journey slot / cycle number, first-clear flag |
+| `daily_order_done`, `daily_order_claim` | order tier, metric, target number |
+| `weekly_event`, `first_try`, `comeback_window`, `catchup_step` | step, milestone number, run depth, Catch-Up offered flag, step number |
+| `ranks_view` | table (all-time), rank band number |
 
 ## 3. Permissions (SB-M58-002/003)
 

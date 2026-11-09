@@ -1,8 +1,8 @@
-# Analytics Taxonomy V1 (SB-M56-001..010, 012..016)
+# Analytics Taxonomy V1 (SB-M56-001..023)
 
 Machine source: `data/config/analytics_taxonomy_v1.json` (schema `scrubbots.analytics_taxonomy.v1`, version 1).
 Service: `scripts/app/analytics_service.gd`, owned by `AppState.analytics`.
-Tests: `tests/m56_analytics_taxonomy.gd` (CI validate, exact 21/21 guard).
+Tests: `tests/m56_analytics_taxonomy.gd` (CI validate, exact 27/27 guard).
 
 ## Rules
 
@@ -11,7 +11,7 @@ Tests: `tests/m56_analytics_taxonomy.gd` (CI validate, exact 21/21 guard).
 - **Privacy-minimized.** Params are only `int`, `bool`, `enum` or `enum_list`. There is no free-text type, so no names, emails, device or advertising ids, tokens, receipts, board or save data can be sent. `privacy.forbidden_param_names` lists names that may never be declared. Times and counts go out as coarse buckets (`buckets` table). No timestamps or ids are added to events. Each event carries only `event`, `v` (taxonomy version) and `params`.
 - **Schema validation.** An unknown event, an undeclared param, a wrong type, an out-of-range int, a disallowed enum value or a missing required param drops the whole event and prints a debug-build warning. An enum with a `fallback` maps unknown values to the fallback (`other` / `UNKNOWN`). A missing or invalid taxonomy file drops everything. Validation never crashes.
 - **Write-only (SB-M56-014).** No gameplay, economy, difficulty, solver or save code reads analytics. Events never grant rewards or change difficulty. Offline play never depends on them. Economy services only expose two signals for it (`EconomyWallet.changed`, `RewardGrantService.granted`); every other call site is one `track` line after the existing logic. `no_economy_change` plays the same session (level, spends, pack, Collection, robots, navigation, rewarded ads, reminders) with consent OFF and ON and requires identical economy and progression snapshots.
-- **Versioning.** Adding a new event or a new enum value keeps `version`. Changing or removing an existing event, param or bucket edge bumps `version` (events carry `v`).
+- **Versioning.** Adding a new event, a new enum value or a new optional (`required: false`) param keeps `version`. Changing or removing an existing event, param or bucket edge bumps `version` (events carry `v`).
 - **Batched.** Events are queued and handed to the sink in batches of `batch_size` (20), and at session end. They are never sent per frame.
 - **Local state.** `user://analytics_v1.json` (tests: `<save>_analytics.json`) holds only `consent`, the first consented local day and the retention markers already sent. It is not part of the game save.
 
@@ -54,8 +54,8 @@ Definitions:
 | `economy_source` | 007 | `AppState` on `EconomyWallet.changed` (credit) | currency (scrub_bucks / bot_parts), amount (bucket), source: the RewardGrantService tx-id prefix mapped by `AppState.ANALYTICS_SOURCES` (first_clear, win_streak, gift, daily_login, daily_task, rewarded_daily, rewarded_ad, cards_exchange, collection, event, comeback, achievement, starter, refund; anything else other) |
 | `economy_sink` | 007 | `AppState` on `EconomyWallet.changed` (debit) | currency, amount (bucket), sink: the spend tag (booster_use = SB-paid booster, booster_buy = saved charge, heart_plus_one, heart_refill, speed_level / speed_timed = 2x products, robot_unlock) |
 | `hearts_empty` | 007 | `main.gd` `_zero_heart_gate` (Heart starvation: a new attempt refused at 0 Hearts) | at (home_play / results_continue / results_retry) |
-| `pack_opened` | 008 | `AppState.commit_pack` (committed, not a replayed receipt) | kind, new_cards, duplicates (count buckets), best_rarity |
-| `collection_set_complete` | 008 | `AppState` on `RewardGrantService.granted` `collection_set:<n>` (applied exactly once) | set (1..15) |
+| `pack_opened` | 008, 019 | `AppState.commit_pack` (committed, not a replayed receipt) | kind, new_cards, duplicates (count buckets), best_rarity, pity (the PackPity guarantee was due for this pack), dry_streak (count bucket of the pity counter after it: earned packs in a row without a new card) |
+| `collection_set_complete` | 008, 019 | `AppState` on `RewardGrantService.granted` `collection_set:<n>` (applied exactly once) | set (1..15), level (campaign frontier when the set completed) |
 | `collection_master_complete` | 008 | `AppState` on `RewardGrantService.granted` `collection_master` | (none) |
 | `robot_unlock` / `robot_equip` | 008 | `AppState` on the app facade `action_committed` (unlock_robot / equip_robot) | robot (roster order 1..10) |
 | `screen_view` | 009 | `main.gd` route change (opening / home / gameplay / results), Home shortcuts and BottomNav, Settings, Help | screen |
@@ -70,7 +70,29 @@ Definitions:
 
 Not sent: transaction ids, tokens and receipts (forbidden names; the ad result only says whether the verified grant committed). There is no purchase path, so purchase fulfilment has no event yet. Local notifications are not delivered by the game yet (no send path), so there is no send event; `deep_link_open` covers the open. A pack whose commit is later rolled back (save failure) may already have sent its events; analytics is best effort and never feeds back.
 
-Not in this version (later rows): Events/Ranks (SB-M56-011) and the Retention V2 measurements (SB-M56-017..023).
+### Feature measures (SB-M56-011, 017..023)
+
+| Event | Task | Call site | Params |
+|---|---|---|---|
+| `next_cleanup_shown` | 017 | `main.gd` WON Results route (`_track_results_momentum`, once per Results) | available (the next frontier resolves to content), image (the cropped teaser could be drawn), reason (ok or the launch resolver reason: CONTENT_MISSING, CATALOG_INVALID, LEVEL_DISABLED, APP_BLOCKED) |
+| `next_cleanup_tap` | 017 | `main.gd` `continue_from_results` (CLEAN NEXT, every request) | ok, reason (ok, not_results, stale_results, not_won, no_next_content, no_hearts, or the launch refusal) |
+| `journey_progress` | 018 | `main.gd` WON Results route (the Results journey, anchor = the won level) | slot (1..10), cycle (1..), cycle_complete (slot 10 of 10), first_clear (progression win vs replay) |
+| `daily_order_done` | 020 | `ProductionGameplayHost` committed progression win (`DailyOrders.on_level_won` newly done) | tier (easy / normal / stretch), metric (archetype metric), target |
+| `daily_order_claim` | 020 | `AppState` on the facade `action_committed` (`claim_daily_task`, `claim_daily_all_tasks`) | tier (easy / normal / stretch; scrubbox = the all-3 bonus) |
+| `weekly_event` | 021 | host progression terminal (`_track_event_progress`: joined = first counted win, milestone_reached), `AppState` on `claim_event_milestone` (milestone_claimed) | step, milestone (1-based; 0 for joined) |
+| `first_try` | 021 | `AppState` on `join_first_try` / `claim_first_try`; host progression terminal on a first attempt of a joined run (advanced / completed / reset) | step (joined, advanced, completed, reset, claimed), run (depth after the win, or the depth a first-attempt loss reset) |
+| `comeback_window` | 022 | `main.gd` boot / OS resume when `ReturnService.on_active` opens a return window | catchup_offered (a Catch-Up track runs for the window) |
+| `catchup_step` | 022 | host first-clear win (`ReturnService.on_first_clear_win` grants) | step (1..3), complete (the last step) |
+| `ranks_view` | 011 | `ProfileScreens.open_ranks` | table (all_time; `weekly` is declared for a weekly table but not sent: the RANKS screen is the personal all-time ladder only), band (1-based rank tier, 0 = ladder unavailable) |
+
+No ids leave: weekly events, orders and cards are described by small ints and enums, never by their config ids.
+
+Not sent, by design or because no path exists yet:
+
+- **Notifications (023).** The game delivers no local notification yet (no send path; local delivery is a separate job), so eligible / suppressed / sent / opened events do not exist. Measured today: `notify_toggle` (category on / off), `notification_prompt` (explainer, Allow / Not now, OS granted / denied) and `deep_link_open` (destination). When delivery lands, its events go here, carrying only the category and a dedup / suppress reason enum.
+- **Weekly expiry.** No code path observes an event ending; expiry is derived offline (see the formulas). Events carry no event id, so the per-event split uses the receipt week. No Weekly event or First-Try is scheduled in `data/config/events_v1.json` yet, so these events stay silent in the shipped build.
+- **Catch-Up expiry.** Derived: a `comeback_window` with Catch-Up offered and no complete `catchup_step` within `catchup_expire_days`.
+- **Daily order time-to-complete.** Events carry no timestamps; it is the provider receipt time of `daily_order_done` minus the day's first `session_start`.
 
 ## Dashboard metrics (SB-M56-013)
 
@@ -94,6 +116,14 @@ Definitions only; there is no dashboard server. "Player-day" = one installation 
 | Rewarded funnel | `ad_offer_shown` (available) -> `ad_request` ok -> `ad_result` granted, by placement / product |
 | Shop entry | `shop_open` by source per DAU |
 | Collection | `pack_opened` new_cards share, duplicate share, `collection_set_complete` by set |
+| Next Cleanup conversion (017) | impressions = `next_cleanup_shown` available; conversion = `next_cleanup_tap` ok / impressions; next-level start = the `level_start` launch right after a tap ok. Frontier / unavailable states (available false, by reason) and refused taps (by reason) are reported apart, never counted as player choice |
+| Journey (018) | reach of slot s = players with `journey_progress` slot s / players with slot 1 in the same cycle; drop-off after slot s = 1 - reach(s+1) / reach(s); cycle completion = `journey_progress` cycle_complete with first_clear / cycles started. Content tuning only, never a per-player difficulty change |
+| Collection fairness (019) | new-card rate = packs with new_cards != 0 / `pack_opened`; dry-streak distribution = `pack_opened.dry_streak`; pity frequency = `pack_opened` with pity / all; guarantee fulfilment = pity packs with new_cards != 0 / pity packs; Set-1 completion level = distribution of `collection_set_complete.level` where set = 1 |
+| Daily Scrub Orders (020) | completion per archetype = `daily_order_done` by (tier, metric, target) / player-days; 3/3 = player-days with three `daily_order_done`; ScrubBox claim = `daily_order_claim` scrubbox / player-days with 3/3; grind / Heart waste check = `hearts_empty` and `level_end` lost per player-day, by the archetype active that day |
+| Weekly / First-Try (021) | participation = players with `weekly_event` joined / players active in the week; milestone completion = `weekly_event` milestone_reached m / joined; expiry = milestone_reached minus milestone_claimed per week (forfeit events); First-Try run depth = distribution of `first_try.run` on reset / completed; reset frequency = reset / joined. Reported apart from campaign retention |
+| Comeback (022) | return session = the session that sends `comeback_window`; three-win completion = `catchup_step` complete / `comeback_window` catchup_offered; later return = `session_start` on the following days and `retention_day` d1 / d7. The Daily login streak stays its own metric (`economy_source` daily_login) |
+| Notifications (023) | opt-in = `notify_toggle` all on / players; per category = `notify_toggle` by category; OS grant = `notification_prompt` os_granted / allowed; opens = `deep_link_open`. No frequency target: the owner cap and copy rules are never tuned from this |
+| Ranks (011) | Ranks reach = players with `ranks_view` / players at the Ranks unlock level; band distribution = `ranks_view.band` |
 | Screen reach | `screen_view` per screen / DAU |
 
 ## Consent, age and provider gating (SB-M56-015, with M58)
