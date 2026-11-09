@@ -17,6 +17,7 @@ const HomeStyle = preload("res://scripts/ui/home/home_style.gd")
 const UiTokens = preload("res://scripts/ui/ui_tokens.gd")
 const UiText = preload("res://scripts/ui/ui_text.gd")
 const RobotRoster = preload("res://scripts/progression/robot_roster.gd")
+const CollectionCardCatalog = preload("res://scripts/collection/collection_card_catalog.gd")
 
 const ART := {
 	"set_complete": "res://assets/ui/final/collection/collection_complete_emblem.png",
@@ -91,6 +92,8 @@ static func build(event: Dictionary, reduced: bool = false):
 			return robot_unlock(event, reduced)
 		"gift_milestone":
 			return gift_milestone(event, reduced)
+		"featured_card":
+			return featured_card(event, reduced)
 		"feature_unlock":
 			return feature_unlock(event, reduced)
 		"world_unlock":
@@ -366,6 +369,22 @@ static func gift_milestone(event: Dictionary, reduced: bool) -> BasePopup:
 	if fallback > 0:
 		p.add_body_line(UiText.t("CEREMONY_GIFT_FALLBACK", [UiText.num(fallback)]), "FallbackNote", BasePopup.INK, 22)
 	p.add_body_line(UiText.t("CEREMONY_GIFT_CLAIMED" if bool(event.get("claimed", false)) else "CEREMONY_GIFT_CLAIM_IN_BAR"), "ClaimNote", BasePopup.INK, 24)
+	p.add_action("continue", UiText.t("CEREMONY_CONTINUE"), "primary", true)
+	return p
+
+# ---------------------------------------------------------- Featured Card milestone ----
+
+## SB-M44-026: the milestone Featured Card guarantee (L20 Scrubby, L30 / L40 a Set 01 card),
+## already added to Collection by FeaturedCards. Canonical card art / name; null for a card
+## not in the catalogue (nothing is fabricated).
+static func featured_card(event: Dictionary, reduced: bool):
+	var cat := CollectionCardCatalog.entry(String(event.get("card", "")))
+	if cat.is_empty():
+		return null
+	var p := _popup("featured_card", "reward", UiText.t("CEREMONY_FEATURED_TITLE"), event)
+	_hero(p, String(cat["art"]), Vector2(240, 300), reduced)
+	p.add_body_line(String(cat["name"]), "CardName", BasePopup.ROYAL_EDGE, 44)
+	p.add_body_line(UiText.t("CEREMONY_FEATURED_LEVEL", [int(event.get("level", 0))]), "CommittedNote", BasePopup.INK, 26)
 	p.add_action("continue", UiText.t("CEREMONY_CONTINUE"), "primary", true)
 	return p
 

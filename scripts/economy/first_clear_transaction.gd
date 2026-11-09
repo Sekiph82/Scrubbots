@@ -5,8 +5,9 @@ extends RefCounted
 ##   1. LevelProgressionService.record_win (forward-only authority; stale/future/
 ##      replay rejects here with ZERO mutation and nothing else runs);
 ##   2. base first-clear reward (SB by class + Bot Part);
-##   3. Win Streak advance (+ streak SB, Gift Meter feed, milestone Bot Part);
-##   4. current-level 2x entitlement completion.
+##   3. SB-M44-026 milestone Featured Card guarantee (FeaturedCards; L20 / L30 / L40);
+##   4. Win Streak advance (+ streak SB, Gift Meter feed, milestone Bot Part);
+##   5. current-level 2x entitlement completion.
 ## Snapshot/rollback boundary: the exact progression + full EconomyServices
 ## snapshot (wallet, Bot Parts, RewardGrant applied tx set, streak, Gift Meter,
 ## entitlement, ...) is captured before step 1 and re-imported if any later step
@@ -14,6 +15,8 @@ extends RefCounted
 ##
 ## `fault` is a test-only seam: fault(stage) -> true forces a failure AFTER that
 ## stage mutated. Stages: "progression", "first_clear", "streak", "entitlement".
+
+const FeaturedCards = preload("res://scripts/collection/featured_cards.gd")
 
 static func commit(progression, economy, level_number: int, fault: Callable = Callable()) -> Dictionary:
 	var pre_prog: Dictionary = progression.snapshot()
@@ -24,6 +27,7 @@ static func commit(progression, economy, level_number: int, fault: Callable = Ca
 	var cls := ""
 	var fc: Dictionary = {}
 	var st: Dictionary = {}
+	var featured: Dictionary = {}
 	if _hit(fault, "progression"):
 		failed = "progression"
 	if failed == "":
@@ -31,6 +35,8 @@ static func commit(progression, economy, level_number: int, fault: Callable = Ca
 		fc = economy.first_clear.grant_first_clear(level_number, cls)
 		if not bool(fc.get("applied", false)) or _hit(fault, "first_clear"):
 			failed = "first_clear"
+	if failed == "":
+		featured = FeaturedCards.grant_milestone(economy, level_number)
 	if failed == "":
 		st = economy.streak.process_first_clear_win(level_number)
 		if not bool(st.get("applied", false)) or _hit(fault, "streak"):
@@ -43,7 +49,7 @@ static func commit(progression, economy, level_number: int, fault: Callable = Ca
 		var rolled: bool = progression.import_snapshot(pre_prog) and economy.import_snapshot(pre_econ)
 		return {"ok": false, "reason": "rolled_back", "stage": failed, "restored": rolled}
 	# M43-C001A: the committed service results ARE the Results receipt source.
-	return {"ok": true, "difficulty": cls, "first_clear": fc, "streak": st}
+	return {"ok": true, "difficulty": cls, "first_clear": fc, "featured": featured, "streak": st}
 
 static func _hit(fault: Callable, stage: String) -> bool:
 	return fault.is_valid() and bool(fault.call(stage))

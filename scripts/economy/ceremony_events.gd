@@ -5,14 +5,17 @@ extends RefCounted
 ## that deserve a meta ceremony, straight from authoritative service state:
 ##
 ##   gift:<occurrence id>  a queued Gift Meter milestone occurrence (GiftMeterService queue)
+##   featured_card:L<n>:<card>  a granted milestone Featured Card (SB-M44-026, reward ledger)
 ##   set:<n>               Collection set n reward claimed (CollectionInventory)
 ##   master                Master Collection reward claimed (CollectionInventory)
 ##   robot:<id>            a robot unlocked after the initial robot (RobotUnlockService)
 ##
 ## Each event carries the committed facts a ceremony needs (no recomputation of grants:
 ## set / master rewards come from the same config the grant used, read-only). Order is
-## deterministic: Gift milestones (queue order), sets ascending, Master, robots.
+## deterministic: Gift milestones (queue order), Featured Cards by level, sets ascending, Master, robots.
 ## Nothing here grants, claims, saves or mutates; pending = events() minus MetaUiState.seen.
+
+const FeaturedCards = preload("res://scripts/collection/featured_cards.gd")
 
 static func events(economy) -> Array:
 	var out: Array = []
@@ -21,6 +24,9 @@ static func events(economy) -> Array:
 			"milestone": int(occ["milestone"]), "cycle": int(occ["cycle"]), "claimed": bool(occ.get("claimed", false)),
 			"cycle_max": int(economy.config.gift_meter_cycle_max()),
 			"rewards": (economy.config.gift_meter_milestone(int(occ["milestone"])) as Dictionary).duplicate(true)})
+	for f in FeaturedCards.milestone_cards(economy.reward):
+		out.append({"key": "%sL%d:%s" % [FeaturedCards.TX_PREFIX, f["level"], f["card"]], "kind": "featured_card",
+			"level": int(f["level"]), "card": String(f["card"])})
 	var col: Dictionary = economy.collection.snapshot()
 	var claimed: Array = (col.get("set_reward_claimed", []) as Array).map(func(n): return int(n))
 	claimed.sort()

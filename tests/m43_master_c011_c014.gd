@@ -943,11 +943,11 @@ func _a07() -> void:
 	re.compile("\"kind\": \"([a-z_]+)\"")
 	for m in re.search_all(src):
 		kinds.append(m.get_string(1))
-	_ok(kinds == ["gift_milestone", "set_complete", "master_complete", "robot_unlock"], "emitted kinds %s" % str(kinds))
+	_ok(kinds == ["gift_milestone", "featured_card", "set_complete", "master_complete", "robot_unlock"], "emitted kinds %s" % str(kinds))
 	var mapped := {}
 	for k in kinds:
 		mapped[k] = MetaFeedback.moment_for_ceremony(k)
-	_ok(mapped == {"gift_milestone": "reward", "set_complete": "unlock", "master_complete": "unlock", "robot_unlock": "unlock"}, "robot / master / set -> unlock, gift -> reward %s" % str(mapped))
+	_ok(mapped == {"gift_milestone": "reward", "featured_card": "reward", "set_complete": "unlock", "master_complete": "unlock", "robot_unlock": "unlock"}, "robot / master / set -> unlock, gift / featured card (SB-M44-026) -> reward %s" % str(mapped))
 	await _boot("a07")
 	var a = _root.get_app_state()
 	var mf = _root.meta_feedback

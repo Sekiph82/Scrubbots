@@ -156,6 +156,12 @@ func _register_handlers() -> void:
 	# guaranteed_new_cards handler only when no card is available, so we never
 	# double-grant it.
 	reward.register_handler("guaranteed_new_fallback_sb", func(_n): pass)
+	# SB-M44-026: a milestone Featured Card guarantee; the card id is the last field of the
+	# parent tx (featured_card:L<level>:<card>, FeaturedCards.grant_milestone).
+	reward.register_handler("featured_card", func(n):
+		var cid := reward.current_tx().get_slice(":", 2)
+		for _i in range(n):
+			collection.add_card(cid))
 	# M43-C003 rewarded grants (RewardedGrantService is the only caller; it pre-checks
 	# Heart fullness, so grant_one never has to fail here).
 	reward.register_handler(RewardedGrantService.RES_HEART, func(n):

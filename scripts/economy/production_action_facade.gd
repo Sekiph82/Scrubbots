@@ -161,12 +161,17 @@ func start_rewarded_daily(slot: int, token: String = "") -> Dictionary:
 ## DURABLY. If the bound save boundary reports failure, the exact pre-claim economy snapshot is
 ## re-imported (no grant-first-save-later: wallet, ledger tx, Daily state and badge return to
 ## the prior durable truth) and the claim is refused, so a retry is the same single claim.
+## SB-M44-023: Daily / Daily Scrub Orders claims follow the data-driven `daily` / `tasks` gate.
 func claim_daily_login() -> Dictionary:
+	if not feature_unlocked("daily"):
+		return _locked("claim_daily_login", "daily")
 	return _finish_durable("claim_daily_login", func(): return _economy.daily.claim_login())
 
 ## M43-C005F-PHASE3: results carry presentation-only identity copied from the input (the task
 ## index / Gift occurrence id); the grant itself is unchanged.
 func claim_daily_task(task_index: int) -> Dictionary:
+	if not feature_unlocked("tasks"):
+		return _locked("claim_daily_task", "tasks")
 	return _finish_durable("claim_daily_task", func():
 		var r: Dictionary = _economy.daily.claim_task(task_index)
 		r["task_index"] = task_index
@@ -200,6 +205,8 @@ func claim_achievement(app, id: String) -> Dictionary:
 	return _finish_durable("claim_achievement", func(): return Achievements.claim(app, id))
 
 func claim_daily_all_tasks() -> Dictionary:
+	if not feature_unlocked("tasks"):
+		return _locked("claim_daily_all_tasks", "tasks")
 	return _finish("claim_daily_all_tasks", _economy.daily.claim_all_tasks_bonus())
 
 func claim_gift(occurrence_id: String) -> Dictionary:

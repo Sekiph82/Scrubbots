@@ -15,6 +15,7 @@ Economy V1 Collection contract:
 - Duplicates are allowed.
 - Cards Exchange values: Common 25, Rare 75, Epic 200, Legendary 500 SB.
 - `EXCHANGE ALL EXTRAS` must be atomic and may never reduce a collected card below one owned copy.
+- Featured Cards (SB-M44-026, `featured_cards.gd` + `data/config/featured_cards_v1.json`): all 135 cards scheduled by level as highlights only; packs stay random. The only card grants are first clears of L20 (Scrubby) and L30 / L40 (first Set 01 card not owned yet, else the row's fallback duplicate), once each via RewardGrantService tx `featured_card:L<level>:<card>`.
 
 Planned M39 module:
 

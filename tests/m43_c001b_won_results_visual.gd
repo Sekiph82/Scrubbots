@@ -10,6 +10,7 @@ const MainScript = preload("res://scripts/app/main.gd")
 const MainScene = preload("res://scenes/app/main.tscn")
 const AppState = preload("res://scripts/app/app_state.gd")
 const FirstClearTransaction = preload("res://scripts/economy/first_clear_transaction.gd")
+const FeaturedCards = preload("res://scripts/collection/featured_cards.gd")
 const TerminalRewardReceipt = preload("res://scripts/economy/terminal_reward_receipt.gd")
 const ResultsScreen = preload("res://scripts/ui/results_screen.gd")
 const HomeStyle = preload("res://scripts/ui/home/home_style.gd")
@@ -220,6 +221,10 @@ func _level30_unavailable_visual() -> void:
 	var nav = root.get_navigation()
 	# SB-CAMPAIGN-L11-L30: Level 30 is the last builtin level (end of content).
 	app.progression.debug_set_current_level(30)
+	# SB-M44-026: a first L30 clear grants a milestone Featured Card whose ceremony holds Results;
+	# commit it beforehand (seen) so this case shows the plain end-of-content layout.
+	var fc: Dictionary = FeaturedCards.grant_milestone(app.economy, 30)
+	app.economy.meta_ui.mark_seen("featured_card:L30:" + String(fc["card"]))
 	var h = await _play(root)
 	h.get_completion().terminal_reached.emit(&"WON", {})
 	var res = root.get_results_screen()
