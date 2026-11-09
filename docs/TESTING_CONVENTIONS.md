@@ -51,7 +51,7 @@ Options: `--path <checkout>` (default: the repo holding the script),
 Per suite it runs `"$GODOT" --headless --path <checkout> -s res://tests/<suite>.gd`,
 writes `validate_logs/<suite>.log` (git-ignored) and applies the CI rule: FAIL if
 the exit code is non-zero, any `SCRIPT ERROR` / `Parse Error` /
-`Failed to load script` diagnostic appears (only m43_c005f's documented injected
+`Failed to load script` diagnostic appears (only m43_c005f phase4's and m54 037's documented injected
 `explode` line is tolerated), the last PASS/FAIL/RESULT line lacks PASS or contains
 FAIL, or a guarded exact summary line is missing. It prints
 `<suite> status=PASS|FAIL exit=N diag=N | <last line>` per suite and

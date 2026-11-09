@@ -14,8 +14,8 @@ import sys
 
 WORKFLOW = ".github/workflows/android-family-first10.yml"
 DIAG = re.compile(r"^(ERROR: )?(SCRIPT ERROR|Parse Error|Failed to load script)")
-# Mirrors the workflow's INJECTED exception: only this suite's documented plugin-throw line is tolerated.
-INJECTED_SUITE = "m43_c005f_phase4_terminal_home_micro"
+# Mirrors the workflow's INJECTED exception: only these suites' documented plugin-throw line is tolerated.
+INJECTED_SUITES = ("m43_c005f_phase4_terminal_home_micro", "m54_regression_pack_037_038")
 INJECTED = "SCRIPT ERROR: Invalid call. Nonexistent function 'explode' in base 'Nil'."
 WINGET_GODOT = os.path.join(
     os.environ.get("LOCALAPPDATA", ""), "Microsoft", "WinGet", "Packages",
@@ -36,7 +36,7 @@ def read_workflow(path):
 def evaluate(suite, exit_code, log, guard=None):
     """Return (status, diag, last) using the workflow's PASS/FAIL rule."""
     lines = log.splitlines()
-    diag = sum(1 for l in lines if DIAG.search(l) and not (suite == INJECTED_SUITE and l == INJECTED))
+    diag = sum(1 for l in lines if DIAG.search(l) and not (suite in INJECTED_SUITES and l == INJECTED))
     hits = [l for l in lines if re.search("PASS|FAIL|RESULT", l)]
     last = hits[-1] if hits else ""
     ok = exit_code == 0 and diag == 0 and "PASS" in last and "FAIL" not in last
@@ -57,9 +57,9 @@ def selftest():
     assert evaluate("a", 0, "nothing\n")[0] == "FAIL"
     assert evaluate("a", 0, "Foo evidence: PASS (1/2 cases, 0 fail)\n", guard)[0] == "FAIL"
     assert evaluate("a", 0, "  " + guard + "\n", guard)[0] == "FAIL"  # whole-line match only
-    assert evaluate(INJECTED_SUITE, 0, INJECTED + "\n" + good)[0:2] == ("PASS", 0)
+    assert evaluate(INJECTED_SUITES[1], 0, INJECTED + "\n" + good)[0:2] == ("PASS", 0)
     assert evaluate("a", 0, INJECTED + "\n" + good)[0] == "FAIL"
-    assert evaluate(INJECTED_SUITE, 0, "SCRIPT ERROR: other\n" + good)[0] == "FAIL"
+    assert evaluate(INJECTED_SUITES[1], 0, "SCRIPT ERROR: other\n" + good)[0] == "FAIL"
     print("selftest PASS")
 
 
