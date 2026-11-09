@@ -47,7 +47,7 @@
       "checks": [
         {
           "check": "manifest_bound",
-          "evidence": "42 surfaces: 40 bound (script + live data + evidence suite exist), 2 explicitly not built: [\"account_cloud_sync_conflict (provider decision SB-M43-153)\", \"friends_postlaunch (post-launch)\"]; unbound / broken []",
+          "evidence": "42 surfaces: 40 bound (script + live data + evidence suite exist), 2 explicitly not built: [\"account_cloud_sync_conflict (no cloud provider yet: Play Games Saved Games / Game Center + iCloud plugins (SB-M43-153))\", \"friends_postlaunch (post-launch)\"]; unbound / broken []",
           "result": "PASS"
         },
         {
@@ -57,7 +57,7 @@
         },
         {
           "check": "no_placeholder_copy",
-          "evidence": "574 English UiText strings, none contains placeholder / dummy / lorem / TODO / TBD / FIXME copy []",
+          "evidence": "597 English UiText strings, none contains placeholder / dummy / lorem / TODO / TBD / FIXME copy []",
           "result": "PASS"
         }
       ],
@@ -273,10 +273,11 @@
       "rewarded_ads"
     ],
     "not_built": [
-      "account_cloud_sync_conflict",
       "friends_postlaunch"
     ],
-    "not_live": [],
+    "not_live": [
+      "account_cloud_sync_conflict"
+    ],
     "not_owner_accepted": [
       "gameplay_v02:REFERENCE_SELECTED",
       "pause:MASTER_REQUIRED",

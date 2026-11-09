@@ -53,7 +53,7 @@ const ROWS := {
 	"gift_meter_milestone": ["ceremony_gift_milestone"], "profile": ["profile"], "achievements": ["achievements"],
 	"events_main": ["events"], "event_detail": ["events"], "ranks": ["leaderboard"], "comeback_summary": ["comeback"],
 	"feature_unlock": ["ceremony_feature_unlock"], "world_unlock_transition": ["ceremony_world_unlock"],
-	"account_cloud_sync_conflict": "NOT_BUILT: no account / cloud-conflict screen yet (SB-M49-030 queue row)",
+	"account_cloud_sync_conflict": "NOT_LIVE: built (cloud_conflict_screen.gd, walked by tests/m54_cloud_save_seam.gd); no cloud provider yet (SB-M43-153)",
 	"generic_reward_confirmation": ["reward", "confirm", "feedback"], "generic_error_offline_loading": ["network_error", "busy"],
 	"notification_education_settings": ["notifications", "notification_permission"],
 	"friends_postlaunch": "NOT_BUILT: post-launch (manifest status MASTER_REQUIRED_POSTLAUNCH)",

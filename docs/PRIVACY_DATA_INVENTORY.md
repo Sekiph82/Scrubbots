@@ -85,6 +85,7 @@ no ads, no purchases, no analytics provider, no crash reporter. The only network
 | Path | Written by | Contents | Leaves device? |
 |---|---|---|---|
 | `user://scrubbots_save.dat` (+ temp/backup siblings) | `scripts/save/save_service.gd` via `scripts/app/app_state.gd` | settings (volumes, haptics, Reduced Effects, color symbols), level progression, economy (wallet, hearts, boosters, collection cards/packs, daily/orders, events, records, the weekly Ranks count with its week start, gift/streak, notification preferences and quiet hours, permission ask/decline timestamps, the time of the one scheduled local reminder, FTUE flags, the No Ads entitlement flag, the finished-play count and the play count at the last interstitial ad (ad cadence, SB-M57-001; no ad provider yet); once a store provider exists, applied purchase tokens as `store:<token>` reward transaction ids so a purchase is never granted twice). In-game pack "receipts" are internal reward transactions, not store purchases. Timestamps are device clock values used for timers. No name, email, device id or location. | No |
+| `user://cloud_sync_v1.json` | `scripts/save/cloud_save_service.gd` via `scripts/app/app_state.gd` | cloud-sync bookkeeping, written only after a successful sync with a real cloud provider (never with the shipping null provider): `schema`, `device` (a random 128-bit install id made by the game, not a hardware, advertising or account id), and the header of the last synced cloud copy (`revision`, `saved_at` device-clock timestamp, `device`, `lineage` = up to 64 SHA-256 fingerprints of earlier copies, `fp` = this copy's fingerprint). No save content. | No |
 | `user://analytics_v1.json` | `scripts/app/analytics_service.gd` | `version`, `consent` (default false; set only by the Settings -> PRIVACY switch, section 7.2), first consented local day, retention markers sent. No events are stored (NullSink). | No |
 | `user://audio_settings.cfg` | `scripts/audio/audio_settings_service.gd` | legacy M33 volume file, read once for migration into the save | No |
 | `user://haptics_settings.cfg` | `scripts/haptics/haptics_settings_service.gd` | haptics on/off (standalone service default path) | No |
@@ -348,7 +349,13 @@ optional). Under-16 or unknown age: 7.1.
   anyone and no other players exist (SB-M43-122), so 012 is not triggered.
 - Planned cloud save (SB-M43-153..160: Play Games Saved Games / Game Center + iCloud) stores
   exactly the game save content (settings, progression, economy, collection, FTUE flags) in
-  the player's own Google / Apple account, adding no name, email or device id. Requirements
+  the player's own Google / Apple account, adding no name or email. The provider-neutral part
+  is built (factory 142: `scripts/save/cloud_save_service.gd`, null provider = nothing is
+  read or written): the cloud copy wraps the save in a header `{schema, revision, device,
+  saved_at, lineage, summary}`, where `device` is the random install id above (not a hardware
+  or advertising id), `saved_at` a device-clock timestamp, `lineage` up to 64 SHA-256
+  fingerprints of earlier copies and `summary` counts derived from the save (level, completed
+  levels, transactions, Scrub Bucks, robots). Requirements
   before it ships: sign-in optional and the game fully playable without it; a "delete cloud
   save" action on the PRIVACY screen (removes the remote snapshot, keeps the local save);
   sign-out keeps the local save; export through the platform (Google Takeout / Apple data

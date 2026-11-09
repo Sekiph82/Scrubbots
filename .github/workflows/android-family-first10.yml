@@ -75,6 +75,7 @@ name: Android Family First10 APK
 # SB-M57-012/013 + SB-M43-081/084 real-money store seam (null provider default, MockProvider grants once per token, No Ads, restore): + m57_store_products (exact 9/9 guard).
 # SB-M44-027 Robots 5-stage assembly visual (50/100/150/200/250 Bot Parts, shader reveal of the next robot's portrait): + m44_robot_assembly_stages (exact 4/4 guard).
 # SB-M57-001..011 ad seam (null provider default, interstitial every 5 finished plays between levels, No Ads keeps rewarded, rewarded grants only on completion, saved play counter): + m57_ads_cadence (exact 6/6 guard).
+# SB-M43-152..157 / SB-M49-030 / SB-M54-031 cloud save seam (null provider default, mock provider: header round trip, conflict choice, no double grant, failures never touch the local save, conflict screen fit): + m54_cloud_save_seam (exact 7/7 guard).
 
 on:
   workflow_dispatch:
@@ -179,7 +180,7 @@ jobs:
                    m43_c005_c072_feature_unlock_ceremony m43_c005_c074_c077_celebrations \
                    m43_master_c005r_gift_micro_progress sb_polish_002_gift_meter sb_polish_004_006_ui_batch sb_polish_003_booster_vfx sb_m22_008_polish_013_slot_fx m43_master_c005_meta_ceremonies m43_c005f_phase6_unlock_feel \
                    m43_master_c006_shop m43_master_c007_collection m54_collection_set_master_exactly_once m43_master_c008_robots m54_regression_pack_022_027 \
-                   m43_master_c010_meta m43_master_c011_c014 m44_pending_packs_gate m44_meta_l1_unlock_ftue m44_meta_verify_achievements_gift m43_master_c007r_pity campaign_l11_l30 m43_personal_ranks real_play_levels real_play_file_cli ui_vis_006_asset_qa m59_app_version m56_analytics_taxonomy m58_privacy_inventory m58_privacy_consent m54_regression_pack_028_036 m43_172_local_notifications m54_world_regression m60_release_gates m43_ranks_weekly m44_featured_card_onboarding m57_store_products m44_robot_assembly_stages m54_regression_pack_037_038 m57_ads_cadence; do
+                   m43_master_c010_meta m43_master_c011_c014 m44_pending_packs_gate m44_meta_l1_unlock_ftue m44_meta_verify_achievements_gift m43_master_c007r_pity campaign_l11_l30 m43_personal_ranks real_play_levels real_play_file_cli ui_vis_006_asset_qa m59_app_version m56_analytics_taxonomy m58_privacy_inventory m58_privacy_consent m54_regression_pack_028_036 m43_172_local_notifications m54_world_regression m60_release_gates m43_ranks_weekly m44_featured_card_onboarding m57_store_products m44_robot_assembly_stages m54_regression_pack_037_038 m57_ads_cadence m54_cloud_save_seam; do
             L="validate_logs/$s.log"
             if [ ! -f "tests/$s.gd" ]; then echo "$s MISSING tests/$s.gd status=FAIL" | tee -a "$S"; fail=1; continue; fi
             if timeout 1500 "$GODOT" --headless --path . -s "res://tests/$s.gd" > "$L" 2>&1; then ec=0; else ec=$?; fi
@@ -420,6 +421,11 @@ jobs:
             echo "M57-ADS verdict=PASS (6/6)" | tee -a "$S"
           else
             echo "M57-ADS verdict=FAIL (exact 6/6 summary missing)" | tee -a "$S"; fail=1
+          fi
+          if grep -qxF 'M54 cloud save seam: PASS (7/7 cases, 0 fail)' validate_logs/m54_cloud_save_seam.log 2>/dev/null; then
+            echo "M54-CLOUD verdict=PASS (7/7)" | tee -a "$S"
+          else
+            echo "M54-CLOUD verdict=FAIL (exact 7/7 summary missing)" | tee -a "$S"; fail=1
           fi
           echo "aggregate=$([ $fail -eq 0 ] && echo PASS || echo FAIL)" | tee -a "$S"
           { echo "### validate (mode=${MODE:-<unset>}, ${GITHUB_SHA})"; echo '```'; cat "$S"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"

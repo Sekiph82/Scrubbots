@@ -589,11 +589,11 @@
       "responsive_gate": true,
       "production_scene_required": true,
       "implementation": {
-        "production_scene": null,
-        "evidence": "tests/m43_master_c011_c014.gd (logic only)",
+        "production_scene": "scripts/ui/cloud_conflict_screen.gd",
+        "evidence": "tests/m54_cloud_save_seam.gd",
         "live_data": false,
-        "gap": "provider decision SB-M43-153",
-        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT"
+        "gap": "no cloud provider yet: Play Games Saved Games / Game Center + iCloud plugins (SB-M43-153)",
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT; factory 142 (Claude): screen built on CloudSaveService (mock-provider evidence), not live until a real provider exists; status unchanged"
       }
     },
     {

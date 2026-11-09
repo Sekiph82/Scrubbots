@@ -29,9 +29,9 @@ Release ready: **NO**
 
 ## SB-M60-002: PASS
 
-- PASS `manifest_bound`: 42 surfaces: 40 bound (script + live data + evidence suite exist), 2 explicitly not built: ["account_cloud_sync_conflict (provider decision SB-M43-153)", "friends_postlaunch (post-launch)"]; unbound / broken []
+- PASS `manifest_bound`: 42 surfaces: 40 bound (script + live data + evidence suite exist), 2 explicitly not built: ["account_cloud_sync_conflict (no cloud provider yet: Play Games Saved Games / Game Center + iCloud plugins (SB-M43-153))", "friends_postlaunch (post-launch)"]; unbound / broken []
 - PASS `registry_covered`: every ui_surface_registry screen / popup has a manifest surface; missing []
-- PASS `no_placeholder_copy`: 574 English UiText strings, none contains placeholder / dummy / lorem / TODO / TBD / FIXME copy []
+- PASS `no_placeholder_copy`: 597 English UiText strings, none contains placeholder / dummy / lorem / TODO / TBD / FIXME copy []
 
 ## SB-M60-003: PASS
 
@@ -83,6 +83,6 @@ No M43 program closure while any required surface is missing, visually unreviewe
 - surfaces: 42, by status {"MASTER_OWNER_APPROVED":5,"MASTER_REQUIRED":31,"MASTER_REQUIRED_POSTLAUNCH":1,"REFERENCE_SELECTED":5}
 - not OWNER_ACCEPTED (42): gameplay_v02:REFERENCE_SELECTED, pause:MASTER_REQUIRED, level_intro:REFERENCE_SELECTED, victory_results:MASTER_OWNER_APPROVED, fail_retry:MASTER_REQUIRED, life_heart_refill:REFERENCE_SELECTED, need_a_hand:REFERENCE_SELECTED, booster_acquire:MASTER_REQUIRED, speed_2x_acquire:MASTER_REQUIRED, insufficient_sb:MASTER_REQUIRED, shop:MASTER_REQUIRED, collection_album:MASTER_REQUIRED, collection_set_detail:MASTER_REQUIRED, card_detail:MASTER_REQUIRED, cards_exchange:MASTER_REQUIRED, standard_pack_open:MASTER_REQUIRED, premium_pack_open:MASTER_REQUIRED, collection_set_complete:MASTER_REQUIRED, master_collection_complete:MASTER_REQUIRED, robots_main:MASTER_REQUIRED, robot_detail_locked:MASTER_REQUIRED, robot_unlock:MASTER_REQUIRED, tasks:MASTER_REQUIRED, daily:MASTER_REQUIRED, gift_bar:MASTER_REQUIRED, gift_meter_milestone:MASTER_REQUIRED, profile:MASTER_OWNER_APPROVED, achievements:MASTER_OWNER_APPROVED, events_main:MASTER_OWNER_APPROVED, event_detail:MASTER_OWNER_APPROVED, ranks:MASTER_REQUIRED, comeback_summary:MASTER_REQUIRED, feature_unlock:MASTER_REQUIRED, world_unlock_transition:MASTER_REQUIRED, account_cloud_sync_conflict:MASTER_REQUIRED, generic_reward_confirmation:MASTER_REQUIRED, generic_error_offline_loading:MASTER_REQUIRED, notification_education_settings:MASTER_REQUIRED, friends_postlaunch:MASTER_REQUIRED_POSTLAUNCH, home:REFERENCE_SELECTED, settings:MASTER_REQUIRED, rewarded_ads:MASTER_REQUIRED
 - MASTER_REQUIRED (32): pause, fail_retry, booster_acquire, speed_2x_acquire, insufficient_sb, shop, collection_album, collection_set_detail, card_detail, cards_exchange, standard_pack_open, premium_pack_open, collection_set_complete, master_collection_complete, robots_main, robot_detail_locked, robot_unlock, tasks, daily, gift_bar, gift_meter_milestone, ranks, comeback_summary, feature_unlock, world_unlock_transition, account_cloud_sync_conflict, generic_reward_confirmation, generic_error_offline_loading, notification_education_settings, friends_postlaunch, settings, rewarded_ads
-- not built (2): account_cloud_sync_conflict, friends_postlaunch
-- built but not live (0): 
+- not built (1): friends_postlaunch
+- built but not live (1): account_cloud_sync_conflict
 - reachable only through debug tooling: none (SB-M60-001 `no_debug_surface`)
