@@ -109,6 +109,58 @@ The game shows `VERSION <version>[-debug] · BUILD <n>` at the bottom of Setting
 (`SettingsPanel.version_text()`, reading the same JSON). Every channel except `release` gets
 `-debug`.
 
+## Release gate (SB-M59-006..009)
+
+A release build never exports untested code:
+
+| Dispatch | Runs before export |
+|---|---|
+| Android `mode: build_apk`, `build_type: debug` | `validate` (as before) |
+| Android `mode: build_apk` or `apk_only`, `build_type: release` | `validate` + `clean_clone`, both green |
+| Android `mode: apk_only`, `build_type: debug` | nothing: the owner's quick path for already-proven levels (owner 2026-10-30) |
+| iOS `build_type: release` | `release_gate`, green |
+| iOS `build_type: debug` | nothing (as before) |
+
+- `validate` (Android): the release/versioning check, the **content validator**
+  `tools/validate_content.gd` (production catalog manifest, every level file, metadata,
+  preview, supply plan and its engine, plus `LevelCatalog.validate_all()`: LevelLoader, TEST
+  rejection, ProductionLevelValidator, square shell; last line `CONTENT_VALIDATION PASS|FAIL`),
+  then every focused suite with its exact guard.
+- `clean_clone` (Android): `tools/clean_clone_check.py` clones the committed commit
+  (`git clone --depth 1`, the validate tree set), imports it headless (exit 0 and no script
+  diagnostics), then runs the smoke suites `m59_app_version` (Settings),
+  `m43_c001a_results_foundation` (Results on the real app root) and
+  `m43_c005f_phase6_unlock_feel` (GameFeelFlow + Spark) through the clone's own
+  `tools/run_suites.py`. Nothing untracked comes along: no `.godot` cache, no local
+  `project.godot` edits, no owner-local `addons/godot_ai`.
+- `release_gate` (iOS, ubuntu): the clean-clone check, the release/versioning check, the content
+  validator and every Android validate suite with its exact guard (`tools/run_suites.py` reads
+  the list from the Android workflow).
+
+Locally:
+
+```
+python -I tools/clean_clone_check.py              # temp dir, deleted afterwards (--keep to inspect)
+godot --headless --path . -s res://tools/validate_content.gd
+```
+
+`clean_clone_check.py` only reads the source checkout through `git clone`; commit first, since
+uncommitted work is not in the clone.
+
+## Export hygiene and third-party notices (SB-M59-010)
+
+- `.github/android/family_first10_export_exclusions.txt` lists every tree that never ships:
+  `coordination`, `docs`, `tests`, `tools`, `level_factory`, `content_pipeline`, the dev-art
+  trees and the editor-only `addons/godot_ai` (owner-local MCP plugin, untracked). Each is in
+  both presets' `exclude_filter` and absent from both export checkouts; the Android PCK/APK scans
+  fail on any packaged path under them.
+- Shipped addons: Game Feel Flow (`addons/game_feel_flow`, autoload `GameFeelFlow`) and
+  Saltmire Spark (`addons/saltmire_spark`, autoload `Spark`), both MIT. Their licence files ship
+  through the presets' `include_filter` (they are not resources) and Settings > CREDITS shows
+  them verbatim, with the Godot licence and the engine's third-party notices (which cover its
+  built-in default font; the game bundles no other font).
+- `project.godot` registers each addon autoload exactly once and never references `godot_ai`.
+
 ## Checks
 
 - `python -I tools/check_release_versioning.py`: every version consumer derives from the JSON,
@@ -116,10 +168,14 @@ The game shows `VERSION <version>[-debug] · BUILD <n>` at the bottom of Setting
   `build_type != 'release'`, release signing steps are guarded `== 'release'` and fail fast,
   the Android export uses `--export-release` only for release, outputs and artifacts use
   `OUT_DIR` / `ARTIFACT`, iOS exports under the fixed basename `Scrubbots` and renames afterwards,
-  and there is no store upload. `--selftest` proves each rule catches a
-  broken workflow. The Android `validate` job runs it.
+  and there is no store upload; the release gate and export hygiene rules above. `--selftest`
+  proves each rule catches a broken workflow. The Android `validate` job runs it.
 - `tests/m59_app_version.gd` (in the CI suite list): the Settings label text, font and position,
   the debug and release suffix, and that the label is localization-keyed.
+- `tests/m59_credits.gd` (in the CI suite list): the Settings CREDITS row, the popup's notices
+  against their sources, scrolling, CLOSE, Turkish title.
+
+The first CI run of the new gate jobs is still pending (no workflow was dispatched for this change).
 
 ## Owner-only steps
 

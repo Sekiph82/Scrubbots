@@ -35,15 +35,16 @@ opening video (`assets/brand/opening/PROVENANCE.md`), owner/generated UI art
 (`ASSET_GENERATION_MANIFEST.json`). No fonts are bundled (Godot default font). These carry no
 code and send nothing; their commercial-use licences are a provenance matter for SB-M59-010.
 
-MIT attribution: MIT requires the copyright notice to travel with the binary. The game has
-no licences/credits screen yet. That notice work is SB-M59-010 (third-party notices); flagged
-here, not built.
+MIT attribution: MIT requires the copyright notice to travel with the binary. Settings >
+CREDITS (SB-M59-010, `scripts/ui/credits_screen.gd`) shows the Godot licence, the engine's
+third-party notices and both addon LICENSE files verbatim; the export presets ship those files
+(`include_filter`). See `docs/RELEASE_BUILDS.md`.
 
 ### Not shipped (development only)
 
 | Component | Where | License | Why it is not in a build |
 |---|---|---|---|
-| Godot AI (MCP editor plugin) | `addons/godot_ai` | MIT | Owner-local only: untracked in git, so CI exports (which build from a clean checkout) never contain it. It has its own editor telemetry and a WebSocket to a local MCP server; none of that runs in the game. `tests/m58_privacy_inventory.gd` fails if the committed `project.godot` ever references it. A local export from the owner's Desktop checkout would include it (local `project.godot` adds its autoload): do not ship local exports. |
+| Godot AI (MCP editor plugin) | `addons/godot_ai` | MIT | Owner-local only: untracked in git, so CI exports (which build from a clean checkout) never contain it. It has its own editor telemetry and a WebSocket to a local MCP server; none of that runs in the game. `tests/m58_privacy_inventory.gd` fails if the committed `project.godot` ever references it. Both export presets also exclude `addons/godot_ai/*` (SB-M59-010). A local export from the owner's Desktop checkout would still reference it (local `project.godot` adds its autoload): do not ship local exports. |
 | Python / stdlib tools | `tools/`, `level_factory/`, `content_pipeline/` | own code | excluded from every export (`.github/android/family_first10_export_exclusions.txt`) |
 | GitHub Actions (pinned actions) | `.github/workflows` | MIT/Apache | CI only |
 
