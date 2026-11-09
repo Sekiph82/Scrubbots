@@ -5,21 +5,30 @@ extends RefCounted
 ## the player turning REMINDERS ON (NotificationPolicy opt-in, OFF by default), where a native
 ## explainer popup says why before the OS dialog. "Not now" never calls the OS and starts a
 ## data-driven cooldown (data/config/notification_permission_v1.json); "Allow" makes exactly one
-## OS request. Android only (Godot built-in OS.request_permission, POST_NOTIFICATIONS, API 33+).
-## TODO(iOS): UNUserNotificationCenter authorization needs a native plugin (TASKS SB-M43-171);
-## until then iOS / desktop are a no-op. No gameplay / economy effect.
+## OS request. Android: Godot built-in OS.request_permission (POST_NOTIFICATIONS, API 33+).
+## iOS (SB-M43-171): the native ScrubbotsNotify GDExtension (UNUserNotificationCenter
+## requestAuthorization); without it iOS is a no-op, desktop always. No gameplay / economy effect.
 ## Economy section `notify_permission`: absent = fresh; present = strict.
 
 const PATH := "res://data/config/notification_permission_v1.json"
 const SCHEMA := "scrubbots.notification_permission.v1"
 const PERMISSION := "android.permission.POST_NOTIFICATIONS"
+const LocalNotifications = preload("res://scripts/economy/local_notifications.gd")
 const SNAPSHOT_VERSION := 1
 
 var cooldown_s := 7 * 86400
 ## Platform seam (tests swap these for a fake OS permission API).
 var platform := OS.get_name()
-var granted_fn := func() -> bool: return OS.get_granted_permissions().has(PERMISSION)
-var request_fn := func() -> void: OS.request_permission(PERMISSION)
+## Native ScrubbotsNotify (SB-M43-171/172): iOS authorization; on Android the OS truth for every
+## API level (areNotificationsEnabled). null = built-in Android path only.
+var native = LocalNotifications.native_backend()
+var granted_fn := func() -> bool:
+	return bool(native.notifications_enabled()) if native != null else OS.get_granted_permissions().has(PERMISSION)
+var request_fn := func() -> void:
+	if platform == "iOS":
+		native.request_authorization()
+	else:
+		OS.request_permission(PERMISSION)
 var _clock: Callable
 var _asked_at := 0       ## last "Allow" (OS request made) ts, 0 = never
 var _declined_at := 0    ## last "Not now" ts, 0 = never
@@ -32,12 +41,12 @@ func _init(clock: Callable = Callable(), path: String = PATH) -> void:
 			cooldown_s = maxi(1, int(d.get("decline_cooldown_days", 7))) * 86400
 
 func supported() -> bool:
-	return platform == "Android"
+	return platform == "Android" or (platform == "iOS" and native != null)
 
 func granted() -> bool:
 	return supported() and bool(granted_fn.call())
 
-## True when the explainer should show now: Android, not granted, outside the cooldown after
+## True when the explainer should show now: supported, not granted, outside the cooldown after
 ## the last "Not now" / "Allow" (an OS-level denial is never re-asked inside it either).
 func should_explain() -> bool:
 	if not supported() or granted():

@@ -2,10 +2,9 @@ extends RefCounted
 ## NotificationPolicy — preload (res://scripts/economy/notification_policy.gd).
 ##
 ## M43-C012 / C012R (SB-M43-145/147/148/149, R12-004..006) — the ONE decision authority for
-## proactive (retention) notifications. Platform delivery is not wired: Godot ships no local
-## notification API, so a native plugin / platform decision is required (the Android OS permission
-## is asked contextually by NotificationPermission, SB-M43-146; iOS permission is SB-M43-171);
-## this authority decides WHAT may be sent and keeps the player's preferences.
+## proactive (retention) notifications. Delivery is LocalNotifications (SB-M43-172, native
+## ScrubbotsNotify plugin; the OS permission is asked contextually by NotificationPermission,
+## SB-M43-146 / SB-M43-171); this authority decides WHAT may be sent and keeps the player's preferences.
 ##   - opt-in: global OFF by default; per-category toggles (hearts, daily, event_ending, gift);
 ##   - quiet hours on the player's local clock (default 22:00-08:00);
 ##   - priority + dedup: simultaneous candidates collapse into ONE message (highest priority);
@@ -77,6 +76,9 @@ func decide(app, now_ts: int, local_hour: int) -> Dictionary:
 ## the cap: eligibility resumes only at last_sent + CAP_S (master remediation V03, R12-005).
 func capped(now_ts: int) -> bool:
 	return _last_sent > 0 and now_ts - _last_sent < CAP_S
+
+func last_sent() -> int:
+	return _last_sent
 
 func mark_sent(now_ts: int) -> void:
 	_last_sent = maxi(_last_sent, now_ts)

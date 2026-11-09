@@ -38,6 +38,7 @@ const ProfileScreens = preload("res://scripts/ui/profile/profile_screens.gd")
 const MetaFeedback = preload("res://scripts/ui/feel/meta_feedback.gd")
 const MetaRewardFeel = preload("res://scripts/ui/feel/meta_reward_feel.gd")
 const NotificationPolicy = preload("res://scripts/economy/notification_policy.gd")
+const UiText = preload("res://scripts/ui/ui_text.gd")
 const RewardedAdsScreen = preload("res://scripts/ui/daily/rewarded_ads_screen.gd")
 const FtueDirector = preload("res://scripts/app/ftue_director.gd")
 const CoachmarkLayer = preload("res://scripts/ui/tutorial/coachmark_layer.gd")
@@ -135,6 +136,8 @@ func _boot() -> void:
 	nav = NavigationController.new()
 	nav.settings_changed.connect(_on_nav_settings_changed)
 	app_state.analytics.start_session("cold_start")
+	if app_state.economy != null:
+		app_state.economy.local_notify.on_app_open()
 
 func _ready() -> void:
 	_modals = ModalStack.new()
@@ -997,22 +1000,32 @@ func _track(event: String, params: Dictionary) -> void:
 	if app_state != null:
 		app_state.analytics.track(event, params)
 
+## SB-M43-172: one OS-scheduled reminder while the app is away (LocalNotifications; cancelled
+## again on the next open). Before flush_lifecycle so the pending reminder is saved.
+func _schedule_reminder() -> void:
+	if app_state != null and app_state.economy != null:
+		app_state.economy.local_notify.on_background(app_state.economy, app_state.is_blocked, func(k): return UiText.t(k))
+
 func _notification(what: int) -> void:
 	match what:
 		NOTIFICATION_WM_GO_BACK_REQUEST:
 			handle_back()
 		NOTIFICATION_APPLICATION_PAUSED:
+			_schedule_reminder()
 			flush_lifecycle("application_paused")
 			if app_state != null:
 				app_state.analytics.end_session("background")
 		NOTIFICATION_APPLICATION_RESUMED:
 			if app_state != null:
 				app_state.analytics.start_session("foreground")
+			if app_state != null and app_state.economy != null:
+				app_state.economy.local_notify.on_app_open()
 			if app_state != null and app_state.economy != null and not app_state.is_blocked and app_state.economy.returns.on_active()["opened"]:
 				request_home_ceremonies()
 		NOTIFICATION_APPLICATION_FOCUS_OUT:
 			flush_lifecycle("focus_out")
 		NOTIFICATION_WM_CLOSE_REQUEST:
+			_schedule_reminder()
 			flush_lifecycle("close_request")
 			if app_state != null:
 				app_state.analytics.end_session("close")

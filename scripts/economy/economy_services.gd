@@ -37,6 +37,7 @@ const EventService = preload("res://scripts/economy/event_service.gd")
 const ReturnService = preload("res://scripts/economy/return_service.gd")
 const NotificationPolicy = preload("res://scripts/economy/notification_policy.gd")
 const NotificationPermission = preload("res://scripts/economy/notification_permission.gd")
+const LocalNotifications = preload("res://scripts/economy/local_notifications.gd")
 const RewardedDailyService = preload("res://scripts/economy/rewarded_daily_service.gd")
 const FtueState = preload("res://scripts/economy/ftue_state.gd")
 
@@ -76,6 +77,8 @@ var returns: ReturnService
 var notify: NotificationPolicy
 ## SB-M43-146: contextual OS notification permission (asked / declined state; Android only).
 var notify_permission: NotificationPermission
+## SB-M43-172: OS-scheduled local reminder (native ScrubbotsNotify; no-op without it).
+var local_notify: LocalNotifications
 ## M43-C015R Rewarded Ads daily track. No save section: state is derived from the canonical
 ## reward ledger (daily_rewarded:<day>:<slot> ids).
 var rewarded_daily: RewardedDailyService
@@ -102,6 +105,7 @@ func _init(config_path: String = EconomyConfig.DEFAULT_PATH, clock: Callable = C
 	returns = ReturnService.new(clock)
 	notify = NotificationPolicy.new()
 	notify_permission = NotificationPermission.new(clock)
+	local_notify = LocalNotifications.new(notify, notify_permission, clock)
 	collection = CollectionInventory.new(config, reward)
 	packs = CardPackService.new(collection, pack_rng)
 	pack_receipts = PackReceiptLedger.new()
@@ -190,6 +194,7 @@ func snapshot() -> Dictionary:
 		"return": returns.snapshot(),
 		"notifications": notify.snapshot(),
 		"notify_permission": notify_permission.snapshot(),
+		"local_notify": local_notify.snapshot(),
 		"ftue": ftue.snapshot(),
 	}
 
@@ -233,7 +238,7 @@ func _apply_sections(s) -> bool:
 	if not orders.import_snapshot(s["daily_orders"] if s.has("daily_orders") else null):
 		return false
 	# M43-C010 / C012: absent = older save (fresh); present = strict.
-	for pair in [["records", records], ["events", events], ["return", returns], ["notifications", notify], ["notify_permission", notify_permission]]:
+	for pair in [["records", records], ["events", events], ["return", returns], ["notifications", notify], ["notify_permission", notify_permission], ["local_notify", local_notify]]:
 		if not pair[1].import_snapshot(s[pair[0]] if s.has(pair[0]) else null):
 			return false
 	# M44: absent = a pre-M44 save (established player, never a beginner); present = strict.
