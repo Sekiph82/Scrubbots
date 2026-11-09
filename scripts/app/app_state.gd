@@ -132,6 +132,8 @@ func _init(save_path: String = CANONICAL_SAVE_PATH, clock: Callable = Callable()
 			unlocks.cfg["unlocks"][id] = 1
 	# M43-C003: a committed rewarded grant hits the canonical save boundary.
 	economy.rewarded.bind_save(Callable(self, "request_save"))
+	# SB-M57-012/013: a committed store grant is saved before the store is acknowledged.
+	economy.store.bind_save(Callable(self, "request_save"))
 	var croot := content_root
 	if croot.is_empty():
 		croot = RemoteContentManager.DEFAULT_ROOT if save_path == CANONICAL_SAVE_PATH else save_path.get_basename() + "_content/"

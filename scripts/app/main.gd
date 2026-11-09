@@ -181,6 +181,13 @@ func _ready() -> void:
 	_home.nav_requested.connect(_on_home_nav)
 	_home.set_app_shortcuts(APP_SHORTCUTS)
 	_home.set_app_nav(APP_NAV)
+	# SB-M57-013: the No Ads entitlement collapses the Home bottom banner slot (live after a buy / restore).
+	if app_state != null and app_state.economy != null:
+		var store = app_state.economy.store
+		var banner := func(): _home.set_ad_slot_enabled(store.ads_allowed("banner"))
+		banner.call()
+		store.resolved.connect(banner.unbind(2))
+		store.restored.connect(banner.unbind(1))
 	# M50-BOARD: the persisted COLOR SYMBOLS setting drives every symbol surface, live.
 	if app_state != null and app_state.effects != null:
 		ColorSymbols.set_enabled(app_state.effects.is_color_symbols(), get_tree())

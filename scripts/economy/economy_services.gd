@@ -41,6 +41,7 @@ const NotificationPermission = preload("res://scripts/economy/notification_permi
 const LocalNotifications = preload("res://scripts/economy/local_notifications.gd")
 const RewardedDailyService = preload("res://scripts/economy/rewarded_daily_service.gd")
 const FtueState = preload("res://scripts/economy/ftue_state.gd")
+const StoreService = preload("res://scripts/economy/store_service.gd")
 
 const GUARANTEED_NEW_FALLBACK_SB := 500
 
@@ -87,6 +88,8 @@ var local_notify: LocalNotifications
 var rewarded_daily: RewardedDailyService
 ## M44: first-time-experience presentation state (profile kind, Skip Tips, acknowledged tips).
 var ftue: FtueState
+## SB-M57-012/013: real-money store (SB packs + No Ads entitlement; shipping provider = unavailable).
+var store: StoreService
 
 ## local_day: Daily local-calendar ordinal provider (M39 V04, F-M39-V03-002).
 ## Omitted in production -> DailyService uses LocalCalendar.system_provider().
@@ -122,6 +125,7 @@ func _init(config_path: String = EconomyConfig.DEFAULT_PATH, clock: Callable = C
 	rewarded = RewardedGrantService.new(reward, hearts)
 	rewarded_daily = RewardedDailyService.new(reward, rewarded, Callable(daily, "local_day"))
 	ftue = FtueState.new()
+	store = StoreService.new(reward)
 	_register_handlers()
 
 func _register_handlers() -> void:
@@ -171,6 +175,7 @@ func _register_handlers() -> void:
 		var id: String = b
 		reward.register_handler(RewardedGrantService.RES_BOOSTER_PREFIX + id, func(n):
 			boosters.add_charges(id, n))
+	reward.register_handler(StoreService.RES_NO_ADS, func(_n): store.grant_no_ads())
 
 ## M55-C001 (SB-M55-010): release a graph that is being discarded. The reward handlers
 ## (registered above and RewardGrantService's own defaults) are lambdas that capture
@@ -207,6 +212,7 @@ func snapshot() -> Dictionary:
 		"notify_permission": notify_permission.snapshot(),
 		"local_notify": local_notify.snapshot(),
 		"ftue": ftue.snapshot(),
+		"store": store.snapshot(),
 	}
 
 ## Independently all-or-nothing import (F-M39-005). Captures the exact current
@@ -254,6 +260,9 @@ func _apply_sections(s) -> bool:
 			return false
 	# M44: absent = a pre-M44 save (established player, never a beginner); present = strict.
 	if not ftue.import_snapshot(s["ftue"] if s.has("ftue") else null):
+		return false
+	# SB-M57-013: absent = a save from before the store (no No Ads entitlement); present = strict.
+	if not store.import_snapshot(s["store"] if s.has("store") else null):
 		return false
 	# M43-C005-C008: key ABSENT = pre-C008 save (keep the live OS-seeded RNG / empty ledger).
 	# Key PRESENT = strict C008 schema; an empty or partial section fails closed.
