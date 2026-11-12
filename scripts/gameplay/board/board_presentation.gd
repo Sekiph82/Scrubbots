@@ -22,7 +22,12 @@ extends Node2D
 ## agents inherit this transform.
 
 const BoardRenderer = preload("res://scripts/gameplay/board/board_renderer.gd")
+## BG01 Midnight Slate (palette V3 gameplayBackground, owner-locked): one rect under exactly the
+## board rect so CLEARED cells and the edge rows show BG01 rather than the baked shell's blue
+## field / bright aperture bevel the outer cells overhang on large boards (SB-PHONE-2026-11-12-D).
+const BG01 := Color8(32, 37, 51)
 
+var _background: ColorRect  # BoardBackground: created once, first child, never per cell
 var _renderer  # BoardRenderer (Control)
 var _agent_layer: Node2D
 ## M31 identity-stable presentation-only cleaning-effect layer. Created ONCE, shares this
@@ -64,6 +69,13 @@ var _presentation_generation: int = 0
 ## the AgentLayer, and the ScrubRailView the screen inserts, survive untouched because
 ## neither node is replaced or reordered here.
 func configure(board, palette: PackedStringArray, available_size: Vector2) -> void:
+	if _background == null or not is_instance_valid(_background):
+		_background = ColorRect.new()
+		_background.name = "BoardBackground"
+		_background.color = BG01
+		_background.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		add_child(_background)
+		move_child(_background, 0)
 	if _renderer == null or not is_instance_valid(_renderer):
 		_renderer = BoardRenderer.new()
 		_renderer.name = "BoardRenderer"
@@ -71,6 +83,8 @@ func configure(board, palette: PackedStringArray, available_size: Vector2) -> vo
 		_renderer.position = Vector2.ZERO
 	_renderer.configure(board, palette, available_size)
 	_renderer.position = Vector2.ZERO
+	_background.position = Vector2.ZERO
+	_background.size = _renderer.size
 
 	if _agent_layer == null or not is_instance_valid(_agent_layer):
 		_agent_layer = Node2D.new()
@@ -150,6 +164,9 @@ func get_presentation_generation() -> int:
 
 func get_renderer():
 	return _renderer
+
+func get_background() -> ColorRect:
+	return _background
 
 func get_agent_layer() -> Node2D:
 	return _agent_layer
