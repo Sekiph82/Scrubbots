@@ -57,7 +57,7 @@ func plays() -> int:
 func interstitial_due() -> bool:
 	return allowed("interstitial") and _plays - _last_interstitial >= INTERVAL
 
-## Between levels only (main.gd Results -> Continue / Retry). True when an ad was shown.
+## Between levels only (main.gd Home PLAY / Results Retry). True when an ad was shown.
 func try_interstitial() -> bool:
 	if not interstitial_due() or not _provider.show_interstitial(PLACEMENT_INTERSTITIAL):
 		return false
