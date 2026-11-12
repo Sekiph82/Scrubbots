@@ -1,0 +1,2 @@
+# Decision 151-board-top-contrast — APPROVE (orchestrator, CLAUDE_PEER_REVIEW round 1 PASS)
+Root cause: board had no own backdrop; CLEARED cells showed the shell's navy field instead of BG01, and on >31-cell boards the outer row sat on the bright bevel (C08 1.07:1). Fix: one BG01 ColorRect under the BoardRenderer. Review round-1 PASS (board_bg01_backdrop 4/4, m32_c002 86/86 re-run by reviewer). Known pre-existing flake: m50_color_symbols 300-rebind timing check fails on main too. Trade-off: C16 black on BG01 1.37:1 (BG01 is owner-locked; grid outline kept).
