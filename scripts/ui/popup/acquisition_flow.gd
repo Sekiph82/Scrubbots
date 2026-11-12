@@ -132,7 +132,7 @@ func open_life(source: String):
 	count.set_anchors_preset(Control.PRESET_FULL_RECT)
 	heart.add_child(count)
 	p.add_body_line("", "HeartsOfMax")
-	# Timer panel: "Next life in:" + clock pill (live) / full ready state (static 15:00).
+	# Timer panel: "Next life in:" + clock pill (live) / at max only "Hearts full!" (pill hidden).
 	var panel := PanelContainer.new()
 	panel.name = "TimerPanel"
 	panel.add_theme_stylebox_override("panel", HomeStyle.pad(HomeStyle.box(BasePopup.ROW, Color(0.890, 0.765, 0.545), 3, 26, 0), UiTokens.SPACE_MD, UiTokens.SPACE_SM))
@@ -207,8 +207,9 @@ func _refresh_life(p) -> void:
 	(p.find_child("HeartCount", true, false) as Label).text = str(v["hearts"])
 	(p.find_child("HeartsOfMax", true, false) as Label).text = UiText.t("LIFE_HEARTS", [v["hearts"], v["max"]])
 	(p.find_child("TimerTitle", true, false) as Label).text = UiText.t("LIFE_FULL" if full else "LIFE_NEXT_IN")
-	# Full: canonical static ready state (the regen interval, 15:00); no second timer.
-	(p.find_child("TimerValue", true, false) as Label).text = _mmss(v["regen_seconds"] if full else v["seconds_to_next"])
+	# Full: no countdown at all (owner 2026-11-12); the pill shows only below max.
+	(p.find_child("TimerPill", true, false) as Control).visible = not full
+	(p.find_child("TimerValue", true, false) as Label).text = "" if full else _mmss(v["seconds_to_next"])
 	(p.find_child("Balance", true, false) as Label).text = UiText.t("ACQ_BALANCE", [UiText.num(v["sb"])])
 	var b1: Button = p.get_action_button("heart_plus_one")
 	b1.text = UiText.t("ACQ_PRICE_SB", [UiText.num(v["plus_one_sb"])])

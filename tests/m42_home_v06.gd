@@ -11,6 +11,7 @@ const HomeScreenScene = preload("res://scenes/ui/home/home_screen.tscn")
 const HS = preload("res://scripts/ui/home/home_screen.gd")
 const LocalCalendar = preload("res://scripts/economy/local_calendar.gd")
 const V = preload("res://scripts/tools/home_asset_manifest_validator.gd")
+const UiText = preload("res://scripts/ui/ui_text.gd")
 
 const WORLD_PATH := "res://assets/ui/final/home/worlds/world_01_whispering_park_1080x2160.png"
 const WORLD_SHA := "8e04eda668aabd9f96172c0e82fd7dd47e61083cb691402a313120443a525e5b"
@@ -221,10 +222,10 @@ func _hearts() -> void:
 	var timer: Label = home.get_region("HeartsChip").value_label
 	_ok(app.economy.config.hearts_regen_seconds() == 900, "canonical regen interval 900 s")
 	_ok(count.get_parent() == home.get_region("HeartsChip").icon and count.text == "5" and count.get_theme_color("font_color") == Color(1, 1, 1) and count.get_theme_constant("outline_size") >= 10, "full: white outlined '5' on the heart icon")
-	_ok(timer.text == "15:00" and timer.text.find("/") == -1, "full: pill shows static 15:00 (no N/5)")
+	_ok(timer.text == UiText.t("LIFE_REFILL_FULL") and timer.text.find("/") == -1 and timer.text.find(":") == -1, "full: pill shows FULL, no countdown (no N/5) (%s)" % timer.text)
 	_now += 600
 	home.refresh()
-	_ok(timer.text == "15:00", "full: static, does not tick")
+	_ok(timer.text == UiText.t("LIFE_REFILL_FULL"), "full: static FULL, does not tick")
 	h.consume()
 	home.refresh()
 	_ok(count.text == "4" and timer.text == "15:00" and h.seconds_to_next() == 900, "consume from full: 4 on the icon, countdown starts at 15:00")
@@ -236,7 +237,7 @@ func _hearts() -> void:
 	_ok(timer.text == "00:01" and count.text == "4", "+899 s total: 00:01, no regen yet")
 	_now += 1
 	home.refresh()
-	_ok(count.text == "5" and timer.text == "15:00", "+900 s: regenerated to 5, back to static 15:00")
+	_ok(count.text == "5" and timer.text == UiText.t("LIFE_REFILL_FULL"), "+900 s: regenerated to 5, back to FULL (no timer)")
 	h.consume(); h.consume()
 	home.refresh()
 	_ok(count.text == "3" and timer.text == "15:00", "two consumed: 3, countdown from 15:00")

@@ -110,7 +110,7 @@ func _home_full_state() -> void:
 	var home = root.get_home()
 	_ok(app.economy.hearts.hearts() == 5, "fresh profile full Hearts")
 	var txt: String = home.get_region("HeartsChip").value_label.text
-	_ok(txt == "15:00", "Home full Heart pill shows the 900 s ready state 15:00 (got %s)" % txt)
+	_ok(txt == "FULL", "Home full Heart pill shows FULL, no 15:00 countdown at max (SB-PHONE-2026-11-12-C) (got %s)" % txt)
 	root.free()
 	MainScript.boot_save_path_override = ""
 

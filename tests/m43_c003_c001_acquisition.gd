@@ -252,14 +252,14 @@ func _c03_life_live_values() -> void:
 	_complete("c03_life_live_values")
 
 func _c04_life_full_state() -> void:
-	print("[4 5/5 Life full state: static ready, no second timer]")
+	print("[4 5/5 Life full state: Hearts full, no timer]")
 	_set_hearts(5)
 	var p = await _open_life()
-	_ok(_txt(p, "TimerTitle") == UiText.t("LIFE_FULL") and _txt(p, "TimerValue") == "15:00", "full: static 15:00 ready state")
+	_ok(_txt(p, "TimerTitle") == UiText.t("LIFE_FULL") and not (p.find_child("TimerPill", true, false) as Control).visible and _txt(p, "TimerValue") == "", "full: Hearts full title, timer pill hidden (no 15:00)")
 	_ok(p.get_action_button("heart_plus_one").disabled and p.get_action_button("heart_refill").disabled and p.get_action_button("watch").disabled, "offers disabled at full")
 	_now[0] += 5000
 	await create_timer(1.2).timeout
-	_ok(_txt(p, "TimerValue") == "15:00" and _eco().hearts.hearts() == 5, "time passes: still 15:00, still 5")
+	_ok(not (p.find_child("TimerPill", true, false) as Control).visible and _eco().hearts.hearts() == 5, "time passes: still no timer, still 5")
 	_press(p, "heart_plus_one")
 	_ok(_eco().wallet.scrub_bucks() == 1000, "blocked +1 at full spends nothing")
 	await _clear()

@@ -1304,12 +1304,12 @@ func _render_values() -> void:
 	var sb: UiValueChip = _nodes["ScrubBucksChip"]
 	sb.set_tag(UiText.t("HOME_CURRENCY_SB"))
 	sb.set_value(UiText.num(_vm["scrub_bucks"]))
-	# V06: count on the heart icon; the pill shows ONLY the regen clock — a static
-	# full-interval ready state (15:00) at max, else HeartService.seconds_to_next().
+	# V06: count on the heart icon; the pill shows the regen clock
+	# (HeartService.seconds_to_next()) only below max; at max it reads FULL (owner 2026-11-12).
 	var hearts: UiValueChip = _nodes["HeartsChip"]
 	(_nodes["HeartsCount"] as Label).text = str(_vm["hearts"])
 	var full: bool = _vm["hearts"] >= _vm["hearts_max"]
-	hearts.set_value(_mmss(int(_app.economy.config.hearts_regen_seconds()) if full else _vm["heart_seconds_to_next"]))
+	hearts.set_value(UiText.t("LIFE_REFILL_FULL") if full else _mmss(_vm["heart_seconds_to_next"]))
 	hearts.set_sub("")
 	# SB-POLISH-002: the bar fills towards the NEXT milestone (0/1, 1/5, ... 500/1,000). The
 	# overlay gets the same 0..next scale, so it draws only the current gap's micro-ticks.
@@ -1518,7 +1518,7 @@ func _render_daily(popup: HomePopup) -> void:
 			row["action_text"] = UiText.t("POPUP_CLAIM")
 			row["action_enabled"] = not _app.is_blocked
 		rows.append(row)
-	popup.set_content(UiText.t("DAILY_TITLE"), rows, UiText.tn("DAILY_STREAK", int(d.streak()), [UiText.num(int(d.streak()))]))
+	popup.set_content(UiText.t("DAILY_TITLE"), rows, UiText.tn("DAILY_STREAK", int(d.display_streak()), [UiText.num(int(d.display_streak()))]))
 
 func _on_popup_action(action_id: String, popup_id: String) -> void:
 	if _app == null or _app.is_blocked:

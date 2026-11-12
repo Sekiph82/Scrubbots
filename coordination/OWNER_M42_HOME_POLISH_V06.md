@@ -109,7 +109,7 @@ Heart display:
 - overlay the current heart count as a large pure-white number directly on top of the red heart icon itself, with a dark outline for readability.
 - when full, show `5` on the heart icon.
 - the pill body displays the regen clock.
-- at full Hearts, pill displays static ready-state **15:00** and does not count down.
+- at full Hearts, pill displays static ready-state **15:00** and does not count down. *(Superseded by owner phone test 2026-11-12, SB-PHONE-2026-11-12-C: at full Hearts the pill reads FULL / DOLU and the Life popup hides its timer; no 15:00 at max.)*
 - immediately after a Heart is consumed from full, countdown begins from 15:00 toward 00:00 using HeartService's wall-clock state.
 - while below max, display live `MM:SS` from `HeartService.seconds_to_next()`.
 - when a heart regenerates and more are still missing, reset display to the next 15:00 interval and continue.

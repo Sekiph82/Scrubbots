@@ -17,7 +17,7 @@ Canonical Heart rules now are:
 - full refill remains 400 Scrub Bucks per missing Heart;
 - clock-rollback safety remains required;
 - Home Heart timer uses HeartService as authority;
-- when full, the current V06 Home presentation may show the static 15:00 ready state.
+- when full, the current V06 Home presentation may show the static 15:00 ready state. *(Superseded 2026-11-12, SB-PHONE-2026-11-12-C: full shows FULL / DOLU, no timer.)*
 
 ## Supersession
 
