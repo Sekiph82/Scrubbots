@@ -1,0 +1,2 @@
+# Decision 154-artwork-ratio-drop — APPROVE (orchestrator, CLAUDE_PEER_REVIEW round 1 PASS)
+Owner amendment 2026-11-12 of ADR-030 D2: >= 200 non-VOID cells only; >= 25% of W*H removed. ProductionLevelValidator, tools/audit_level_art.py, ADR-030 (dated amendment), LEVEL_DATA_SPEC, LEVEL_ART_TECHNICAL_AUDIT, CLAUDE.md §7, tests/void_cells_c001.gd (56x56/700 accept, 56x56/199 reject; failed on old code first). No level data/art changed; audit 30/30 unchanged. Reviewer re-ran void_cells_c001 PASS. Follow-up (non-blocking): world10 manifest voidRule free text still mentions 25%.
