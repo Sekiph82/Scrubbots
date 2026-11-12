@@ -180,7 +180,7 @@ jobs:
                    m50_color_symbols m28_c002_c004_tile_visual m28_c002_c001_gameplay_v02 m47_touch_r01_mobile_ux \
                    m43_c003_c001_acquisition m46_performance m44_unlock_gate m44_contextual_coach m44_new_badge \
                    m43_c005_c072_feature_unlock_ceremony m43_c005_c074_c077_celebrations \
-                   m43_master_c005r_gift_micro_progress sb_polish_002_gift_meter sb_polish_004_006_ui_batch sb_polish_003_booster_vfx sb_m22_008_polish_013_slot_fx m43_master_c005_meta_ceremonies m43_c005f_phase6_unlock_feel \
+                   m43_master_c005r_gift_micro_progress sb_polish_002_gift_meter sb_polish_004_006_ui_batch sb_phone_2026_11_12_c_copy_state sb_polish_003_booster_vfx sb_m22_008_polish_013_slot_fx m43_master_c005_meta_ceremonies m43_c005f_phase6_unlock_feel \
                    m43_master_c006_shop m43_master_c007_collection m54_collection_set_master_exactly_once m43_master_c008_robots m54_regression_pack_022_027 \
                    m43_master_c010_meta m43_master_c011_c014 m44_pending_packs_gate m44_meta_l1_unlock_ftue m44_meta_verify_achievements_gift m43_master_c007r_pity campaign_l11_l30 m43_personal_ranks real_play_levels real_play_file_cli ui_vis_006_asset_qa m59_app_version m56_analytics_taxonomy m58_privacy_inventory m58_privacy_consent m54_regression_pack_028_036 m43_172_local_notifications m54_world_regression m60_release_gates m43_ranks_weekly m44_featured_card_onboarding m57_store_products m44_robot_assembly_stages m54_regression_pack_037_038 m57_ads_cadence m54_cloud_save_seam m49_ad_store_return_layout board_bg01_backdrop; do
             L="validate_logs/$s.log"
@@ -234,6 +234,12 @@ jobs:
             echo "M51 verdict=PASS (8/8)" | tee -a "$S"
           else
             echo "M51 verdict=FAIL (exact 8/8 summary missing)" | tee -a "$S"; fail=1
+          fi
+          # SB-PHONE-2026-11-12-C hearts-full / collection TR / Scrubby copy / one login streak: exact 8-case summary.
+          if grep -qxF 'SB-PHONE-2026-11-12-C copy/state evidence: PASS (8/8 cases, 0 fail)' validate_logs/sb_phone_2026_11_12_c_copy_state.log 2>/dev/null; then
+            echo "PHONE-1112C verdict=PASS (8/8)" | tee -a "$S"
+          else
+            echo "PHONE-1112C verdict=FAIL (exact 8/8 summary missing)" | tee -a "$S"; fail=1
           fi
           # M50 colour symbols + navy PLAY + HUD price: exact 10-case summary is mandatory.
           if grep -qxF 'M50 color symbols evidence: PASS (10/10 cases, 0 fail)' validate_logs/m50_color_symbols.log 2>/dev/null; then
