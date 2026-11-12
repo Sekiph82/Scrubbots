@@ -45,7 +45,7 @@ They may NEVER modify:
 
 | # | Robot | Role / personality | Main accent | Canonical perk |
 |---:|---|---|---|---|
-| 1 | **Scrubby** | The Leader. Friendly, balanced, optimistic face of the franchise. | Teal + cyan + leaf green | **Leader Baseline:** no economy modifier. Scrubby is the neutral reference character. |
+| 1 | **Scrubby** | The Leader. Friendly, balanced, optimistic face of the franchise. | Teal + cyan + leaf green | **Team Leader:** no economy modifier (player copy, owner 2026-11-12: "Scrubby gives no bonus; he leads the whole team."). Scrubby is the neutral reference character. |
 | 2 | **Moppy** | Floor-cleaning specialist. Hard-working, slightly clumsy, lovable. Mop-inspired tool silhouette. | Aqua + lime | **Clean Bonus:** +20% first-clear Scrub Bucks. |
 | 3 | **Bubbles** | Foam/detergent specialist. Round, energetic, bubbly tank silhouette. | Cyan + lavender | **Gift Sparkle:** +20% Scrub Bucks granted by Gift Bar rewards. |
 | 4 | **Spark** | Electrical maintenance / speed specialist. Slim, energetic, coil/antenna motifs. | Electric blue + yellow | **2x Saver:** 20% discount on paid 2x speed products. |

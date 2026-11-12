@@ -42,7 +42,6 @@ const ART := {
 }
 const RARITY_COLOR := {"COMMON": Color(0.47, 0.53, 0.62), "RARE": Color(0.10, 0.45, 0.92),
 	"EPIC": Color(0.56, 0.25, 0.86), "LEGENDARY": Color(0.92, 0.62, 0.05)}
-const RARITY_SHORT := {"COMMON": "C", "RARE": "R", "EPIC": "E", "LEGENDARY": "L"}
 const LIST_H := 1020.0
 
 static func card_key(card_id: String) -> String:
@@ -121,7 +120,7 @@ static func _set_row(p: BasePopup, e, n: int, row: Dictionary) -> Control:
 	var v := VBoxContainer.new()
 	v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	h.add_child(v)
-	var t := BasePopup.body_label(UiText.t("COLLECTION_SET_ROW", [n, String(row.get("name", ""))]), 26, BasePopup.INK)
+	var t := BasePopup.body_label(UiText.t("COLLECTION_SET_ROW", [n, UiText.data("SET_NAME_%d" % n, String(row.get("name", "")))]), 26, BasePopup.INK)
 	t.name = "Title"
 	t.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	v.add_child(t)
@@ -192,7 +191,7 @@ static func _refresh_album(p: BasePopup, e) -> void:
 		var parts: Array = []
 		for r in ["COMMON", "RARE", "EPIC", "LEGENDARY"]:
 			if burden.has(r):
-				parts.append("%s %d/%d" % [RARITY_SHORT[r], burden[r][0], burden[r][1]])
+				parts.append("%s %d/%d" % [UiText.t("RARITY_SHORT_" + r), burden[r][0], burden[r][1]])
 		(card.find_child("Progress", true, false) as Label).text = UiText.t("COLLECTION_PROGRESS", [have, 9])
 		(card.find_child("Burden", true, false) as Label).text = " · ".join(parts)
 		var rw := UiText.t("COLLECTION_REWARD", [UiText.num(int(row.get("scrub_bucks", 0))), UiText.num(int(row.get("bot_parts", 0)))])
