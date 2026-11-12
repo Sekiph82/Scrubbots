@@ -131,7 +131,7 @@ exists only for levels with VOID cells (ADR-030, owner 2026-10-08).
 - ACTIVE alpha is 255.
 - A fully transparent source pixel is a VOID cell (`cells` value `-1`, version 2 only): not
   artwork, never a candidate, starts CLEARED/open, renders like CLEARED (D1), never filled
-  with a colour. Production needs >= 200 non-VOID cells and >= 25% of W*H (D2).
+  with a colour. Production needs >= 200 non-VOID cells (D2, owner amendment 2026-11-12).
 - Local LevelData palette contains only used canonical colors, ascending global C-ID.
 - CLEARED alpha 0 is runtime state, not palette color.
 - BG01 Midnight Slate `#202533` is gameplay background, not a logical cell color.

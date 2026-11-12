@@ -69,7 +69,7 @@ Rules:
 - The board is still the full `width * height` grid; `get_cell_count()` is unchanged and `get_artwork_cell_count()` counts non-VOID cells.
 - Palette/colour rules (3..12 used colours, C01..C16, used-only ascending palette) count only non-VOID cells.
 - Supply conservation, WIN (all non-VOID cells cleared), solver and Difficulty V1 measurements use artwork cells only.
-- Production minimum artwork (owner D2): >= 200 non-VOID cells and >= 25% of `width * height`.
+- Production minimum artwork (owner D2, amended 2026-11-12): >= 200 non-VOID cells (the former >= 25% of `width * height` condition is removed).
 
 ## 3. Structural validation
 
@@ -100,7 +100,7 @@ Current engine/content envelope:
 - height: 20..59;
 - rectangular boards allowed;
 - maximum 59x59 = 3481 logical cells;
-- minimum artwork (ADR-030 D2): >= 200 non-VOID cells and >= 25% of W*H (always true for a void-free board).
+- minimum artwork (ADR-030 D2, amended 2026-11-12): >= 200 non-VOID cells (always true for a void-free board).
 
 This envelope is **not** an EASY/MEDIUM/HARD/VERY_HARD mapping.
 

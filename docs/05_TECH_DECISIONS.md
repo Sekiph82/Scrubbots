@@ -1068,7 +1068,8 @@ Separating wallet/reward/entitlement/inventory services from gameplay and UI pre
 **Owner decision (2026-10-08)**: pixel-art levels may contain transparent pixels. A transparent pixel is a **VOID** cell: it is not artwork, never needs a robot and starts the level as open space. Filling transparent pixels with a colour is forbidden (it changes the puzzle). Levels without VOID behave exactly as before.
 
 - **D1 presentation**: VOID renders exactly like a CLEARED cell: the BG01 `#202533` gameplay background shows through an alpha-0 texel, with no grid/border/bevel (the pixel-grid shader already emits nothing for alpha < 0.5).
-- **D2 minimum artwork**: a production level needs **>= 200 non-VOID cells AND >= 25% of W*H** non-VOID. The 20..59 per-dimension envelope is unchanged and the board stays the full W x H (VOID never shrinks it).
+- **D2 minimum artwork**: a production level needs **>= 200 non-VOID cells**. The 20..59 per-dimension envelope is unchanged and the board stays the full W x H (VOID never shrinks it).
+  - 2026-11-12 owner amendment: the >= 25% of W*H condition is removed; >= 200 non-VOID cells remains.
 
 **Decision**:
 

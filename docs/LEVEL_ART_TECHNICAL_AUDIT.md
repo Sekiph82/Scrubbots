@@ -21,7 +21,7 @@ Regenerate (deterministic, stdlib Python, exit 1 on any FAIL):
   interpolation (smooth resampling). Ceiling: an exact nearest-neighbour *fractional* upscale that keeps
   palette colours would read as block 1.
 - **Envelope**: logical width and height 20..59 (CLAUDE.md §6); with any VOID, D2 needs >= 200 non-VOID
-  cells and >= 25% of W*H (ADR-030).
+  cells (ADR-030, owner amendment 2026-11-12).
 - **Palette mapping**: each source colour maps to C01..C16 of `data/palettes/scrubbots_palette_v3.json` by
   exact RGB match, else REJECTED (the nearest C-ID is printed for information only). Never C17+.
 

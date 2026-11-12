@@ -22,7 +22,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PALETTE = os.path.join(ROOT, "data", "palettes", "scrubbots_palette_v3.json")
 SOURCE_GLOB = os.path.join(ROOT, "assets", "art", "levels", "source", "**", "*.png")
 ENVELOPE_MIN, ENVELOPE_MAX = 20, 59  # CLAUDE.md section 6 / DifficultyRules
-MIN_ARTWORK_CELLS, MIN_ARTWORK_FRACTION = 200, 0.25  # ADR-030 D2 / ProductionLevelValidator
+MIN_ARTWORK_CELLS = 200  # ADR-030 D2 (owner amendment 2026-11-12) / ProductionLevelValidator
 COLOR_MIN, COLOR_MAX = 3, 12  # palette V3 usedColorEnvelopeV1
 
 
@@ -128,7 +128,7 @@ def audit(name, w, h, rows, palette):
         fails.append("width %d outside %d..%d" % (gw, ENVELOPE_MIN, ENVELOPE_MAX))
     if not (ENVELOPE_MIN <= gh <= ENVELOPE_MAX):
         fails.append("height %d outside %d..%d" % (gh, ENVELOPE_MIN, ENVELOPE_MAX))
-    if void and (nonvoid_cells < MIN_ARTWORK_CELLS or nonvoid_cells < MIN_ARTWORK_FRACTION * gw * gh):
+    if void and nonvoid_cells < MIN_ARTWORK_CELLS:
         fails.append("D2: %d non-VOID cells of %d" % (nonvoid_cells, gw * gh))
     if partial:
         fails.append("%d semi-transparent pixels" % partial)

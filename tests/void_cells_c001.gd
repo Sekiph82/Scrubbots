@@ -1,7 +1,7 @@
 extends SceneTree
 ## VOID-CELLS-C001 — transparent artwork pixels as first-class VOID cells (ADR-030,
 ## owner decision 2026-10-08; D1 VOID renders exactly like CLEARED, D2 production
-## artwork >= 200 cells and >= 25% of W*H).
+## artwork >= 200 cells; the 25%-of-W*H ratio was removed by owner amendment 2026-11-12).
 ##
 ## Direct assertions against the real stack: LevelLoader/LevelValidator,
 ## ProductionLevelValidator, BoardState, ColorCandidateIndex, BoardRenderer,
@@ -225,9 +225,11 @@ func _production_d2() -> void:
 	var a200 = _art_level(20, 20, 200)
 	_ok(not ProductionLevelValidator.validate(a199).is_ok(), "20x20 with 199 artwork cells rejected (< 200)")
 	_ok(ProductionLevelValidator.validate(a200).is_ok(), "20x20 with 200 artwork cells accepted")
-	# 40x40 = 1600: 399 artwork (< 25% = 400) rejected even though >= 200; 400 accepted.
-	_ok(not ProductionLevelValidator.validate(_art_level(40, 40, 399)).is_ok(), "40x40 with 399 artwork (< 25%) rejected")
-	_ok(ProductionLevelValidator.validate(_art_level(40, 40, 400)).is_ok(), "40x40 with 400 artwork (== 25%) accepted")
+	# Owner amendment 2026-11-12: no 25%-of-board ratio, only the 200-cell floor.
+	_ok(ProductionLevelValidator.validate(_art_level(40, 40, 399)).is_ok(), "40x40 with 399 artwork (< 25%) accepted")
+	# 56x56 = 3136 (Factory PixelLab canvas): 700 artwork (~22%) accepted, 199 rejected.
+	_ok(ProductionLevelValidator.validate(_art_level(56, 56, 700)).is_ok(), "56x56 with 700 artwork (< 25%) accepted")
+	_ok(not ProductionLevelValidator.validate(_art_level(56, 56, 199)).is_ok(), "56x56 with 199 artwork cells rejected (< 200)")
 	# Envelope unchanged: 19 / 60 still rejected regardless of VOID.
 	_ok(not ProductionLevelValidator.validate(_art_level(19, 40, 500)).is_ok(), "envelope 20..59 still enforced")
 
