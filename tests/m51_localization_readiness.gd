@@ -229,9 +229,8 @@ func _l07() -> void:
 	_root.open_settings()
 	await _frames(4)
 	var panel = _root.get_settings_panel()
-	var body: Node = panel.find_child("Body", true, false)
 	var order: Array = []
-	for c in body.get_children():
+	for c in panel.find_child("Cards", true, false).get_children():
 		if String(c.name).begins_with("Card_"):
 			order.append(String(c.name))
 	_ok(order.slice(-4) == ["Card_HapticsToggle", "Card_ReducedEffectsToggle", "Card_ColorSymbolsRow", "Card_LanguageRow"], "one LANGUAGE card added after the existing cards, Reduced Effects in place %s" % str(order))

@@ -249,10 +249,11 @@ static func open_daily(stack, app) -> BasePopup:
 		return null
 	return p
 
-## R15-003: three cards + two gaps fit the large frame's 652 px body at its 880 px reference
-## width (3 x 210 + 2 x 8 = 646), so the grid can never push the body past the frame.
+## R15-003: three cards + two gaps fit the large frame's body at its 880 px reference width
+## (642 px since SB-PHONE-2026-11-12-A; 3 x 203 + 2 x 8 = 625), so the grid can never push the
+## body past the frame.
 const CALENDAR_SIZE := Vector2(132, 132)
-const DAY_CARD_SIZE := Vector2(210, 280)
+const DAY_CARD_SIZE := Vector2(203, 280)
 const CHECK_SIZE := 34
 ## Card insets keep every label / check clear of the frame art (top gem, Day 5 crown).
 const DAY_CARD_INSET := {"side": 26, "top": 46, "top_day5": 56, "bottom": 30}

@@ -109,7 +109,7 @@ func _p02() -> void:
 	_ok(Rect2(Vector2.ZERO, Vector2(_sub.size)).encloses(frame.get_global_rect()), "Settings frame fits %s: %s" % [str(_sub.size), str(frame.get_global_rect())])
 	var body: Node = panel.find_child("Body", true, false)
 	var cards: Array = []
-	for c in body.get_children():
+	for c in panel.find_child("Cards", true, false).get_children():
 		if String(c.name).begins_with("Card_"):
 			cards.append(String(c.name))
 	_ok(cards.slice(-4) == ["Card_HapticsToggle", "Card_ReducedEffectsToggle", "Card_ColorSymbolsRow", "Card_LanguageRow"], "cards unchanged, Reduced Effects in place %s" % str(cards))

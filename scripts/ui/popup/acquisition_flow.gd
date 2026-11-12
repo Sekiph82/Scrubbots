@@ -854,8 +854,8 @@ func _badge(b: Button, icon_path: String, text: String) -> void:
 	badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	badge.anchor_left = 1.0
 	badge.anchor_right = 1.0
-	badge.offset_left = -64
-	badge.offset_right = 12
+	badge.offset_left = -68
+	badge.offset_right = 8   # overhang stays inside the popup frame's clear interior
 	badge.offset_top = -22
 	badge.offset_bottom = 54
 	b.add_child(badge)

@@ -43,7 +43,7 @@ const ART := {
 	"selector": "res://assets/ui/final/boosters/selector.png",
 	"tornado": "res://assets/ui/final/boosters/tornado.png",
 }
-const LIST_H := 1040.0
+const LIST_H := 1020.0   # the frame + list fit a 1080x1920 safe area (SB-PHONE-2026-11-12-A)
 
 var popup: BasePopup
 var _stack

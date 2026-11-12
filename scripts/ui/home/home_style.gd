@@ -168,6 +168,29 @@ static func fit_font(c: Control, px: int, width: float) -> void:
 		fs -= 1
 	c.add_theme_font_size_override("font_size", fs)
 
+## SB-PHONE-2026-11-12-A: one-line Label / Button that never widens its parent; on every resize
+## its font shrinks from `px` (fit_font) to the width the layout gave it. Only text still wider
+## at the 60% floor wraps instead (never cut).
+static func fit_on_resize(c: Control, px: int) -> void:
+	c.set("autowrap_mode", TextServer.AUTOWRAP_OFF)
+	c.set("clip_text", true)
+	c.resized.connect(func():
+		fit_font(c, px, c.size.x)
+		var avail: float = c.size.x - c.get_theme_stylebox("normal").get_minimum_size().x
+		var wide: bool = c.get_theme_font("font").get_string_size(c.get("text"), HORIZONTAL_ALIGNMENT_LEFT, -1, c.get_theme_font_size("font_size")).x > avail
+		c.set("autowrap_mode", TextServer.AUTOWRAP_WORD_SMART if wide else TextServer.AUTOWRAP_OFF)
+		c.set("clip_text", not wide))
+
+## Shrink every Button / Label in `row` together from `px` (floor 60%) until the row's minimum
+## width fits `width` (side-by-side buttons sized by their own text, longest locale first).
+static func fit_row(row: Control, px: int, width: float) -> void:
+	for fs in range(px, int(px * 0.6) - 1, -1):
+		for c in row.get_children():
+			if c is Button or c is Label:
+				(c as Control).add_theme_font_size_override("font_size", fs)
+		if row.get_combined_minimum_size().x <= width:
+			return
+
 static func art(name: String) -> TextureRect:
 	var t := TextureRect.new()
 	t.name = name

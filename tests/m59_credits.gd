@@ -45,18 +45,22 @@ func _c01() -> void:
 	_ok(b.text == UiText.t("CREDITS_TITLE") and b.text == "CREDITS", "keyed label %s" % b.text)
 	_ok(b.size.y >= 88, "touch height %d >= 88" % int(b.size.y))
 	_ok(frame.get_global_rect().grow(0.5).encloses(b.get_global_rect()), "row inside the Settings frame")
-	_ok(frame.get_global_rect().size.y <= 1888.0, "Settings frame fits 1920 px with 16 px gutters %s" % str(frame.get_global_rect()))
+	# SB-PHONE-2026-11-12-A: the cards scroll on short screens, so the frame fits every viewport
+	# (1080x1920 itself: tests/m41_settings.gd).
+	var vp := Rect2(Vector2.ZERO, panel.get_viewport_rect().size).grow(-16.0)
+	_ok(vp.grow(0.5).encloses(frame.get_global_rect()), "Settings frame fits %s with 16 px gutters %s" % [str(vp.size), str(frame.get_global_rect())])
 	var body: Node = panel.find_child("Body", true, false)
-	var at := func(n: String) -> int:
+	var cards: Node = panel.find_child("Cards", true, false)
+	var at := func(n: String, parent: Node) -> int:
 		var node: Node = panel.find_child(n, true, false)
-		while node != null and node.get_parent() != body:
+		while node != null and node.get_parent() != parent:
 			node = node.get_parent()
 		return node.get_index() if node != null else -1
-	var hap: int = at.call("HapticsToggle")
-	_ok(hap > 0 and at.call("ReducedEffectsToggle") == hap + 1 and at.call("ColorSymbolsRow") == hap + 2 and at.call("LanguageRow") == hap + 3,
+	var hap: int = at.call("HapticsToggle", cards)
+	_ok(hap > 0 and at.call("ReducedEffectsToggle", cards) == hap + 1 and at.call("ColorSymbolsRow", cards) == hap + 2 and at.call("LanguageRow", cards) == hap + 3,
 		"Vibration / Reduced Effects / Color Symbols / Language keep their order")
-	_ok(at.call("CreditsButton") > hap + 3 and at.call("CreditsButton") == at.call("CloseButton") and b.get_index() == 0,
-		"CREDITS shares the CLOSE row after LANGUAGE (left of CLOSE)")
+	_ok(at.call("CreditsButton", body) > at.call("SettingsScroll", body) and at.call("CreditsButton", body) == at.call("CloseButton", body) and b.get_index() == 0,
+		"CREDITS shares the CLOSE row after the cards (left of CLOSE)")
 	_completed["c01_settings_row"] = true
 
 func _c02() -> void:

@@ -186,11 +186,14 @@ static func _tile(n: String, icon: String, caption: String, value: String, badge
 	col.alignment = BoxContainer.ALIGNMENT_CENTER
 	col.add_theme_constant_override("separation", 0)
 	row.add_child(col)
+	col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var cap := _text(caption, 26)
 	cap.name = "Caption"
+	HomeStyle.fit_on_resize(cap, 26)   # long locales ("Temizlenen Bölüm") stay inside the tile
 	col.add_child(cap)
 	var val := _text(value, 44)
 	val.name = "Value"
+	HomeStyle.fit_on_resize(val, 44)
 	col.add_child(val)
 	return t
 
@@ -210,6 +213,7 @@ static func _best_row(parent: Control, n: String, icon: String, label: String, c
 	var l := _text(label, 26)
 	l.name = "Label"
 	l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	HomeStyle.fit_on_resize(l, 26)
 	h.add_child(l)
 	var cur := _cell(UiText.num(current), 40)
 	cur.name = "Current"
@@ -344,6 +348,7 @@ static func _ach_card(a: Dictionary) -> PanelContainer:
 	row.add_child(col)
 	var t := _text(UiText.data("ACH_NAME_" + String(a["id"]).to_upper(), String(a["name"])), 32)
 	t.name = "Title"
+	HomeStyle.fit_on_resize(t, 32)
 	col.add_child(t)
 	var d := BasePopup.body_label(UiText.data("ACH_DESC_" + String(a["id"]).to_upper(), String(a["desc"])), 20)
 	d.name = "Desc"
@@ -572,6 +577,7 @@ static func open_ranks(stack, app) -> BasePopup:
 		var meter := UiProgressMeter.new("NextMeter")
 		meter.caption.add_theme_color_override("font_color", BasePopup.INK)
 		meter.caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		HomeStyle.fit_on_resize(meter.caption, UiTokens.FONT_BODY)
 		if r["next_id"] != "":
 			meter.set_progress(r["into"], r["span"], UiText.tn("RANKS_NEXT", int(r["next_min"]) - n, [UiText.num(int(r["next_min"]) - n), UiText.t(tiers[cur + 1]["name_key"])]))
 		else:

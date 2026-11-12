@@ -28,6 +28,7 @@ signal privacy_requested
 const BasePopup = preload("res://scripts/ui/popup/base_popup.gd")
 const HomeStyle = preload("res://scripts/ui/home/home_style.gd")
 const UiText = preload("res://scripts/ui/ui_text.gd")
+const TouchScroll = preload("res://scripts/ui/components/touch_scroll.gd")
 
 const BUSES := ["master", "music", "sfx"]
 ## M51: UiText keys (English unchanged: MASTER / MUSIC / SOUND FX).
@@ -56,6 +57,8 @@ var _status: Label
 var _cloud: Label
 var _built := false
 var _frame = null
+var _actions: HBoxContainer = null
+var _scroll: ScrollContainer = null
 
 func _ready() -> void:
 	_build()
@@ -153,18 +156,32 @@ func _build() -> void:
 	x.pressed.connect(close_panel)
 	head.add_child(x)
 
+	# SB-PHONE-2026-11-12-A: the cards scroll when the screen is too short for them (16:9
+	# phones, long locales); header, CREDITS / PRIVACY / CLOSE and the version stay put.
+	_scroll = ScrollContainer.new()
+	_scroll.name = "SettingsScroll"
+	_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	col.add_child(_scroll)
+	var list := VBoxContainer.new()
+	list.name = "Cards"
+	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	list.add_theme_constant_override("separation", 16)
+	_scroll.add_child(list)
+	TouchScroll.enable(_scroll)
+	list.minimum_size_changed.connect(_fit_height)
+
 	for bus in BUSES:
-		col.add_child(_card(_make_audio_row(bus)))
+		list.add_child(_card(_make_audio_row(bus)))
 
 	_haptics_toggle = _make_toggle(UiText.t("SETTINGS_VIBRATION"))
 	_haptics_toggle.name = "HapticsToggle"
 	_haptics_toggle.toggled.connect(_on_haptics_toggled)
-	col.add_child(_card(_haptics_toggle))
+	list.add_child(_card(_haptics_toggle))
 
 	_reduced_toggle = _make_toggle(UiText.t("SETTINGS_REDUCED_EFFECTS"))
 	_reduced_toggle.name = "ReducedEffectsToggle"
 	_reduced_toggle.toggled.connect(_on_reduced_toggled)
-	col.add_child(_card(_reduced_toggle))
+	list.add_child(_card(_reduced_toggle))
 
 	# M50-BOARD: COLOR SYMBOLS (board cells + Supply/Slots + booster chips), with the board
 	# magnifier hint under it.
@@ -182,7 +199,7 @@ func _build() -> void:
 	hint.add_theme_font_size_override("font_size", FONT_BODY)
 	_ink(hint)
 	sym_box.add_child(hint)
-	col.add_child(_card(sym_box))
+	list.add_child(_card(sym_box))
 
 	# M51 (SB-M51-005): LANGUAGE, one row (title + one button per launch language, each named in
 	# its own language); the active one shows pressed.
@@ -222,14 +239,14 @@ func _build() -> void:
 		b.pressed.connect(_on_language_pressed.bind(code))
 		_lang_buttons[code] = b
 		lang_line.add_child(b)
-	col.add_child(_card(lang_box))
+	list.add_child(_card(lang_box))
 
 	_status = Label.new()
 	_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_status.add_theme_font_size_override("font_size", FONT_BODY)
 	_ink(_status)
-	col.add_child(_status)
+	list.add_child(_status)
 
 	# SB-M43-156: one read-only cloud save status line ("NOT AVAILABLE" while no provider exists).
 	_cloud = Label.new()
@@ -238,13 +255,14 @@ func _build() -> void:
 	_cloud.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_cloud.add_theme_font_size_override("font_size", FONT_BODY)
 	_ink(_cloud)
-	col.add_child(_cloud)
+	list.add_child(_cloud)
 
 	# SB-M59-010 / SB-M58-008: CREDITS and PRIVACY share the CLOSE row, so the panel keeps its height.
 	var actions := HBoxContainer.new()
 	actions.name = "ActionRow"
 	actions.add_theme_constant_override("separation", 16)
 	col.add_child(actions)
+	_actions = actions
 	_credits = _make_row_button("CreditsButton", UiText.t("CREDITS_TITLE"))
 	_credits.pressed.connect(func(): credits_requested.emit())
 	actions.add_child(_credits)
@@ -262,6 +280,7 @@ func _build() -> void:
 	ver.add_theme_font_size_override("font_size", FONT_BODY)
 	_ink(ver)
 	col.add_child(ver)
+	_fit_frame()
 
 ## Tan row button (CREDITS / PRIVACY / CLOSE share one row).
 static func _make_row_button(n: String, text: String) -> Button:
@@ -273,7 +292,7 @@ static func _make_row_button(n: String, text: String) -> Button:
 	b.custom_minimum_size = Vector2(0, TOUCH_MIN)
 	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	b.add_theme_font_size_override("font_size", FONT_BUTTON)
-	var tan := HomeStyle.box(BasePopup.ROW, BasePopup.ROW_EDGE, 4, 30, 4, 4)
+	var tan := HomeStyle.pad(HomeStyle.box(BasePopup.ROW, BasePopup.ROW_EDGE, 4, 30, 4, 4), 16, 4)   # text clears the rounded ends
 	for st in ["normal", "hover", "pressed", "disabled"]:
 		b.add_theme_stylebox_override(st, tan)
 	b.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
@@ -293,9 +312,22 @@ func _notification(what: int) -> void:
 	if what == NOTIFICATION_RESIZED and _frame != null:
 		_fit_frame()
 
-## Frame width: the BasePopup reference width, bounded by the 16 px phone gutter.
+## Frame width: the BasePopup reference width, bounded by the 16 px phone gutter. The
+## CREDITS / PRIVACY / CLOSE row shrinks its font until it fits the frame (SB-PHONE-2026-11-12-A).
 func _fit_frame() -> void:
 	_frame.set_width(minf(BasePopup.FRAME_WIDTH, _ref_width() - 32.0))
+	if _actions != null:
+		HomeStyle.fit_row(_actions, FONT_BUTTON, _frame.body_width())
+	_fit_height()
+
+## The card list is as tall as its content, at most what the screen leaves (16 px gutters).
+func _fit_height() -> void:
+	if _scroll == null:
+		return
+	var fixed: float = _frame.get_combined_minimum_size().y - _scroll.get_combined_minimum_size().y
+	var vp := get_viewport()
+	var h: float = size.y if size.y > 0.0 else (vp.get_visible_rect().size.y if vp != null else 2160.0)
+	_scroll.custom_minimum_size.y = minf((_scroll.get_child(0) as Control).get_combined_minimum_size().y, h - 32.0 - fixed)
 
 func _ref_width() -> float:
 	if size.x > 0.0:
@@ -470,6 +502,7 @@ func _sync_from_state() -> void:
 		_status.text = UiText.t("SETTINGS_SAVE_BLOCKED")
 	else:
 		_status.text = ""
+	_status.visible = not _status.text.is_empty()
 	var cloud = _app.cloud if _app != null else null
 	var cs: String = cloud.state() if cloud != null and cloud.is_available() else "unavailable"
 	_cloud.text = UiText.t("SETTINGS_CLOUD", [UiText.t("CLOUD_STATE_" + cs.to_upper())])

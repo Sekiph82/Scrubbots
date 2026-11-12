@@ -130,7 +130,8 @@ static func _row(p: BasePopup, e, r: Dictionary, is_new: bool) -> Control:
 	var name_l := BasePopup.body_label("%d · %s" % [int(r["order"]), String(r["name"]).to_upper()], 28, BasePopup.ROYAL_EDGE)
 	name_l.name = "Name"
 	name_l.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-	name_l.autowrap_mode = TextServer.AUTOWRAP_OFF
+	name_l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	HomeStyle.fit_on_resize(name_l, 28)   # the row never widens past the frame
 	top.add_child(name_l)
 	var state := _chip("", Color(0.2, 0.66, 0.14), 18)
 	state.name = "State"
@@ -149,6 +150,7 @@ static func _row(p: BasePopup, e, r: Dictionary, is_new: bool) -> Control:
 	v.add_child(note)
 	var b := p.add_action("robot:" + id, "", "secondary", false, "", h)
 	b.custom_minimum_size = Vector2(210, 80)
+	HomeStyle.fit_on_resize(b, UiTokens.FONT_BUTTON)   # long labels (UNLOCK 250) shrink, never widen the row
 	return card
 
 static func _chip(text: String, bg: Color, fs: int) -> PanelContainer:
@@ -230,6 +232,8 @@ static func refresh(p: BasePopup, e) -> void:
 				note.text = UiText.t("ROBOTS_NOTE_LOCKED")
 				b.text = UiText.t("COLLECTION_DETAILS")
 				p.set_action_blocked("robot:" + id, false)
+		if b.is_inside_tree():
+			HomeStyle.fit_font(b, UiTokens.FONT_BUTTON, b.size.x)
 
 static func _on_action(stack, app, ceremonies, p: BasePopup, id: String) -> void:
 	if not id.begins_with("robot:"):

@@ -477,9 +477,10 @@ func _k19() -> void:
 	var prev: Button = d.get_action_button("prev")
 	var next: Button = d.get_action_button("next")
 	var grid: Control = d.find_child("Cards", true, false)
-	var fr: Rect2 = d.get_frame_rect()
 	_ok(prev.size.x >= 88 and prev.size.y >= 88 and next.size.x >= 88 and next.size.y >= 88 and prev.is_visible_in_tree() and next.is_visible_in_tree(), "arrow touch targets >= 88 px (%s, %s)" % [str(prev.size), str(next.size)])
-	_ok(fr.encloses(prev.get_global_rect()) and fr.encloses(next.get_global_rect()) and prev.get_global_rect().end.x <= grid.global_position.x and next.global_position.x >= grid.get_global_rect().end.x, "arrows on the left / right sides of the page, inside the frame, clear of the cards")
+	var back: Button = d.get_action_button("back")
+	var clear: Rect2 = d.find_child("Frame", true, false).get_clear_rect()
+	_ok(clear.encloses(prev.get_global_rect()) and clear.encloses(next.get_global_rect()) and prev.get_global_rect().end.x <= back.global_position.x and next.global_position.x >= back.get_global_rect().end.x 		and prev.global_position.y >= grid.get_global_rect().end.y, "arrows flank BACK below the cards, inside the frame's clear interior (SB-PHONE-2026-11-12-A)")
 	_root.flush_lifecycle("application_paused")   # set 15's own view marks saved
 	var dirty0: bool = _root.get_app_state().is_dirty()
 	d._on_action("next")

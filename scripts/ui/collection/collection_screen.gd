@@ -247,30 +247,17 @@ static func open_set(stack, app, n: int, on_close: Callable = Callable(), cache 
 	grid.add_theme_constant_override("h_separation", UiTokens.SPACE_SM)
 	grid.add_theme_constant_override("v_separation", UiTokens.SPACE_SM)
 	var center := CenterContainer.new()
-	center.set_anchors_preset(Control.PRESET_FULL_RECT)
 	center.add_child(grid)
-	# The 3-card grid already fills the frame interior, so the < / > pager sits over the frame's
-	# side borders: a plain Control sized to the grid, arrows anchored just outside it.
-	var pager := Control.new()
-	pager.name = "Pager"
-	pager.add_child(center)
-	p.get_content().add_child(pager)
-	center.minimum_size_changed.connect(func(): pager.custom_minimum_size = center.get_combined_minimum_size())
-	for side in [["prev", "COLLECTION_PREV_SET", 0.0, -1], ["next", "COLLECTION_NEXT_SET", 1.0, 1]]:
-		var b := p.add_action(side[0], UiText.t(side[1]), "secondary", false, "", pager)
-		b.accessibility_name = UiText.t("A11Y_PREV_SET" if side[3] < 0 else "A11Y_NEXT_SET")
-		b.custom_minimum_size = Vector2(UiTokens.TOUCH_MIN, UiTokens.TOUCH_MIN)
-		b.anchor_left = side[2]
-		b.anchor_right = side[2]
-		b.anchor_top = 0.5
-		b.anchor_bottom = 0.5
-		b.offset_left = -UiTokens.TOUCH_MIN - UiTokens.SPACE_SM if side[3] < 0 else UiTokens.SPACE_SM
-		b.offset_right = b.offset_left + UiTokens.TOUCH_MIN
-		b.offset_top = -UiTokens.TOUCH_MIN / 2.0
-		b.offset_bottom = UiTokens.TOUCH_MIN / 2.0
-	p.add_action("back", UiText.t("SHOP_BACK"), "secondary", true)
+	p.get_content().add_child(center)
+	# The 3-card grid fills the frame's clear interior, so the < / > pager flanks BACK in the
+	# footer row (SB-PHONE-2026-11-12-A: nothing sits on the frame's side bars).
+	for side in [["prev", "COLLECTION_PREV_SET", -1], ["back", "SHOP_BACK", 0], ["next", "COLLECTION_NEXT_SET", 1]]:
+		var b := p.add_action(side[0], UiText.t(side[1]), "secondary", side[2] == 0, "pager")
+		if side[2] != 0:
+			b.accessibility_name = UiText.t("A11Y_PREV_SET" if side[2] < 0 else "A11Y_NEXT_SET")
+			b.custom_minimum_size = Vector2(UiTokens.TOUCH_MIN, UiTokens.TOUCH_MIN)
+			b.size_flags_horizontal = Control.SIZE_FILL
 	_show_set(p, app, n, cache)
-	pager.custom_minimum_size = center.get_combined_minimum_size()
 	p.action_selected.connect(func(id, _c):
 		if id.begins_with("card:"):
 			if open_card(stack, app, id.substr(5), func(): _refresh_set(p, e), cache) == null:
@@ -330,7 +317,7 @@ static func _tile(p: BasePopup, e, cid: String, cache) -> Control:
 	tile.add_theme_constant_override("separation", 2)
 	var face := Control.new()
 	face.name = "Face"
-	face.custom_minimum_size = Vector2(210, 300)
+	face.custom_minimum_size = Vector2(203, 290)   # 3 columns fit the large frame's clear interior
 	tile.add_child(face)
 	var art := HomeStyle.art("CardArt")
 	art.set_anchors_preset(Control.PRESET_FULL_RECT)

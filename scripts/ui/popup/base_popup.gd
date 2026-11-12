@@ -36,14 +36,20 @@ const UiText = preload("res://scripts/ui/ui_text.gd")
 const HomeStyle = preload("res://scripts/ui/home/home_style.gd")
 const SafeAreaRootScene = preload("res://scenes/components/ui/common/safe_area_root.tscn")
 
-## Promoted common frames: texture size + measured cream-interior insets (texture px),
-## used as the 9-slice margins so corners/emblems never distort.
+## Promoted common frames (texture px, [left, top, right, bottom]), measured from the PNGs
+## (SB-PHONE-2026-11-12-A):
+##   patch: 9-slice margins. top / bottom end where the corner art (caps, orbs, brackets) and
+##          the cream interior's rounded corner end, so only straight bars and flat cream
+##          stretch and the corners never distort.
+##   clear: the largest cream-interior rect (flood fill from the centre, colour within 60 of
+##          it), trading 2 px of width for 1 px of height; the Body sits inside it, so no
+##          content reaches the corner art or the side bars (tests/m49_popup_frame_fit.gd).
 const FRAMES := {
-	"small": {"path": "res://assets/ui/final/common/frames/popup_small_frame.png", "tex": Vector2(1536, 1024), "patch": [176, 205, 176, 223]},
-	"medium": {"path": "res://assets/ui/final/common/frames/popup_medium_frame.png", "tex": Vector2(1212, 1298), "patch": [119, 169, 119, 185]},
-	"large": {"path": "res://assets/ui/final/common/frames/popup_large_frame.png", "tex": Vector2(1145, 1374), "patch": [125, 133, 126, 144]},
-	"reward": {"path": "res://assets/ui/final/common/frames/popup_reward_frame.png", "tex": Vector2(1199, 1312), "patch": [128, 331, 122, 216]},
-	"warning": {"path": "res://assets/ui/final/common/frames/popup_warning_frame.png", "tex": Vector2(1214, 1295), "patch": [119, 356, 120, 220]},
+	"small": {"path": "res://assets/ui/final/common/frames/popup_small_frame.png", "tex": Vector2(1536, 1024), "patch": [176, 370, 176, 389], "clear": [190, 259, 189, 305]},
+	"medium": {"path": "res://assets/ui/final/common/frames/popup_medium_frame.png", "tex": Vector2(1212, 1298), "patch": [119, 315, 119, 340], "clear": [142, 228, 140, 254]},
+	"large": {"path": "res://assets/ui/final/common/frames/popup_large_frame.png", "tex": Vector2(1145, 1374), "patch": [125, 264, 126, 273], "clear": [144, 255, 144, 265]},
+	"reward": {"path": "res://assets/ui/final/common/frames/popup_reward_frame.png", "tex": Vector2(1199, 1312), "patch": [128, 470, 122, 348], "clear": [146, 362, 147, 289]},
+	"warning": {"path": "res://assets/ui/final/common/frames/popup_warning_frame.png", "tex": Vector2(1214, 1295), "patch": [119, 465, 120, 320], "clear": [139, 372, 139, 320]},
 }
 const FRAME_WIDTH := 880.0      ## same reference width as the accepted Results frame
 const SIDE_GUTTER := 40.0
@@ -147,8 +153,8 @@ func _init(id: String = "popup") -> void:
 	_title = Label.new()
 	_title.name = "Title"
 	_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_title.add_theme_font_size_override("font_size", 44)
+	HomeStyle.fit_on_resize(_title, 44)   # one line in every locale (SB-PHONE-2026-11-12-A)
 	pill.add_child(_title)
 	_close = Button.new()
 	_close.name = "CloseButton"
@@ -204,6 +210,8 @@ func get_frame_texture_path() -> String:
 
 func set_title(text: String) -> void:
 	_title.text = text
+	if _title.size.x > 0.0:
+		HomeStyle.fit_font(_title, 44, _title.size.x)
 
 func get_title() -> String:
 	return _title.text
@@ -271,7 +279,7 @@ func add_action(id: String, text: String, style: String = "secondary", closes: b
 		b.add_theme_constant_override("outline_size", 10)
 		b.custom_minimum_size = Vector2(0, PRIMARY_HEIGHT)
 	else:
-		var sb := HomeStyle.box(ROW, ROW_EDGE, 4, 30, 4, 4)
+		var sb := HomeStyle.pad(HomeStyle.box(ROW, ROW_EDGE, 4, 30, 4, 4), 16, 4)   # text clears the rounded ends
 		for st in ["normal", "hover", "pressed", "disabled"]:
 			b.add_theme_stylebox_override(st, sb)
 		b.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
@@ -493,10 +501,11 @@ class FrameBox extends Container:
 	var _chrome: NinePatchRect
 	var _body: Control
 	var _patch: Array = [0, 0, 0, 0]
+	var _clear: Array = [0, 0, 0, 0]
 	var _tex_w := 1.0
 	var _width := 880.0
 	var _path := ""
-	const PAD := 18.0
+	const PAD := 8.0   ## breathing room inside the measured clear interior
 
 	func _init() -> void:
 		mouse_filter = Control.MOUSE_FILTER_STOP
@@ -513,6 +522,7 @@ class FrameBox extends Container:
 		_path = spec["path"]
 		_chrome.texture = load(_path) as Texture2D
 		_patch = spec["patch"]
+		_clear = spec["clear"]
 		_tex_w = spec["tex"].x
 		_chrome.patch_margin_left = _patch[0]
 		_chrome.patch_margin_top = _patch[1]
@@ -537,7 +547,18 @@ class FrameBox extends Container:
 
 	func _insets() -> Array:
 		var k := _k()
-		return [_patch[0] * k + PAD, _patch[1] * k + PAD * 0.5, _patch[2] * k + PAD, _patch[3] * k + PAD]
+		return [_clear[0] * k + PAD, _clear[1] * k + PAD, _clear[2] * k + PAD, _clear[3] * k + PAD]
+
+	## Width the Body is laid out in (shrink-to-fit rows measure against it).
+	func body_width() -> float:
+		var i := _insets()
+		return _width - i[0] - i[2]
+
+	## Global rect of the measured clear interior (tests / evidence).
+	func get_clear_rect() -> Rect2:
+		var k := _k()
+		var g := get_global_rect()
+		return Rect2(g.position + Vector2(_clear[0], _clear[1]) * k, g.size - Vector2(_clear[0] + _clear[2], _clear[1] + _clear[3]) * k)
 
 	func _get_minimum_size() -> Vector2:
 		var i := _insets()
