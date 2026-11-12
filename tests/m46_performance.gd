@@ -90,7 +90,7 @@ const ProofState = preload("res://scripts/gameplay/solver/proof_state.gd")
 const DeadlockClassifier = preload("res://scripts/gameplay/solver/deadlock_classifier.gd")
 const BatchSupplyEngine = preload("res://scripts/gameplay/supply/batch_supply_engine.gd")
 const ProductionBoosterAdapter = preload("res://scripts/economy/production_booster_adapter.gd")
-const ResultsScreen = preload("res://scripts/ui/results_screen.gd")
+const WinOverlay = preload("res://scripts/ui/win_overlay.gd")
 const FeedbackAdapter = preload("res://scripts/ui/feel/feedback_adapter.gd")
 const EffectsSettingsService = preload("res://scripts/settings/effects_settings_service.gd")
 const FirstClearTransaction = preload("res://scripts/economy/first_clear_transaction.gd")
@@ -1270,25 +1270,15 @@ func _p19() -> void:
 	var live: bool = bool(caps["gff"]) and bool(caps["spark"])
 	_ok(live, "installed plugins live through the real adapter: GameFeelFlow %s (%s), Spark %s (%s)" % [str(caps["gff"]), str(caps["gff_effects"]), str(caps["spark"]), str(caps["spark_presets"])])
 	var spark_node: Node = get_root().get_node_or_null("Spark")
-	# A legitimate WON receipt from the host's own (isolated) economy + progression.
-	var prog = h.get_progression()
-	var eco = h.get_economy()
-	for n in [1, 2, 3, 4]:
-		eco.streak.process_first_clear_win(n)
-	prog.debug_set_current_level(10)
-	var pre: Dictionary = TerminalRewardReceipt.capture(prog, eco)
-	var commit: Dictionary = FirstClearTransaction.commit(prog, eco, 10)
-	var receipt: Dictionary = TerminalRewardReceipt.build("WON", 10, pre, TerminalRewardReceipt.capture(prog, eco), commit, {"ok": true})
-	var res = ResultsScreen.new()
+	# SB-PHONE-2026-11-12-E: the win's celebration is the WinOverlay (WIN confetti through the
+	# adapter; no decoder here). Settled baseline: one win show (attempt 0) + every ceiling
+	# expired, then measure the win subtree + Spark state (the host's node count moves with bots).
+	var res := Control.new()
 	res.set_anchors_preset(Control.PRESET_FULL_RECT)
 	sub.add_child(res)
-	res.set_feedback(adapter)
-	# Settled baseline: one Results show (attempt 0) + every ceiling expired, then measure the
-	# Results subtree + Spark state (the host's own node count moves with bots in flight).
-	res.visible = true
-	res.show_model({"status": "WON", "level": 10, "attempt": 0, "receipt": receipt, "continue": {"available": true}})
+	_show_win(res, adapter, 0, false)
 	await create_timer(1.6).timeout
-	res.visible = false
+	_hide_win(res)
 	await _frames(3)
 	var res_nodes0: int = _live_nodes(res)
 	var objects0: int = _mem()["objects"]
@@ -1305,12 +1295,11 @@ func _p19() -> void:
 		var log0: int = adapter.dispatch_log().size()
 		var cleared0: int = h.get_board().count_cells_by_state(BoardState.CellState.CLEARED)
 		for f in range(1500):
-			var t0 := Time.get_ticks_usec()   # the Results show (row build) counts in its frame
+			var t0 := Time.get_ticks_usec()   # the win show (overlay build) counts in its frame
 			if f % 250 == 0:
 				attempt += 1
 				shows += 1
-				res.visible = true
-				res.show_model({"status": "WON", "level": 10, "attempt": attempt, "receipt": receipt, "continue": {"available": true}, "reduced_effects": mode == "REDUCED"})
+				_show_win(res, adapter, attempt, mode == "REDUCED")
 			_feed(h)
 			rt.tick(DT)
 			await process_frame
@@ -1332,11 +1321,11 @@ func _p19() -> void:
 	var F: Dictionary = phases["FULL"]
 	var R: Dictionary = phases["REDUCED"]
 	_ok(F["owned"] > 0 and F["particles"] > 0 and F["particles"] <= F["owned"] and int(F["left"]) == 0 and int(F["free_ms"]) < 2000,
-		"FULL: real Spark work ran on the Results path (peak %d owned dispatches, %d burst emitters <= dispatches) and all of it expired within %d ms" % [F["owned"], F["particles"], F["free_ms"]])
-	_ok(R["owned"] == 0 and R["particles"] == 0 and int(R["left"]) == 0, "REDUCED: zero plugin dispatches owned, zero particle nodes (Results still shown %d times)" % R["shows"])
+		"FULL: real Spark work ran on the win path (peak %d owned dispatches, %d burst emitters <= dispatches) and all of it expired within %d ms" % [F["owned"], F["particles"], F["free_ms"]])
+	_ok(R["owned"] == 0 and R["particles"] == 0 and int(R["left"]) == 0, "REDUCED: zero plugin dispatches owned, zero particle nodes (win still shown %d times)" % R["shows"])
 	_ok(F["fx"] <= F["fx_cap"] and R["fx"] <= R["fx_cap"], "native board cleaning FX within cap: FULL %d / %d, REDUCED %d / %d" % [F["fx"], F["fx_cap"], R["fx"], R["fx_cap"]])
-	# Never per cleared cell: 300 more FULL frames of dense clearing with NO Results event must
-	# not produce a single adapter event; per Results show the events stay bounded.
+	# Never per cleared cell: 300 more FULL frames of dense clearing with NO win event must
+	# not produce a single adapter event; per win show the events stay bounded.
 	effects.set_reduced(false)
 	fx.set_reduced_effects(false)
 	var log_q: int = adapter.dispatch_log().size()
@@ -1356,7 +1345,7 @@ func _p19() -> void:
 		for needle in ["FeedbackAdapter", "feedback_adapter", "GameFeelFlow", "/root/Spark", "saltmire_spark", "\"Spark\""]:
 			scan_ok = scan_ok and src.find(needle) == -1
 	_ok(scan_ok and quiet_clears > 20 and adapter.dispatch_log().size() == log_q and per_show <= 12.0,
-		"never per cell (structural): clear / native FX / renderer source never reaches the plugin gateway; %d clears without a Results event -> 0 plugin events; %.1f events per Results show" % [quiet_clears, per_show])
+		"never per cell (structural): clear / native FX / renderer source never reaches the plugin gateway; %d clears without a win event -> 0 plugin events; %.1f events per win show" % [quiet_clears, per_show])
 	# GameFeelFlow: production Results targets are Controls (GFF 1.0.0 punch_scale drives only
 	# Node2D / Node3D, so the adapter never sends it a Control). Exercise the real GFF backend
 	# through the same adapter on a Node2D: it must punch, then restore scale exactly on expiry,
@@ -1393,42 +1382,40 @@ func _p19() -> void:
 	effects.set_reduced(false)
 	# Replay window covers the whole reveal (rows step every 0.16 s of real time).
 	attempt += 1
-	var replay_model := {"status": "WON", "level": 10, "attempt": attempt, "receipt": receipt, "continue": {"available": true}}
-	res.visible = true
-	res.show_model(replay_model)
+	_show_win(res, adapter, attempt, false)
 	await create_timer(1.8).timeout
 	var log1: int = adapter.dispatch_log().size()
-	res.show_model(replay_model)
+	_show_win(res, adapter, attempt, false)
 	await create_timer(1.8).timeout
 	_ok(adapter.dispatch_log().size() == log1 and adapter.owned_count() == 0, "re-showing a fully revealed, celebrated terminal replays nothing (one-shot keys, 1.8 s window)")
 	# Live FULL -> REDUCED toggle, cancel, retry and unbind leave nothing owned.
 	attempt += 1
-	res.show_model({"status": "WON", "level": 10, "attempt": attempt, "receipt": receipt, "continue": {"available": true}})
+	_show_win(res, adapter, attempt, false)
 	await _frames(12)
 	var owned_live: int = adapter.owned_count()
 	effects.set_reduced(true)
 	var after_toggle: int = adapter.owned_count()
 	effects.set_reduced(false)
 	attempt += 1
-	res.show_model({"status": "WON", "level": 10, "attempt": attempt, "receipt": receipt, "continue": {"available": true}})
+	_show_win(res, adapter, attempt, false)
 	await _frames(12)
 	var retried: bool = h.retry()
 	adapter.cancel_all()
 	var after_cancel: int = adapter.owned_count()
 	_ok(owned_live > 0 and after_toggle == 0 and retried and after_cancel == 0, "live FULL->REDUCED toggle cancels %d owned dispatches; a mid-celebration level retry (ok) + cancel_all leave 0 owned" % owned_live)
-	# Same settled state as the baseline: one more Results show of the same receipt, ceilings expired.
+	# Same settled state as the baseline: one more win show of the same receipt, ceilings expired.
 	attempt += 1
-	res.show_model({"status": "WON", "level": 10, "attempt": attempt, "receipt": receipt, "continue": {"available": true}})
+	_show_win(res, adapter, attempt, false)
 	await create_timer(1.6).timeout
-	res.visible = false
+	_hide_win(res)
 	await _frames(3)
 	adapter.unbind()
 	var spark_pool: Node = spark_node.get_node_or_null(FeedbackAdapter.SPARK_POOL) if spark_node != null else null
 	var res_nodes1: int = _live_nodes(res)
 	var objects1: int = _mem()["objects"]
-	print("    drift: Results subtree nodes %d -> %d; process objects %+d (report-only: includes bots in flight / retried supply)" % [res_nodes0, res_nodes1, objects1 - objects0])
+	print("    drift: win subtree nodes %d -> %d; process objects %+d (report-only: includes bots in flight / retried supply)" % [res_nodes0, res_nodes1, objects1 - objects0])
 	_ok(res_nodes1 == res_nodes0 and _particles(sub) == 0 and (spark_pool == null or _live_nodes(spark_pool) == 0) and adapter.owned_count() == 0 and not effects.changed.is_connected(adapter._on_effects_changed),
-		"after %d Results shows FULL + REDUCED: Results subtree %d -> %d nodes, 0 Spark emitters (target canvas + pool), 0 owned, unbind dropped the settings subscription" % [attempt, res_nodes0, res_nodes1])
+		"after %d win shows FULL + REDUCED: win subtree %d -> %d nodes, 0 Spark emitters (target canvas + pool), 0 owned, unbind dropped the settings subscription" % [attempt, res_nodes0, res_nodes1])
 	_summary.append("R02 p19 SB-M46-015 FULL: mean %.3f / p99 %.3f ms, peak %d owned / %d particles, self-free %d ms; REDUCED: mean %.3f / p99 %.3f ms, 0 owned / 0 particles" % [
 		F["mean"], F["p99"], F["owned"], F["particles"], F["free_ms"], R["mean"], R["p99"]])
 	res.queue_free()
@@ -1439,6 +1426,21 @@ func _p19() -> void:
 ## case-group boundary so in-process slowdown can be told apart from machine slowdown.
 var _calib_board = null
 var _calib_targets: Array = []
+## SB-PHONE-2026-11-12-E: one win celebration (WinOverlay, no decoder) in `box`, replacing the last.
+func _show_win(box: Control, adapter, attempt: int, reduced: bool) -> void:
+	_hide_win(box)
+	var o = WinOverlay.new()
+	o.video = null
+	o.reduced = reduced
+	o.feel = adapter
+	o.feel_key = "win:a%d:L10" % attempt
+	box.add_child(o)
+
+func _hide_win(box: Control) -> void:
+	for c in box.get_children():
+		box.remove_child(c)
+		c.free()
+
 func _calib() -> float:
 	if _calib_board == null:
 		_calib_board = _dense_board()

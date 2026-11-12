@@ -33,7 +33,7 @@ var EXPECTED_CASES := [
 	"e15_roster_canonical", "e16_robot_ceremony_truth", "e17_equip_persists", "e18_keep_current",
 	"e19_active_strict", "e20_unlock_next_order", "e21_unknown_robot_never_shown", "e22_robot_reduced",
 	"e23_gift_queued_truth", "e24_gift_1000_fallback", "e25_gift_claimed_note", "e26_gift_all_five_once",
-	"e27_results_handoff", "e28_results_no_event_no_hold",
+	"e27_home_handoff", "e28_home_no_event",
 	"e29_feature_builder_truth", "e30_feature_no_authority", "e31_world_builder_truth", "e32_world_no_authority",
 	"e33_presentable_matches_build",
 ]
@@ -82,8 +82,8 @@ func _initialize() -> void:
 	_unmount()
 	await _e09_home_integration()
 	_e10_no_authority_static()
-	await _e27_results_handoff()
-	await _e28_results_no_event_no_hold()
+	await _e27_home_handoff()
+	await _e28_home_no_event()
 	await _frames(3)
 	_cleanup()
 	_done()
@@ -562,7 +562,9 @@ func _e26_gift_all_five_once() -> void:
 
 ## Real app root: frontier level 1, a real WON terminal (host economy + save first). With the
 ## Gift Meter seeded at 9 through the real authority, the win's streak SB crosses milestone 10.
-func _won_results(tag: String, seed_gift: int):
+## SB-PHONE-2026-11-12-E: a real WON terminal on the app root goes Home (the win animation is
+## off for test saves). Returns the host's committed receipt.
+func _won_home(tag: String, seed_gift: int) -> Dictionary:
 	_sub = SubViewport.new()
 	_sub.size = Vector2i(1080, 2160)
 	_sub.disable_3d = true
@@ -584,8 +586,9 @@ func _won_results(tag: String, seed_gift: int):
 	var h = _root.get_gameplay_host()
 	h.get_runtime().set_process(false)
 	h.get_completion().terminal_reached.emit(&"WON", {})
+	var receipt: Dictionary = h.get_terminal_receipt()
 	await _frames(2)
-	return h
+	return receipt
 
 func _end_app() -> void:
 	if _root != null and is_instance_valid(_root):
@@ -596,42 +599,39 @@ func _end_app() -> void:
 	_sub = null
 	MainScript.boot_save_path_override = ""
 
-func _e27_results_handoff() -> void:
-	print("[e27 WON Results hands off to the committed Gift milestone ceremony]")
-	var h = await _won_results("e27", 9)
-	var res = _root.get_results_screen()
-	var receipt: Dictionary = h.get_terminal_receipt()
+func _e27_home_handoff() -> void:
+	print("[e27 WON goes Home; the committed Gift milestone ceremony follows the reward flight]")
+	var receipt := await _won_home("e27", 9)
 	var follow: Array = receipt.get("follow_ups", []).map(func(f): return f["kind"])
-	_ok(_root.get_navigation().route_name() == "RESULTS" and follow.has("gift_milestone"), "real WON committed; receipt follow-up = gift_milestone")
-	_ok(res.has_ceremony_barrier() and res.get_primary_button().text == UiText.t("RESULTS_HOME") and res.find_child("NextCleanup", true, false) == null,
-		"ceremony barrier set; WON primary is HOME, no next-level teaser (SB-PHONE-2026-11-12-B)")
+	var home = _root.get_home()
+	_ok(_root.get_navigation().route_name() == "HOME" and follow.has("gift_milestone") and not _root.get_results_screen().visible, "real WON committed -> Home (no Results); receipt follow-up = gift_milestone")
+	_ok(home.is_reward_flight_running() and _root.get_modal_stack().depth() == 0, "the rewards fly in first: no ceremony yet")
 	var a0: Dictionary = _root.get_app_state().economy.snapshot()
-	res.finish_reveal()
+	home.get_reward_flight().finish()
 	var top = null
 	for _i in range(20):
 		await _frames(1)
 		top = _root.get_modal_stack().top()
 		if top != null:
 			break
-	_ok(top != null and String(top.context.get("ceremony_key", "")) == "gift:gift_ms:c0:m10" and h.get_terminal_receipt() == receipt, "after the reward reveal: Gift 10 ceremony on top; receipt unchanged")
+	_ok(top != null and String(top.context.get("ceremony_key", "")) == "gift:gift_ms:c0:m10", "after the reward flight: Gift 10 ceremony on top of Home")
 	var a1: Dictionary = _root.get_app_state().economy.snapshot()
 	_ok(a1["reward"] == a0["reward"] and a1["gift"] == a0["gift"] and a1["collection"] == a0["collection"], "presenting granted nothing (wallet / applied ids / Gift / Collection unchanged)")
 	_close_cta(top)
 	await _frames(4)
-	_ok(not res.has_ceremony_barrier() and not res.get_primary_button().disabled and _root.get_navigation().route_name() == "RESULTS", "barrier released: HOME live, still on Results (no level started)")
+	_ok(_root.get_navigation().route_name() == "HOME" and _root.get_gameplay_host() == null, "closed: still Home, no level started")
 	_ok(_root.get_app_state().economy.meta_ui.is_seen("gift:gift_ms:c0:m10") and _root.get_app_state().economy.gift.claimable().size() == 3, "acknowledged; reward still waits in the Gift Bar (m1 / m5 seed + m10)")
 	_end_app()
-	_complete("e27_results_handoff")
+	_complete("e27_home_handoff")
 
-func _e28_results_no_event_no_hold() -> void:
-	print("[e28 WON with no ceremony event: no hold]")
-	var h = await _won_results("e28", 1)   # 1 -> 2 crosses no milestone (SB-POLISH-002)
-	var res = _root.get_results_screen()
-	res.finish_reveal()
+func _e28_home_no_event() -> void:
+	print("[e28 WON with no ceremony event: nothing after the flight]")
+	await _won_home("e28", 1)   # 1 -> 2 crosses no milestone (SB-POLISH-002)
+	_root.get_home().get_reward_flight().finish()
 	await _frames(4)
-	_ok(not res.has_ceremony_barrier() and _root.get_modal_stack().depth() == 0 and not res.get_primary_button().disabled, "no barrier, no popup, HOME live")
+	_ok(_root.get_modal_stack().depth() == 0 and _root.get_navigation().route_name() == "HOME", "no popup, Home")
 	_end_app()
-	_complete("e28_results_no_event_no_hold")
+	_complete("e28_home_no_event")
 
 # --------------------------------------------------------------- SB-M43-072/073 ----
 

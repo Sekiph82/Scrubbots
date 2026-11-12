@@ -1,6 +1,8 @@
 extends SceneTree
-## M43-C005F-PHASE4 — Gameplay->Results bridge (SB-M43-C005F-010) + Home state-change micro feel
-## (SB-M43-C005F-012). Everything runs in the REAL app (main.tscn, 1080x2160 SubViewport):
+## M43-C005F-PHASE4 — gameplay-complete bridge (SB-M43-C005F-010) + Home state-change micro feel
+## (SB-M43-C005F-012). Since SB-PHONE-2026-11-12-E a WON shows the win animation over the board
+## (no Results), then Home; the suite boots with that animation ON.
+## Everything runs in the REAL app (main.tscn, 1080x2160 SubViewport):
 ##   t*: F010 — Level 1 played to its REAL WON terminal (supply-plan clicks + runtime ticks, the
 ##       CompletionController latches it), LOST through the real completion signal (the M43-C004
 ##       pattern), duplicates / stale signals, plugins missing / throwing, Reduced, static guard;
@@ -47,9 +49,9 @@ class FaultySpark extends RefCounted:
 		pass
 
 var EXPECTED_CASES := [
-	"t01_real_won_one_results_one_small", "t02_lost_no_bridge_no_win", "t03_duplicate_stale_no_second_bridge",
-	"t04_plugins_missing_results_once", "t05_plugin_throws_results_once", "t06_reduced_zero_plugin_work",
-	"t07_static_no_delay_before_navigation", "t08_results_win_count_unchanged",
+	"t01_real_won_no_results_one_small", "t02_lost_no_bridge_no_win", "t03_duplicate_stale_no_second_bridge",
+	"t04_plugins_missing_win_once", "t05_plugin_throws_win_once", "t06_reduced_zero_plugin_work",
+	"t07_static_no_delay_before_navigation", "t08_win_count_one",
 	"h01_first_render_baseline", "h02_refresh_x10_zero", "h03_heart_timer_zero", "h04_layout_modal_hide_content_zero",
 	"h05_real_frontier_streak_delta", "h06_bot_parts_unlockable_one", "h07_gift_milestone_no_duplicate",
 	"h08_same_state_no_replay", "h09_reduced_delta_visible_zero_work", "h10_plugins_missing_throwing_home_ok",
@@ -94,6 +96,7 @@ func _boot(tag: String) -> void:
 	_sub.disable_3d = true
 	get_root().add_child(_sub)
 	MainScript.boot_save_path_override = _uniq(tag)
+	MainScript.boot_win_animation_override = 1
 	_root = MainScene.instantiate()
 	_sub.add_child(_root)
 	await _frames(14)
@@ -186,22 +189,22 @@ static func _truth(t: Dictionary) -> Array:
 # --------------------------------------------------------------------- F010 ----
 
 func _t01() -> Dictionary:
-	print("[t01 F010 real WON: committed receipt, ONE Results route, at most ONE SMALL bridge]")
+	print("[t01 F010 real WON: committed receipt, the win animation (no Results), at most ONE SMALL bridge]")
 	var t := await _won_run("t01")
 	_ok(t.get("status") == "WON" and t.get("saved") and t.get("progress") == 1, "real terminal WON latched by CompletionController, receipt saved, frontier advanced")
-	_ok(t.get("results") == 1 and _nav().current() == R.RESULTS, "exactly one navigation to Results")
+	_ok(t.get("results") == 0 and _nav().current() == R.GAMEPLAY and _root.get_win_overlay() != null, "no Results: the win animation plays over the board")
 	var b := _adapter_log("c005f010:")
 	_ok(b.size() == 1 and b[0][0] == "SMALL" and b[0][1] == "c005f010:a1:L1", "one SMALL bridge keyed by the terminal attempt %s" % str(b.map(func(r): return [r[0], r[1]])))
 	var portrait = _root.get_gameplay_host().get_screen().get_profile_portrait()
-	_ok(portrait != null and portrait.is_visible_in_tree() and _root.get_results_screen().visible, "target = HUD robot portrait, under the shown Results")
+	_ok(portrait != null and portrait.is_visible_in_tree() and not _root.get_results_screen().visible, "target = HUD robot portrait, under the win animation")
 	_ok(_spark.bursts.count(4) == 1, "SMALL = one 4-particle Spark burst (bursts %s)" % str(_spark.bursts))
-	_complete("t01_real_won_one_results_one_small")
-	print("[t08 F003 WIN count unchanged: the bridge adds no WIN / confetti]")
+	_complete("t01_real_won_no_results_one_small")
+	print("[t08 WIN count: the win animation's one WIN; the bridge adds no WIN / confetti]")
 	await _frames(20)
 	var win := _adapter_log("", "WIN")
-	_ok(win.size() == 1 and win[0][1] == "results:WON:a1:L1:win", "exactly one WIN (F003 Results) %s" % str(win.map(func(r): return r[1])))
+	_ok(win.size() == 1 and win[0][1] == "win:a1:L1", "exactly one WIN (the win animation) %s" % str(win.map(func(r): return r[1])))
 	_ok(_spark.bursts.count(18) == 1 and _adapter_log("c005f010:").all(func(r): return r[0] != "WIN"), "one 18-particle WIN confetti; bridge is not a WIN")
-	_complete("t08_results_win_count_unchanged")
+	_complete("t08_win_count_one")
 	await _h05_after_real_won()
 	return t
 
@@ -222,43 +225,41 @@ func _t02() -> void:
 	_complete("t02_lost_no_bridge_no_win")
 
 func _t03() -> void:
-	print("[t03 F010 duplicate / stale terminal signal, Results re-show: no second bridge]")
+	print("[t03 F010 duplicate / stale terminal signal during the win animation: no second bridge]")
 	await _won_run("t03")
 	var host = _root.get_gameplay_host()
 	var rc: Dictionary = host.get_terminal_receipt()
 	for _i in range(3):
 		host.get_completion().terminal_reached.emit(&"WON", {})
 		host.get_completion().terminal_reached.emit(&"LOST", {})
-	_root._on_route_changed(R.GAMEPLAY, R.RESULTS, _nav().last_payload())   # Results re-show
-	_root.get_results_screen().show_model(_root.get_results_screen().get_model())
 	await _frames(14)
-	_ok(_results_count() == 1, "still exactly one Results transition")
+	_ok(_results_count() == 0 and _routes == [R.GAMEPLAY] and _root.get_win_overlay() != null, "no Results, no route change, one win animation")
 	_ok(_adapter_log("c005f010:").size() == 1 and _adapter_log("", "WIN").size() == 1, "still one bridge, one WIN")
 	_ok(host.get_terminal_receipt() == rc, "receipt unchanged")
 	_complete("t03_duplicate_stale_no_second_bridge")
 
 func _t04(base: Dictionary) -> void:
-	print("[t04 F010 plugins missing: Results once, same committed truth]")
+	print("[t04 F010 plugins missing: the win animation once, same committed truth]")
 	var t := await _won_run_with(null, null, false, "t04")
-	_ok(t.get("results") == 1 and _nav().current() == R.RESULTS, "Results reached once")
+	_ok(t.get("results") == 0 and _nav().current() == R.GAMEPLAY and _root.get_win_overlay() != null, "the win animation runs, no Results")
 	_ok(_truth(t) == _truth(base), "receipt / economy / save / progression identical to the spied run")
 	_ok(_adapter_log("c005f010:").size() == 1, "bridge accepted as a no-op")
-	_complete("t04_plugins_missing_results_once")
+	_complete("t04_plugins_missing_win_once")
 
 func _t05(base: Dictionary) -> void:
-	print("[t05 F010 plugin throws: Results once, same committed truth (expected injected SCRIPT ERRORs: one per Spark burst)]")
+	print("[t05 F010 plugin throws: the win animation once, same committed truth (expected injected SCRIPT ERRORs: one per Spark burst)]")
 	var t := await _won_run_with(SpyGff.new(), FaultySpark.new(), false, "t05")
 	await _frames(10)
-	_ok(t.get("results") == 1 and _nav().current() == R.RESULTS and _root.get_results_screen().visible, "Results reached once, still shown")
+	_ok(t.get("results") == 0 and _nav().current() == R.GAMEPLAY and _root.get_win_overlay() != null, "the win animation still runs, no Results")
 	_ok(_truth(t) == _truth(base), "receipt / economy / save / progression identical to the spied run")
 	_ok(_root.get_gameplay_host() != null and _root.get_gameplay_host().get_completion().is_terminal(), "gameplay host terminal, not stuck")
-	_complete("t05_plugin_throws_results_once")
+	_complete("t05_plugin_throws_win_once")
 
 func _t06(base: Dictionary) -> void:
-	print("[t06 F010 Reduced: zero plugin work, Results once]")
+	print("[t06 F010 Reduced: zero plugin work, no Results]")
 	var t := await _won_run_with(SpyGff.new(), SpySpark.new(), true, "t06")
 	await _frames(20)
-	_ok(t.get("results") == 1 and _nav().current() == R.RESULTS, "Results reached once")
+	_ok(t.get("results") == 0 and _routes.count(R.GAMEPLAY) == 1, "no Results")
 	_ok(_gff.plays.is_empty() and _spark.bursts.is_empty() and _root.feel.owned_count() == 0, "zero plugin work")
 	_ok(_truth(t) == _truth(base), "same committed truth as FULL")
 	_complete("t06_reduced_zero_plugin_work")
@@ -294,14 +295,14 @@ func _t07() -> void:
 
 # --------------------------------------------------------------------- F012 ----
 
-## Real WON (from t01) -> Results Home: one frontier MICRO on the Journey strip, then the streak.
+## Real WON (from t01) -> Home: one frontier MICRO on the Journey strip, then the streak.
 func _h05_after_real_won() -> void:
-	print("[h05 F012 real frontier + Win Streak delta after the real WON (Results -> Home)]")
+	print("[h05 F012 real frontier + Win Streak delta after the real WON (win animation -> Home)]")
 	var before := _micro().size()
-	_ok(before == 0, "nothing answered while Home was hidden (gameplay / Results)")
-	_root.get_results_screen().get_home_button().pressed.emit()
+	_ok(before == 0, "nothing answered while Home was hidden (gameplay / win animation)")
+	_root.handle_back()   # skips the rest of the win animation
 	await _frames(2)
-	_ok(_nav().current() == R.HOME, "Results -> Home")
+	_ok(_nav().current() == R.HOME, "win animation -> Home")
 	var m := _micro()
 	_ok(m.size() == 1 and m[0] == ["frontier", "HomeJourneyStrip"], "dominant delta answered at once on the Journey strip %s" % str(m))
 	var strip = _home().get_journey_strip()
@@ -483,6 +484,7 @@ static func _func_body(src: String, head: String) -> String:
 
 func _cleanup() -> void:
 	MainScript.boot_save_path_override = ""
+	MainScript.boot_win_animation_override = -1
 	MainScript.boot_clock_override = Callable()
 	MainScript.boot_local_day_override = Callable()
 	for p in _tmp:

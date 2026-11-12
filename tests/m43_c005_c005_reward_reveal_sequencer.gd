@@ -1,14 +1,16 @@
 extends SceneTree
-## M43-C005-C005 (SB-M43-063) — reusable production RevealSequencer + Results integration.
+## M43-C005-C005 (SB-M43-063) — reusable production RevealSequencer + its win integration.
 ## s* cases drive the sequencer with dummy presentation controls (future-ceremony seam: no
 ## pack/card/robot assets bound). r* cases use the real main.tscn root, real AppState, real
-## host terminal commit and the real ResultsScreen. Expected/completed case ledger.
+## host terminal commit and the real Home reward flight (SB-PHONE-2026-11-12-E: a win goes
+## Home; the WON Results and its row reveal are gone). Expected/completed case ledger.
 ##
 ## Run: godot --headless --path . -s res://tests/m43_c005_c005_reward_reveal_sequencer.gd
 
 const CharacterMotion = preload("res://scripts/ui/feel/character_motion.gd")
 const RevealSequencer = preload("res://scripts/ui/components/reveal_sequencer.gd")
-const ResultsScreen = preload("res://scripts/ui/results_screen.gd")
+const HomeRewardFlight = preload("res://scripts/ui/home/home_reward_flight.gd")
+const UiText = preload("res://scripts/ui/ui_text.gd")
 const MainScript = preload("res://scripts/app/main.gd")
 const MainScene = preload("res://scenes/app/main.tscn")
 const ScrubbotAgent = preload("res://scripts/gameplay/agents/scrubbot_agent.gd")
@@ -23,8 +25,8 @@ var EXPECTED_CASES := [
 	"s01_three_and_five_steps", "s02_fast_forward_any_step", "s03_reduced_parity",
 	"s04_cancel_restart_new_key", "s05_one_shot_key", "s06_empty_and_invalid",
 	"s07_cleanup_no_accumulation", "s08_no_authority_source",
-	"r01_results_plan_equivalence", "r02_results_authority_idempotency",
-	"r03_results_hide_free_kills", "r04_results_reduced_parity",
+	"r01_flight_plan", "r02_flight_authority_idempotency",
+	"r03_flight_hide_lands_frees", "r04_flight_reduced_parity",
 ]
 
 var _fail := 0
@@ -222,134 +224,59 @@ func _s08_no_authority_source() -> void:
 # ------------------------------------------------------------ Results (real) ----
 
 func _results_cases() -> void:
-	var path := _uniq("res")
+	print("[r01-r04 the Home reward flight on the shared sequencer]")
+	var path := _uniq("fl")
 	var root = await _boot_main(path)
 	var app = root.get_app_state()
-	var nav = root.get_navigation()
-	app.economy.gift.add_streak_sb("c005c005_seed", 9)   # Level 1 also yields the gift follow-up row
-	for o in app.economy.gift.gift_bar_queue():   # SB-POLISH-002: the seed's own 1 / 5 ceremonies count as seen
-		app.economy.meta_ui.mark_seen("gift:" + String(o["id"]))
 	var h = await _play(root)
 	_drain(h)
-	var res = root.get_results_screen()
-	var seq = res.get_reveal_sequencer()
-	var model: Dictionary = root._results_model(nav.last_payload())
-	await _r01_plan(res, seq, h)
-	await _r02_authority(root, app, nav, h, res, seq, model, path)
-	await _r03_hide_free(res, model)
-	await _r04_reduced(model)
-	_shutdown(root)
-
-## The refactor keeps the approved timing family: one 0.16 s fade per committed row in
-## receipt order, then the momentum section after its configured delay.
-func _r01_plan(res, seq, h) -> void:
-	print("[r01 Results plan equivalence]")
-	var rows := _rows(res)
-	var steps: Array = seq.get_steps()
 	var rc: Dictionary = h.get_terminal_receipt()
-	var delay := float(res.get_model()["momentum"]["reveal_delay_s"])
-	_ok(res.is_revealing() and res.get_momentum_section().visible and rows.size() == 5 and steps.size() == 6, "WON level 1: 5 committed rows + momentum = 6 steps (%d)" % steps.size())
-	var plan_ok := true
-	for i in range(rows.size()):
-		plan_ok = plan_ok and steps[i]["target"] == rows[i] and steps[i]["property"] == "modulate:a" and steps[i]["duration"] == ResultsScreen.REVEAL_STEP_S and steps[i]["delay"] == 0.0
-	_ok(plan_ok and ResultsScreen.REVEAL_STEP_S == 0.16, "rows: one 0.16 s fade each, in display order")
-	_ok(steps[5]["target"] == res.get_momentum_section() and steps[5]["duration"] == 0.16 and steps[5]["delay"] == delay and delay == 0.2, "momentum follows after the configured %.2f s delay" % delay)
-	_ok(res.shown_row_texts() == ResultsScreen.reward_lines(rc), "rows = committed receipt lines, receipt order")
-	_complete("r01_results_plan_equivalence")
-
-func _r02_authority(root, app, nav, h, res, seq, model: Dictionary, path: String) -> void:
-	print("[r02 Results authority / idempotency]")
-	var counts := {}
-	seq.completed.connect(func(k): counts[k] = int(counts.get(k, 0)) + 1)
-	var e0: Dictionary = _econ(app.economy)
+	var home = root.get_home()
+	var flight = home.get_reward_flight()
+	var seq: RevealSequencer = flight._seq
+	var steps: Array = seq.get_steps()
+	var plan: Array = HomeRewardFlight.plan(rc, home.get_view_model())
+	var shape := true
+	for k in range(plan.size()):
+		shape = shape and steps[3 * k]["property"] == "modulate:a" and steps[3 * k + 1]["property"] == "position" and steps[3 * k + 2]["property"] == "value" \
+			and float(steps[3 * k + 2]["from"]) == float(plan[k]["from"]) and float(steps[3 * k + 2]["to"]) == float(plan[k]["to"])
+	_ok(seq.is_running() and seq.current_key() == "win:a1:L1" and steps.size() == 3 * plan.size() and plan.size() == 4 and shape,
+		"one key per win; per reward: fade, flight, count-up from the receipt (%d rewards)" % plan.size())
+	_complete("r01_flight_plan")
+	var e0 := _econ(app.economy)
 	var tx0: int = app.economy.reward.applied_transaction_count()
-	var save0 := FileAccess.get_file_as_bytes(path)
-	var rc0: Dictionary = h.get_terminal_receipt().duplicate(true)
-	var route0: int = nav.current()
-	var tid0: int = nav.transition_id()
-	var lines0: Array = res.shown_row_texts()
-	var stable := true
-	for i in range(6):
-		res.show_model(model)
-		stable = stable and res.shown_row_texts() == lines0 and _rows(res).size() == 5
-		if i % 2 == 0:
-			res.finish_reveal()
+	for _i in range(3):
+		home.refresh()
+		_ok(not home.play_reward_flight(rc, "win:a1:L1"), "same win key refused")
+	var t0 := Time.get_ticks_msec()
+	while seq.is_running() and Time.get_ticks_msec() - t0 < 10000:
 		await process_frame
-	seq.finish()
-	seq.cancel()
-	seq.play("probe_empty", [])
-	res.show_model(model)
-	await _frames(40)   # let the last reveal end naturally
-	res.finish_reveal()
-	_ok(stable and res.shown_row_texts() == lines0 and _rows(res).size() == 5, "repeated show_model: exact reward text/order, no row accumulation")
-	var once := true
-	for k in counts:
-		once = once and counts[k] == 1
-	_ok(once and not counts.is_empty(), "every presentation key completed at most once %s" % str(counts))
-	_ok(_econ(app.economy) == e0 and app.economy.reward.applied_transaction_count() == tx0, "start/restart/finish/cancel: economy snapshot and applied grants unchanged")
-	_ok(FileAccess.get_file_as_bytes(path) == save0 and save0.size() > 0, "save file bytes unchanged (%d bytes)" % save0.size())
-	_ok(h.get_terminal_receipt() == rc0 and nav.current() == route0 and nav.transition_id() == tid0, "committed receipt, route and transition id unchanged")
-	# Sensitivity: a real grant IS detected by the same comparator.
-	app.economy.gift.add_streak_sb("c005c005_sensitivity", 1)
-	_ok(_econ(app.economy) != e0, "sensitivity: a real economy mutation is detected")
-	_complete("r02_results_authority_idempotency")
-
-func _r03_hide_free(res, model: Dictionary) -> void:
-	print("[r03 hide / free kills presentation work]")
-	await create_timer(1.0).timeout   # SB-POLISH-011: let r02's one-shot feel tweens (row settle, hero, CLEAN NEXT pulse) end first
-	var b := _tweens()   # the real root may own unrelated tweens; count relative to it
-	res.show_model(model)
-	_ok(res.is_revealing() and _tweens() == b + 1, "reveal running (1 tween)")
-	res.visible = false
-	await process_frame
-	_ok(not res.is_revealing() and _tweens() == b and res.get_reward_lines_node().get_child_count() == 0 and res.get_momentum_section().modulate.a == 1.0, "hidden Results: reveal cancelled, rows released, momentum not left hidden")
-	res.visible = true
-	res.show_model(model)
-	res.finish_reveal()
-	var lone = ResultsScreen.new()
-	get_root().add_child(lone)
-	var done := []
-	lone.get_reveal_sequencer().completed.connect(func(k): done.append(k))
-	lone.show_model(model)
-	_ok(lone.is_revealing() and _tweens() == b + 1, "standalone Results revealing")
-	lone.free()
-	await _frames(10)
-	await create_timer(1.0).timeout   # the real Results' one-shot CLEAN NEXT pulse (after finish_reveal) ends too
-	_ok(_tweens() == b and done.is_empty(), "freed Results: tween gone, no completion")
-	_complete("r03_results_hide_free_kills")
-
-func _r04_reduced(model: Dictionary) -> void:
-	print("[r04 Results Reduced Effects parity]")
-	var full = _lone(model, false)
-	var mid := _info(full)
-	full.finish_reveal()
-	var final_full := _info(full)
-	var red = _lone(model, true)
-	_ok(not red.is_revealing() and _info(red) == final_full, "Reduced: immediate final information == FULL final %s" % str(final_full["alphas"]))
-	_ok(mid != final_full, "sensitivity: mid-reveal information differs from final")
-	full.free()
-	red.free()
-	_complete("r04_results_reduced_parity")
-
-func _lone(model: Dictionary, reduced: bool):
-	var m := model.duplicate(true)
-	m["reduced_effects"] = reduced
-	var r = ResultsScreen.new()
-	get_root().add_child(r)
-	r.show_model(m)
-	return r
-
-func _info(r) -> Dictionary:
-	return {
-		"kinds": _rows(r).map(func(c): return c.get_meta("kind")),
-		"texts": r.shown_row_texts(),
-		"alphas": _rows(r).map(func(c): return c.modulate.a),
-		"momentum": [r.get_momentum_section().visible, r.get_momentum_section().modulate.a],
-		"primary": [r.get_primary_button().text, r.get_primary_button().disabled],
-		"note": r.get_note_label().text,
-	}
-
-# ------------------------------------------------------------ helpers ----
+	_ok(not seq.is_active() and flight.get_layer() == null and _econ(app.economy) == e0 and app.economy.reward.applied_transaction_count() == tx0,
+		"natural end: layer freed; refresh x3 + replays changed no economy / ledger")
+	_complete("r02_flight_authority_idempotency")
+	_shutdown(root)
+	root = await _boot_main(_uniq("fl2"))
+	h = await _play(root)
+	_drain(h)
+	home = root.get_home()
+	flight = home.get_reward_flight()
+	var tw0 := _tweens()
+	_ok(flight.is_running() and flight.get_layer() != null, "second run flying")
+	root.play_current_frontier()   # Home hides: the flight lands at once
+	await _frames(2)
+	_ok(not flight.is_running() and flight.get_layer() == null and _tweens() <= tw0, "Home hidden mid-flight: final state landed, layer freed, no tween left")
+	_complete("r03_flight_hide_lands_frees")
+	_shutdown(root)
+	root = await _boot_main(_uniq("fl3"))
+	root.get_app_state().set_reduced_effects(true)
+	h = await _play(root)
+	_drain(h)
+	home = root.get_home()
+	var chip: String = home.get_region("ScrubBucksChip").value_label.text
+	_ok(not home.is_reward_flight_running() and home.get_reward_flight().has_played("win:a1:L1") and home.get_reward_flight().get_layer() == null
+		and chip == UiText.num(root.get_app_state().economy.wallet.scrub_bucks()), "Reduced: the same key lands the final HUD at once (SB %s)" % chip)
+	_complete("r04_flight_reduced_parity")
+	_shutdown(root)
 
 func _host(n: int) -> Control:
 	var h := Control.new()
@@ -408,9 +335,6 @@ func _free(n: Node) -> void:
 
 func _count(n: Node) -> int:
 	return n.find_children("*", "", true, false).filter(func(c): return not c.is_queued_for_deletion()).size()
-
-func _rows(res) -> Array:
-	return res.get_reward_lines_node().get_children().filter(func(c): return not c.is_queued_for_deletion())
 
 func _code_only(text: String) -> String:
 	var out := PackedStringArray()

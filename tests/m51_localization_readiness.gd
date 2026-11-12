@@ -141,9 +141,9 @@ func _l04() -> void:
 		surfaces += 1
 	var res = _root.get_results_screen()
 	res.visible = true
-	res.show_model(_root._results_model({"status": "WON", "level": 1, "attempt": 1}))
+	res.show_model(_root._results_model({"status": "LOST", "level": 1, "attempt": 1}))
 	await _frames(6)
-	report.call("results_won", res)
+	report.call("results_lost", res)
 	surfaces += 1
 	_ok(surfaces >= 7, "%d player surfaces scanned (findings above feed SB-M51-001/009 and SB-M49-022/027)" % surfaces)
 	_complete("l04_surface_scan_report")
@@ -195,7 +195,7 @@ func _l05() -> void:
 
 func _l06() -> void:
 	print("[l06 plurals: EN one/other, TR one form]")
-	var fam := {"RESULTS_CARDS": ["+1 Card", "+2 Cards"], "RESULTS_BOT_PARTS": ["+1 Bot Part", "+2 Bot Parts"],
+	var fam := {"CEREMONY_ROW_BOT_PARTS": ["+1 Bot Part", "+2 Bot Parts"],
 		"CEREMONY_ROW_HEART": ["+1 Heart", "+2 Hearts"], "DAILY_STREAK": ["Login streak: 1 day.", "Login streak: 2 days."],
 		"COMEBACK_GIFT": ["1 gift waiting in the Gift Bar", "2 gifts waiting in the Gift Bar"],
 		"CEREMONY_ROW_STANDARD_PACK": ["+1 Standard Card Pack", "+2 Standard Card Packs"]}
@@ -203,15 +203,12 @@ func _l06() -> void:
 		var got := [UiText.tn(k, 1, ["1"]), UiText.tn(k, 2, ["2"])]
 		_ok(got == fam[k] and UiText.tn(k, 0, ["0"]) == UiText.t(k, ["0"]), "EN %s: %s (0 -> other)" % [k, str(got)])
 	_ok(UiText.tn("RANKS_NEXT", 1, ["1", "Gold"]) == "1 more level to Gold" and UiText.tn("RANKS_NEXT", 3, ["3", "Gold"]) == "3 more levels to Gold", "EN ranks: 1 more level / 3 more levels")
-	var receipt := {"reveal_queue": [{"kind": "bot_parts", "amount": 1}, {"kind": "collection_cards", "amount": 3}]}
-	var rows: Array = ResultsScreen.reward_rows(receipt).map(func(r): return r["text"])
-	_ok(rows == ["+1 Bot Part", "+3 Cards"], "real Results rows: %s" % str(rows))
 	_ok(UiText.t("TIME_DHM", [1, 1, 1]) == "1d 1h 1m", "time remaining uses unit abbreviations (no plural)")
 	UiText.locale = "tr"
-	var tr_rows: Array = ResultsScreen.reward_rows(receipt).map(func(r): return r["text"])
-	var tr_ok := UiText.tn("RESULTS_CARDS", 1, ["1"]) == "+1 Kart" and UiText.tn("RESULTS_CARDS", 2, ["2"]) == "+2 Kart" and UiText.t("TIME_DHM", [1, 2, 3]) == "1g 2sa 3dk"
+	var tr_rows := [UiText.tn("CEREMONY_ROW_BOT_PARTS", 1, ["1"]), UiText.tn("CEREMONY_ROW_STANDARD_PACK", 3, ["3"])]
+	var tr_ok := UiText.t("TIME_DHM", [1, 2, 3]) == "1g 2sa 3dk"
 	UiText.locale = "en"
-	_ok(tr_ok and tr_rows == ["+1 Robot Parçası", "+3 Kart"], "TR: noun stays singular after a number %s" % str(tr_rows))
+	_ok(tr_ok and tr_rows == ["+1 Robot Parçası", "+3 Standart Kart Paketi"], "TR: noun stays singular after a number %s" % str(tr_rows))
 	_complete("l06_plurals")
 
 func _l07() -> void:

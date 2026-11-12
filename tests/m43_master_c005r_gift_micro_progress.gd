@@ -1,7 +1,7 @@
 extends SceneTree
 ## M43 master — Lane C005R Gift Meter micro-progress (SB-M43-R05-001 / R05-002).
-## Real AppState / GiftMeterService, real Home scene, real Results row builder, real Gift Bar
-## popup. Expected/completed case ledger.
+## Real AppState / GiftMeterService, real Home scene (incl. the SB-PHONE-2026-11-12-E win reward
+## flight's Gift count), real Gift Bar popup. Expected/completed case ledger.
 ##
 ## Run: godot --headless --path . -s res://tests/m43_master_c005r_gift_micro_progress.gd
 
@@ -9,11 +9,10 @@ const AppState = preload("res://scripts/app/app_state.gd")
 const HomeScreenScene = preload("res://scenes/ui/home/home_screen.tscn")
 const GiftProgressModel = preload("res://scripts/economy/gift_progress_model.gd")
 const GiftMeterService = preload("res://scripts/economy/gift_meter_service.gd")
-const ResultsScreen = preload("res://scripts/ui/results_screen.gd")
 
 var EXPECTED_CASES := [
 	"g01_model_segments", "g02_ticks_mint_nothing", "g03_home_overlay_no_layout_change", "g04_pulse_once_reduced_static",
-	"g05_no_authority_static", "g06_results_row_model", "g07_one_model_three_surfaces", "g08_crossing_keeps_bundle",
+	"g05_no_authority_static", "g06_flight_gift_model", "g07_one_model_three_surfaces", "g08_crossing_keeps_bundle",
 ]
 
 var _fail := 0
@@ -27,7 +26,7 @@ func _initialize() -> void:
 	await _g03_home_overlay()
 	await _g04_pulse()
 	_g05_no_authority_static()
-	_g06_results_row_model()
+	await _g06_flight_gift_model()
 	await _g07_one_model()
 	_g08_crossing_keeps_bundle()
 	_cleanup()
@@ -111,25 +110,30 @@ func _g05_no_authority_static() -> void:
 
 # ------------------------------------------------------------------- R05-002 ----
 
-func _g06_results_row_model() -> void:
-	print("[g06 Results gift row = shared model of the committed receipt value]")
-	var rows: Array = ResultsScreen.reward_rows({"reveal_queue": [{"kind": "gift_meter", "from": 41, "to": 61, "cycle_max": 1000, "milestones": [50]}], "follow_ups": []})
-	_ok(rows.size() == 1 and rows[0]["text"] == "Gift Meter 61/100", "row text = progress / next milestone %s" % str(rows))
-	_complete("g06_results_row_model")
+func _g06_flight_gift_model() -> void:
+	print("[g06 the win flight's Gift count = shared model of the committed receipt value]")
+	var r := await _home("g06", 41)
+	var home = r[1]
+	home.show_hud_value("gift_meter", 61)   # the receipt's 41 -> 61 count crossed milestone 50
+	var want := GiftProgressModel.build(61)
+	want["cycle_max"] = want["next"]
+	_ok(home.get_region("GiftMeterBar").caption.text == "61/100" and home.get_region("GiftTickOverlay").get_model() == want, "bar = progress / next milestone, overlay = shared model %s" % home.get_region("GiftMeterBar").caption.text)
+	r[0].free()
+	_complete("g06_flight_gift_model")
 
 func _g07_one_model() -> void:
-	print("[g07 Home overlay, Gift Bar and Results read one normalized model]")
+	print("[g07 Home overlay, Gift Bar and the win flight read one normalized model]")
 	var r := await _home("g07", 330)
 	var home = r[1]
 	var app = r[2]
 	var svc := GiftProgressModel.from_service(app.economy.gift)
 	var popup = home.open_popup("gift_bar")
 	await process_frame
-	var res_text: String = ResultsScreen.reward_rows({"reveal_queue": [{"kind": "gift_meter", "to": app.economy.gift.cycle_progress(), "cycle_max": 1000}], "follow_ups": []})[0]["text"]
 	var on_bar := svc.duplicate()
 	on_bar["cycle_max"] = svc["next"]   # the Home bar spans 0..next
 	_ok(home.get_region("GiftTickOverlay").get_model() == on_bar, "Home overlay model == model from the service (0..next scale)")
-	_ok(popup.get_note().contains("Gift Meter 330/500") and res_text == "Gift Meter 330/500", "Gift Bar note and Results row state the same model values")
+	home.show_hud_value("gift_meter", app.economy.gift.cycle_progress())
+	_ok(popup.get_note().contains("Gift Meter 330/500") and home.get_region("GiftMeterBar").caption.text == "330/500", "Gift Bar note and the win flight's count state the same model values")
 	r[0].free()
 	_complete("g07_one_model_three_surfaces")
 

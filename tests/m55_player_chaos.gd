@@ -227,6 +227,9 @@ func _boot(frontier: int = 1, sb: int = 0) -> void:
 
 ## Acknowledge / close whatever the app put on the stack (boot ceremonies, What's New, ...).
 func _drain_all() -> void:
+	var t0 := Time.get_ticks_msec()   # SB-PHONE-2026-11-12-E: a win's reward flight lands first
+	while _root.get_home().is_reward_flight_running() and Time.get_ticks_msec() - t0 < 10000:
+		await process_frame
 	for _i in range(60):
 		await _frames(3)
 		var p = _top()
@@ -549,12 +552,11 @@ func _bg_gameplay() -> void:
 		var st := _play_out(host, d)
 		print("    lap %d: play-out %d ms, %d clicks" % [rep + 1, Time.get_ticks_msec() - tp, d["i"]])
 		await _frames(4)
-		_ok(st == "WON" and terminals == ["WON"] and _nav().current() == R.RESULTS, "lap %d: attempt reached one WON -> Results %s" % [rep + 1, str(terminals)])
+		_ok(st == "WON" and terminals == ["WON"] and _nav().current() == R.HOME, "lap %d: attempt reached one WON -> Home (SB-PHONE-2026-11-12-E) %s" % [rep + 1, str(terminals)])
 		var sb1: int = _e().wallet.scrub_bucks()
 		_ok((sb1 > sb0) == (rep == 0), "lap %d: first-clear reward granted once per level (lap 2 = repeat clear, no reward)" % (rep + 1))
 		await _bg_cycle()
-		_ok(_e().wallet.scrub_bucks() == sb1 and terminals.size() == 1, "lap %d: background over Results grants nothing more" % (rep + 1))
-		_root.get_results_screen().get_home_button().pressed.emit()
+		_ok(_e().wallet.scrub_bucks() == sb1 and terminals.size() == 1, "lap %d: background over the win's Home grants nothing more" % (rep + 1))
 		await _drain_all()
 		lap.append(await _quiet())
 		_free_home(lap[rep], "019 gameplay lap %d" % (rep + 1))
@@ -564,36 +566,35 @@ func _bg_gameplay() -> void:
 	_completed["019_bg_gameplay"] = true
 
 func _bg_results_video() -> void:
-	print("[019 background / focus loss during the Results reveal + WIN video, resize, refresh]")
+	print("[019 background / focus loss during the win's Home reward flight, resize, refresh]")
 	await _boot(1)
 	_root.play_current_frontier()
 	await _frames(2)
 	var st := _play_out(_root.get_gameplay_host())
-	var res = _root.get_results_screen()
+	var home = _root.get_home()
 	await _frames(2)
 	var truth0 := _truth()
 	var log0: int = _root.feel.dispatch_log().size()
-	var revealing: bool = res.is_revealing()
+	var revealing: bool = home.is_reward_flight_running()
 	await _bg_cycle(6)
 	_sub.size = Vector2i(1536, 2048)
 	await _frames(4)
 	_sub.size = Vector2i(1080, 2160)
 	await _bg_cycle(6)
 	for _f in range(900):
-		if not res.is_revealing():
+		if not home.is_reward_flight_running():
 			break
 		await process_frame
-	_ok(st == "WON" and revealing and not res.is_revealing(), "WON Results: reveal was running at background and completed after resume")
-	_ok(_truth() == truth0, "background / resize during Results changed no authority truth")
+	_ok(st == "WON" and revealing and not home.is_reward_flight_running(), "WON -> Home: the reward flight was running at background and completed after resume")
+	_ok(_truth() == truth0, "background / resize during the flight changed no authority truth")
 	var keys: Array = _root.feel.dispatch_log().map(func(x): return String(x[1])).filter(func(k): return not k.is_empty())
 	var dup: Array = keys.filter(func(k): return keys.count(k) > 1)
 	_ok(dup.is_empty() and _root.feel.dispatch_log().size() >= log0, "no one-shot feel key replayed by background / resize %s" % str(dup))
 	_ok(_max_playing <= 1, "at most one video decoder playing at any frame (max %d)" % _max_playing)
-	res.get_home_button().pressed.emit()
 	await _drain_all()
 	var s := await _quiet()
-	_free_home(s, "019 Results")
-	_ok(s["decoders"] == 0 and s["emitters"] == 0, "Results video and WIN bursts released at HOME")
+	_free_home(s, "019 win Home")
+	_ok(s["decoders"] == 0 and s["emitters"] == 0, "videos and reward bursts released at HOME")
 	_completed["019_bg_results_video"] = true
 
 func _bg_rewarded_purchase() -> void:
@@ -1103,7 +1104,7 @@ func _plugin_chaos() -> void:
 	_ok(spark != null and gff != null, "both installed plugin autoloads present")
 	var lap: Array = []
 	for rep in range(2):
-		# WON Results with real plugins; mid-celebration: Spark removed, Reduced toggled 10x, background.
+		# WON -> Home with real plugins; mid reward flight: Spark removed, Reduced toggled 10x, background.
 		_app().progression.import_snapshot({"schema": "scrubbots.progression.v1", "current_level": 1, "completed": []})
 		_e().hearts.import_snapshot({"hearts": 5, "anchor": _now[0]})
 		_root.feel._use_override = false   # real installed plugins
@@ -1119,14 +1120,12 @@ func _plugin_chaos() -> void:
 		app.set_reduced_effects(false)
 		await _bg_cycle()
 		get_root().add_child(spark)
-		var res = _root.get_results_screen()
 		for _f in range(900):
-			if not res.is_revealing():
+			if not _root.get_home().is_reward_flight_running():
 				break
 			await process_frame
-		_ok(st == "WON" and _truth() == truth0, "lap %d: Spark removed + 10 Reduced toggles + background mid-WIN: authority truth unchanged" % (rep + 1))
+		_ok(st == "WON" and _truth() == truth0, "lap %d: Spark removed + 10 Reduced toggles + background mid reward flight: authority truth unchanged" % (rep + 1))
 		# Faulting Spark through the Gift ceremonies (labelled injection), then plugins absent.
-		res.get_home_button().pressed.emit()
 		await _drain_all()
 		var faulty := FaultySpark.new()
 		_root.feel.set_backends_for_test(null, faulty)

@@ -1,8 +1,10 @@
 extends SceneTree
 ## SB-POLISH-004 / 005 / 006 — owner phone-playtest polish batch (2026-10-31), real app root
 ## (main.tscn) in a 1080x2160 SubViewport, real pointer events through the viewport GUI:
-##   004 CLEAN NEXT answers the first tap: the finished board's top_level Supply HitAreas no longer
-##       sit above Results (they were their own GUI roots and silently ate the tap);
+##   004 the finished board's top_level Supply HitAreas stop picking at the terminal (they were
+##       their own GUI roots and silently ate taps meant for the surface above the board); since
+##       SB-PHONE-2026-11-12-E that surface is the win animation, which takes every tap itself
+##       (no skip) and then goes Home by itself (Back skips);
 ##   005 Robots rows 1 (Scrubby, ACTIVE) and 2 (Moppy, UNLOCK) open their detail card on a row tap,
 ##       ACTIVE / UNLOCK buttons unchanged, a swipe opens nothing;
 ##   006 Home Scrub Bucks "+" opens the focused Scrub Bucks popup (balance + SB packs, honestly
@@ -49,8 +51,10 @@ func _initialize() -> void:
 # ------------------------------------------------------------------ cases ----
 
 func _p004() -> void:
-	print("[p004 Results CLEAN NEXT: first tap, nothing above it]")
+	print("[p004 terminal: HitAreas off, the win animation owns taps, then Home]")
+	MainScript.boot_win_animation_override = 1
 	await _boot("p004")
+	MainScript.boot_win_animation_override = -1
 	var nav = _root.get_navigation()
 	_root.play_current_frontier()
 	await _frames(2)
@@ -77,30 +81,26 @@ func _p004() -> void:
 	_complete("p004_pause_popup_not_under_hit_areas")
 	_drain(h)
 	await _frames(3)
-	var res = _root.get_results_screen()
-	res.finish_reveal()
-	await _frames(3)
 	var hits := _hit_areas(h)
-	_ok(not hits.is_empty() and hits.all(func(c): return c.mouse_filter == Control.MOUSE_FILTER_IGNORE), "terminal: all %d top_level Supply HitAreas stop picking" % hits.size())
+	_ok(nav.current() == R.GAMEPLAY and _root.get_win_overlay() != null and not hits.is_empty() and hits.all(func(c): return c.mouse_filter == Control.MOUSE_FILTER_IGNORE),
+		"terminal (win animation): all %d top_level Supply HitAreas stop picking" % hits.size())
 	_complete("p004_hit_areas_off_after_terminal")
-	var b: Button = res.get_primary_button()
-	var r: Rect2 = b.get_global_rect()
+	var o: Control = _root.get_win_overlay()
+	var r: Rect2 = o.get_global_rect()
 	var bad: Array = []
 	for fx in [0.05, 0.25, 0.5, 0.75, 0.95]:
 		for fy in [0.1, 0.5, 0.9]:
-			var p := r.position + r.size * Vector2(fx, fy)
-			_move(p)
+			var pt := r.position + r.size * Vector2(fx, fy)
+			_move(pt)
 			await process_frame
-			if _sub.gui_get_hovered_control() != b:
-				bad.append("%s->%s" % [str(p), str(_sub.gui_get_hovered_control())])
-	# SB-PHONE-2026-11-12-B: the WON primary is HOME (the one action after a win).
-	_ok(nav.current() == R.RESULTS and not b.disabled and b.text == UiText.t("RESULTS_HOME") and r.size.y >= UiTokens.TOUCH_MIN and r.size.x >= UiTokens.TOUCH_MIN,
-		"WON primary HOME live, hit area %s >= %d px" % [str(r.size), UiTokens.TOUCH_MIN])
-	_ok(bad.is_empty(), "15 points across HOME all pick the button itself %s" % str(bad))
+			if _sub.gui_get_hovered_control() != o:
+				bad.append("%s->%s" % [str(pt), str(_sub.gui_get_hovered_control())])
+	_ok(bad.is_empty(), "15 points across the screen pick the win animation itself %s" % str(bad))
 	var t0: int = nav.transition_id()
 	await _click(r.get_center())
 	await _frames(2)
-	_ok(nav.current() == R.HOME and nav.transition_id() == t0 + 1 and _root.get_gameplay_host() == null, "ONE real tap -> Home (no level started)")
+	_ok(nav.current() == R.GAMEPLAY and _root.get_win_overlay() != null, "a tap is consumed, never skips or reaches the board")
+	_ok(_root.handle_back() == "home" and nav.current() == R.HOME and nav.transition_id() == t0 + 1 and _root.get_gameplay_host() == null, "Back -> Home (no level started)")
 	_root.get_modal_stack().clear("t")
 	_ok(_root.play_current_frontier().get("ok", false) and int(_root.get_gameplay_host().progression_level) == 2, "Home PLAY -> next level (Level 2)")
 	await _frames(2)

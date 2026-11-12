@@ -25,7 +25,7 @@ const SHORTCUTS := "res://assets/ui/final/home/shortcuts/"
 const LEGACY_LEVELS := {"daily": 4, "shop": 8, "tasks": 12, "collection": 20}
 
 var EXPECTED_CASES := ["a_daily_at_l4", "b_several_ascending", "c_ack_once_no_grant", "d_grandfather_and_l1",
-	"e_no_icon_skipped", "f_reduced_same_labels", "g_save_failure_pending", "h_keys_distinct", "i_results_handoff"]
+	"e_no_icon_skipped", "f_reduced_same_labels", "g_save_failure_pending", "h_keys_distinct", "i_home_handoff"]
 
 var _fail := 0
 var _completed: Dictionary = {}
@@ -211,7 +211,7 @@ func _h_keys_distinct() -> void:
 	_complete("h_keys_distinct")
 
 func _i_results_handoff() -> void:
-	print("[i real app root: winning L3 hands off to the Daily ceremony; coachmark hidden under it]")
+	print("[i real app root: winning L3 goes Home, the Daily ceremony follows the reward flight; coachmark hidden under it]")
 	_sub = SubViewport.new()
 	_sub.size = Vector2i(1080, 2160)
 	_sub.disable_3d = true
@@ -235,27 +235,27 @@ func _i_results_handoff() -> void:
 	h.get_runtime().set_process(false)
 	h.get_completion().terminal_reached.emit(&"WON", {})
 	await _frames(2)
-	var res = _root.get_results_screen()
-	_ok(_root.get_navigation().route_name() == "RESULTS" and res.has_ceremony_barrier(), "WON L3 -> frontier 4: Results ceremony barrier holds")
-	res.finish_reveal()
+	var home = _root.get_home()
+	_ok(_root.get_navigation().route_name() == "HOME" and home.is_reward_flight_running() and _root.get_modal_stack().depth() == 0, "WON L3 -> frontier 4: Home, rewards fly in first (no ceremony yet)")
+	home.get_reward_flight().finish()
 	var top = null
 	for _i in range(20):
 		await _frames(1)
 		top = _root.get_modal_stack().top()
 		if top != null:
 			break
-	_ok(top != null and String(top.context.get("ceremony_key", "")) == "unlock:daily" and _root.get_modal_stack().depth() == 1, "after the reveal: the Daily feature ceremony alone on top")
+	_ok(top != null and String(top.context.get("ceremony_key", "")) == "unlock:daily" and _root.get_modal_stack().depth() == 1, "after the reward flight: the Daily feature ceremony alone on top")
 	_ok(not _root.get_coachmarks().is_showing(), "no coachmark over the ceremony")
 	_close_cta(top)
 	await _frames(4)
-	_ok(not res.has_ceremony_barrier() and _root.get_app_state().economy.meta_ui.is_seen("unlock:daily"), "acknowledged; barrier released")
+	_ok(_root.get_app_state().economy.meta_ui.is_seen("unlock:daily") and _root.get_navigation().route_name() == "HOME", "acknowledged; still Home")
 	_ok(AppState.new(path).economy.meta_ui.is_seen("unlock:daily"), "durably saved")
 	if _root != null and is_instance_valid(_root):
 		_root.free()
 	_unmount()
 	_root = null
 	MainScript.boot_save_path_override = ""
-	_complete("i_results_handoff")
+	_complete("i_home_handoff")
 
 # ------------------------------------------------------------------ helpers ----
 

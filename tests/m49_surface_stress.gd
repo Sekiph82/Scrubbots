@@ -217,12 +217,16 @@ func _v07() -> void:
 		host.get_runtime().set_process(false)
 		var res = _root.get_results_screen()
 		res.visible = true
-		var model: Dictionary = _root._results_model({"status": "WON", "level": 1, "attempt": 1})
-		model["receipt"] = _receipt("WON")
+		# SB-PHONE-2026-11-12-E: only a LOST shows Results (a win goes Home).
+		var model: Dictionary = _root._results_model({"status": "LOST", "level": 1, "attempt": 1})
+		model["receipt"] = _receipt("LOST")
 		res.show_model(model)
 		await _frames(4)
-		res.finish_reveal()
-		await create_timer(0.5).timeout   # the CLEAN NEXT emphasis bump (0.40 s) settles
-		_track_results(phys, lv, res, safe)
+		var rbad: Array = []
+		for b in [res.get_primary_button(), res.get_home_button()]:
+			var r: Rect2 = (b as Control).get_global_rect()
+			if not _inside(r, safe) or r.size.y < TOUCH - 0.5:
+				rbad.append("%s %s" % [b.name, _rs(r)])
+		_ok(rbad.is_empty(), "%s Results LOST: RETRY + HOME inside the notch safe rect, >= 88 px %s" % [str(phys), str(rbad)])
 		res.visible = false
 	_complete("v07_compact_degradation")

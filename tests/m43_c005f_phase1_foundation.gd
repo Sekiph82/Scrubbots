@@ -583,10 +583,10 @@ func _b04() -> void:
 	var h = root.get_gameplay_host()
 	h.get_runtime().set_process(false)
 	h.get_completion().terminal_reached.emit(&"WON", {})
-	await _frames(4)
 	var rc: Dictionary = h.get_terminal_receipt()
-	_ok(r.get("ok", false) and root.get_navigation().route_name() == "RESULTS" and bool(rc.get("first_clear", false)) and bool(rc.get("saved", false)), "launch, WON commit + save, Results all work without plugins")
-	_ok(root.feel.play("WIN", root.get_results_screen(), "b04") and root.feel.play("MAJOR_UNLOCK", root.get_results_screen()), "adapter calls stay harmless no-ops")
+	await _frames(4)
+	_ok(r.get("ok", false) and root.get_navigation().route_name() == "HOME" and bool(rc.get("first_clear", false)) and bool(rc.get("saved", false)), "launch, WON commit + save, win -> Home all work without plugins")
+	_ok(root.feel.play("WIN", root.get_home(), "b04") and root.feel.play("MAJOR_UNLOCK", root.get_home()), "adapter calls stay harmless no-ops")
 	root.free()
 	sub.free()
 	MainScript.boot_save_path_override = ""

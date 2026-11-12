@@ -195,7 +195,7 @@ func _f09() -> void:
 	_complete("f09_adapter_never_an_authority_callback")
 
 func _f10() -> void:
-	print("[f10 plugin autoloads removed: Home -> gameplay -> WON -> Results still work]")
+	print("[f10 plugin autoloads removed: Home -> gameplay -> WON -> Home + reward flight still work]")
 	var removed: Array = []
 	for n in ["GameFeelFlow", "Spark"]:
 		var node := get_root().get_node_or_null(n)
@@ -218,12 +218,12 @@ func _f10() -> void:
 	var h = root.get_gameplay_host()
 	h.get_runtime().set_process(false)
 	h.get_completion().terminal_reached.emit(&"WON", {})
+	var rc: Dictionary = h.get_terminal_receipt()
 	for _i in range(4):
 		await process_frame
-	var rc: Dictionary = h.get_terminal_receipt()
 	_ok(get_root().get_node_or_null("GameFeelFlow") == null and get_root().get_node_or_null("Spark") == null, "both plugin autoloads absent")
-	_ok(r.get("ok", false) and root.get_navigation().route_name() == "RESULTS" and bool(rc.get("first_clear", false)) and bool(rc.get("saved", false)), "launch, WON commit + save, Results all work")
-	_ok(root.feel != null and root.feel.play("WIN", root.get_results_screen(), "f10") , "adapter call with plugins absent is a harmless no-op")
+	_ok(r.get("ok", false) and root.get_navigation().route_name() == "HOME" and root.get_home().is_reward_flight_running() and bool(rc.get("first_clear", false)) and bool(rc.get("saved", false)), "launch, WON commit + save, Home + reward flight all work (SB-PHONE-2026-11-12-E)")
+	_ok(root.feel != null and root.feel.play("WIN", root.get_home(), "f10") , "adapter call with plugins absent is a harmless no-op")
 	root.free()
 	sub.free()
 	MainScript.boot_save_path_override = ""

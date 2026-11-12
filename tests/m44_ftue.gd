@@ -10,6 +10,7 @@ extends SceneTree
 ##
 ## Run: godot --headless --path . -s res://tests/m44_ftue.gd
 
+const ResultsMomentum = preload("res://scripts/progression/results_momentum.gd")
 const MainScene = preload("res://scenes/app/main.tscn")
 const MainScript = preload("res://scripts/app/main.gd")
 const AppState = preload("res://scripts/app/app_state.gd")
@@ -639,9 +640,9 @@ func _t20() -> void:
 	_ok(e.events.claimable_count() == 0, "no fabricated Weekly / First-Try reward")
 	var o: Array = e.orders.orders()
 	_ok(o.size() == 3 and bool(o[1]["available"]) and bool(o[2]["available"]), "Daily Scrub Orders live from day one (slots 1, 2)")
-	var m: Dictionary = _root._results_model({"status": "WON", "level": 1, "attempt": 1})
-	_ok(m.has("momentum") and bool(m["momentum"].get("ok", false)) and int(m["momentum"]["journey"].get("anchor", 0)) == 1 and not m.has("continue"),
-		"Results journey from the canonical progression (no invented level, no next-level offer)")
+	var mo: Dictionary = ResultsMomentum.results_model(_root.get_app_state(), 1, _root.momentum_cfg)
+	_ok(bool(mo.get("ok", false)) and int(mo["journey"].get("anchor", 0)) == 1 and not mo.has("next"),
+		"win journey from the canonical progression (no invented level, no next-level offer)")
 	_complete("t20_fresh_meta_dependencies")
 
 func _t21() -> void:

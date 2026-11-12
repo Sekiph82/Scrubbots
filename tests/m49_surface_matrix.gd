@@ -7,7 +7,7 @@ extends "res://tests/m49_touch_targets_text_stress.gd"
 ##       explicitly recorded NOT_BUILT row (a new manifest surface fails this ledger)
 ##   v02 every walked surface (Home popups, Collection set / card / exchange, Robot detail,
 ##       acquisition popups, generic popups, ceremonies, packs, gameplay popups, Level Intro,
-##       Results WON / LOST) on all 8 sizes: frame inside the screen, touch, text
+##       win animation, Results LOST) on all 8 sizes: frame inside the screen, touch, text
 ##   v06 tracks (SB-M49-031): Results journey (10 nodes, no overlap) + Next Cleanup + Catch-Up
 ##       row, Events Weekly + First-Try, Tasks ScrubBox, Comeback Catch-Up on all 8 sizes;
 ##       CTAs stay >= 88.
@@ -24,6 +24,7 @@ const DailyScreens = preload("res://scripts/ui/daily/daily_screens.gd")
 const RewardedAdsScreen = preload("res://scripts/ui/daily/rewarded_ads_screen.gd")
 const MetaCeremonies = preload("res://scripts/ui/ceremony/meta_ceremonies.gd")
 const Popups = preload("res://scripts/ui/popup/popups.gd")
+const WinOverlay = preload("res://scripts/ui/win_overlay.gd")
 const LevelIntroOverlay = preload("res://scripts/ui/level_intro_overlay.gd")
 const ResponsiveLayout = preload("res://scripts/ui/responsive_layout.gd")
 const NavigationController = preload("res://scripts/app/navigation_controller.gd")
@@ -42,7 +43,7 @@ const HOME_EXTRA := ["comeback", "rewarded_ads", "achievements", "notifications"
 ## Manifest surface id -> walked rows, or "NOT_BUILT: why" (recorded, never invented).
 const ROWS := {
 	"gameplay_v02": ["gameplay"], "pause": ["pause"], "level_intro": ["level_intro"],
-	"victory_results": ["results_WON"], "fail_retry": ["results_LOST"], "life_heart_refill": ["life"],
+	"victory_results": ["win_animation"], "fail_retry": ["results_LOST"], "life_heart_refill": ["life"],
 	"need_a_hand": ["need_a_hand"], "booster_acquire": ["booster_plus_one_slot", "booster_random", "booster_selector", "booster_tornado"],
 	"speed_2x_acquire": ["speed_acquire"], "insufficient_sb": ["insufficient_sb", "scrub_bucks"], "shop": ["shop"],
 	"collection_album": ["collection"], "collection_set_detail": ["collection_set"], "card_detail": ["card_detail"],
@@ -124,7 +125,7 @@ func _rows() -> Array:
 	return out
 
 ## One size: Home surfaces on a returning player (Comeback + Catch-Up live), then gameplay,
-## its popups, Level Intro and Results WON / LOST.
+## its popups, Level Intro, the win animation and Results LOST.
 func _walk(phys: Vector2i) -> void:
 	var lv := _logical(phys)
 	await _boot_returning("walk", lv)
@@ -198,24 +199,25 @@ func _walk(phys: Vector2i) -> void:
 	await _frames(3)
 	await _scan(phys, lv, "level_intro", intro)
 	intro.free()
+	# SB-PHONE-2026-11-12-E: a win plays the level-complete animation over the board (no Results).
+	var win = WinOverlay.new()
+	win.reduced = true
+	host.add_child(win)
+	await _frames(3)
+	await _scan(phys, lv, "win_animation", win)
+	win.free()
 	var res = _root.get_results_screen()
-	for status in ["WON", "LOST"]:
-		res.visible = true
-		var model: Dictionary = _root._results_model({"status": status, "level": 1, "attempt": 1})
-		model["receipt"] = _receipt(status)
-		res.show_model(model)
-		await _frames(4)
-		res.finish_reveal()
-		await create_timer(0.5).timeout   # the primary emphasis bump (0.40 s) settles
-		await _scan(phys, lv, "results_" + status, res)
-		if status == "WON":
-			_track_results(phys, lv, res, Rect2(Vector2.ZERO, Vector2(lv)))
-		else:
-			var nah = acq.open_need_a_hand({"show": true, "level": 1, "picks": [{"id": "tornado"}, {"id": "random"}]})
-			await _frames(4)
-			await _scan(phys, lv, "need_a_hand", nah)
-			stack.clear("test")
-			await _frames(2)
+	res.visible = true
+	var model: Dictionary = _root._results_model({"status": "LOST", "level": 1, "attempt": 1})
+	model["receipt"] = _receipt("LOST")
+	res.show_model(model)
+	await _frames(4)
+	await _scan(phys, lv, "results_LOST", res)
+	var nah = acq.open_need_a_hand({"show": true, "level": 1, "picks": [{"id": "tornado"}, {"id": "random"}]})
+	await _frames(4)
+	await _scan(phys, lv, "need_a_hand", nah)
+	stack.clear("test")
+	await _frames(2)
 	res.visible = false
 
 ## Measure one surface: popup frame (or the control) inside the screen + factory 115 touch +
@@ -321,15 +323,10 @@ func _bundle() -> Dictionary:
 		return {"scrub_bucks": 999999, "bot_parts": 9999, "premium_card_packs": 99, "selected_booster_charges": 99, "guaranteed_new_cards": 9}
 	return {"scrub_bucks": 600, "bot_parts": 2, "premium_card_packs": 1, "selected_booster_charges": 2, "guaranteed_new_cards": 1}
 
-## The fullest committed receipt shape Results shows: every reward-row kind incl. Catch-Up
-## and the Gift follow-up (WON), Hearts + ended streak (LOST). Presentation input only.
-func _receipt(status: String) -> Dictionary:
-	var n := 999999 if _long else 50
-	if status == "LOST":
-		return {"status": "LOST", "hearts": {"before": 5, "after": 4}, "streak": {"before": 999 if _long else 4, "after": 0}}
-	return {"status": "WON", "reveal_queue": [{"kind": "first_clear_sb", "amount": n}, {"kind": "win_streak_sb", "streak": 999 if _long else 5, "amount": n},
-		{"kind": "bot_parts", "amount": n}, {"kind": "gift_meter", "to": 950, "cycle_max": 1000}, {"kind": "collection_cards", "amount": 99 if _long else 1},
-		{"kind": "catchup", "step": 3, "steps": 3, "reward": {"scrub_bucks": n, "bot_parts": 1}}], "follow_ups": [{"kind": "gift_milestone"}]}
+## The fullest committed receipt shape LOST Results shows: Hearts + ended streak. Presentation
+## input only.
+func _receipt(_status: String) -> Dictionary:
+	return {"status": "LOST", "hearts": {"before": 5, "after": 4}, "streak": {"before": 999 if _long else 4, "after": 0}}
 
 ## Weekly (active, 6 milestones) + upcoming Weekly + First-Try Cleanup, through the canonical
 ## EventService loader. v03 uses big reward bundles.
@@ -398,22 +395,6 @@ func _journey_ok(phys: Vector2i, where: String, j, avoid: Array) -> void:
 	if j.mouse_filter != Control.MOUSE_FILTER_IGNORE or j.focus_mode != Control.FOCUS_NONE or j.get_child_count() > 0:
 		bad.append("interactive")
 	_ok(bad.is_empty(), "%s %s journey: one row of 10 info-only nodes inside %s %s" % [str(phys), where, _rs(jr), str(bad)])
-
-func _track_results(phys: Vector2i, lv: Vector2i, res, safe: Rect2) -> void:
-	_journey_ok(phys, "results", res.get_journey_strip(), [])
-	var bad: Array = []
-	if res.get_home_button().visible or res.find_child("NextCleanup", true, false) != null:
-		bad.append("WON shows more than the one HOME action")
-	for b in [res.get_primary_button()]:
-		var r: Rect2 = (b as Control).get_global_rect()
-		if not _inside(r, safe) or r.size.x < TOUCH - 0.5 or r.size.y < TOUCH - 0.5:
-			bad.append("%s %s" % [b.name, _rs(r)])
-	var stack: Control = res.find_child("Stack", true, false)
-	if not _inside(stack.get_global_rect(), safe):
-		bad.append("content %s" % _rs(stack.get_global_rect()))
-	if not res.shown_row_texts().any(func(t): return String(t).contains(UiText.t("RESULTS_CATCHUP", ["", "", ""]).get_slice(" ", 0))):
-		bad.append("no Catch-Up row %s" % str(res.shown_row_texts()))
-	_ok(bad.is_empty(), "%s Results WON: HOME only (>= 88), Catch-Up row, content inside %s %s" % [str(phys), _rs(safe), str(bad)])
 
 func _track_events(phys: Vector2i, p) -> void:
 	var bad: Array = []

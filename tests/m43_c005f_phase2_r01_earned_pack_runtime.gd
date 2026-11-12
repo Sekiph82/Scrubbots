@@ -502,7 +502,7 @@ func _g11() -> void:
 	_complete("g11_duplicate_claim")
 
 func _g12() -> void:
-	print("[g12 a pending pack never interrupts gameplay / Results; it opens back on Home]")
+	print("[g12 a pending pack never interrupts gameplay / the win's reward flight; it opens back on Home]")
 	await _boot(_uniq("g12"))
 	var a = _root.get_app_state()
 	var r: Dictionary = _root.play_current_frontier()
@@ -517,8 +517,8 @@ func _g12() -> void:
 	await _frames(4)
 	_root.request_earned_packs()
 	await _frames(4)
-	_ok(_root.get_navigation().route_name() == "RESULTS" and _pack_count_in_stack() == 0, "RESULTS: no pack popup")
-	_root.get_results_screen().home_requested.emit()
+	_ok(_root.get_navigation().route_name() == "HOME" and _root.get_home().is_reward_flight_running() and _pack_count_in_stack() == 0, "win -> Home, reward flight running: no pack popup (SB-PHONE-2026-11-12-E)")
+	_root.get_home().get_reward_flight().finish()
 	for _i in range(60):
 		await process_frame
 		if _is_pack(_top()):

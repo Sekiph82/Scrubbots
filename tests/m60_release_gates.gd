@@ -10,8 +10,8 @@ extends SceneTree
 ##       placeholder / dummy / lorem / TODO copy in the shipped English table
 ##   SB-M60-003 a brand-new save (shipping FTUE + Level Intro policy, no debug / test unlock):
 ##       first Home, Welcome task claimed through the real TASKS popup, L1 -> L3 played for real
-##       (RealPlayDriver human policy on the shipped host) through Results HOME + Home PLAY, tutorial
-##       window closed at L4
+##       (RealPlayDriver human policy on the shipped host) through the win animation -> Home (by
+##       itself, SB-PHONE-2026-11-12-E) + Home PLAY, tutorial window closed at L4
 ##   SB-M60-004 no ad / store provider: Shop SB packs + No Ads, Home SB +, Life / Rewarded Ads
 ##       video offers are honestly UNAVAILABLE and pressing them grants or charges nothing
 ##   SB-M60-005 Events L30 / Ranks L40 gate on real frontier saves, Ranks counts only cleared
@@ -172,16 +172,17 @@ func _g001() -> void:
 			await _frames(2)
 	var hud_dead: Array = hud.keys().filter(func(k): return String(hud[k]).is_empty())
 	_check(g, "gameplay_hud", gp_ok and hud.size() == 6 and hud_dead.is_empty(), "Home PLAY -> GAMEPLAY; HUD controls -> %s; dead %s" % [str(hud), str(hud_dead)])
-	# Results through the real completion signal (the established terminal test seam; real wins: g003).
+	# Terminals through the real completion signal (the established terminal test seam; real wins: g003).
 	var res := {}
 	var rs = _root.get_results_screen()
 	if gp_ok:
 		var lv := int(host.progression_level)
-		res["won"] = await _terminal(host, &"WON", rs.get_primary_button())
-		# SB-PHONE-2026-11-12-B: the WON Results' one action is HOME; Home PLAY starts the next level.
-		res["won_home_only"] = not rs.get_home_button().visible and rs.get_primary_button().text == UiText.t("RESULTS_HOME")
-		rs.get_primary_button().pressed.emit()
-		await _frames(6)
+		# SB-PHONE-2026-11-12-E: a WON shows no Results (no button) and goes Home by itself.
+		host.get_completion().terminal_reached.emit(&"WON", {})
+		await _frames(4)
+		res["won"] = not rs.visible
+		res["won_no_results"] = nav.current() == NavigationController.Route.HOME and not rs.visible
+		await _drain_popups()
 		res["won_home"] = nav.current() == NavigationController.Route.HOME and _root.get_gameplay_host() == null
 		ms.clear("test")
 		_root.get_home().get_region("PlayButton").pressed.emit()
@@ -202,7 +203,7 @@ func _g001() -> void:
 				await _frames(4)
 				res["home"] = nav.current() == NavigationController.Route.HOME
 	var res_ok: bool = res.size() == 8 and res.values().all(func(v): return v == true)
-	_check(g, "results_buttons", res_ok, "WON -> Results with HOME only, HOME -> Home, PLAY -> next level; LOST -> Results, RETRY -> same level; LOST -> Results, HOME -> Home %s" % str(res))
+	_check(g, "results_buttons", res_ok, "WON -> Home by itself (no Results), PLAY -> next level; LOST -> Results, RETRY -> same level; LOST -> Results, HOME -> Home %s" % str(res))
 	# Registry ledger: every route source is walked and lands on its registry destination.
 	var reg = JSON.parse_string(FileAccess.get_file_as_string(REGISTRY))
 	# Route source -> where its press landed in this walk (Home buttons by node name).
@@ -335,6 +336,7 @@ func _g003() -> void:
 	print("[g003 brand-new save: shipping FTUE + Level Intro policy, real play L1..L3]")
 	MainScript.boot_ftue_override = 1
 	MainScript.boot_level_intro_override = 1
+	MainScript.boot_win_animation_override = 1
 	await _boot("g003")
 	var app = _root.get_app_state()
 	var nav = _root.get_navigation()
@@ -376,26 +378,31 @@ func _g003() -> void:
 		var e = entries[n - 1]
 		var r: Dictionary = RealPlayDriver.play_on_host(host, RealPlayDriver.clicks_for(e.id, e.supply_plan_path, prov))
 		await _frames(4)
-		var to_results: bool = nav.current() == NavigationController.Route.RESULTS
-		steps.append("L%d tip %s: %s -> %s" % [n, tip, "WON" if r.get("won", false) else "NOT WON", nav.route_name()])
-		if not (r.get("won", false) and to_results):
+		var anim: bool = _root.get_win_overlay() != null
+		# The win animation, then Home with no input (SB-PHONE-2026-11-12-E).
+		var t0 := Time.get_ticks_msec()
+		while nav.current() == NavigationController.Route.GAMEPLAY and Time.get_ticks_msec() - t0 < 15000:
+			await process_frame
+		var home_alone: bool = anim and nav.current() == NavigationController.Route.HOME and not _root.get_results_screen().visible
+		steps.append("L%d tip %s: %s -> %s%s" % [n, tip, "WON" if r.get("won", false) else "NOT WON", "win animation -> " if anim else "", nav.route_name()])
+		if not (r.get("won", false) and home_alone):
 			won_all = false
 			break
-		var rs = _root.get_results_screen()
-		var b: Button = rs.get_primary_button()   # WON: HOME is the one action
-		await _settle(b)
-		b.pressed.emit()
-		await _frames(6)
+		while home.is_reward_flight_running() and Time.get_ticks_msec() - t0 < 30000:
+			await process_frame
+		await _frames(2)
+		await _settle(home.get_region("PlayButton"))
 		await _drain_popups()
 		if n < 3:
 			home.get_region("PlayButton").pressed.emit()
 			await _frames(6)
 	_check(g, "l1_l3_real_play", won_all and nav.current() == NavigationController.Route.HOME and app.progression.current_level() == 4 and app.economy.ftue.closed,
-		"L1..L3 under the human policy on the shipped host, Results HOME then Home PLAY: %s; at Home L%d, FTUE window closed %s" % [str(steps), app.progression.current_level(), str(app.economy.ftue.closed)])
+		"L1..L3 under the human policy on the shipped host, win animation -> Home by itself, then Home PLAY: %s; at Home L%d, FTUE window closed %s" % [str(steps), app.progression.current_level(), str(app.economy.ftue.closed)])
 	_check(g, "no_debug_tools", not AppStateScript.test_unlock_all and app.unlocks.cfg["unlocks"]["robots"] == 25,
 		"no test unlock, no debug_set_current_level, no injected terminal: the shipped unlock table and real wins only")
 	MainScript.boot_ftue_override = -1
 	MainScript.boot_level_intro_override = -1
+	MainScript.boot_win_animation_override = -1
 	_complete("g003_fresh_save_ftue")
 
 ## Close every popup a real win puts over Results (gift / pack ceremonies arrive after the reveal)

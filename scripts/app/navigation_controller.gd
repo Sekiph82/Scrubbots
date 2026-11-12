@@ -12,10 +12,10 @@ extends RefCounted
 ##   BOOT -> OPENING | HOME
 ##   OPENING -> HOME
 ##   HOME -> GAMEPLAY
-##   GAMEPLAY -> RESULTS           (authoritative terminal only, once per attempt)
-##   GAMEPLAY -> HOME              (pre-action exit only; caller proves it)
-##   RESULTS -> HOME | GAMEPLAY    (GAMEPLAY = Retry after a LOST only; SB-PHONE-2026-11-12-B:
-##                                 a WON goes Home, the next level starts from Home PLAY)
+##   GAMEPLAY -> RESULTS           (authoritative LOST / ERROR terminal only, once per attempt)
+##   GAMEPLAY -> HOME              (pre-action exit, caller proves it; or after a WON terminal:
+##                                 SB-PHONE-2026-11-12-E, the win animation then Home, no Results)
+##   RESULTS -> HOME | GAMEPLAY    (GAMEPLAY = Retry; the next level starts from Home PLAY)
 ## Settings is an overlay flag, openable only from HOME.
 ##
 ## Every transition is deterministic: an illegal edge, an unknown route, a re-entrant
@@ -42,6 +42,7 @@ var _in_transition := false
 var _transition_id := 0
 var _attempt_id := 0
 var _terminal_latched := false
+var _won_pending := false
 var _last_payload: Dictionary = {}
 
 func current() -> int:
@@ -67,8 +68,6 @@ func last_payload() -> Dictionary:
 	return _last_payload.duplicate(true)
 
 func can_go(to: int) -> bool:
-	if _route == Route.RESULTS and to == Route.GAMEPLAY and String(_last_payload.get("status", "")) == "WON":
-		return false
 	return not _in_transition and _EDGES.has(_route) and (_EDGES[_route] as Array).has(to)
 
 ## Request a route change. Returns true only when the transition was accepted.
@@ -82,6 +81,7 @@ func go(to: int, payload: Dictionary = {}) -> bool:
 	_route = to
 	_transition_id += 1
 	_last_payload = payload.duplicate(true)
+	_won_pending = false
 	if to == Route.GAMEPLAY:
 		_attempt_id += 1
 		_terminal_latched = false
@@ -92,15 +92,24 @@ func go(to: int, payload: Dictionary = {}) -> bool:
 	_in_transition = false
 	return true
 
-## Authoritative gameplay terminal -> RESULTS, exactly once per attempt. A stale
-## attempt id, a repeated terminal callback or a call outside GAMEPLAY is rejected.
+## Authoritative gameplay terminal, exactly once per attempt. A stale attempt id, a repeated
+## terminal callback or a call outside GAMEPLAY is rejected. LOST / ERROR -> RESULTS; a WON
+## stays on GAMEPLAY (the app root plays the win animation, then goes HOME: is_won_pending()).
 func on_gameplay_terminal(attempt: int, status: StringName, level: int) -> bool:
 	if _route != Route.GAMEPLAY or attempt != _attempt_id or _terminal_latched:
 		return false
+	if String(status) == "WON":
+		_terminal_latched = true
+		_won_pending = true
+		return true
 	if not can_go(Route.RESULTS):
 		return false
 	_terminal_latched = true
 	return go(Route.RESULTS, {"status": String(status), "level": level, "attempt": attempt})
+
+## True between a WON terminal and the route change that follows it (the win animation).
+func is_won_pending() -> bool:
+	return _won_pending
 
 ## RESULTS -> GAMEPLAY for a Retry of the SAME attempt host: re-arms the terminal
 ## latch under a new attempt id (the host itself performs the transaction-safe retry).

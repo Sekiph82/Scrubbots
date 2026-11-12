@@ -673,7 +673,7 @@ func _localization_seam() -> void:
 	await process_frame
 	var res = ResultsScreen.new()
 	sub.add_child(res)
-	res.show_model({"status": "WON", "level": 1, "attempt": 1})
+	res.show_model({"status": "LOST", "level": 1, "attempt": 1})
 	var numeric := RegEx.create_from_string("^[0-9,/:+. -]*$")
 	var untranslated: Array = []
 	var checked := 0

@@ -53,12 +53,12 @@ Definitions:
 |---|---|---|---|
 | `economy_source` | 007 | `AppState` on `EconomyWallet.changed` (credit) | currency (scrub_bucks / bot_parts), amount (bucket), source: the RewardGrantService tx-id prefix mapped by `AppState.ANALYTICS_SOURCES` (first_clear, win_streak, gift, daily_login, daily_task, rewarded_daily, rewarded_ad, cards_exchange, collection, event, comeback, achievement, starter, refund; anything else other) |
 | `economy_sink` | 007 | `AppState` on `EconomyWallet.changed` (debit) | currency, amount (bucket), sink: the spend tag (booster_use = SB-paid booster, booster_buy = saved charge, heart_plus_one, heart_refill, speed_level / speed_timed = 2x products, robot_unlock) |
-| `hearts_empty` | 007 | `main.gd` `_zero_heart_gate` (Heart starvation: a new attempt refused at 0 Hearts) | at (home_play / results_continue / results_retry) |
+| `hearts_empty` | 007 | `main.gd` `_zero_heart_gate` (Heart starvation: a new attempt refused at 0 Hearts) | at (home_play / results_retry) |
 | `pack_opened` | 008, 019 | `AppState.commit_pack` (committed, not a replayed receipt) | kind, new_cards, duplicates (count buckets), best_rarity, pity (the PackPity guarantee was due for this pack), dry_streak (count bucket of the pity counter after it: earned packs in a row without a new card) |
 | `collection_set_complete` | 008, 019 | `AppState` on `RewardGrantService.granted` `collection_set:<n>` (applied exactly once) | set (1..15), level (campaign frontier when the set completed) |
 | `collection_master_complete` | 008 | `AppState` on `RewardGrantService.granted` `collection_master` | (none) |
 | `robot_unlock` / `robot_equip` | 008 | `AppState` on the app facade `action_committed` (unlock_robot / equip_robot) | robot (roster order 1..10) |
-| `screen_view` | 009 | `main.gd` route change (opening / home / gameplay / results), Home shortcuts and BottomNav, Settings, Help | screen |
+| `screen_view` | 009 | `main.gd` route change (opening / home / gameplay / results; results = a LOST / ERROR terminal only, a win goes Home since SB-PHONE-2026-11-12-E), Home shortcuts and BottomNav, Settings, Help | screen |
 | `shop_open` | 009, 010 | `main.gd` on `ShopHandoff.shop_requested` (every Shop entry; store page view, no purchases exist) | source (home_shop, home_sb_plus, life, booster, speed, need_a_hand) |
 | `launch_failed` | 009 | `main.gd` `launch_gameplay` refusals | reason (APP_BLOCKED, CONTENT_MISSING, CATALOG_INVALID, LEVEL_DISABLED, BUILD_FAILED) |
 | `ad_offer_shown` | 010 | `AcquisitionFlow` Life / Booster / Need a Hand popup opened | placement, available (provider + product state allow a video now) |
@@ -74,7 +74,7 @@ Not sent: transaction ids, tokens and receipts (forbidden names; the ad result o
 
 | Event | Task | Call site | Params |
 |---|---|---|---|
-| `journey_progress` | 018 | `main.gd` WON Results route (the Results journey, anchor = the won level) | slot (1..10), cycle (1..), cycle_complete (slot 10 of 10), first_clear (progression win vs replay) |
+| `journey_progress` | 018 | `main.gd` win -> Home (`_track_win_journey`, anchor = the won level; was the WON Results route before SB-PHONE-2026-11-12-E) | slot (1..10), cycle (1..), cycle_complete (slot 10 of 10), first_clear (progression win vs replay) |
 | `daily_order_done` | 020 | `ProductionGameplayHost` committed progression win (`DailyOrders.on_level_won` newly done) | tier (easy / normal / stretch), metric (archetype metric), target |
 | `daily_order_claim` | 020 | `AppState` on the facade `action_committed` (`claim_daily_task`, `claim_daily_all_tasks`) | tier (easy / normal / stretch; scrubbox = the all-3 bonus) |
 | `weekly_event` | 021 | host progression terminal (`_track_event_progress`: joined = first counted win, milestone_reached), `AppState` on `claim_event_milestone` (milestone_claimed) | step, milestone (1-based; 0 for joined) |

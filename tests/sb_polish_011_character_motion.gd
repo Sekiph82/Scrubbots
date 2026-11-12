@@ -1,19 +1,23 @@
 extends SceneTree
 ## SB-POLISH-011 V1 — CharacterMotion (scripts/ui/feel/character_motion.gd) on the existing robot
-## art, and its WON / LOST Results wiring:
+## art, and its LOST Results wiring (SB-PHONE-2026-11-12-E: a WON shows no Results; the WIN video
+## plays over the board in WinOverlay):
 ##   every mode moves the character and every mode ends on the static pose (stop / ready end);
 ##   ready < 1 s; win loop sparkles with ONE emitter that stop() removes; a replay never stacks;
-##   Reduced = static, no material, no node; Results WON / LOST play, hidden stops, a re-show of
-##   the same terminal skips the intro, repeated Results leave no extra nodes, CLEAN NEXT stays
+##   Reduced = static, no material, no node; Results LOST plays, hidden stops, a re-show of
+##   the same terminal skips the intro, repeated Results leave no extra nodes, RETRY stays
 ##   live and the robot never takes input.
-## SB-VIDEO-001/002 — Scrubby's Results play the keyed WIN / LOSE video once (one decoder, freed on
+## SB-VIDEO-001/002 — Scrubby's LOST Results play the keyed LOSE video once (one decoder, freed on
 ##   hide / finish, still held after), Reduced = keyed still only, other robots and a failing video
-##   keep the pose + CharacterMotion (the CharacterMotion cases above use a non-Scrubby robot).
+##   keep the pose + CharacterMotion (the CharacterMotion cases above use a non-Scrubby robot);
+##   the keyed WIN video plays in the win animation.
 ##
 ## Run: godot --headless --path . -s res://tests/sb_polish_011_character_motion.gd
 
 const CharacterMotion = preload("res://scripts/ui/feel/character_motion.gd")
 const ResultsScreen = preload("res://scripts/ui/results_screen.gd")
+const WinOverlay = preload("res://scripts/ui/win_overlay.gd")
+const RobotRoster = preload("res://scripts/progression/robot_roster.gd")
 
 var EXPECTED_CASES := [
 	"modes_move", "ready_under_1s", "win_loop_sparkle", "replay_no_stack", "reduced_static",
@@ -112,34 +116,33 @@ func _reduced_static() -> void:
 func _model(status: String, attempt: int, reduced := false, robot := "spark") -> Dictionary:
 	return {"status": status, "level": 3, "attempt": attempt, "receipt": {}, "continue": {"available": true, "next_level": 4}, "reduced_effects": reduced, "robot_id": robot}
 
+## SB-PHONE-2026-11-12-E: a WON never shows Results (the win animation, then Home); Results
+## motion / video is LOST (and the ERROR fallback) only.
 func _results() -> void:
 	var res = ResultsScreen.new()
 	get_root().add_child(res)
 	await process_frame
 	var robot: TextureRect = res.get_robot()
-	res.show_model(_model("WON", 1))
-	await _wait(0.15)
-	_ok(CharacterMotion.is_playing(robot) and robot.scale.y < 1.0, "WON: intro crouch running (scale %s)" % robot.scale)
 	res.show_model(_model("LOST", 2))
 	await _wait(0.2)
 	_ok(CharacterMotion.is_playing(robot) and robot.scale.y < 1.0 and robot.rotation < 0.0, "LOST: droop running (scale %s rot %.3f)" % [robot.scale, robot.rotation])
-	res.show_model(_model("WON", 3, true))
+	res.show_model(_model("LOST", 3, true))
 	await _wait(0.2)
 	_ok(not CharacterMotion.is_playing(robot) and _static(robot), "Reduced Effects model: static robot")
 	res.show_model(_model("ERROR", 4))
 	_ok(not CharacterMotion.is_playing(robot) and _static(robot), "ERROR fallback: no motion")
 	_complete("results_won_lost")
 
-	res.show_model(_model("WON", 5))
+	res.show_model(_model("LOST", 5))
 	await _wait(0.1)
 	res.visible = false
-	_ok(not CharacterMotion.is_playing(robot) and _static(robot) and robot.get_node_or_null("Sparkle") == null, "hidden Results: robot stopped on the static pose")
+	_ok(not CharacterMotion.is_playing(robot) and _static(robot), "hidden Results: robot stopped on the static pose")
 	_complete("results_hidden_stops")
 
 	res.visible = true
-	res.show_model(_model("WON", 5))   # same terminal re-shown (e.g. Continue re-arm)
+	res.show_model(_model("LOST", 5))   # same terminal re-shown
 	await _wait(0.15)
-	_ok(CharacterMotion.is_playing(robot) and robot.scale.y >= 1.0, "re-show of the same terminal: idle bob, no second jump (scale %s)" % robot.scale)
+	_ok(CharacterMotion.is_playing(robot) and robot.scale.y >= 1.0 and is_zero_approx(robot.rotation), "re-show of the same terminal: idle breathe, no second droop (scale %s)" % robot.scale)
 	_complete("results_reshow_skips_intro")
 
 	res.visible = false
@@ -148,23 +151,23 @@ func _results() -> void:
 	Engine.time_scale = 4.0
 	for i in range(4):
 		res.visible = true
-		res.show_model(_model("WON", 10 + i))
-		await _wait(3.0)   # intro + a sparkle cycle (scaled time)
+		res.show_model(_model("LOST", 10 + i))
+		await _wait(3.0)   # intro + a loop cycle (scaled time)
 		res.visible = false
 		await process_frame
 	Engine.time_scale = 1.0
-	_ok(_count(res) == base, "4 WON Results with sparkles, then hidden: node count %d == %d" % [_count(res), base])
+	_ok(_count(res) == base, "4 LOST Results, then hidden: node count %d == %d" % [_count(res), base])
 	_complete("results_no_node_growth")
 
 	res.visible = true
-	res.show_model(_model("WON", 20))
+	res.show_model(_model("LOST", 20))
 	await process_frame
 	var got := [0]
-	res.home_requested.connect(func(): got[0] += 1)
+	res.retry_requested.connect(func(): got[0] += 1)
 	var primary: Button = res.get_primary_button()
-	_ok(CharacterMotion.is_playing(robot) and robot.mouse_filter == Control.MOUSE_FILTER_IGNORE and not primary.disabled, "during the intro: robot ignores input, primary (HOME) enabled")
+	_ok(CharacterMotion.is_playing(robot) and robot.mouse_filter == Control.MOUSE_FILTER_IGNORE and not primary.disabled, "during the intro: robot ignores input, primary (RETRY) enabled")
 	primary.pressed.emit()
-	_ok(got[0] == 1, "primary (HOME) accepted mid-animation")
+	_ok(got[0] == 1, "primary (RETRY) accepted mid-animation")
 	_complete("results_input_live")
 	res.free()
 
@@ -174,45 +177,52 @@ func _video() -> void:
 	await process_frame
 	var robot: TextureRect = res.get_robot()
 	var slot: Control = robot.get_parent()
-	res.show_model(_model("WON", 1, false, ""))
+	res.show_model(_model("LOST", 1, false, ""))
 	await process_frame
 	var slot_size: Vector2 = slot.size
 	var v: VideoStreamPlayer = res.get_result_video()
-	_ok(v != null and v.is_playing() and v.stream.resource_path == ResultsScreen.WIN_VIDEO and (v.material as ShaderMaterial).shader == ResultsScreen.CHROMA_KEY, "Scrubby WON: keyed WIN video playing")
-	_ok(robot.texture.resource_path == ResultsScreen.WIN_STILL and robot.self_modulate.a == 0.0 and not CharacterMotion.is_playing(robot), "Scrubby WON: still bound under the video, no tween")
+	_ok(v != null and v.is_playing() and v.stream.resource_path == ResultsScreen.LOSE_VIDEO and (v.material as ShaderMaterial).shader == ResultsScreen.CHROMA_KEY, "Scrubby LOST: keyed LOSE video playing")
+	_ok(robot.texture.resource_path == ResultsScreen.LOSE_STILL and robot.self_modulate.a == 0.0 and not CharacterMotion.is_playing(robot), "Scrubby LOST: still bound under the video, no tween")
 	_ok(_players(res) == 1 and v.mouse_filter == Control.MOUSE_FILTER_IGNORE and not res.get_primary_button().disabled, "one decoder, ignores input, primary live")
 	res.show_model(_model("LOST", 2, false, "scrubby"))
 	await process_frame
 	v = res.get_result_video()
-	_ok(v != null and v.is_playing() and v.stream.resource_path == ResultsScreen.LOSE_VIDEO and robot.texture.resource_path == ResultsScreen.LOSE_STILL, "Scrubby LOST: keyed LOSE video playing")
-	_ok(_players(res) == 1 and slot.size == slot_size, "LOST after WON: still one decoder, robot slot rect unchanged (%s)" % slot.size)
+	_ok(v != null and v.is_playing() and v.stream.resource_path == ResultsScreen.LOSE_VIDEO and robot.texture.resource_path == ResultsScreen.LOSE_STILL, "next LOST attempt: keyed LOSE video again")
+	_ok(_players(res) == 1 and slot.size == slot_size, "still one decoder, robot slot rect unchanged (%s)" % slot.size)
+	# The WIN video now plays over the board (WinOverlay), never on Results.
+	var o = WinOverlay.new()
+	get_root().add_child(o)
+	await process_frame
+	var wv: VideoStreamPlayer = o.get_video_player()
+	_ok(wv != null and wv.is_playing() and wv.stream.resource_path == WinOverlay.VIDEO and (wv.material as ShaderMaterial).shader == WinOverlay.CHROMA_KEY, "win animation: keyed WIN video playing")
+	o.free()
 	_complete("video_scrubby_win_lose")
 
-	res.show_model(_model("WON", 3, true, ""))
+	res.show_model(_model("LOST", 3, true, ""))
 	await process_frame
-	_ok(res.get_result_video() == null and _players(res) == 0 and robot.texture.resource_path == ResultsScreen.WIN_STILL and robot.self_modulate.a == 1.0 and _static(robot) and not CharacterMotion.is_playing(robot), "Reduced Effects: keyed still only, no decoder, no tween")
+	_ok(res.get_result_video() == null and _players(res) == 0 and robot.texture.resource_path == ResultsScreen.LOSE_STILL and robot.self_modulate.a == 1.0 and _static(robot) and not CharacterMotion.is_playing(robot), "Reduced Effects: keyed still only, no decoder, no tween")
 	_complete("video_reduced_still")
 
-	res.show_model(_model("WON", 4, false, "spark"))
+	res.show_model(_model("LOST", 4, false, "spark"))
 	await _wait(0.15)
-	_ok(res.get_result_video() == null and _players(res) == 0 and robot.texture.resource_path.contains("/victory/robots/") and CharacterMotion.is_playing(robot), "other robot: approved pose + CharacterMotion, no video")
+	_ok(res.get_result_video() == null and _players(res) == 0 and robot.texture.resource_path == RobotRoster.asset("spark", "help_pose") and CharacterMotion.is_playing(robot), "other robot: approved help pose + CharacterMotion, no video")
 	_complete("video_other_robot")
 
-	var still: Texture2D = load(ResultsScreen.WIN_STILL)
+	var still: Texture2D = load(ResultsScreen.LOSE_STILL)
 	var bad := VideoStreamTheora.new()
 	bad.file = "res://tests/__missing_video__.ogv"
 	_ok(not res._start_video(null, still) and not res._start_video(bad, still) and res.get_result_video() == null and _players(res) == 0 and robot.self_modulate.a == 1.0, "unloadable / unplayable video: refused, no decoder left, robot visible (caller keeps the tween)")
 	_complete("video_fail_fallback")
 
-	res.show_model(_model("WON", 5, false, ""))
+	res.show_model(_model("LOST", 5, false, ""))
 	await process_frame
 	res.visible = false
 	await process_frame
 	_ok(res.get_result_video() == null and _players(res) == 0 and robot.self_modulate.a == 1.0, "hidden Results: decoder stopped and freed")
 	res.visible = true
-	res.show_model(_model("WON", 5, false, ""))
+	res.show_model(_model("LOST", 5, false, ""))
 	await process_frame
-	_ok(res.get_result_video() == null and robot.texture.resource_path == ResultsScreen.WIN_STILL, "re-show of the same terminal: still only, the video is not replayed")
+	_ok(res.get_result_video() == null and robot.texture.resource_path == ResultsScreen.LOSE_STILL, "re-show of the same terminal: still only, the video is not replayed")
 	_complete("video_freed_on_hide")
 
 	res.show_model(_model("LOST", 6, false, ""))

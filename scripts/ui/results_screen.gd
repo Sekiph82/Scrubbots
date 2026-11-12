@@ -1,62 +1,35 @@
 extends Control
 ## ResultsScreen — preload (res://scripts/ui/results_screen.gd).
 ##
-## M42 (SB-M42-007) — the Results navigation surface shown once per gameplay terminal.
+## M42 (SB-M42-007) — the Results navigation surface shown once per LOST / ERROR gameplay
+## terminal. SB-PHONE-2026-11-12-E (owner 2026-11-12): a WON never shows Results; the win
+## animation plays over the board and Home opens by itself (main.gd, WinOverlay, Home reward
+## flight), so the WON branch (Victory layout, reward rows, journey, ceremony barrier, feel)
+## is gone.
 ## M43-C001A — presents ONE read-only Results model built by the app root:
-##   {status, level, attempt, receipt, momentum, reduced_effects, robot_id}
-## where `receipt` is the host's committed TerminalRewardReceipt. It never computes
-## rewards or mutates any state (the terminal economy/save already ran inside the
-## gameplay host before this is shown); re-showing/refreshing the same model is pure
-## presentation.
-## M43-C001B — WON visual candidate per OWNER_RESULTS_VISUAL_REPLAY_V01:
-##   - warm Life/Help-family frame built from native StyleBoxes (no one-piece chrome PNG
-##     exists; no art generated);
-##   - the celebrating robot (Scrubby until an equipped-robot authority exists) sits
-##     above and overlaps the frame; a small Victory emblem sits in the header;
-##   - reward rows come ONLY from receipt.reveal_queue (+ gift follow-up), in that order,
-##     each with an existing approved icon + live text;
-##   - green Life/Help-family Home CTA (SB-PHONE-2026-11-12-B: the only WON action);
-##   - a short ordered row reveal (presentation only; rows exist from the start, grants
-##     are already committed, Home is never gated by it). Reduced Effects shows every
-##     row immediately. M43-C005-C005: driven by the shared RevealSequencer.
-## M43-C004 (SB-M43-050) — LOST is the production Fail surface in the same family: the
-##   existing help Scrubby pose (no sad pose exists yet) above the cream frame, the
-##   existing fail emblem in the header, `LEVEL FAILED`, live level, the committed loss
-##   rows from the receipt (Hearts before -> after, ended Win Streak), Retry primary and
-##   Home secondary. No Victory art, no Replay, no ad CTA. It only presents the loss the
-##   host already committed; Retry/Home apply nothing here.
-## ERROR keeps the technical fallback layout with NO Victory art.
-## M43-C001R (SB-M43-R01-001..004) — WON momentum: the compact 10-Level Cleaning Journey
-##   (shared JourneyStrip) after the committed reward rows. Read-only: model["momentum"] comes
-##   from ResultsMomentum; nothing here grants or resolves content.
-## SB-PHONE-2026-11-12-B (owner 2026-11-12, supersedes the M43-C001R CLEAN NEXT CTA + Next
-##   Cleanup teaser): a win goes back Home. WON has no next-level action or teaser; its one
-##   action is HOME (the green primary). The next level starts only from Home PLAY.
-##   Ceremony barrier seam (M43-C005): while any barrier is set the primary's emphasis waits.
-## There is no Replay control (owner A1-NO).
-## M43-C005F-PHASE2 (SB-M43-C005F-003 / -004) — optional presentation feel through the ONE app
-##   feel adapter (set_feedback; null = exactly the native Results above). Only for WON, only
-##   after the committed terminal already exists, every event one-shot per terminal identity
-##   ("results:WON:a<attempt>:L<level>[:...]") so re-show / resize / refresh / barrier never
-##   replays:
-##     - WIN: bounded confetti at the robot (adapter WIN) + one restrained native emblem pop;
-##     - each committed reward row, as its reveal step starts: adapter REWARD pickup at the row
-##       + a tiny native settle (at most ROW_FEEL_MAX rows; rows / order / text untouched);
-##     - the primary (HOME): one subtle native pulse once the reveal is done, no ceremony barrier
-##       holds it and it is actionable (never disables, delays or latches anything).
-##   Reduced Effects: keys are consumed but nothing moves and no plugin work happens.
-## SB-POLISH-011 V1 — WON / LOST robot motion (CharacterMotion `win` / `lose`) on the existing
-##   pose, independent of the adapter: draw-only (layout and input untouched), Reduced = static,
-##   a re-show of the same terminal skips the intro straight to the idle loop, hidden = stopped.
-## SB-VIDEO-001/002 — Scrubby's WON / LOST robot slot plays the owner's Flow result video once,
-##   magenta keyed by chroma_key_magenta.gdshader, then holds the pre-keyed still (frame 0 = last
+##   {status, level, attempt, receipt, reduced_effects, robot_id}
+## where `receipt` is the host's committed TerminalRewardReceipt. It never computes or
+## mutates any state (the terminal economy/save already ran inside the gameplay host before
+## this is shown); re-showing/refreshing the same model is pure presentation.
+## M43-C004 (SB-M43-050) — LOST is the production Fail surface: the existing help Scrubby pose
+##   above the cream Life/Help-family frame (native StyleBoxes), the existing fail emblem in the
+##   header, `LEVEL FAILED`, live level, the committed loss rows from the receipt (Hearts
+##   before -> after, ended Win Streak), Retry primary and Home secondary. No Victory art, no
+##   Replay, no ad CTA. It only presents the loss the host already committed; Retry/Home apply
+##   nothing here.
+## ERROR keeps the technical fallback layout.
+## SB-POLISH-011 V1 — LOST robot motion (CharacterMotion `lose`) on the existing pose: draw-only
+##   (layout and input untouched), Reduced = static, a re-show of the same terminal skips the
+##   intro straight to the idle loop, hidden = stopped.
+## SB-VIDEO-002 — Scrubby's LOST robot slot plays the owner's Flow result video once, magenta
+##   keyed by chroma_key_magenta.gdshader, then holds the pre-keyed still (frame 0 = last
 ##   frame). Reduced Effects or a re-show of the same terminal shows only the still. One decoder,
 ##   freed when Results hides or re-shows; it never takes input and the slot rect never changes.
 ##   Other robots, or a video that fails to load / play, keep the approved pose + CharacterMotion.
 ##
 ## Actions (intents only; the app root performs them):
-##   HOME (WON primary, LOST / ERROR secondary) -> home_requested
-##   LOST: RETRY         -> retry_requested     (M30 transaction-safe retry)
+##   LOST: RETRY (primary) -> retry_requested     (M30 transaction-safe retry)
+##   HOME (secondary)      -> home_requested
 
 signal home_requested
 signal retry_requested
@@ -64,42 +37,28 @@ signal retry_requested
 const UiTokens = preload("res://scripts/ui/ui_tokens.gd")
 const UiText = preload("res://scripts/ui/ui_text.gd")
 const HomeStyle = preload("res://scripts/ui/home/home_style.gd")
-const JourneyStrip = preload("res://scripts/ui/components/journey_strip.gd")
-const RevealSequencer = preload("res://scripts/ui/components/reveal_sequencer.gd")
-const GiftProgressModel = preload("res://scripts/economy/gift_progress_model.gd")
 const RobotRoster = preload("res://scripts/progression/robot_roster.gd")
 const CharacterMotion = preload("res://scripts/ui/feel/character_motion.gd")
 
 ## Existing approved production art (never written by this screen).
-const ROBOT_ART := "res://assets/ui/final/popups/victory/victory_scrubby_pose.png"
-const EMBLEM_ART := "res://assets/ui/final/popups/victory/victory_emblem.png"
 const FAIL_ROBOT_ART := "res://assets/ui/final/popups/help/help_scrubby_pose.png"
 const FAIL_EMBLEM_ART := "res://assets/ui/final/popups/failure/fail_header_emblem.png"
-## SB-VIDEO-001/002: Scrubby result videos (see assets/ui/final/popups/videos/PROVENANCE.md).
+## SB-VIDEO-002: Scrubby LOSE result video (see assets/ui/final/popups/videos/PROVENANCE.md).
 const SCRUBBY_ID := "scrubby"
-const WIN_VIDEO := "res://assets/ui/final/popups/videos/result_scrubby_win.ogv"
-const WIN_STILL := "res://assets/ui/final/popups/videos/result_scrubby_win_still.png"
 const LOSE_VIDEO := "res://assets/ui/final/popups/videos/result_scrubby_lose.ogv"
 const LOSE_STILL := "res://assets/ui/final/popups/videos/result_scrubby_lose_still.png"
 const CHROMA_KEY := preload("res://scripts/ui/feel/chroma_key_magenta.gdshader")
 const ICON_ART := {
-	"first_clear_sb": "res://assets/ui/final/common/currencies/icon_currency_scrub_bucks.png",
 	"win_streak_sb": "res://assets/ui/final/home/reward_track/win_streak_reward_badge.png",
-	"bot_parts": "res://assets/ui/final/robots/bot_parts_icon.png",
-	"gift_meter": "res://assets/ui/final/home/gift_meter/gift_meter_emblem.png",
-	"collection_cards": "res://assets/ui/final/rewards/card_pack_standard.png",
-	"gift_ready": "res://assets/ui/final/rewards/gift_box.png",
 	"heart": "res://assets/ui/final/common/currencies/icon_currency_heart.png",
 }
 
-## WON composition metrics (reference 1080-wide portrait).
+## Fail composition metrics (reference 1080-wide portrait).
 const FRAME_WIDTH := 880
 const ROBOT_SIZE := Vector2(340, 340)
 const ROBOT_OVERLAP := 96
 const EMBLEM_SIZE := 96
 const ICON_SIZE := 76
-const REVEAL_STEP_S := 0.16   ## per-row fade; visual-only candidate timing (owner gate)
-const JOURNEY_H := 76   ## V02: proportionally larger for the beat size hierarchy (V01 56)
 
 ## Warm Life/Help-family palette (native chrome; values only).
 const CREAM := Color(1.0, 0.957, 0.878)
@@ -110,8 +69,7 @@ const INK := Color(0.106, 0.180, 0.349)
 
 var _payload: Dictionary = {}
 var _model: Dictionary = {}
-var _victory := false
-## Production family chrome (WON Victory or LOST Fail); false = ERROR technical fallback.
+## Production family chrome (LOST Fail); false = ERROR technical fallback.
 var _styled := false
 var _stack: VBoxContainer
 var _robot_slot: CenterContainer
@@ -125,33 +83,15 @@ var _lines: VBoxContainer
 var _note: Label
 var _primary: Button
 var _home: Button
-var _reveal: RevealSequencer
-var _reveal_serial := 0   ## each show_model builds fresh rows = a new presentation key
-var _momentum: VBoxContainer
-var _journey_caption: Label
-var _journey
-var _barriers: Dictionary = {}   ## ceremony barrier id -> true (presentation hold only)
-var _victory_theme: Theme
-## M43-C005F-PHASE2: optional presentation feel (the app root's feel adapter); never authority.
-var _feel = null
-var _feel_tweens: Array = []
+var _family_theme: Theme
 var _motion_id := ""   ## terminal identity whose robot intro already played
 var _video: VideoStreamPlayer = null   ## the one result-video decoder (only while it plays)
-const ROW_FEEL_MAX := 6        ## at most this many reward-row feel events per Results
-const EMBLEM_POP := 0.12       ## WON emblem: one sine bump 1.0 -> 1.12 -> 1.0
-const EMBLEM_POP_S := 0.36
-const ROW_SETTLE := 0.04       ## row: scale 0.96 -> 1.0 while its fade runs
-const NEXT_POP := 0.05         ## primary: one sine bump 1.0 -> 1.05 -> 1.0
-const NEXT_POP_S := 0.40
 
 func _init() -> void:
 	name = "ResultsScreen"
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_STOP
-	_victory_theme = HomeStyle.make_theme()
-	_reveal = RevealSequencer.new(self)
-	_reveal.step_started.connect(_on_reveal_step)
-	_reveal.completed.connect(func(_k): call_deferred("_maybe_emphasize_primary"))
+	_family_theme = HomeStyle.make_theme()
 	var dim := ColorRect.new()
 	dim.name = "Dim"
 	dim.color = Color(0, 0, 0, 0.6)
@@ -166,7 +106,7 @@ func _init() -> void:
 	_robot_slot = CenterContainer.new()
 	_robot_slot.name = "RobotSlot"
 	_stack.add_child(_robot_slot)
-	_robot = HomeStyle.art("VictoryRobot")
+	_robot = HomeStyle.art("ResultRobot")
 	_robot.custom_minimum_size = ROBOT_SIZE
 	_robot.z_index = 1   # the robot overlaps (draws over) the frame's top edge
 	_robot_slot.add_child(_robot)
@@ -184,7 +124,7 @@ func _init() -> void:
 	head_row.alignment = BoxContainer.ALIGNMENT_CENTER
 	head_row.add_theme_constant_override("separation", UiTokens.SPACE_MD)
 	_header.add_child(head_row)
-	_emblem = HomeStyle.art("VictoryEmblem")
+	_emblem = HomeStyle.art("ResultEmblem")
 	_emblem.custom_minimum_size = Vector2(EMBLEM_SIZE, EMBLEM_SIZE)
 	head_row.add_child(_emblem)
 	_title = Label.new()
@@ -201,7 +141,6 @@ func _init() -> void:
 	_lines.name = "RewardLines"
 	_lines.add_theme_constant_override("separation", UiTokens.SPACE_SM)
 	col.add_child(_lines)
-	_build_momentum(col)
 	_note = Label.new()
 	_note.name = "NoteLabel"
 	_note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -212,63 +151,6 @@ func _init() -> void:
 	col.add_child(_primary)
 	_home = _button("HomeButton", func(): home_requested.emit())
 	col.add_child(_home)
-
-## Momentum section (built once; only data changes per model -> no node accumulation).
-func _build_momentum(col: VBoxContainer) -> void:
-	_momentum = VBoxContainer.new()
-	_momentum.name = "Momentum"
-	_momentum.add_theme_constant_override("separation", UiTokens.SPACE_SM)
-	_momentum.visible = false
-	col.add_child(_momentum)
-	_journey_caption = _ink_label("JourneyCaption", 26)
-	_momentum.add_child(_journey_caption)
-	_journey = JourneyStrip.new()
-	_journey.custom_minimum_size = Vector2(0, JOURNEY_H)
-	_momentum.add_child(_journey)
-
-func _ink_label(n: String, fs: int) -> Label:
-	var l := Label.new()
-	l.name = n
-	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	l.add_theme_font_size_override("font_size", fs)
-	l.add_theme_color_override("font_color", INK)
-	l.add_theme_constant_override("outline_size", 0)
-	l.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0))
-	return l
-
-## WON momentum from model["momentum"] (ResultsMomentum.results_model). Hidden otherwise.
-func _render_momentum(won: bool) -> void:
-	var m: Dictionary = _model.get("momentum", {})
-	_momentum.visible = won and bool(m.get("ok", false))
-	if not _momentum.visible:
-		_sync_barrier()
-		return
-	var j: Dictionary = m.get("journey", {})
-	_journey.set_model(j)
-	_journey_caption.text = UiText.t("JOURNEY_CAPTION", [int(j.get("completed", 0)), int(j.get("length", 10))]) if j.get("ok", false) else ""
-	_sync_barrier()
-
-## M43-C005 seam: hold (active) / release the primary's emphasis for a mandatory ceremony `id`.
-## Presentation only; rewards / progression / economy are never touched.
-func set_ceremony_barrier(id: String, active: bool) -> void:
-	if active:
-		_barriers[id] = true
-	else:
-		_barriers.erase(id)
-	_sync_barrier()
-
-func has_ceremony_barrier() -> bool:
-	return not _barriers.is_empty()
-
-func _sync_barrier() -> void:
-	call_deferred("_maybe_emphasize_primary")
-
-func get_journey_strip():
-	return _journey
-
-func get_momentum_section() -> VBoxContainer:
-	return _momentum
 
 func _button(n: String, cb: Callable) -> Button:
 	var b := Button.new()
@@ -284,49 +166,38 @@ func show_model(model: Dictionary) -> void:
 	_model = model.duplicate(true)
 	_payload = {"status": _model.get("status", ""), "level": _model.get("level", 0), "attempt": _model.get("attempt", 0)}
 	var status := String(_payload["status"])
-	var won := status == "WON"
+	var lost := status == "LOST"
 	_apply_layout(status)
-	_title.text = UiText.t("RESULTS_WON" if won else ("RESULTS_LOST" if status == "LOST" else "RESULTS_ERROR"))
+	_title.text = UiText.t("RESULTS_LOST" if lost else "RESULTS_ERROR")
 	_level.text = UiText.t("RESULTS_LEVEL", [int(_payload["level"])])
-	# WON: HOME is the one (primary) action; LOST: Retry + Home; ERROR: Home only.
-	_primary.text = UiText.t("RESULTS_HOME" if won else "RESULTS_RETRY")
-	_primary.visible = won or status == "LOST"
-	_primary.disabled = not _primary.visible
+	# LOST: Retry + Home; ERROR: Home only.
+	_primary.text = UiText.t("RESULTS_RETRY")
+	_primary.visible = lost
+	_primary.disabled = not lost
 	_home.text = UiText.t("RESULTS_HOME")
-	_home.visible = not won
+	_home.visible = true
 	_clear_lines()
-	var receipt: Dictionary = _model.get("receipt", {})
-	for r in (reward_rows(receipt) if won else loss_rows(receipt)):
+	for r in loss_rows(_model.get("receipt", {})):
 		_lines.add_child(_row(r) if _styled else _plain_line(r["text"]))
-	_note.text = ""
-	if status == "LOST":
-		_note.text = UiText.t("FAIL_ENCOURAGE")
-	elif won and bool(receipt.get("already_cleared", false)):
-		_note.text = UiText.t("RESULTS_ALREADY_CLEARED")
+	_note.text = UiText.t("FAIL_ENCOURAGE") if lost else ""
 	_note.visible = not _note.text.is_empty()
-	_render_momentum(won)
-	_start_reveal(bool(_model.get("reduced_effects", false)))
 	if _styled:
-		var intro := _feel_id() != _motion_id
-		if not _show_scrubby_video(won, intro):
-			CharacterMotion.play(_robot, "win" if won else "lose", _feel_reduced(), intro)
-		_motion_id = _feel_id()
-	if won:
-		if _feel_reduced():
-			_consume_rows_static()
-		_after_layout(_celebrate_win.bind(_feel_id()))
+		var intro := _show_id() != _motion_id
+		if not _show_scrubby_video(intro):
+			CharacterMotion.play(_robot, "lose", _reduced(), intro)
+		_motion_id = _show_id()
 
-## SB-VIDEO-001/002: Scrubby's result video in the robot slot, or only its keyed still (Reduced
-## Effects, a re-show of the same terminal, outside the tree). False = not Scrubby, or the video
-## could not load / play: the caller keeps the approved pose + CharacterMotion.
-func _show_scrubby_video(won: bool, intro: bool) -> bool:
+## SB-VIDEO-002: Scrubby's LOSE video in the robot slot, or only its keyed still (Reduced Effects,
+## a re-show of the same terminal, outside the tree). False = not Scrubby, or the video could not
+## load / play: the caller keeps the approved pose + CharacterMotion.
+func _show_scrubby_video(intro: bool) -> bool:
 	var rid := String(_model.get("robot_id", ""))
 	if not rid.is_empty() and rid != SCRUBBY_ID:
 		return false
-	var still := load(WIN_STILL if won else LOSE_STILL) as Texture2D
+	var still := load(LOSE_STILL) as Texture2D
 	if still == null:
 		return false
-	if intro and not _feel_reduced() and is_inside_tree() and not _start_video(load(WIN_VIDEO if won else LOSE_VIDEO) as VideoStream, still):
+	if intro and not _reduced() and is_inside_tree() and not _start_video(load(LOSE_VIDEO) as VideoStream, still):
 		return false
 	_robot.texture = still
 	return true
@@ -372,30 +243,22 @@ func _stop_video() -> void:
 	box.queue_free()
 	_video = null
 
-## SB-M43-C005F-015: one decoder at a time. A ceremony opening over Results plays its own Flow
-## video, so Scrubby's result video ends on its keyed still first.
-func stop_result_video() -> void:
-	_stop_video()
-
 func get_result_video() -> VideoStreamPlayer:
 	return _video
 
-## WON = Victory composition; LOST = Fail composition (same family, failure art);
-## ERROR = technical fallback. No Victory art outside WON.
+## LOST = Fail composition; ERROR = technical fallback.
 func _apply_layout(status: String) -> void:
-	var won := status == "WON"
-	_victory = won
-	_styled = won or status == "LOST"
-	theme = _victory_theme if _styled else null
+	_styled = status == "LOST"
+	theme = _family_theme if _styled else null
 	_robot_slot.visible = _styled
 	_emblem.visible = _styled
-	# M43-C008 (SB-M43-108): the active robot's approved victory / help pose (Scrubby default).
+	# M43-C008 (SB-M43-108): the active robot's approved help pose (Scrubby default).
 	var rid := String(_model.get("robot_id", ""))
-	var pose := ROBOT_ART if won else FAIL_ROBOT_ART
+	var pose := FAIL_ROBOT_ART
 	if not rid.is_empty():
-		pose = RobotRoster.asset(rid, "victory_pose" if won else "help_pose")
+		pose = RobotRoster.asset(rid, "help_pose")
 	_robot.texture = load(pose) if _styled else null
-	_emblem.texture = load(EMBLEM_ART if won else FAIL_EMBLEM_ART) if _styled else null
+	_emblem.texture = load(FAIL_EMBLEM_ART) if _styled else null
 	_stack.add_theme_constant_override("separation", -ROBOT_OVERLAP if _styled else 0)
 	if _styled:
 		_panel.custom_minimum_size = Vector2(FRAME_WIDTH, 0)
@@ -443,7 +306,7 @@ func _apply_layout(status: String) -> void:
 			l.remove_theme_constant_override("outline_size")
 			l.remove_theme_color_override("font_shadow_color")
 
-## One WON reward row: warm inset card, existing approved icon, live text.
+## One loss row: warm inset card, existing approved icon, live text.
 func _row(r: Dictionary) -> Control:
 	var card := PanelContainer.new()
 	card.name = "Row_" + String(r["kind"])
@@ -476,35 +339,8 @@ func _plain_line(text: String) -> Label:
 	l.text = text
 	return l
 
-## Ordered row reveal. Presentation only: every row already exists and every grant is
-## already committed; the actions stay live throughout. Reduced Effects (or no tree)
-## shows all rows immediately. One RevealSequencer step per committed row, then (M43-C001R)
-## the journey section after its configured delay.
-func _start_reveal(reduced: bool) -> void:
-	_momentum.modulate.a = 1.0
-	var steps: Array = []
-	if _victory:
-		for c in _lines.get_children():
-			steps.append(RevealSequencer.fade(c, REVEAL_STEP_S))
-		if _momentum.visible:
-			steps.append(RevealSequencer.fade(_momentum, REVEAL_STEP_S, float((_model.get("momentum", {}) as Dictionary).get("reveal_delay_s", 0.0))))
-	_reveal_serial += 1
-	_reveal.play("results_%d" % _reveal_serial, steps, reduced)
-
-## Fast-forward the reveal to its final state (all committed rows visible). Presentation only.
-func finish_reveal() -> void:
-	_reveal.finish()
-
-func is_revealing() -> bool:
-	return _reveal.is_running()
-
-func get_reveal_sequencer() -> RevealSequencer:
-	return _reveal
-
 func _clear_lines() -> void:
-	_stop_feel()
-	_reveal.cancel()
-	_momentum.modulate.a = 1.0   # persistent node: never left hidden by a cancelled reveal
+	_stop_motion()
 	for c in _lines.get_children():
 		_lines.remove_child(c)
 		c.queue_free()
@@ -513,36 +349,6 @@ func _clear_lines() -> void:
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_VISIBILITY_CHANGED and not visible and _lines != null:
 		_clear_lines()
-		_barriers.clear()   # a ceremony hold belongs to the Results it was set on
-
-## Display rows for a receipt, in its committed reveal_queue order (then follow-ups):
-## [{kind, icon, text}]. Nothing outside the receipt can create a row.
-static func reward_rows(receipt: Dictionary) -> Array:
-	var out: Array = []
-	for e in receipt.get("reveal_queue", []):
-		var kind := String(e.get("kind", ""))
-		var text := ""
-		match kind:
-			"first_clear_sb":
-				text = UiText.t("RESULTS_FIRST_CLEAR_SB", [e["amount"]])
-			"win_streak_sb":
-				text = UiText.t("RESULTS_STREAK_SB", [e["streak"], e["amount"]])
-			"bot_parts":
-				text = UiText.tn("RESULTS_BOT_PARTS", int(e["amount"]), [e["amount"]])
-			"gift_meter":
-				# M43-C005R: the shared normalized model of the COMMITTED value (receipt "to").
-				var gm := GiftProgressModel.build(int(e["to"]), int(e["cycle_max"]))
-				text = UiText.t("RESULTS_GIFT_METER", [UiText.num(gm["progress"]), UiText.num(gm["next"])])   # SB-POLISH-002: progress / next
-			"collection_cards":
-				text = UiText.tn("RESULTS_CARDS", int(e["amount"]), [e["amount"]])
-			"catchup":
-				text = UiText.t("RESULTS_CATCHUP", [e["step"], e["steps"], UiText.reward_text(e["reward"])])
-		if not text.is_empty():
-			out.append({"kind": kind, "icon": "gift_ready" if kind == "catchup" else kind, "text": text})
-	for f in receipt.get("follow_ups", []):
-		if String(f.get("kind", "")) == "gift_milestone":
-			out.append({"kind": "gift_milestone", "icon": "gift_ready", "text": UiText.t("RESULTS_GIFT_READY")})
-	return out
 
 ## M43-C004: committed loss rows of a LOST receipt (Hearts before -> after, an ended Win
 ## Streak). Only what the terminal actually changed; nothing outside the receipt.
@@ -558,16 +364,8 @@ static func loss_rows(receipt: Dictionary) -> Array:
 		out.append({"kind": "streak_reset", "icon": "win_streak_sb", "text": UiText.t("FAIL_STREAK_RESET", [int(s["before"])])})
 	return out
 
-## Text-only view of reward_rows (M43-C001A contract).
-static func reward_lines(receipt: Dictionary) -> Array:
-	return reward_rows(receipt).map(func(r): return r["text"])
-
 func _on_primary() -> void:
-	if _primary.disabled:
-		return
-	if String(_payload.get("status", "")) == "WON":
-		home_requested.emit()
-	else:
+	if not _primary.disabled:
 		retry_requested.emit()
 
 func get_model() -> Dictionary:
@@ -585,9 +383,6 @@ func shown_row_texts() -> Array:
 		for l in ([c] if c is Label else c.find_children("Text", "Label", true, false)):
 			out.append(l.text)
 	return out
-
-func is_victory_layout() -> bool:
-	return _victory
 
 func get_robot() -> TextureRect:
 	return _robot
@@ -610,120 +405,14 @@ func get_primary_button() -> Button:
 func get_home_button() -> Button:
 	return _home
 
-# ------------------------------------------------- M43-C005F-PHASE2 presentation feel --
-
-## Bind (or clear with null) the app's feel adapter. Presentation only; never saved.
-func set_feedback(adapter) -> void:
-	_feel = adapter
-
-func get_feedback():
-	return _feel
-
-## Immutable identity of the shown terminal: every feel key derives from it.
-func _feel_id() -> String:
+## Immutable identity of the shown terminal (a re-show of it skips the robot intro).
+func _show_id() -> String:
 	return "results:%s:a%d:L%d" % [String(_payload.get("status", "")), int(_payload.get("attempt", 0)), int(_payload.get("level", 0))]
 
-func _feel_reduced() -> bool:
-	return bool(_model.get("reduced_effects", false)) or (_feel != null and _feel.reduced())
+func _reduced() -> bool:
+	return bool(_model.get("reduced_effects", false))
 
-## Run `f` once the nested containers have settled (`watch`'s rect stops moving, default the robot
-## slot; at most SETTLE_FRAMES frames), or now when outside the tree. The slot, not the robot: the
-## robot's own transform is animated by CharacterMotion and never settles while it plays.
-const SETTLE_FRAMES := 8
-func _after_layout(f: Callable, watch: Control = null) -> void:
-	if not is_inside_tree():
-		f.call()
-		return
-	var w: Control = watch if watch != null else _robot_slot
-	var last := w.get_global_rect()
-	for _i in range(SETTLE_FRAMES):
-		await get_tree().process_frame
-		if not is_instance_valid(self) or not is_inside_tree() or not is_instance_valid(w):
-			return
-		var r := w.get_global_rect()
-		if r == last:
-			break
-		last = r
-	f.call()
-
-## WON only, once per terminal identity (the adapter's one-shot key is the gate).
-func _celebrate_win(id: String) -> void:
-	if _feel == null or not _victory or id != _feel_id() or not visible:
-		return
-	if not _feel_event("WIN", _robot_slot, id + ":win"):   # the slot: the robot itself is moving
-		return   # already consumed (re-show / refresh / resize)
-	if not _feel_reduced():
-		_pop(_emblem, EMBLEM_POP, EMBLEM_POP_S)
-
-## A committed reward row's reveal step started: one feel event for that row identity.
-func _on_reveal_step(key: String, index: int) -> void:
-	if _feel == null or not _victory or key != _reveal.current_key():
-		return
-	if index >= _lines.get_child_count() or index >= ROW_FEEL_MAX:
-		return   # the momentum step (or rows beyond the bounded budget): no feel
-	# Row 0's step starts inside show_model(), before the rows are laid out: wait for its rect,
-	# so the burst lands on the row and not where it was before the first layout pass.
-	var row: Control = _lines.get_child(index)
-	_after_layout(_row_feel.bind(_feel_id(), index, row), row)
-
-func _row_feel(id: String, index: int, row: Control) -> void:
-	if _feel == null or not _victory or id != _feel_id() or not is_instance_valid(row) or row.get_parent() != _lines:
-		return
-	if not _feel_event("REWARD", row, _row_key(index, row)):
-		return
-	if not _feel_reduced():
-		row.pivot_offset = row.size * 0.5
-		var tw := row.create_tween()
-		tw.tween_method(func(t: float): row.scale = Vector2.ONE * lerpf(1.0 - ROW_SETTLE, 1.0, t), 0.0, 1.0, REVEAL_STEP_S)
-		_feel_tweens.append(tw)
-
-## Primary (HOME) emphasis: only after the reveal, with no ceremony barrier, when actionable.
-## Always reached deferred, so a barrier set later in the same frame is seen first.
-func _maybe_emphasize_primary() -> void:
-	if _feel == null or not _victory or not visible or _reveal.is_active() or not _barriers.is_empty():
-		return
-	if not _primary.visible or _primary.disabled:
-		return
-	if _feel_event("MICRO", _primary, _feel_id() + ":next") and not _feel_reduced():
-		_pop(_primary, NEXT_POP, NEXT_POP_S)
-
-func _row_key(index: int, row: Node) -> String:
-	return "%s:row%d:%s" % [_feel_id(), index, String(row.get_meta("kind", ""))]
-
-## Reduced shows every row at once: their one-shot keys are consumed statically (no plugin work),
-## so a later FULL re-show of the same terminal can never play them.
-func _consume_rows_static() -> void:
-	var rows := _lines.get_children()
-	for i in range(mini(rows.size(), ROW_FEEL_MAX)):
-		_feel_event("REWARD", rows[i], _row_key(i, rows[i]))
-
-## The one gate to the adapter. A Reduced model with a (momentarily) FULL adapter does nothing
-## and consumes nothing, so Reduced Results can never start plugin work.
-func _feel_event(intent: String, target: Node, key: String) -> bool:
-	if _feel == null:
-		return false
-	if bool(_model.get("reduced_effects", false)) and not _feel.reduced():
-		return false
-	return _feel.play(intent, target, key)
-
-## One native sine bump on a Control's scale (pivot = centre), restored to exactly 1.
-func _pop(c: Control, amount: float, dur: float) -> void:
-	if not c.is_inside_tree():
-		return
-	c.pivot_offset = c.size * 0.5
-	var tw := c.create_tween()
-	tw.tween_method(func(t: float): c.scale = Vector2.ONE * (1.0 + amount * sin(PI * t)), 0.0, 1.0, dur)
-	tw.tween_callback(func(): c.scale = Vector2.ONE)
-	_feel_tweens.append(tw)
-
-## Settle native feel tweens (screen hidden / rows rebuilt): persistent nodes back to scale 1.
-func _stop_feel() -> void:
-	for tw in _feel_tweens:
-		if tw != null and tw.is_valid():
-			tw.kill()
-	_feel_tweens.clear()
+## Hidden / rebuilt: the robot motion and its decoder stop.
+func _stop_motion() -> void:
 	CharacterMotion.stop(_robot)
 	_stop_video()
-	for c in [_emblem, _primary]:
-		if c != null:
-			c.scale = Vector2.ONE

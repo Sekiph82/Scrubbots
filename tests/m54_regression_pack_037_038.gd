@@ -10,8 +10,9 @@ extends SceneTree
 ##             before boot (= plugins disabled in the project), the adapter's own lookup finds none
 ##   THROWING  spy GFF + Spark whose every call raises (documented EXPECTED_FAULT_INJECTION)
 ## Scenario (each seam hit with its duplicate trigger):
-##   terminal -> Results  real Level 1 WON, then 3x duplicate WON + LOST terminal signals, a
-##                        Results route re-show, show_model() of the same attempt x2, resize
+##   terminal -> win      real Level 1 WON (SB-PHONE-2026-11-12-E: the win animation, no Results),
+##                        then 3x duplicate WON + LOST terminal signals and a resize during it;
+##                        Back -> Home, the reward flight runs to its end
 ##   popup refresh/reopen Set Complete ceremony, closed unacknowledged and re-drained, Home refresh
 ##   provider callbacks   rewarded Heart: verified delivery, then the same token delivered 2x more
 ##   acquisition          Heart +1 purchase
@@ -70,7 +71,7 @@ class ThrowingSpark extends SpySpark:
 
 const ARMS := ["FULL", "REDUCED", "ABSENT", "DISABLED", "THROWING"]
 ## One-shot keys FULL must request exactly once (the feel ran on every seam).
-const ONE_SHOT := ["c005f010:a1:L1", "results:WON:a1:L1:win", "c005f006:set:1", "c005f009:rewarded:"]
+const ONE_SHOT := ["c005f010:a1:L1", "win:a1:L1", "c005f006:set:1", "c005f009:rewarded:"]
 const MAX_EVENTS := 40   ## bounded event count for the whole scenario (FULL)
 
 var EXPECTED_CASES := ["m037_arm_full", "m037_arm_reduced", "m037_arm_absent", "m037_arm_disabled",
@@ -134,8 +135,10 @@ func _run_arm(arm: String, seed_bytes: PackedByteArray) -> Dictionary:
 	_sub.disable_3d = true
 	get_root().add_child(_sub)
 	MainScript.boot_save_path_override = save
+	MainScript.boot_win_animation_override = 1
 	_root = MainScene.instantiate()
 	_sub.add_child(_root)
+	MainScript.boot_win_animation_override = -1
 	await _frames(14)
 	var gff = SpyGff.new()
 	var spark = SpySpark.new()
@@ -187,7 +190,8 @@ func _run_arm(arm: String, seed_bytes: PackedByteArray) -> Dictionary:
 		get_root().add_child(node)
 	return r
 
-## Real Level 1 WON -> one Results; duplicate / stale terminals + Results re-shows replay nothing.
+## Real Level 1 WON -> the win animation (no Results); duplicate / stale terminals + a resize replay
+## nothing; Back -> Home, the reward flight runs to its end, then the ceremonies drain.
 func _terminal_results(r: Dictionary) -> void:
 	if not _root.play_current_frontier().get("ok", false):
 		r["why"].append("launch")
@@ -217,29 +221,25 @@ func _terminal_results(r: Dictionary) -> void:
 	if String(host.get_completion().get_state()) != "WON":
 		r["why"].append("terminal " + String(host.get_completion().get_state()))
 		return
-	var res = _root.get_results_screen()
-	for _f in range(900):
-		if res.visible and not res._reveal.is_active():
-			break
-		await process_frame
 	await _frames(14)
 	var rc: Dictionary = host.get_terminal_receipt()
 	var n0: int = _root.feel.dispatch_log().size()
 	for _k in range(3):
 		host.get_completion().terminal_reached.emit(&"WON", {})
 		host.get_completion().terminal_reached.emit(&"LOST", {})
-	_root._on_route_changed(R.GAMEPLAY, R.RESULTS, _root.get_navigation().last_payload())
-	res.show_model(res.get_model())
-	res.show_model(res.get_model())
 	_sub.size = Vector2i(1536, 2048)
 	await _frames(6)
 	_sub.size = Vector2i(1080, 2160)
 	await _frames(14)
-	r["results_routes"] = _routes.count(R.RESULTS)
+	r["win_anim"] = _routes.count(R.RESULTS) == 0
 	r["terminal_replay"] = _root.feel.dispatch_log().size() - n0
 	r["receipt_same"] = host.get_terminal_receipt() == rc and bool(rc.get("saved", false))
-	res.get_home_button().pressed.emit()
+	_root.handle_back()
+	var t0 := Time.get_ticks_msec()
+	while _root.get_home().is_reward_flight_running() and Time.get_ticks_msec() - t0 < 10000:
+		await process_frame
 	await _frames(14)
+	r["win_anim"] = r["win_anim"] and _routes.count(R.HOME) == 1 and _routes.count(R.RESULTS) == 0
 	var why := await _drain_ceremonies()
 	if not why.is_empty():
 		r["why"].append(why)
@@ -309,7 +309,7 @@ func _acquisition(r: Dictionary) -> void:
 
 func _check_arm(arm: String, r: Dictionary) -> void:
 	_ok(r["why"].is_empty(), "%s: every seam reached its end state %s" % [arm, str(r["why"])])
-	_ok(r.get("results_routes", 0) == 1 and r.get("terminal_replay", -1) == 0 and r.get("receipt_same", false), "%s: one Results route; 3x duplicate WON / LOST + route re-show + show_model x2 + resize: 0 new requests, receipt unchanged and saved" % arm)
+	_ok(r.get("win_anim", false) and r.get("terminal_replay", -1) == 0 and r.get("receipt_same", false), "%s: win animation then one Home route, no Results; 3x duplicate WON / LOST + resize: 0 new requests, receipt unchanged and saved" % arm)
 	_ok(r.get("set_shown", 0) == 2 and r.get("set_acked", false), "%s: Set Complete presented twice (reopen), acknowledged once" % arm)
 	_ok(r.get("rewarded", []) == [true, false, false, 1], "%s: rewarded verified once, duplicate provider callbacks x2 refused, +1 Heart %s" % [arm, str(r.get("rewarded"))])
 	_ok(r.get("heart_buy", 0) == 1, "%s: Heart +1 purchase committed exactly" % arm)
@@ -319,7 +319,7 @@ func _check_arm(arm: String, r: Dictionary) -> void:
 	match arm:
 		"FULL":
 			for k in ONE_SHOT:
-				_ok(r["keys"].filter(func(x): return String(x).begins_with(k)).size() == 1, "FULL: %s requested exactly once" % k)
+				_ok(r["keys"].filter(func(x): return String(x) == k or (k.ends_with(":") and String(x).begins_with(k))).size() == 1, "FULL: %s requested exactly once" % k)
 			_ok(r["log"].size() <= MAX_EVENTS and r["plugin_calls"] == r["planned"] and r["planned"] > 0, "FULL: %d requests (<= %d), plugin calls %d == planned dispatches %d" % [r["log"].size(), MAX_EVENTS, r["plugin_calls"], r["planned"]])
 		"REDUCED":
 			_ok(r["plugin_calls"] == 0, "REDUCED: zero plugin calls")

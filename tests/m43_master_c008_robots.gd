@@ -186,7 +186,8 @@ func _r06() -> void:
 	await _frames(2)
 	_ok(home.get_region("ProfilePortrait").texture == scrubby_tex and _root.get_acquisition()._help_pose() == RobotRoster.entry("scrubby")["assets"]["help_pose"], "re-equip Scrubby restores the owner-approved Home binding")
 	var rs := FileAccess.get_file_as_string("res://scripts/ui/results_screen.gd")
-	_ok(rs.contains("RobotRoster.asset(rid, \"victory_pose\" if won else \"help_pose\")"), "Results victory / help pose from the roster family")
+	var wo := FileAccess.get_file_as_string("res://scripts/ui/win_overlay.gd")
+	_ok(rs.contains("RobotRoster.asset(rid, \"help_pose\")") and wo.contains("RobotRoster.asset(robot_id, \"victory_pose\")"), "Results help pose / win animation victory pose from the roster family")
 	_complete("r06_active_robot_presentation")
 
 func _r07() -> void:

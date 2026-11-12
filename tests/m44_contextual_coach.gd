@@ -3,10 +3,11 @@ extends SceneTree
 ## against the REAL services and the REAL app root (main.tscn, temp save override):
 ##   - strict `contextual` config block; l3_rules no longer schedules WAITING / Hearts;
 ##   - first WAITING (real scheduler state) -> ctx_waiting on the five-slot strip, once;
-##   - first WON / LOST Results -> ctx_result_won / ctx_result_lost once each, Heart sentence
-##     from the committed receipt, pointer on RETRY; Retry press acknowledges;
+##   - first WON (on the Home it lands on, SB-PHONE-2026-11-12-E) / LOST Results ->
+##     ctx_result_won / ctx_result_lost once each, Heart sentence from the committed receipt,
+##     pointer on RETRY; Retry press acknowledges;
 ##   - persistence across relaunch, Skip Tips, established profiles never, window-closed still;
-##   - no economy / progression mutation; hidden under modals and the Results reveal.
+##   - no economy / progression mutation; hidden under modals and the win's reward flight.
 ##
 ## Run: godot --headless --path . -s res://tests/m44_contextual_coach.gd
 
@@ -192,16 +193,16 @@ func _c04() -> void:
 	_first_action()
 	await _win()
 	_root.refresh_coachmark()
-	_ok(_nav().current() == R.RESULTS and cm.get_step_id() == "ctx_result_won", "first WON (after a seen loss): ctx_result_won, independent")
+	_ok(_nav().current() == R.HOME and cm.get_step_id() == "ctx_result_won", "first WON (after a seen loss): ctx_result_won on Home, independent")
 	_ok(not cm.get_pointer().visible and cm.get_body_label().text == UiText.t("FTUE_CTX_WON_BODY"), "won copy, no pointer")
 	cm.get_got_it_button().pressed.emit()
 	_root.refresh_coachmark()
-	_ok(app.economy.ftue.seen_steps().has("ctx_result_won") and not cm.is_showing(), "GOT IT acknowledged the win entry")
+	_ok(app.economy.ftue.seen_steps().has("ctx_result_won") and cm.get_step_id() != "ctx_result_won", "GOT IT acknowledged the win entry")
 	await _play(app.progression.current_level())
 	_first_action()
 	await _win()
 	_root.refresh_coachmark()
-	_ok(_nav().current() == R.RESULTS and not cm.is_showing(), "second WON: not re-shown")
+	_ok(_nav().current() == R.HOME and cm.get_step_id() != "ctx_result_won", "second WON: not re-shown")
 	_complete("c04_first_win_loss_results")
 
 func _c05() -> void:
@@ -236,7 +237,7 @@ func _c05() -> void:
 	await _frames(3)
 	await _win()
 	_root.refresh_coachmark()
-	var no_won: bool = not cm.is_showing()
+	var no_won: bool = _nav().current() == R.HOME and not cm.is_showing()
 	var w := await _play_until_waiting(false)
 	_root.refresh_coachmark()
 	_ok(no_lost and no_won and w > 0 and not cm.is_showing() and app.economy.ftue.seen_steps().all(func(s): return not CTX.has(s)), "skipped: no WAITING / win / loss coachmark")
@@ -260,17 +261,16 @@ func _c06() -> void:
 	await _frames(3)
 	await _win()
 	_root.refresh_coachmark()
-	var c: bool = _nav().current() == R.RESULTS and not cm.is_showing()
+	var c: bool = _nav().current() == R.HOME and cm.get_step_id() != "ctx_result_won"
 	_ok(a and b and c, "WAITING %s / loss %s / win %s: no contextual coachmark" % [a, b, c])
 	_ok(app.economy.ftue.seen_steps().is_empty() and cm.shown_log().all(func(id): return not CTX.has(id)), "seen empty, no contextual entry ever shown %s" % str(cm.shown_log()))
 	_complete("c06_established_never")
 
 func _c07() -> void:
-	print("[c07 modal / Results reveal suppress; economy byte-identical]")
+	print("[c07 modal / the win's reward flight suppress; economy byte-identical]")
 	await _boot("c07")
 	var app = _root.get_app_state()
 	var cm = _root.get_coachmarks()
-	var res = _root.get_results_screen()
 	await _play(4)
 	_first_action()
 	await _lose()
@@ -289,16 +289,16 @@ func _c07() -> void:
 	_first_action()
 	await _win(false)
 	_root.refresh_coachmark()
-	var revealing: bool = res.is_revealing()
-	_ok(revealing and not cm.is_showing(), "WON reveal still running: hidden (revealing=%s)" % revealing)
-	res.finish_reveal()
-	if res.has_ceremony_barrier():
+	var flying: bool = _root.get_home().is_reward_flight_running()
+	_ok(flying and not cm.is_showing(), "the win's rewards still fly in on Home: hidden (flying=%s)" % flying)
+	_root.get_home().get_reward_flight().finish()
+	await _frames(2)
+	if _root.get_modal_stack().depth() > 0:
 		_root.refresh_coachmark()
-		_ok(not cm.is_showing(), "ceremony barrier held: hidden")
-		res.set_ceremony_barrier("meta_ceremonies", false)
+		_ok(not cm.is_showing(), "a ceremony after the flight: hidden")
 	_root.get_modal_stack().clear("t")
 	_root.refresh_coachmark()
-	_ok(cm.get_step_id() == "ctx_result_won", "reveal done: shown")
+	_ok(cm.get_step_id() == "ctx_result_won", "flight done, no modal: shown")
 	_complete("c07_suppression_and_no_economy_mutation")
 
 # ------------------------------------------------------------------ helpers ----
@@ -345,7 +345,7 @@ func _first_action() -> bool:
 	return false
 
 ## One authoritative terminal through the real completion signal (host economy + save first,
-## then the app root's Results route).
+## then the app root's Results route, or Home for a win).
 func _lose() -> void:
 	_root.get_gameplay_host().get_completion().terminal_reached.emit(&"LOST", {})
 	await _frames(3)
@@ -354,9 +354,8 @@ func _win(finish := true) -> void:
 	_root.get_gameplay_host().get_completion().terminal_reached.emit(&"WON", {})
 	await _frames(3)
 	if finish:
-		_root.get_results_screen().finish_reveal()
-		if _root.get_results_screen().has_ceremony_barrier():
-			_root.get_results_screen().set_ceremony_barrier("meta_ceremonies", false)
+		_root.get_home().get_reward_flight().finish()
+		await _frames(2)
 		_root.get_modal_stack().clear("t")
 		await _frames(1)
 

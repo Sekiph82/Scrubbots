@@ -24,7 +24,6 @@ const CollectionScreen = preload("res://scripts/ui/collection/collection_screen.
 const Popups = preload("res://scripts/ui/popup/popups.gd")
 const HomeBadges = preload("res://scripts/ui/home/home_badges.gd")
 const NavigationController = preload("res://scripts/app/navigation_controller.gd")
-const ResultsScreen = preload("res://scripts/ui/results_screen.gd")
 const BasePopup = preload("res://scripts/ui/popup/base_popup.gd")
 
 var EXPECTED_CASES := [
@@ -299,20 +298,20 @@ func _c05() -> void:
 	for lv in [1, 2, 3]:
 		await _win(lv)
 		var rc: Dictionary = _root.get_gameplay_host().get_terminal_receipt()
-		var rows: Array = ResultsScreen.reward_rows(rc).filter(func(rr): return rr["kind"] == "catchup")
-		_ok(rc["first_clear"] and rc["reconciled"] and rows.size() == 1 and rows[0]["text"] == UiText.t("RESULTS_CATCHUP", [lv, 3, UiText.reward_text(expect[lv - 1])]),
-			"win %d: Results row '%s', wallet delta reconciled %s" % [lv, rows[0]["text"] if rows.size() == 1 else "none", str(rc["wallet_delta"])])
+		var rows: Array = rc["reveal_queue"].filter(func(rr): return rr["kind"] == "catchup")
+		_ok(rc["first_clear"] and rc["reconciled"] and rows.size() == 1 and rows[0]["step"] == lv and rows[0]["steps"] == 3 and UiText.reward_text(rows[0]["reward"]) == UiText.reward_text(expect[lv - 1]),
+			"win %d: receipt Catch-Up entry %s, wallet delta reconciled %s" % [lv, str(rows), str(rc["wallet_delta"])])
 		_ok(e.reward.already_applied("catchup:%d:%d" % [window, lv - 1]) and rc["rewards"]["catchup_sb"] == int(expect[lv - 1]["scrub_bucks"]) and rc["rewards"]["catchup_bot_parts"] == int(expect[lv - 1].get("bot_parts", 0)),
 			"win %d: step %d granted under its tx" % [lv, lv])
 		if lv == 1:
 			var sb1: int = e.wallet.scrub_bucks()
 			await _win(1)
 			var rr: Dictionary = _root.get_gameplay_host().get_terminal_receipt()
-			_ok(not rr["first_clear"] and e.returns.catchup()["wins"] == 1 and e.wallet.scrub_bucks() == sb1 and ResultsScreen.reward_rows(rr).is_empty(), "replaying cleared level 1: no win counted, nothing granted, no row")
+			_ok(not rr["first_clear"] and e.returns.catchup()["wins"] == 1 and e.wallet.scrub_bucks() == sb1 and rr["reveal_queue"].is_empty(), "replaying cleared level 1: no win counted, nothing granted, no reveal")
 	_ok(e.returns.catchup()["complete"] and e.returns.catchup()["steps"].all(func(st): return st["claimed"]), "3 first clears: track complete")
 	await _win(4)
 	var rc4: Dictionary = _root.get_gameplay_host().get_terminal_receipt()
-	_ok(rc4["first_clear"] and rc4["rewards"]["catchup_sb"] == 0 and ResultsScreen.reward_rows(rc4).all(func(rr): return rr["kind"] != "catchup"), "4th first clear: track capped, no Catch-Up grant")
+	_ok(rc4["first_clear"] and rc4["rewards"]["catchup_sb"] == 0 and rc4["reveal_queue"].all(func(rr): return rr["kind"] != "catchup"), "4th first clear: track capped, no Catch-Up grant")
 	var sb4: int = e.wallet.scrub_bucks()
 	var bp4: int = e.wallet.bot_parts()
 	var tx4: int = e.reward.applied_transaction_count()

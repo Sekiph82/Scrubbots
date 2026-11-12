@@ -48,6 +48,7 @@ const PrivacyScreen = preload("res://scripts/ui/privacy_screen.gd")
 const CloudConflictScreen = preload("res://scripts/ui/cloud_conflict_screen.gd")
 const MetaCeremonies = preload("res://scripts/ui/ceremony/meta_ceremonies.gd")
 const LevelIntroOverlay = preload("res://scripts/ui/level_intro_overlay.gd")
+const WinOverlay = preload("res://scripts/ui/win_overlay.gd")
 ## M44: coachmark refresh cadence (presentation poll; not per frame).
 const COACH_TICK_S := 0.2
 ## M44 peer-review D1: step copy (L2 booster lines run the host's solver-backed legality
@@ -75,6 +76,9 @@ static var boot_ftue_override: int = -1
 ## SB-VIDEO-005 Level Intro seam, same policy: -1 auto = ON for the canonical save path, OFF
 ## for an injected test save path (gameplay suites keep an un-overlaid board); 0 never; 1 always.
 static var boot_level_intro_override: int = -1
+## SB-PHONE-2026-11-12-E win animation seam, same policy: -1 auto = ON for the canonical save
+## path, OFF for an injected test save path (a WON goes Home at once); 0 never; 1 always.
+static var boot_win_animation_override: int = -1
 
 var app_state = null
 ## M42 (SB-M42-001): the ONE app-root-owned navigation authority.
@@ -105,7 +109,7 @@ var packs = null
 var meta_feedback = null
 ## M43-C005F (SB-M43-C005F-002): the ONE fail-open presentation-feel adapter (no call site yet).
 ## Ephemeral: never saved; cancelled + unbound when the app root leaves the tree.
-## Handed (presentation-only) to ResultsScreen; a pack ceremony takes it via bind_feedback().
+## Handed (presentation-only) to Home and the win animation; a pack ceremony takes it via bind_feedback().
 var feel = null
 ## M43-C005F-PHASE3 (F006 / F008 / F009): committed meta reward / acquisition -> feel intents.
 var meta_feel = null
@@ -119,6 +123,11 @@ var _coach_copy := {"id": "", "at": 0, "copy": {}}
 var _coach_ctx_id := ""
 ## SB-VIDEO-005: show the Level Intro overlay on each gameplay start (boot_level_intro_override).
 var level_intro_enabled := false
+## SB-PHONE-2026-11-12-E: play the level-complete animation before a WON goes Home.
+var win_animation_enabled := false
+var _win_overlay = null
+## The first-win contextual tip waits on the Home a win landed on (until Home is left).
+var _win_tip := false
 
 func _enter_tree() -> void:
 	_boot()
@@ -136,6 +145,7 @@ func _boot() -> void:
 		app_state.bootstrap_new_profile()
 		ftue.settle()
 	level_intro_enabled = boot_level_intro_override == 1 or (boot_level_intro_override == -1 and path == AppState.CANONICAL_SAVE_PATH)
+	win_animation_enabled = boot_win_animation_override == 1 or (boot_win_animation_override == -1 and path == AppState.CANONICAL_SAVE_PATH)
 	nav = NavigationController.new()
 	nav.settings_changed.connect(_on_nav_settings_changed)
 	app_state.analytics.start_session("cold_start")
@@ -152,6 +162,11 @@ func _ready() -> void:
 	set_momentum_config(ResultsMomentum.load_config())
 	_home.settings_requested.connect(open_settings)
 	_home.play_requested.connect(play_current_frontier)
+	# SB-PHONE-2026-11-12-E: the win's ceremonies / packs / tip wait for its reward flight.
+	_home.reward_flight_finished.connect(func(_k):
+		request_home_ceremonies()
+		request_earned_packs()
+		refresh_coachmark())
 	_results = ResultsScreen.new()
 	_results.visible = false
 	add_child(_results)
@@ -202,7 +217,6 @@ func _ready() -> void:
 		ColorSymbols.board_atlas()   # one-time board glyph atlas build at boot, not at first level start
 	feel = FeedbackAdapter.new()
 	feel.bind(get_tree(), app_state.effects if app_state != null else null)
-	_results.set_feedback(feel)   # M43-C005F-003/004: presentation-only Results feel
 	_home.set_feedback(feel)      # M43-C005F-PHASE4 F012: Home state-change micro feel
 	ceremonies = CeremonyPresenter.new()
 	ceremonies.bind(_modals, app_state)
@@ -224,9 +238,6 @@ func _ready() -> void:
 	if app_state != null and app_state.economy != null and not app_state.is_blocked:
 		_track_return_window(app_state.economy.returns.on_active())
 		app_state.mark_dirty()
-	ceremonies.idle.connect(func(src):
-		if src == "results" and _results != null:
-			_results.set_ceremony_barrier(RESULTS_CEREMONY_BARRIER, false))
 	# Every committed facade action (Gift / Daily claim, exchange, unlock, ...) may have
 	# completed a set / Master / robot event: show its ceremony once Home is quiet.
 	if app_state != null and app_state.actions != null:
@@ -305,11 +316,14 @@ func _on_route_changed(_from: int, to: int, _payload: Dictionary) -> void:
 			remove_child(_opening)
 			_opening.queue_free()
 			_opening = null
+	_win_tip = false
 	if _home != null:
 		_home.visible = to == NavigationController.Route.HOME
 		if _home.visible:
 			_home.refresh()
 			request_home_ceremonies()
+			if String(_payload.get("via", "")) == "win":
+				_start_win_rewards(_payload)
 	if _results != null:
 		_results.visible = to == NavigationController.Route.RESULTS
 		if _results.visible:
@@ -317,38 +331,22 @@ func _on_route_changed(_from: int, to: int, _payload: Dictionary) -> void:
 			move_child(_results, get_child_count() - 1)
 			if String(_payload.get("status", "")) == "LOST":
 				_offer_need_a_hand()
-			elif String(_payload.get("status", "")) == "WON":
-				_track_results_momentum()
-				_begin_results_ceremonies()
 	# M44: the compulsory window settles by L3 Results (frontier past max level), and the
 	# coachmark follows the route at once (never left over a Results / Opening screen).
 	if ftue != null and (to == NavigationController.Route.RESULTS or to == NavigationController.Route.HOME):
 		ftue.settle()
 	refresh_coachmark()
 
-## SB-M43-013: a WON Results whose committed terminal (economy + save already done inside the
-## host) produced a ceremony event (Gift milestone, set, Master, robot) hands off to it: the
-## primary's emphasis is held by a ceremony barrier, the ceremonies open one at a time AFTER
-## the committed reward-row reveal, and the barrier releases when none is left. Presentation
-## only — rewards / progression are untouched; a route change leaves any unshown ceremony
-## pending for Home.
-const RESULTS_CEREMONY_BARRIER := "meta_ceremonies"
-
-func _begin_results_ceremonies() -> void:
-	if ceremonies == null or ceremonies.pending().is_empty():
-		return
-	_results.set_ceremony_barrier(RESULTS_CEREMONY_BARRIER, true)
-	if _results.is_revealing():
-		_results.get_reveal_sequencer().completed.connect(func(_k): call_deferred("_drain_results_ceremonies"), CONNECT_ONE_SHOT)
-	else:
-		call_deferred("_drain_results_ceremonies")
-
-func _drain_results_ceremonies() -> void:
-	if nav.current() != NavigationController.Route.RESULTS or ceremonies == null:
-		return
-	_results.stop_result_video()   # the ceremony brings its own video: one decoder at a time
-	if not ceremonies.drain("results") and not ceremonies.is_presenting():
-		_results.set_ceremony_barrier(RESULTS_CEREMONY_BARRIER, false)
+## SB-PHONE-2026-11-12-E (owner 2026-11-12): a WON lands on Home (via "win", the host's committed
+## receipt in the payload). Home flies that receipt's rewards into the HUD; the committed
+## ceremony events (Gift milestone, set, Master, robot, feature) and earned packs wait for the
+## flight, then open through the usual Home drain. Presentation only: the economy granted and
+## saved inside the host terminal; a relaunch boots Home without a payload, so nothing replays.
+func _start_win_rewards(payload: Dictionary) -> void:
+	_track_win_journey(payload)
+	_win_tip = true
+	_home.play_reward_flight(payload.get("receipt", {}), "win:a%d:L%d" % [int(payload.get("attempt", 0)), int(payload.get("level", 0))])
+	refresh_coachmark()
 
 ## M43-C004: on the Fail surface of a due third failure, Need a Hand opens on the ONE
 ## ModalStack over Fail. The host decided the offer inside its latched terminal (after the
@@ -360,33 +358,27 @@ func _offer_need_a_hand() -> void:
 	if _acq.open_need_a_hand(host.get_assistance_offer(), app_state != null and app_state.effects != null and app_state.effects.is_reduced()) != null:
 		host.note_assistance_shown()
 
-## M43-C001A: the ONE Results model for a RESULTS route payload. The receipt is the
-## host's committed terminal truth (never recomputed here). Pure read: building it any
-## number of times grants nothing. SB-PHONE-2026-11-12-B: no next-level availability (a win
-## goes Home; the next level starts from Home PLAY).
+## M43-C001A: the ONE Results model for a RESULTS route payload (LOST / ERROR; a WON goes
+## Home, SB-PHONE-2026-11-12-E). The receipt is the host's committed terminal truth (never
+## recomputed here). Pure read: building it any number of times grants nothing.
 func _results_model(payload: Dictionary) -> Dictionary:
 	var m := payload.duplicate(true)
 	m["receipt"] = _gameplay_host.get_terminal_receipt() if _gameplay_host != null and is_instance_valid(_gameplay_host) else {}
-	# M43-C001R: journey (anchor = the just-completed level). Read-only; a malformed config
-	# just omits it.
-	if String(m.get("status", "")) == "WON":
-		m["momentum"] = ResultsMomentum.results_model(app_state, int(m.get("level", 0)), momentum_cfg)
 	# M43-C001B: presentation-only Reduced Effects flag (canonical settings service).
 	m["reduced_effects"] = app_state != null and app_state.effects != null and app_state.effects.is_reduced()
 	# M43-C008 (SB-M43-108): the active robot's approved victory / help pose (presentation only).
 	m["robot_id"] = app_state.economy.robots.active_robot() if app_state != null and app_state.economy != null else ""
 	return m
 
-## SB-M56-018: a WON Results shows its journey node.
-func _track_results_momentum() -> void:
-	var m: Dictionary = _results.get_model()
-	var mo: Dictionary = m.get("momentum", {})
+## SB-M56-018: a win reached its journey node (anchor = the won level; shown on Home's strip).
+func _track_win_journey(payload: Dictionary) -> void:
+	var mo: Dictionary = ResultsMomentum.results_model(app_state, int(payload.get("level", 0)), momentum_cfg)
 	if not bool(mo.get("ok", false)):
 		return
 	var j: Dictionary = mo["journey"]
 	if bool(j.get("ok", false)):
 		_track("journey_progress", {"slot": j["slot"], "cycle": j["cycle"], "cycle_complete": j["slot"] == j["length"],
-			"first_clear": bool(m["receipt"].get("first_clear", false))})
+			"first_clear": bool((payload.get("receipt", {}) as Dictionary).get("first_clear", false))})
 
 ## SB-M56-022: a genuine absence opened a return window (Catch-Up offered when configured).
 ## Returns whether it opened.
@@ -395,7 +387,7 @@ func _track_return_window(r: Dictionary) -> bool:
 		_track("comeback_window", {"catchup_offered": not app_state.economy.returns.catchup().is_empty()})
 	return r["opened"]
 
-## Share one validated momentum config with Results (via _results_model) and Home.
+## Share one validated momentum config with Home (and the win journey event).
 func set_momentum_config(cfg: Dictionary) -> void:
 	momentum_cfg = cfg.duplicate(true)
 	if _home != null:
@@ -451,6 +443,8 @@ func request_home_ceremonies() -> void:
 func _drain_home_ceremonies() -> void:
 	if ceremonies == null or nav == null or nav.current() != NavigationController.Route.HOME or nav.is_settings_open():
 		return
+	if _home.is_reward_flight_running():
+		return   # SB-PHONE-2026-11-12-E: the win's rewards land first (reward_flight_finished drains)
 	if _modals != null and _modals.depth() > 0:
 		return
 	# Quiet Home order: pending meta ceremonies, then earned packs (FIFO), then the comeback summary.
@@ -472,6 +466,8 @@ func request_earned_packs() -> void:
 
 func _drain_earned_packs() -> void:
 	if packs == null or nav == null or nav.current() != NavigationController.Route.HOME or nav.is_settings_open():
+		return
+	if _home.is_reward_flight_running():
 		return
 	if packs.is_presenting() or (ceremonies != null and ceremonies.is_presenting()):
 		return
@@ -629,16 +625,16 @@ func refresh_coachmark() -> void:
 	coachmarks.show_step(id, String(copy["title"]), String(copy["body"]), want["rect"])
 
 ## SB-M44-005/006: the live contextual trigger, read from canonical state only ("" = none):
-## a slot of the live host the scheduler reports WAITING, or the shown Results status.
+## a slot of the live host the scheduler reports WAITING, the shown LOST Results, or the Home a
+## win landed on once its reward flight is done (SB-PHONE-2026-11-12-E).
 func _coach_trigger() -> String:
 	if ftue == null or nav == null or not ftue.contextual_active():
 		return ""
+	if nav.current() == NavigationController.Route.HOME:
+		return "result_won" if _win_tip and not _home.is_reward_flight_running() else ""
 	if nav.current() == NavigationController.Route.RESULTS:
-		match String(nav.last_payload().get("status", "")):
-			"WON":
-				return "result_won"
-			"LOST":
-				return "result_lost"
+		if String(nav.last_payload().get("status", "")) == "LOST":
+			return "result_lost"
 	elif nav.current() == NavigationController.Route.GAMEPLAY:
 		var host = _gameplay_host
 		if host == null or not is_instance_valid(host) or not host.is_built() or host.get_completion() == null or host.get_completion().is_terminal():
@@ -649,9 +645,9 @@ func _coach_trigger() -> String:
 	return ""
 
 ## The scheduled step for this surface, else (gameplay) a due booster intro, else the unseen
-## contextual entry for `trigger`
-## (null = read it now). Hidden under modals / Settings and while Results still reveals or
-## holds a ceremony, so a coachmark never covers a reward claim.
+## contextual entry for `trigger` (the first-win entry goes first on its Home)
+## (null = read it now). Hidden under modals / Settings and while a win's rewards still fly in,
+## so a coachmark never covers a reward or a ceremony.
 func _coach_want(trigger = null) -> Dictionary:
 	if trigger == null:
 		trigger = _coach_trigger()
@@ -664,7 +660,7 @@ func _coach_want(trigger = null) -> Dictionary:
 	var ctx := {}
 	var host = null
 	if nav.current() == NavigationController.Route.HOME:
-		if _home == null or not _home.visible or _home.is_modal_active():
+		if _home == null or not _home.visible or _home.is_modal_active() or _home.is_reward_flight_running():
 			return {}
 		surface = "home"
 		ctx = ftue.home_context()
@@ -675,13 +671,15 @@ func _coach_want(trigger = null) -> Dictionary:
 		surface = "gameplay"
 		ctx = {"level": int(host.progression_level), "level_id": String(host.launch_entry_id), "host": host}
 	elif nav.current() == NavigationController.Route.RESULTS:
-		if _results == null or not _results.visible or _results.is_revealing() or _results.has_ceremony_barrier():
+		if _results == null or not _results.visible:
 			return {}
 		surface = "results"
 		ctx = {"receipt": _results.get_model().get("receipt", {})}
 	else:
 		return {}
-	var step: Dictionary = ftue.current_step(surface, ctx)
+	var step: Dictionary = ftue.contextual_step(String(trigger)) if trigger == "result_won" else {}
+	if step.is_empty():
+		step = ftue.current_step(surface, ctx)
 	if step.is_empty() and surface == "gameplay":
 		step = ftue.booster_intro_step()
 	if step.is_empty():
@@ -898,25 +896,60 @@ func _bind_terminal(host) -> void:
 		if host == _gameplay_host and String(status) == "WON" and app_state != null:
 			app_state.reconcile_disabled_frontier()
 		if host == _gameplay_host and nav.on_gameplay_terminal(nav.attempt_id(), status, int(host.progression_level)):
-			_terminal_bridge(host, String(status)))
+			_terminal_bridge(host, String(status))
+			if String(status) == "WON":
+				_show_win(host))
 
-## M43-C005F-PHASE4 (SB-M43-C005F-010): gameplay-complete -> Results bridge. Fire-and-forget
-## decoration AFTER navigation already accepted the terminal (Results is on screen): one SMALL
-## spark on the HUD robot portrait, still visible under the Results dim, keyed by the terminal
-## attempt so a duplicate / stale signal (refused by nav anyway) or a re-show never replays.
-## WON only: Results owns the WIN confetti (F003) and a loss gets no celebratory spark. The
-## adapter defers all plugin work, so nothing here can delay or break the Results route.
+## SB-PHONE-2026-11-12-E (owner 2026-11-12: no popup or button between the win and Home): a WON
+## stays on the finished board under the level-complete animation (WinOverlay), then goes Home by
+## itself; with the animation off (test saves) it goes Home at once. Back skips to Home; nothing
+## here can start a level (the only edge taken is GAMEPLAY -> HOME).
+func _show_win(host) -> void:
+	if not win_animation_enabled:
+		_finish_win(host)
+		return
+	_win_overlay = WinOverlay.new()
+	_win_overlay.reduced = app_state.effects.is_reduced()
+	_win_overlay.robot_id = app_state.economy.robots.active_robot() if app_state.economy != null else ""
+	_win_overlay.feel = feel
+	_win_overlay.feel_key = "win:a%d:L%d" % [nav.attempt_id(), int(host.progression_level)]
+	_win_overlay.finished.connect(_finish_win.bind(host))
+	host.add_child(_win_overlay)
+	refresh_coachmark()
+
+func _finish_win(host) -> void:
+	_win_overlay = null
+	if host != _gameplay_host or nav.current() != NavigationController.Route.GAMEPLAY or not nav.is_won_pending():
+		return
+	nav.go(NavigationController.Route.HOME, {"via": "win", "status": "WON", "level": int(host.progression_level),
+		"attempt": nav.attempt_id(), "receipt": host.get_terminal_receipt()})
+
+## The win animation on screen right now, or null.
+func get_win_overlay():
+	return _win_overlay if _win_overlay != null and is_instance_valid(_win_overlay) else null
+
+## End a running win animation now (Back): the app goes Home. False when none runs.
+func finish_win_animation() -> bool:
+	var o = get_win_overlay()
+	if o == null or o.is_closed():
+		return false
+	o.close()
+	return true
+
+## M43-C005F-PHASE4 (SB-M43-C005F-010): gameplay-complete bridge. Fire-and-forget decoration
+## AFTER navigation already accepted the terminal: one SMALL spark on the HUD robot portrait,
+## keyed by the terminal attempt so a duplicate / stale signal (refused by nav anyway) never
+## replays. WON only: the win animation owns the WIN confetti and a loss gets no celebratory
+## spark. The adapter defers all plugin work, so nothing here can delay or break the route.
 func _terminal_bridge(host, status: String) -> void:
 	if feel == null or status != "WON" or not host.has_method("get_screen") or host.get_screen() == null:
 		return
 	feel.play("SMALL", host.get_screen().get_profile_portrait(), "c005f010:a%d:L%d" % [nav.attempt_id(), int(host.progression_level)])
 
-## RESULTS (LOST) -> M30 transaction-safe Retry of the same host, new attempt id. Never after a
-## WON (SB-PHONE-2026-11-12-B: a win goes Home).
+## RESULTS (LOST) -> M30 transaction-safe Retry of the same host, new attempt id (a WON never
+## shows Results: SB-PHONE-2026-11-12-E).
 func retry_from_results() -> bool:
 	if nav.current() != NavigationController.Route.RESULTS or _gameplay_host == null:
-		return false
-	if String(nav.last_payload().get("status", "")) == "WON":
 		return false
 	if _zero_heart_gate("attempt_gate", "results_retry"):
 		return false
@@ -929,7 +962,7 @@ func retry_from_results() -> bool:
 	return true
 
 ## SB-M57-001: the every-5-plays interstitial, only at the next attempt (Home PLAY or Results
-## Retry; SB-PHONE-2026-11-12-B: a win goes Home first), never during gameplay. AdService
+## Retry; a win goes Home first), never during gameplay or between the win animation and Home. AdService
 ## decides (No Ads, cadence); the null provider shows nothing.
 func _between_levels_ad() -> void:
 	if app_state != null and app_state.economy != null:
@@ -995,7 +1028,7 @@ func flush_lifecycle(reason: String) -> Dictionary:
 ## SB-M42-009: deterministic back (Android back / Esc). The OS auto-quit on back is
 ## disabled in project.godot (application/config/quit_on_go_back=false) so back is
 ## routed only through the navigation authority:
-##   Settings open -> close it; RESULTS -> HOME;
+##   Settings open -> close it; RESULTS -> HOME; the win animation -> HOME (skip);
 ##   GAMEPLAY -> HOME only before the first real action (Economy V1: pre-action exit =
 ##   no Heart/streak consequence; WinStreakService.on_pre_action_exit); after the first
 ##   action there is no owner-defined mid-level exit rule, so back does nothing;
@@ -1006,6 +1039,9 @@ func handle_back() -> String:
 	# M43-C002 (SB-M43-026): an open popup consumes back first (top only, never leaks).
 	if _modals != null and _modals.handle_back():
 		return "close_modal"
+	# SB-PHONE-2026-11-12-E: Back during the win animation skips straight to Home.
+	if finish_win_animation():
+		return "home"
 	var pre_action := false
 	if nav.current() == NavigationController.Route.GAMEPLAY and _gameplay_host != null 			and app_state != null and app_state.economy != null:
 		pre_action = not app_state.economy.streak.gameplay_started() 			and not _gameplay_host.get_completion().is_terminal()

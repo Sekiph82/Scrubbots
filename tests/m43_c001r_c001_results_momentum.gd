@@ -1,9 +1,10 @@
 extends SceneTree
 ## M43-C001R-C001 — Results momentum / 10-Level Cleaning Journey evidence
 ## (SB-M43-R01-001..008). SB-PHONE-2026-11-12-B (owner 2026-11-12) removed the Next Cleanup
-## teaser and CLEAN NEXT: a WON Results only goes Home and Home PLAY starts the next level.
-## Real app root (main.tscn), real production catalog and previews,
-## real terminal WON (economy + progression + save commit in the host BEFORE Results), the
+## teaser and CLEAN NEXT; SB-PHONE-2026-11-12-E removed the WON Results itself: a win goes
+## straight Home (its journey shows on the Home strip; the win's journey read model only feeds
+## the journey_progress event). Real app root (main.tscn), real production catalog,
+## real terminal WON (economy + progression + save commit in the host BEFORE Home), the
 ## real Home, and the ONE ResultsMomentum read authority.
 ##
 ## Run: godot --headless --path . -s res://tests/m43_c001r_c001_results_momentum.gd
@@ -24,13 +25,11 @@ const R = NavigationController.Route
 const T0 := 1_900_000_000
 
 var EXPECTED_CASES := [
-	"w01_won_no_next_offer", "w02_won_home_then_play", "w03_last_level_no_coming_soon", "t06_no_preview_drawn",
-	"t12_t14_ten_nodes_beats",
-	"t15_nodes_no_input", "t16_home_frontier_1", "t17_home_frontier_6", "t18_results_l9", "t19_results_l10",
+	"w02_won_home_then_play", "t12_t14_ten_nodes_beats",
+	"t15_nodes_no_input", "t16_home_frontier_1", "t17_home_frontier_6", "t18_win_journey_l9", "t19_win_journey_l10",
 	"t20_home_frontier_11", "t21_injected_l11_cycle_transition", "t22_one_authority", "t23_save_reload",
-	"t24_receipt_economy_identical", "t25_row_order", "t30_barrier_holds", "t31_barrier_release_same", "t32_reduced_effects", "t33_responsive",
-	"t34_no_accumulation", "t35_malformed_config", "no_manipulation_copy",
-	"v02_home_strip_larger", "v02_results_strip_not_smaller", "v02_beat_size_hierarchy", "v02_beat_colors",
+	"t33_responsive", "t35_malformed_config", "no_manipulation_copy",
+	"v02_home_strip_larger", "v02_beat_size_hierarchy", "v02_beat_colors",
 ]
 
 var _fail := 0
@@ -56,11 +55,7 @@ func _initialize() -> void:
 	await _t21_injected()
 	await _v02_cases()
 	await _t22_t23()
-	await _corridor_cases()
-	await _barrier_cases()
-	await _t32_reduced()
 	await _t33_responsive()
-	await _t34_no_accumulation()
 	await _t35_malformed()
 	_shutdown()
 	MainScript.boot_opening_override = -1
@@ -106,7 +101,7 @@ func _boot(frontier: int, size: Vector2i = Vector2i(1080, 2160), path: String = 
 	_root.get_home().refresh()
 	await _settle()
 
-## Boot at frontier `level`, play it and commit a real terminal WON -> Results.
+## Boot at frontier `level`, play it and commit a real terminal WON -> Home.
 func _won(level: int, size: Vector2i = Vector2i(1080, 2160), reduced := false) -> void:
 	await _boot(level, size)
 	if reduced:
@@ -130,9 +125,6 @@ func _shutdown() -> void:
 func _app():
 	return _root.get_app_state()
 
-func _res():
-	return _root.get_results_screen()
-
 func _nav():
 	return _root.get_navigation()
 
@@ -143,8 +135,9 @@ func _settle() -> void:
 func _set_frontier(n: int) -> void:
 	_app().progression.import_snapshot({"schema": "scrubbots.progression.v1", "current_level": n, "completed": range(1, n)})
 
-func _momentum() -> Dictionary:
-	return _res().get_model().get("momentum", {})
+## The win's journey read model (anchor = the won level), as main.gd's journey_progress reads it.
+func _win_journey(level: int) -> Dictionary:
+	return ResultsMomentum.results_model(_app(), level, _root.momentum_cfg)["journey"]
 
 func _entry(order: int):
 	for e in _cat.get_entries_ordered():
@@ -168,75 +161,24 @@ func _click(pos: Vector2) -> void:
 func _count(n: Node) -> int:
 	return n.find_children("*", "", true, false).filter(func(c): return not c.is_queued_for_deletion()).size()
 
-## Nodes minus the one transient result video (SB-VIDEO-001/002: "VideoBox" + "ResultVideo",
-## freed when the clip ends); a leaked extra video gets a renamed duplicate and still counts.
-func _count_static(n: Node) -> int:
-	return _count(n) - n.find_children("*", "", true, false).filter(func(c): return not c.is_queued_for_deletion() and String(c.name) in ["VideoBox", "ResultVideo"]).size()
-
-## Non-disclosure probe: every TextureRect under `n` that draws a level preview (full texture
-## or an atlas region > 25%). Since SB-PHONE-2026-11-12-B Results draws no preview at all.
-func _preview_leaks(n: Node) -> Array:
-	var leaks: Array = []
-	for t in n.find_children("*", "TextureRect", true, false):
-		var tex = t.texture
-		if tex == null or not t.is_visible_in_tree():
-			continue
-		if tex is AtlasTexture:
-			var a: Texture2D = tex.atlas
-			if a != null and a.resource_path.begins_with("res://assets/art/levels/previews/"):
-				var frac: float = (tex.region.size.x * tex.region.size.y) / float(a.get_width() * a.get_height())
-				if frac > 0.25:
-					leaks.append("%s region %.2f" % [t.name, frac])
-		elif String(tex.resource_path).begins_with("res://assets/art/levels/previews/"):
-			leaks.append("%s full %s" % [t.name, tex.resource_path])
-	return leaks
-
-# ============================================= SB-PHONE-2026-11-12-B: win -> Home =====
-
-## The WON Results' visible buttons (presentation truth, not node existence).
-func _visible_buttons(res) -> Array:
-	return res.find_children("*", "Button", true, false).filter(func(b): return b.is_visible_in_tree())
+# ============================================= SB-PHONE-2026-11-12-E: win -> Home =====
 
 func _won_home_cases() -> void:
-	print("[w01-w03 a win goes Home: no next-level offer; Home PLAY starts the next level]")
+	print("[w02 a win goes straight Home (no Results); Home PLAY starts the next level]")
 	await _won(2)
-	var res = _res()
-	res.finish_reveal()
-	await _settle()
-	var btns := _visible_buttons(res)
-	_ok(_nav().current() == R.RESULTS and btns.size() == 1 and btns[0] == res.get_primary_button() and btns[0].text == UiText.t("RESULTS_HOME") and not btns[0].disabled,
-		"WON L2: exactly one visible action, the green primary HOME %s" % str(btns.map(func(b): return b.text)))
-	_ok(res.find_child("NextCleanup", true, false) == null and res.find_child("TeaserImage", true, false) == null and res.find_child("NextLevel", true, false) == null
-		and not _momentum().has("next") and not res.get_model().has("continue"), "no Next Cleanup teaser node / model, no next-level availability")
-	_ok(not _root.has_method("continue_from_results") and not res.has_signal("continue_requested"), "no Continue intent or handler exists")
-	_ok(res.get_momentum_section().is_visible_in_tree() and res.get_journey_strip().is_visible_in_tree(), "journey strip still shown")
-	_complete("w01_won_no_next_offer")
-	var e0 := _econ_snap()
-	var t0: int = _nav().transition_id()
-	for _i in range(5):
-		res.get_primary_button().pressed.emit()
-	await _settle()
-	_ok(_nav().current() == R.HOME and _nav().transition_id() == t0 + 1 and _root.get_gameplay_host() == null and _econ_snap() == e0,
-		"5 rapid HOME taps -> exactly one HOME transition, no level started, no state change")
+	_ok(_nav().current() == R.HOME and not _root.get_results_screen().visible and _root.get_gameplay_host() == null, "WON L2 -> Home, no Results, no host")
+	_ok(not _root.has_method("continue_from_results"), "no Continue intent or handler exists")
 	_root.get_modal_stack().clear("t")
 	var r: Dictionary = _root.play_current_frontier()
 	await _settle()
 	_ok(r.get("ok", false) and _nav().current() == R.GAMEPLAY and int(_root.get_gameplay_host().progression_level) == 3, "Home PLAY starts the next level (3)")
 	_complete("w02_won_home_then_play")
-	await _won(_last)
-	res = _res()
-	var soon: Array = res.find_children("*", "Label", true, false).filter(func(l): return l.is_visible_in_tree() and l.text.to_lower().find("coming soon") != -1)
-	_ok(soon.is_empty() and not res.get_note_label().visible and not res.get_primary_button().disabled and _visible_buttons(res).size() == 1,
-		"last production level L%d: no coming-soon / next-level copy, HOME live" % _last)
-	_complete("w03_last_level_no_coming_soon")
 
 # ================================================================ V02 ============
 
 ## V01 reference geometry (owner V02 asked for a materially larger Journey).
 const V01_HOME_STRIP := Vector2(560, 58)
 const V01_HOME_NODE := 39.4      ## 2 * min(58 * 0.34, 56 * 0.36)
-const V01_RESULTS_H := 56.0
-const V01_RESULTS_NODE := 38.0
 
 func _nodes_ok(strip) -> Array:
 	var bad: Array = []
@@ -269,13 +211,6 @@ func _v02_cases() -> void:
 	var r10: Array = _root.get_home().get_journey_strip().node_rects()
 	_ok(r10[9].size.x > r10[4].size.x and r10[4].size.x > r10[0].size.x, "Home frontier 10 (boss current): boss > mini > ordinary")
 	bad.append_array(_nodes_ok(_root.get_home().get_journey_strip()))
-	await _won(9)
-	var rs = _res().get_journey_strip()
-	var rr: Array = rs.node_rects()
-	_ok(rs.size.y >= V01_RESULTS_H and rr[0].size.x >= V01_RESULTS_NODE, "Results strip %s, ordinary node %.1f px (V01 h 56 / %.0f px)" % [str(rs.size), rr[0].size.x, V01_RESULTS_NODE])
-	_complete("v02_results_strip_not_smaller")
-	_ok(rr[4].size.x >= rr[0].size.x * 1.25 and rr[9].size.x >= rr[4].size.x * 1.15, "Results: mini-boss > ordinary, boss > mini-boss")
-	bad.append_array(_nodes_ok(rs))
 	_ok(bad.is_empty(), "all nodes inside their strip, neighbours never overlap %s" % str(bad))
 	_complete("v02_beat_size_hierarchy")
 	_ok(JourneyStrip.MINI_EDGE == Color(1.0, 0.55, 0.12) and JourneyStrip.BOSS_EDGE == Color(0.86, 0.13, 0.20) and JourneyStrip.BEAT_SCALE["mini_boss"] < JourneyStrip.BEAT_SCALE["boss"],
@@ -315,14 +250,13 @@ func _journey_cases() -> void:
 		and j["nodes"].slice(6).all(func(nd): return nd["state"] == "future"), "Home frontier 6: 1..5 complete, 6 current")
 	_complete("t17_home_frontier_6")
 	await _won(9)
-	j = _momentum()["journey"]
-	_ok(j["context"] == "results" and j["completed"] == 9 and j["nodes"][9]["state"] == "next", "Results L9: 1..9 complete, slot 10 next")
-	_ok(_res().find_child("JourneyCaption", true, false).text == UiText.t("JOURNEY_CAPTION", [9, 10]), "caption 9/10")
-	_complete("t18_results_l9")
+	j = _win_journey(9)
+	_ok(j["context"] == "results" and j["completed"] == 9 and j["nodes"][9]["state"] == "next", "win L9 journey: 1..9 complete, slot 10 next")
+	_complete("t18_win_journey_l9")
 	await _won(10)
-	j = _momentum()["journey"]
-	_ok(j["completed"] == 10 and j["nodes"].all(func(nd): return nd["state"] == "complete") and j["cycle"] == 1, "Results L10: 10/10 complete")
-	_complete("t19_results_l10")
+	j = _win_journey(10)
+	_ok(j["completed"] == 10 and j["nodes"].all(func(nd): return nd["state"] == "complete") and j["cycle"] == 1, "win L10 journey: 10/10 complete")
+	_complete("t19_win_journey_l10")
 	await _boot(11)
 	j = _root.get_home().get_journey_strip().get_model()
 	_ok(j["cycle"] == 2 and j["slot"] == 1 and j["completed"] == 0 and j["nodes"][0]["state"] == "current" and j["nodes"][0]["level"] == 11 and j["nodes"][9]["level"] == 20,
@@ -361,13 +295,10 @@ func _t22_t23() -> void:
 	print("[22-23 one authority / save-reload continuity]")
 	await _won(5)
 	var cfg: Dictionary = _root.momentum_cfg
-	var rj: Dictionary = _momentum()["journey"]
-	_ok(rj == ResultsMomentum.journey(_app().progression, "results", 5, cfg) and _res().get_journey_strip().get_model() == rj, "Results strip = ResultsMomentum.journey(results, 5)")
-	_res().get_primary_button().pressed.emit()   # WON: HOME
-	await _settle()
+	_ok(_win_journey(5) == ResultsMomentum.journey(_app().progression, "results", 5, cfg), "win journey = ResultsMomentum.journey(results, 5)")
 	var hj: Dictionary = _root.get_home().get_journey_strip().get_model()
-	_ok(hj == ResultsMomentum.home_journey(_app(), cfg) and _root.get_home().get_journey_strip().get_script() == _res().get_journey_strip().get_script()
-		and hj["slot"] == 6 and hj["completed"] == 5, "Home strip = ResultsMomentum.home_journey (frontier 6); same JourneyStrip component")
+	_ok(_nav().current() == R.HOME and hj == ResultsMomentum.home_journey(_app(), cfg) and _root.get_home().get_journey_strip().get_script() == JourneyStrip
+		and hj["slot"] == 6 and hj["completed"] == 5, "the Home the win lands on: strip = ResultsMomentum.home_journey (frontier 6), the JourneyStrip component")
 	_complete("t22_one_authority")
 	var path: String = MainScript.boot_save_path_override
 	_app().flush()
@@ -379,110 +310,10 @@ func _t22_t23() -> void:
 	app2.economy.dispose()
 	_complete("t23_save_reload")
 
-# ============================================================== corridor =========
-
-func _corridor_cases() -> void:
-	print("[24-25 corridor]")
-	await _won(3)
-	var res = _res()
-	var host = _root.get_gameplay_host()
-	var rc0: Dictionary = host.get_terminal_receipt()
-	var e0 := _econ_snap()
-	for _i in range(3):
-		res.show_model(res.get_model())
-		res.finish_reveal()
-	res.set_ceremony_barrier("t", true)
-	res.set_ceremony_barrier("t", false)
-	_root.get_home().refresh()
-	await _settle()
-	_ok(host.get_terminal_receipt() == rc0 and _econ_snap() == e0, "receipt + economy + progression identical after repeated journey rendering")
-	_complete("t24_receipt_economy_identical")
-	_ok(res.shown_row_texts() == ResultsScreen.reward_lines(rc0) and res.get_reward_lines_node().get_index() < res.get_momentum_section().get_index()
-		and res.get_momentum_section().get_index() < res.get_primary_button().get_index(), "rows = receipt order; rows -> journey -> HOME")
-	_complete("t25_row_order")
-
-func _barrier_cases() -> void:
-	print("[30-31 ceremony barrier seam: holds only the emphasis, never HOME]")
-	await _won(4)
-	var res = _res()
-	res.finish_reveal()
-	var e0 := _econ_snap()
-	res.set_ceremony_barrier("future_c005", true)
-	await _settle()
-	_ok(res.has_ceremony_barrier() and not res.get_primary_button().disabled and res.get_journey_strip().is_visible_in_tree() and _nav().current() == R.RESULTS,
-		"barrier: journey + HOME stay available, no navigation by itself")
-	_complete("t30_barrier_holds")
-	res.set_ceremony_barrier("future_c005", false)
-	await _settle()
-	_ok(not res.has_ceremony_barrier() and not res.get_primary_button().disabled and _econ_snap() == e0, "release: HOME live, no state change")
-	res.set_ceremony_barrier("a", true)
-	res.set_ceremony_barrier("b", true)
-	res.set_ceremony_barrier("a", false)
-	_ok(res.has_ceremony_barrier(), "held while any barrier remains")
-	res.set_ceremony_barrier("b", false)
-	_ok(not res.has_ceremony_barrier(), "released when none remains")
-	_complete("t31_barrier_release_same")
-
-func _t32_reduced() -> void:
-	print("[06 / 32 no preview drawn across the reveal; Reduced Effects]")
-	await _won(2)
-	var res = _res()
-	var leaks: Array = []
-	var revealed := false
-	for _i in range(120):   # every frame of the normal reveal
-		leaks.append_array(_preview_leaks(_root))
-		revealed = revealed or res.is_revealing()
-		await process_frame
-	leaks.append_array(_preview_leaks(_root))
-	var normal_model: Dictionary = _momentum()
-	await _won(2, Vector2i(1080, 2160), true)
-	res = _res()
-	_ok(not res.is_revealing() and res.get_momentum_section().modulate.a == 1.0 and res.get_journey_strip().is_visible_in_tree(), "Reduced Effects: final journey immediately")
-	_ok(_momentum()["journey"] == normal_model["journey"], "Reduced Effects: identical journey truth")
-	for _i in range(10):
-		leaks.append_array(_preview_leaks(_root))
-		await process_frame
-	_ok(revealed and leaks.is_empty(), "no frame (normal reveal or Reduced) draws a next-level preview %s" % str(leaks))
-	# Sensitivity: the probe must flag a planted full preview and an over-large region.
-	var plant := TextureRect.new()
-	plant.texture = load(_entry(3).preview_path)
-	res.get_panel().add_child(plant)
-	var at := AtlasTexture.new()
-	at.atlas = load(_entry(3).preview_path)
-	at.region = Rect2(0, 0, 30, 30)
-	var plant2 := TextureRect.new()
-	plant2.texture = at
-	res.get_panel().add_child(plant2)
-	_ok(_preview_leaks(res).size() == 2, "probe sensitivity: a full preview and a 30x30 region are both flagged")
-	plant.free()
-	plant2.free()
-	_complete("t06_no_preview_drawn")
-	_complete("t32_reduced_effects")
-
 func _t33_responsive() -> void:
-	print("[33 responsive: Results + Home]")
+	print("[33 responsive: Home strip]")
 	for sz in [Vector2i(1080, 2160), Vector2i(1170, 2532), Vector2i(1290, 2796), Vector2i(1080, 1920), Vector2i(1536, 2048)]:
 		var bad: Array = []
-		for lvl in [4, _last]:
-			await _won(lvl, sz)
-			var res = _res()
-			res.finish_reveal()
-			await _settle()
-			var vp := Rect2(Vector2.ZERO, Vector2(sz))
-			var panel: Rect2 = res.get_panel().get_global_rect()
-			for c in [res.get_panel(), res.get_robot(), res.get_primary_button()]:
-				if not vp.encloses(c.get_global_rect()):
-					bad.append("L%d %s" % [lvl, c.name])
-			if res.get_home_button().visible:
-				bad.append("L%d second button" % lvl)
-			for c in [res.get_journey_strip()]:
-				if not panel.encloses(c.get_global_rect()):
-					bad.append("L%d %s outside panel" % [lvl, c.name])
-			for l in res.get_momentum_section().find_children("*", "Label", true, false):
-				if l.is_visible_in_tree() and l.get_minimum_size().y > l.size.y + 0.5:
-					bad.append("L%d clipped %s" % [lvl, l.name])
-			if res.get_primary_button().size.y < UiTokens.TOUCH_MIN:
-				bad.append("touch")
 		await _boot(6, sz)
 		var home = _root.get_home()
 		var strip: Rect2 = home.get_journey_strip().get_global_rect()
@@ -493,33 +324,8 @@ func _t33_responsive() -> void:
 			var rr: Rect2 = home.get_region(region).get_global_rect()
 			if rr.intersects(strip):
 				bad.append("home strip x " + region)
-		_ok(bad.is_empty(), "%dx%d: Results (L4, L%d) + Home strip fit, no collisions %s" % [sz.x, sz.y, _last, str(bad)])
+		_ok(bad.is_empty(), "%dx%d: Home strip fits, no collisions %s" % [sz.x, sz.y, str(bad)])
 	_complete("t33_responsive")
-
-func _t34_no_accumulation() -> void:
-	print("[34 repeated show / hide / refresh]")
-	await _won(2)
-	var res = _res()
-	var home = _root.get_home()
-	var model: Dictionary = res.get_model()
-	res.finish_reveal()
-	await _settle()
-	var n0 := _count_static(_root)
-	var timers: int = _root.find_children("*", "Timer", true, false).size()
-	var c0: int = res.home_requested.get_connections().size()
-	for _i in range(20):
-		res.visible = false
-		res.visible = true
-		res.show_model(model)
-		res.set_ceremony_barrier("x", true)
-		res.set_ceremony_barrier("x", false)
-		res.finish_reveal()
-		home.refresh()
-		await process_frame
-	await _settle()
-	_ok(_count_static(_root) == n0 and _root.find_children("*", "VideoStreamPlayer", true, false).size() <= 1 and _root.find_children("*", "Timer", true, false).size() == timers and res.home_requested.get_connections().size() == c0,
-		"20 cycles: nodes %d -> %d, timers / connections / one result-video decoder stable" % [n0, _count_static(_root)])
-	_complete("t34_no_accumulation")
 
 func _t35_malformed() -> void:
 	print("[35 malformed momentum config fails closed]")
@@ -556,15 +362,12 @@ func _t35_malformed() -> void:
 	h.get_runtime().set_process(false)
 	h.get_completion().terminal_reached.emit(&"WON", {})
 	await _settle()
-	_ok(_nav().current() == R.RESULTS and not _res().get_momentum_section().visible and _preview_leaks(_res()).is_empty() and not _res().get_primary_button().disabled, "Results: no momentum section, HOME still live")
-	_res().get_primary_button().pressed.emit()
-	await _settle()
-	_ok(_nav().current() == R.HOME, "ordinary HOME navigation unaffected")
+	_ok(_nav().current() == R.HOME and not _root.get_home().get_journey_strip().visible, "a win still goes Home (no strip), unaffected")
 	_complete("t35_malformed_config")
 	# Copy guard: momentum text carries only canonical facts.
 	var banned := ["ALMOST", "LUCKY", "JACKPOT", "HURRY", "FREE", "REWARD", "GUARANTEE", "LAST CHANCE"]
 	var texts: Array = []
-	for key in ["JOURNEY_CAPTION", "RESULTS_HOME"]:
+	for key in ["HOME_PLAY", "RESULTS_HOME"]:
 		texts.append(UiText.EN[key].to_upper())
 	var hit := banned.filter(func(b): return " ".join(texts).find(b) != -1)
 	_ok(hit.is_empty(), "no near-miss / urgency / reward-promise copy %s" % str(hit))

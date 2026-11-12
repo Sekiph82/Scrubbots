@@ -43,6 +43,8 @@ signal shortcut_requested(id: String)
 ## V04: HUD (+) buttons — intent only (no price/product/transaction is implemented here).
 signal scrub_bucks_purchase_requested
 signal hearts_purchase_requested
+## SB-PHONE-2026-11-12-E: a win's reward flight ended (or landed at once under Reduced Effects).
+signal reward_flight_finished(key: String)
 
 const UiTokens = preload("res://scripts/ui/ui_tokens.gd")
 const SafeAreaRootScene = preload("res://scenes/components/ui/common/safe_area_root.tscn")
@@ -65,6 +67,7 @@ const GiftTickOverlay = preload("res://scripts/ui/components/gift_tick_overlay.g
 const RobotRoster = preload("res://scripts/progression/robot_roster.gd")
 const HomeBadges = preload("res://scripts/ui/home/home_badges.gd")
 const HomeMicroFeel = preload("res://scripts/ui/feel/home_micro_feel.gd")
+const HomeRewardFlight = preload("res://scripts/ui/home/home_reward_flight.gd")
 ## M42-C003 V03 pinned gesture frame set (HOME_ASSET_MANIFEST animation_sets).
 const HERO_ANIMATION_SET := "home_scrubby_gestures_v03"
 ## SB-POLISH-009 World 01 owner Flow videos (HOME_ASSET_MANIFEST video_sets); when bound they
@@ -152,8 +155,14 @@ var _ad_slot_enabled := true
 var _momentum_cfg: Dictionary = {}
 ## M43-C005F-PHASE4 (F012): ephemeral state-change micro feel (presentation only, never saved).
 var _micro = HomeMicroFeel.new()
+## SB-PHONE-2026-11-12-E: a win's committed rewards flying into the HUD (presentation only).
+var _flight = null
+var _feel_adapter = null
 
 func _ready() -> void:
+	_flight = HomeRewardFlight.new(self)
+	_flight.completed.connect(func(k): reward_flight_finished.emit(k))
+	_flight.bind_feel(_feel_adapter)
 	_build()
 	# SB-M42-015: live values (Heart regen timer) re-read once per second while visible.
 	_tick = Timer.new()
@@ -1272,6 +1281,8 @@ func refresh() -> void:
 	status.visible = not status.text.is_empty()
 	_render_journey(status)
 	_render_values()
+	if _flight != null and _flight.is_running():
+		_flight.reapply()   # the HUD keeps counting from the pre-win values
 	# F012: only a VISIBLE render is compared (a hidden refresh keeps the last seen baseline).
 	if is_visible_in_tree():
 		_micro.observe(_vm, {"frontier": _nodes["HomeJourneyStrip"] if _nodes["HomeJourneyStrip"].visible else play,
@@ -1537,6 +1548,50 @@ static func _mmss(seconds: int) -> String:
 ## M43-C005F-PHASE4 (F012): bind the app's feel adapter (null = no micro feel). Presentation only.
 func set_feedback(adapter) -> void:
 	_micro.bind(adapter)
+	_feel_adapter = adapter
+	if _flight != null:
+		_flight.bind_feel(adapter)
+
+# ------------------------------------------------- SB-PHONE-2026-11-12-E reward flight --
+
+## Fly one win's committed rewards (its TerminalRewardReceipt) into the HUD, once per `key`.
+## False = not built, already played, or nothing to show. Reduced Effects lands at once.
+func play_reward_flight(receipt: Dictionary, key: String) -> bool:
+	if not _built or _flight == null:
+		return false
+	return _flight.play(receipt, key, _app != null and "effects" in _app and _app.effects != null and _app.effects.is_reduced())
+
+func is_reward_flight_running() -> bool:
+	return _flight != null and _flight.is_running()
+
+func get_reward_flight():
+	return _flight
+
+## One counted HUD value of the flight (`v` between the pre-win and the live value).
+func show_hud_value(kind: String, v: float) -> void:
+	if not _built or not _vm.get("ok", false):
+		return
+	var n := int(round(v))
+	match kind:
+		"scrub_bucks":
+			(_nodes["ScrubBucksChip"] as UiValueChip).set_value(UiText.num(n))
+		"bot_parts":
+			(_nodes["ProfileBotParts"] as UiProgressMeter).set_progress(n, _vm["bot_parts_target"],
+				UiText.t("HOME_RATIO", [UiText.num(n), UiText.num(_vm["bot_parts_target"])]))
+		"gift_meter":
+			var gnext := GiftProgressModel.next_milestone(n)
+			(_nodes["GiftMeterBar"] as UiProgressMeter).set_progress(n, gnext, UiText.t("HOME_RATIO", [UiText.num(n), UiText.num(gnext)]))
+			var gm := GiftProgressModel.build(n, int(_vm["gift_cycle_max"]))
+			gm["cycle_max"] = gnext
+			(_nodes["GiftTickOverlay"] as GiftTickOverlay).set_model(gm, [], _app.effects.is_reduced())
+		"win_streak":
+			(_nodes["TrackStreakValue"] as Label).text = UiText.num(n)
+			(_nodes["TrackProgress"] as ProgressBar).value = clampi(n, 0, TRACK_POSITIONS)
+
+## Home hidden (PLAY, route change): a running flight lands its final state at once.
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_VISIBILITY_CHANGED and not visible and _flight != null:
+		_flight.finish()
 
 func get_micro_feel():
 	return _micro

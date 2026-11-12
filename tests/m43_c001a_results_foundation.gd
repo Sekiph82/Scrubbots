@@ -1,8 +1,9 @@
 extends SceneTree
-## M43-C001A — Results foundation evidence (receipt/model, reward idempotency; since
-## SB-PHONE-2026-11-12-B a WON Results only goes Home, never starts the next level).
+## M43-C001A — Results foundation evidence (receipt, reward idempotency). Since
+## SB-PHONE-2026-11-12-E a WON never shows Results: it goes Home (the win animation is off for
+## test saves) and Home flies the receipt's rewards in; LOST keeps Results Retry / Home.
 ## Production path: real main.tscn root, real AppState graph, real ProductionGameplayHost
-## terminal transaction, real ResultsScreen. Expected/completed case ledger.
+## terminal transaction, real ResultsScreen / HomeScreen. Expected/completed case ledger.
 ##
 ## Run: godot --headless --path . -s res://tests/m43_c001a_results_foundation.gd
 
@@ -13,6 +14,7 @@ const AppState = preload("res://scripts/app/app_state.gd")
 const FirstClearTransaction = preload("res://scripts/economy/first_clear_transaction.gd")
 const TerminalRewardReceipt = preload("res://scripts/economy/terminal_reward_receipt.gd")
 const ResultsScreen = preload("res://scripts/ui/results_screen.gd")
+const HomeRewardFlight = preload("res://scripts/ui/home/home_reward_flight.gd")
 const UiText = preload("res://scripts/ui/ui_text.gd")
 const ScrubbotAgent = preload("res://scripts/gameplay/agents/scrubbot_agent.gd")
 
@@ -20,7 +22,7 @@ const R := NavigationController.Route
 
 var EXPECTED_CASES := [
 	"receipt_matches_commit", "already_cleared_and_rollback", "duplicate_terminal_open_refresh",
-	"rapid_home_once", "won_never_starts_level", "level30_won_home_only",
+	"win_home_once", "won_never_starts_level", "level30_won_home_only",
 	"gift_milestone_handoff", "follow_ups_authoritative_only", "lost_retry_regression",
 	"m42_contract_preserved", "results_never_grants_source",
 ]
@@ -34,7 +36,7 @@ func _initialize() -> void:
 	await _receipt_matches_commit()
 	await _already_cleared_and_rollback()
 	await _duplicate_terminal_open_refresh()
-	await _rapid_home_once()
+	await _win_home_once()
 	await _won_never_starts_level()
 	await _level30_won_home_only()
 	await _gift_milestone_handoff()
@@ -56,7 +58,7 @@ func _receipt_matches_commit() -> void:
 	var bp0: int = eco.wallet.bot_parts()
 	var h = await _play(root)
 	_drain(h)
-	_ok(h.get_completion().is_won() and root.get_navigation().current() == R.RESULTS, "real Level 1 WON -> RESULTS")
+	_ok(h.get_completion().is_won() and root.get_navigation().current() == R.HOME and not root.get_results_screen().visible, "real Level 1 WON -> HOME (no Results)")
 	var rc: Dictionary = h.get_terminal_receipt()
 	var fc_sb: int = cfg.first_clear_sb(app.progression.class_for(1))
 	_ok(rc["schema"] == TerminalRewardReceipt.SCHEMA and rc["status"] == "WON" and rc["level"] == 1, "receipt identity WON / level 1")
@@ -72,16 +74,16 @@ func _receipt_matches_commit() -> void:
 	_ok(kinds == ["first_clear_sb", "win_streak_sb", "bot_parts", "gift_meter"], "ordered reveal queue %s" % str(kinds))
 	_ok(rc["reveal_queue"].map(func(e): return e["seq"]) == [0, 1, 2, 3], "deterministic seq")
 	_ok(rc["follow_ups"].is_empty(), "no follow-up ceremony without committed truth")
-	var res = root.get_results_screen()
-	var model: Dictionary = res.get_model()
-	_ok(model["receipt"] == rc and model["attempt"] == 1 and not model.has("continue"), "Results model binds the host receipt; no next-level availability")
-	_ok(_labels(res.get_reward_lines_node()) == ResultsScreen.reward_lines(rc) and _labels(res.get_reward_lines_node()).size() == 4, "Results shows every committed reveal line at once (Reduced-Effects safe)")
-	_ok(_labels(res.get_reward_lines_node())[0] == UiText.t("RESULTS_FIRST_CLEAR_SB", [fc_sb]), "first line = first-clear SB")
+	var pay: Dictionary = root.get_navigation().last_payload()
+	_ok(pay["receipt"] == rc and pay["attempt"] == 1 and pay["via"] == "win" and not pay.has("continue"), "Home payload binds the host receipt; no next-level availability")
+	var plan: Array = HomeRewardFlight.plan(rc, root.get_home().get_view_model())
+	_ok(plan.map(func(e): return e["kind"]) == ["scrub_bucks", "bot_parts", "gift_meter", "win_streak"] and root.get_home().is_reward_flight_running(), "Home flies every committed reward %s" % str(plan.map(func(e): return e["kind"])))
+	_ok(plan[0]["to"] - plan[0]["from"] == fc_sb + 1, "SB flight = first clear + streak SB")
 	var copy: Dictionary = h.get_terminal_receipt()
 	copy["rewards"]["first_clear_sb"] = 999999
-	var m2: Dictionary = res.get_model()
+	var m2: Dictionary = root.get_navigation().last_payload()
 	m2["receipt"]["level"] = 77
-	_ok(h.get_terminal_receipt() == rc and res.get_model()["receipt"] == rc, "receipt/model getters return detached copies")
+	_ok(h.get_terminal_receipt() == rc and root.get_navigation().last_payload()["receipt"] == rc, "receipt/payload getters return detached copies")
 	_shutdown(root)
 	_complete("receipt_matches_commit")
 
@@ -100,9 +102,7 @@ func _already_cleared_and_rollback() -> void:
 	_ok(rc["status"] == "WON" and rc["already_cleared"] and not rc["first_clear"] and rc["commit_reason"] == "not_frontier", "already-cleared WON: no first clear")
 	_ok(rc["reveal_queue"].is_empty() and rc["follow_ups"].is_empty() and rc["wallet_delta"] == {"scrub_bucks": 0, "bot_parts": 0} and rc["reconciled"], "zero rewards, zero reveals")
 	_ok(_econ(app.economy) == econ0 and app.progression.current_level() == 2, "economy/progression untouched")
-	var res = root.get_results_screen()
-	_ok(res.get_note_label().visible and res.get_note_label().text == UiText.t("RESULTS_ALREADY_CLEARED"), "Results states no progression reward")
-	_ok(_labels(res.get_reward_lines_node()).is_empty(), "no reward lines")
+	_ok(root.get_navigation().current() == R.HOME and HomeRewardFlight.plan(rc, root.get_home().get_view_model()).is_empty() and not root.get_home().is_reward_flight_running(), "Home: nothing flies (no reward)")
 	_shutdown(root)
 	root = await _boot_main(_uniq("rb"))
 	app = root.get_app_state()
@@ -138,47 +138,45 @@ func _duplicate_terminal_open_refresh() -> void:
 	for _i in range(5):
 		h.get_completion().terminal_reached.emit(&"WON", {})
 		h._on_terminal_reached(&"WON", {})
-	var res = root.get_results_screen()
+	var home = root.get_home()
 	for _i in range(5):
-		res.show_model(root._results_model(nav.last_payload()))
-		root._on_route_changed(R.GAMEPLAY, R.RESULTS, nav.last_payload())
+		home.refresh()
+		root._on_route_changed(R.GAMEPLAY, R.HOME, nav.last_payload())
 	_ok(h.get_terminal_receipt() == rc, "receipt never rebuilt/overwritten by duplicates")
 	_ok(_econ(app.economy) == e0 and app.progression.snapshot() == p0 and app.economy.reward.applied_transaction_count() == tx0, "no SB / Bot Parts / Gift / streak / progression change")
-	_ok(saves[0] == s0 and nav.transition_id() == t0 and nav.current() == R.RESULTS, "no extra save, no extra route transition")
-	_ok(res.get_model()["receipt"] == rc and _labels(res.get_reward_lines_node()).size() == 4, "refresh re-renders the same committed lines (no duplicated lines)")
+	_ok(saves[0] == s0 and nav.transition_id() == t0 and nav.current() == R.HOME, "no extra save, no extra route transition")
+	_ok(home.get_reward_flight().has_played("win:a1:L1") and not home.play_reward_flight(rc, "win:a1:L1"), "the win's flight never replays on a re-shown Home")
 	app.save.set_fault_injector(Callable())
 	_shutdown(root)
 	_complete("duplicate_terminal_open_refresh")
 
-## SB-PHONE-2026-11-12-B: rapid taps on the WON primary (HOME) -> exactly one HOME transition,
-## no host, no level started, nothing granted.
-func _rapid_home_once() -> void:
-	print("[rapid home once]")
-	var root = await _boot_main(_uniq("rapid"))
+## SB-PHONE-2026-11-12-E: a WON goes Home exactly once by itself (no Results, no tap): one
+## HOME transition, no host, no level started, nothing granted by Home.
+func _win_home_once() -> void:
+	print("[win home once]")
+	var root = await _boot_main(_uniq("once"))
 	var app = root.get_app_state()
 	var nav = root.get_navigation()
 	var h = await _play(root)
+	var t0: int = nav.transition_id()
+	var a0: int = nav.attempt_id()
+	var routes: Array = []
+	nav.route_changed.connect(func(_f, to, _p): routes.append(to))
 	_drain(h)
 	var e0: Dictionary = _econ(app.economy)
 	var p0: Dictionary = app.progression.snapshot()
-	var t0: int = nav.transition_id()
-	var a0: int = nav.attempt_id()
-	var res = root.get_results_screen()
-	var homes := [0]
-	res.home_requested.connect(func(): homes[0] += 1)
-	_ok(res.get_primary_button().text == UiText.t("RESULTS_HOME") and not res.get_primary_button().disabled and not res.get_home_button().visible,
-		"WON: the one visible action is the primary HOME")
 	for _i in range(10):
-		res.get_primary_button().pressed.emit()   # same-frame taps
+		root.handle_back()   # same-frame Back presses on Home
+		h.get_completion().terminal_reached.emit(&"WON", {})
 	await process_frame
-	_ok(homes[0] >= 1 and nav.current() == R.HOME and nav.transition_id() == t0 + 1 and nav.attempt_id() == a0 and _hosts(root) == 0,
-		"10 taps -> one HOME transition, no new attempt, no host")
-	_ok(_econ(app.economy) == e0 and app.progression.snapshot() == p0 and app.progression.current_level() == 2, "HOME grants nothing; frontier 2 waits for Home PLAY")
+	_ok(routes == [R.HOME] and nav.transition_id() == t0 + 1 and nav.attempt_id() == a0 and _hosts(root) == 0 and not root.get_results_screen().visible,
+		"WON -> one HOME transition, no Results, no new attempt, no host")
+	_ok(_econ(app.economy) == e0 and app.progression.snapshot() == p0 and app.progression.current_level() == 2, "Home grants nothing; frontier 2 waits for Home PLAY")
 	_shutdown(root)
-	_complete("rapid_home_once")
+	_complete("win_home_once")
 
-## SB-PHONE-2026-11-12-B: no path starts the next level from a WON Results (no Continue API,
-## navigation refuses RESULTS -> GAMEPLAY, Back goes Home); Home PLAY then starts it.
+## SB-PHONE-2026-11-12-E: no path starts the next level from a win (no Continue API, no Results,
+## Retry refused off Results, Home waits); Home PLAY then starts it.
 func _won_never_starts_level() -> void:
 	print("[won never starts level]")
 	var root = await _boot_main(_uniq("won"))
@@ -186,15 +184,11 @@ func _won_never_starts_level() -> void:
 	var h = await _play(root)
 	_drain(h)
 	var res = root.get_results_screen()
-	var t0: int = nav.transition_id()
 	_ok(not root.has_method("continue_from_results") and not res.has_signal("continue_requested"), "no Continue intent / handler exists")
-	_ok(not nav.can_go(R.GAMEPLAY) and not nav.go(R.GAMEPLAY) and not nav.resume_gameplay_after_retry() and not root.retry_from_results(),
-		"navigation refuses RESULTS(WON) -> GAMEPLAY; Retry refused on a win")
-	_ok(nav.current() == R.RESULTS and nav.transition_id() == t0 and root.get_gameplay_host() == h, "no transition, host kept")
-	var visible_actions: Array = res.find_children("*", "Button", true, false).filter(func(b): return b.is_visible_in_tree())
-	_ok(visible_actions.size() == 1 and visible_actions[0] == res.get_primary_button() and visible_actions[0].text == UiText.t("RESULTS_HOME"),
-		"exactly one visible button: HOME %s" % str(visible_actions.map(func(b): return b.text)))
-	_ok(root.handle_back() == "home" and nav.current() == R.HOME and _hosts(root) == 0, "Back from WON Results -> HOME, no level started")
+	_ok(nav.current() == R.HOME and not root.retry_from_results(), "a win lands on Home; Retry refused")
+	for _i in range(10):
+		await process_frame
+	_ok(nav.current() == R.HOME and _hosts(root) == 0 and root.get_gameplay_host() == null, "Home waits: no level started by itself")
 	var r: Dictionary = root.play_current_frontier()
 	await process_frame
 	_ok(r.get("ok", false) and nav.current() == R.GAMEPLAY and int(root.get_gameplay_host().progression_level) == 2, "Home PLAY starts the next level (2)")
@@ -206,8 +200,8 @@ func _won_never_starts_level() -> void:
 	_shutdown(root)
 	_complete("won_never_starts_level")
 
-## Last builtin level (30 since SB-CAMPAIGN-L11-L30) -> frontier 31 CONTENT_MISSING: the WON
-## Results shows no next-level teaser / note; HOME is the only action.
+## Last builtin level (30 since SB-CAMPAIGN-L11-L30) -> frontier 31 CONTENT_MISSING: the win goes
+## Home, which shows the honest coming-soon state (no level starts).
 func _level30_won_home_only() -> void:
 	print("[level 30 won home only]")
 	var root = await _boot_main(_uniq("l10"))
@@ -219,14 +213,12 @@ func _level30_won_home_only() -> void:
 	h.get_completion().terminal_reached.emit(&"WON", {})
 	var rc: Dictionary = h.get_terminal_receipt()
 	_ok(rc["first_clear"] and rc["frontier"] == {"before": 30, "after": 31} and rc["rewards"]["first_clear_sb"] == app.economy.config.first_clear_sb(app.progression.class_for(30)), "Level 30 first clear committed")
-	var res = root.get_results_screen()
-	_ok(not res.get_note_label().visible and res.find_child("NextCleanup", true, false) == null and res.find_child("NextLevel", true, false) == null,
-		"no next-level teaser or coming-soon note")
 	var e0: Dictionary = _econ(app.economy)
 	var p0: Dictionary = app.progression.snapshot()
-	res.get_primary_button().pressed.emit()
 	await process_frame
-	_ok(nav.current() == R.HOME and _hosts(root) == 0 and _econ(app.economy) == e0 and app.progression.snapshot() == p0, "primary HOME: no mutation, no level started")
+	_ok(nav.current() == R.HOME and not root.get_results_screen().visible and _hosts(root) == 0, "WON -> HOME, no Results")
+	_ok(root.get_home().get_region("PlayButton").disabled and not root.play_current_frontier().get("ok", true), "frontier 31 has no content: PLAY disabled, nothing starts")
+	_ok(_econ(app.economy) == e0 and app.progression.snapshot() == p0, "Home: no mutation")
 	_shutdown(root)
 	_complete("level30_won_home_only")
 
@@ -247,11 +239,11 @@ func _gift_milestone_handoff() -> void:
 	var gift_entry: Array = rc["reveal_queue"].filter(func(e): return e["kind"] == "gift_meter")
 	_ok(gift_entry.size() == 1 and gift_entry[0]["milestones"] == [10], "reveal queue carries the crossed milestone")
 	_ok(eco.gift.claimable().size() == 3 and eco.gift.claimable()[2]["id"] == nq[0]["id"] and rc["reconciled"], "milestone queued unclaimed; no gift reward in the wallet delta")
-	var res = root.get_results_screen()
-	_ok(_labels(res.get_reward_lines_node()).has(UiText.t("RESULTS_GIFT_READY")), "Results announces the gift handoff")
+	_ok(root.get_ceremonies().pending().any(func(e): return String(e["kind"]) == "gift_milestone") and root.get_ceremonies().presented_log().is_empty(),
+		"the Gift ceremony waits on Home for the reward flight")
 	var e0: Dictionary = _econ(eco)
 	for _i in range(3):
-		res.show_model(root._results_model(root.get_navigation().last_payload()))
+		root.get_home().refresh()
 	_ok(_econ(eco) == e0 and eco.gift.claimable().size() == 3, "refresh never claims/queues again")
 	var claim: Dictionary = eco.gift.claim(nq[0]["id"], eco.reward, eco.config)
 	var again: Dictionary = eco.gift.claim(nq[0]["id"], eco.reward, eco.config)
@@ -307,12 +299,13 @@ func _m42_contract_preserved() -> void:
 	var nav = root.get_navigation()
 	var h = await _play(root)
 	_drain(h)
-	_ok(nav.last_payload() == {"status": "WON", "level": 1, "attempt": 1}, "navigation payload unchanged (receipt not in nav)")
+	var pay: Dictionary = nav.last_payload()
+	_ok(pay.keys() == ["via", "status", "level", "attempt", "receipt"] and pay["status"] == "WON" and pay["level"] == 1 and pay["attempt"] == 1, "HOME payload of a win %s" % str(pay.keys()))
 	_shutdown(root)
 	var res = ResultsScreen.new()
 	get_root().add_child(res)
-	res.show_model({"status": "WON", "level": 3, "attempt": 1})
-	_ok(res.get_payload() == {"status": "WON", "level": 3, "attempt": 1} and not res.get_primary_button().disabled and _labels(res.get_reward_lines_node()).is_empty(), "payload-only model still works (no receipt -> no lines)")
+	res.show_model({"status": "LOST", "level": 3, "attempt": 1})
+	_ok(res.get_payload() == {"status": "LOST", "level": 3, "attempt": 1} and not res.get_primary_button().disabled and _labels(res.get_reward_lines_node()).is_empty(), "payload-only model still works (no receipt -> no lines)")
 	res.show_model({"status": "ERROR", "level": 3, "attempt": 1})
 	_ok(not res.get_primary_button().visible, "ERROR: HOME only")
 	res.free()
@@ -321,7 +314,8 @@ func _m42_contract_preserved() -> void:
 func _results_never_grants_source() -> void:
 	print("[Results never grants (source)]")
 	var bad: Array = []
-	for f in ["res://scripts/ui/results_screen.gd", "res://scripts/app/main.gd", "res://scripts/economy/terminal_reward_receipt.gd"]:
+	for f in ["res://scripts/ui/results_screen.gd", "res://scripts/app/main.gd", "res://scripts/economy/terminal_reward_receipt.gd",
+			"res://scripts/ui/home/home_reward_flight.gd", "res://scripts/ui/win_overlay.gd"]:
 		var t := _strip_comments(FileAccess.get_file_as_string(f))
 		for needle in [".grant(", "grant_first_clear", "process_first_clear_win", "FirstClearTransaction", ".claim(", "add_streak_sb", ".credit(", ".debit(", "record_win"]:
 			if t.find(needle) != -1:
@@ -402,7 +396,7 @@ func _strip_comments(text: String) -> String:
 		out.append(line if i == -1 else line.substr(0, i))
 	return "\n".join(out)
 
-## SB-POLISH-002: a fresh Level 1 win would cross Gift milestone 1 (its ceremony holds Results).
+## SB-POLISH-002: a fresh Level 1 win would cross Gift milestone 1 (its ceremony would open on Home).
 ## Boot from a save whose Gift Meter is already at 1 with that ceremony seen, so a Level 1 win
 ## (1 -> 2) crosses no milestone unless a case seeds one on purpose.
 func _boot_main(path: String):

@@ -276,11 +276,11 @@ func _t05_t06() -> void:
 	var h0: int = _eco().hearts.hearts()
 	await _lose()
 	var res = _res()
-	_ok(res.visible and not res.is_victory_layout() and res.theme != null, "Fail uses the production family theme, not the Victory layout")
+	_ok(res.visible and res.theme != null, "Fail uses the production family theme")
 	_ok(res.get_robot().texture != null and res.get_robot().texture.resource_path == ResultsScreen.LOSE_STILL
 		and res.get_emblem().texture.resource_path == ResultsScreen.FAIL_EMBLEM_ART, "Scrubby's keyed LOSE video still (SB-VIDEO-002) + fail emblem")
 	var tex_paths: Array = res.find_children("*", "TextureRect", true, false).filter(func(t): return t.texture != null).map(func(t): return t.texture.resource_path)
-	_ok(not tex_paths.has(ResultsScreen.ROBOT_ART) and not tex_paths.has(ResultsScreen.WIN_STILL) and not tex_paths.has(ResultsScreen.EMBLEM_ART), "no Victory art anywhere on Fail")
+	_ok(tex_paths.all(func(t): return not String(t).contains("/victory/") and not String(t).contains("_win")), "no Victory art anywhere on Fail %s" % str(tex_paths))
 	var texts: Array = _visible_buttons(res).map(func(b): return b.text)
 	_ok(texts == [UiText.t("RESULTS_RETRY"), UiText.t("RESULTS_HOME")], "exactly Retry (primary) + Home: %s" % str(texts))
 	var joined := " ".join(texts).to_upper()

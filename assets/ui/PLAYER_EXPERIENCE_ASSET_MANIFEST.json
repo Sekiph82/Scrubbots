@@ -83,11 +83,11 @@
       "responsive_gate": true,
       "production_scene_required": true,
       "implementation": {
-        "production_scene": "scripts/ui/results_screen.gd",
-        "evidence": "tests/m43_c001b_won_results_visual.gd",
+        "production_scene": "scripts/ui/win_overlay.gd",
+        "evidence": "tests/sb_phone_2026_11_12_e_win_home.gd",
         "live_data": true,
-        "gap": null,
-        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT"
+        "gap": "SB-PHONE-2026-11-12-E (owner 2026-11-12): a win shows no Results panel; the level-complete animation (keyed Scrubby WIN video) plays over the board, then Home opens and flies the rewards in (scripts/ui/home/home_reward_flight.gd). The approved Victory Results panel art is no longer shown.",
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT; factory 152 (Claude): implementation facts updated for the win -> Home flow, status unchanged"
       }
     },
     {

@@ -86,13 +86,11 @@ func _nav_terminal_latch() -> void:
 	n.go(R.GAMEPLAY)
 	var a: int = n.attempt_id()
 	_ok(not n.on_gameplay_terminal(a + 1, &"WON", 1), "wrong attempt id rejected")
-	_ok(n.on_gameplay_terminal(a, &"WON", 1) and n.current() == R.RESULTS, "terminal -> RESULTS")
-	_ok(n.last_payload() == {"status": "WON", "level": 1, "attempt": a}, "minimal results payload")
-	_ok(not n.on_gameplay_terminal(a, &"WON", 1) and n.transition_id() == 3, "repeated terminal ignored")
-	# SB-PHONE-2026-11-12-B: a WON Results never enters GAMEPLAY (no next level from a win).
-	_ok(not n.can_go(R.GAMEPLAY) and not n.go(R.GAMEPLAY) and not n.resume_gameplay_after_retry()
-		and n.current() == R.RESULTS and n.transition_id() == 3 and n.can_go(R.HOME), "WON RESULTS -> GAMEPLAY refused; only HOME")
-	_ok(n.go(R.HOME) and n.go(R.GAMEPLAY), "WON -> HOME -> GAMEPLAY (Home PLAY starts the next level)")
+	# SB-PHONE-2026-11-12-E: a WON latches the attempt but stays on GAMEPLAY (the win animation);
+	# the app root then goes HOME. No Results for a win.
+	_ok(n.on_gameplay_terminal(a, &"WON", 1) and n.current() == R.GAMEPLAY and n.is_won_pending() and n.transition_id() == 2, "WON terminal accepted: still GAMEPLAY, won pending")
+	_ok(not n.on_gameplay_terminal(a, &"WON", 1) and not n.on_gameplay_terminal(a, &"LOST", 1) and n.transition_id() == 2, "repeated terminal ignored")
+	_ok(n.go(R.HOME, {"via": "win"}) and not n.is_won_pending() and n.go(R.GAMEPLAY), "WON -> HOME -> GAMEPLAY (Home PLAY starts the next level)")
 	a = n.attempt_id()
 	_ok(n.on_gameplay_terminal(a, &"LOST", 1) and n.can_go(R.GAMEPLAY), "LOST RESULTS may still enter GAMEPLAY (Retry)")
 	_ok(n.resume_gameplay_after_retry() and n.attempt_id() == a + 1, "RESULTS -> GAMEPLAY retry = new attempt")
@@ -126,7 +124,7 @@ func _nav_back() -> void:
 	_ok(n.back() == "none" and n.current() == R.GAMEPLAY, "GAMEPLAY back after action: none")
 	_ok(n.back(true) == "home" and n.current() == R.HOME, "GAMEPLAY back pre-action: HOME")
 	n.go(R.GAMEPLAY)
-	n.on_gameplay_terminal(n.attempt_id(), &"WON", 1)
+	n.on_gameplay_terminal(n.attempt_id(), &"LOST", 1)
 	_ok(n.back() == "home" and n.current() == R.HOME, "RESULTS back: HOME")
 	_complete("nav_back")
 
@@ -176,12 +174,12 @@ func _home_to_gameplay_once() -> void:
 	_shutdown(root)
 	_complete("home_to_gameplay_once")
 
-## SB-M42-007: authoritative terminal -> RESULTS once, minimal payload, economy/save
-## already committed by the host before Results appears.
+## SB-M42-007 / SB-PHONE-2026-11-12-E: an authoritative WON goes HOME once (no Results; the win
+## animation is off for test saves), economy/save already committed by the host before.
 func _results_on_real_won() -> void:
-	print("[results on real WON]")
+	print("[real WON goes Home]")
 	var path := _uniq("won")
-	_seed_gift_past_m1(path)   # SB-POLISH-002: else the Level 1 win crosses Gift 1 and its ceremony opens over Results
+	_seed_gift_past_m1(path)   # SB-POLISH-002: else the Level 1 win crosses Gift 1
 	var root = await _boot_main(path)
 	var app = root.get_app_state()
 	var nav = root.get_navigation()
@@ -190,26 +188,23 @@ func _results_on_real_won() -> void:
 	await process_frame
 	var h = root.get_gameplay_host()
 	h.get_runtime().set_process(false)
-	var seen := {"sb_at_results": -1, "count": 0}
+	var seen := {"sb_at_home": -1, "routes": []}
 	nav.route_changed.connect(func(_f, t, _p):
-		if t == R.RESULTS:
-			seen["count"] += 1
-			seen["sb_at_results"] = app.economy.wallet.scrub_bucks())
+		seen["routes"].append(t)
+		if t == R.HOME:
+			seen["sb_at_home"] = app.economy.wallet.scrub_bucks())
 	_drain(h)
 	_ok(h.get_completion().is_won(), "real gameplay reached WON")
-	_ok(nav.current() == R.RESULTS and seen["count"] == 1, "exactly one RESULTS transition")
-	_ok(nav.last_payload() == {"status": "WON", "level": 1, "attempt": 1}, "minimal payload %s" % str(nav.last_payload()))
-	_ok(seen["sb_at_results"] > sb0 and app.progression.current_level() == 2, "first-clear economy + progression committed before Results")
-	var res = root.get_results_screen()
-	# SB-PHONE-2026-11-12-B: a win goes Home; HOME is the one (primary) action.
-	_ok(res.visible and res.get_payload()["status"] == "WON" and res.get_primary_button().text == "HOME" and not res.get_primary_button().disabled
-		and not res.get_home_button().visible, "Results visible: WON / primary HOME, no second button")
+	_ok(nav.current() == R.HOME and seen["routes"] == [R.HOME], "exactly one HOME transition, no RESULTS")
+	var pay: Dictionary = nav.last_payload()
+	_ok(pay["via"] == "win" and pay["status"] == "WON" and pay["level"] == 1 and pay["attempt"] == 1 and pay["receipt"] == h.get_terminal_receipt(), "win payload carries the committed receipt")
+	_ok(seen["sb_at_home"] > sb0 and app.progression.current_level() == 2, "first-clear economy + progression committed before Home")
+	_ok(not root.get_results_screen().visible and root.get_home().visible, "Home visible, Results hidden")
 	h.get_completion().terminal_reached.emit(&"WON", {})
-	_ok(seen["count"] == 1 and nav.current() == R.RESULTS, "repeated terminal callback ignored")
-	res.get_primary_button().pressed.emit()
+	_ok(seen["routes"] == [R.HOME], "repeated terminal callback ignored")
 	await process_frame
-	_ok(nav.current() == R.HOME and root.get_gameplay_host() == null and not res.visible and app.progression.current_level() == 2,
-		"primary HOME from WON Results releases the host; no level started, frontier stays 2 for Home PLAY")
+	_ok(nav.current() == R.HOME and root.get_gameplay_host() == null and app.progression.current_level() == 2,
+		"host released; no level started, frontier stays 2 for Home PLAY")
 	_shutdown(root)
 	_complete("results_on_real_won")
 
@@ -257,22 +252,18 @@ func _duplicate_transitions() -> void:
 	_drain(h)
 	var sb_after: int = app.economy.wallet.scrub_bucks()
 	var saves_after_terminal: int = saves[0]
-	var results_count := [0]
-	nav.route_changed.connect(func(_f, t, _p):
-		if t == R.RESULTS:
-			results_count[0] += 1)
+	var routes := [0]
+	nav.route_changed.connect(func(_f, _t, _p): routes[0] += 1)
+	var t0: int = nav.transition_id()
 	for _i in range(5):
 		h.get_completion().terminal_reached.emit(&"WON", {})
-	_ok(results_count[0] == 0 and nav.current() == R.RESULTS, "5 repeated terminal callbacks -> no extra Results")
+	_ok(routes[0] == 0 and nav.current() == R.HOME, "5 repeated terminal callbacks -> no extra transition")
 	_ok(app.economy.wallet.scrub_bucks() == sb_after and app.progression.current_level() == 2, "no double reward / double progression")
 	_ok(saves[0] == saves_after_terminal, "no repeated saves from repeated terminals")
-	var res = root.get_results_screen()
-	var t0: int = nav.transition_id()
-	res.get_home_button().pressed.emit()
-	res.get_home_button().pressed.emit()
-	res.get_primary_button().pressed.emit()
+	root.handle_back()
+	root.handle_back()
 	await process_frame
-	_ok(nav.current() == R.HOME and nav.transition_id() == t0 + 1 and _hosts(root) == 0, "double HOME + late primary (HOME) -> one transition, no host")
+	_ok(nav.current() == R.HOME and nav.transition_id() == t0 and _hosts(root) == 0, "a win landed on Home once; Back presses there change nothing, no host")
 	_ok(not root.retry_from_results() and not root.has_method("continue_from_results"), "Retry refused outside RESULTS; no Continue action exists")
 	root.open_settings()
 	root.open_settings()
@@ -313,9 +304,9 @@ func _back_navigation_real_root() -> void:
 	root.notification(Node.NOTIFICATION_WM_GO_BACK_REQUEST)
 	_ok(nav.current() == R.GAMEPLAY and root.get_gameplay_host() == h and app.economy.hearts.hearts() == hearts0, "post-action back does nothing (no undefined exit rule invented)")
 	_drain(h)
-	_ok(nav.current() == R.RESULTS, "terminal -> RESULTS")
+	_ok(nav.current() == R.HOME, "WON terminal -> HOME (no Results)")
 	var sb: int = app.economy.wallet.scrub_bucks()
-	_ok(root.handle_back() == "home" and nav.current() == R.HOME and app.economy.wallet.scrub_bucks() == sb, "RESULTS back -> HOME, no reward replay")
+	_ok(root.handle_back() == "none" and nav.current() == R.HOME and app.economy.wallet.scrub_bucks() == sb, "HOME back after a win -> nothing, no reward replay")
 	_shutdown(root)
 	_complete("back_navigation_real_root")
 

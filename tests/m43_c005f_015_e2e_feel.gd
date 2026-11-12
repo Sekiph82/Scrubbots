@@ -1,11 +1,12 @@
 extends SceneTree
 ## SB-M43-C005F-015 — end-to-end GameFeelFlow / Saltmire Spark feel validation. Every path runs
 ## in the REAL app (main.tscn, 1080x2160 SubViewport, throw-away test saves) through the shipping
-## seams, together with the owner Flow videos those paths play (Results WIN, Gift milestone,
+## seams, together with the owner Flow videos those paths play (win animation WIN, Gift milestone,
 ## Set Complete, Standard / Premium pack openings, Home world video):
-##   won   gameplay (real Level 1 WON, native cleaning cues) -> F010 bridge -> WON Results (WIN,
-##         reward rows, WIN video) -> Gift milestone hand-off over Results (its own video; the
-##         Results video is ended first: one decoder) -> HOME -> Home state change (F012 MICRO)
+##   won   gameplay (real Level 1 WON, native cleaning cues) -> F010 bridge -> the win animation
+##         (WIN confetti + WIN video; SB-PHONE-2026-11-12-E, no Results), skipped by Back ->
+##         HOME -> reward flight (REWARD pickups) + Home state change (F012 MICRO) -> Gift
+##         milestone ceremony on Home (its own video: one decoder at a time)
 ##   gift  Gift milestone ceremonies 1..1000 -> Gift claims 10 + 1000 -> Standard + Premium pack
 ##   meta  Set Complete + Master Collection ceremonies
 ##   robot Robot Unlock at L25 (MAJOR_UNLOCK) -> EQUIP
@@ -63,7 +64,7 @@ const PATHS := ["won", "gift", "meta", "robot", "acq"]
 const ARMS := ["OFF", "FULL", "REDUCED", "FAULT", "REAL"]
 ## Key prefixes the FULL arm must request on each path (the feel actually ran end to end).
 const EXPECT := {
-	"won": ["c005f010:a1:L1", "results:WON:a1:L1:win", "results:WON:a1:L1:row0:"],
+	"won": ["c005f010:a1:L1", "win:a1:L1", "win:a1:L1:Fly_scrub_bucks"],
 	"gift": ["c005f008:gift:", "c005f008:gift_claim:", ":card0:reveal"],
 	"meta": ["c005f006:set:1", "c005f006:master"],
 	"robot": ["c005f007:robot:moppy"],
@@ -192,8 +193,10 @@ func _run_arm(path: String, arm: String, seed_bytes: PackedByteArray) -> Diction
 	_sub.disable_3d = true
 	get_root().add_child(_sub)
 	MainScript.boot_save_path_override = save
+	MainScript.boot_win_animation_override = 1
 	_root = MainScene.instantiate()
 	_sub.add_child(_root)
+	MainScript.boot_win_animation_override = -1
 	await _frames(14)
 	_gff = SpyGff.new()
 	_spark = SpySpark.new()
@@ -291,16 +294,17 @@ func _path_won() -> String:
 		return "no native cleaning cue observed"
 	if String(host.get_completion().get_state()) != "WON":
 		return "terminal " + String(host.get_completion().get_state())
-	var res = _root.get_results_screen()
-	for _f in range(900):
-		if res.visible and not res._reveal.is_active():
-			break
-		await process_frame
 	await _frames(20)
-	if not res.visible:
-		return "Results not shown"
+	if _root.get_results_screen().visible or _root.get_win_overlay() == null:
+		return "win animation not shown (or Results shown)"
 	await create_timer(0.5).timeout
-	res.get_home_button().pressed.emit()
+	_root.handle_back()   # skip the rest of the win animation -> Home
+	await _frames(2)
+	if _root.get_navigation().route_name() != "HOME":
+		return "not Home after the win animation"
+	var t0 := Time.get_ticks_msec()
+	while _root.get_home().is_reward_flight_running() and Time.get_ticks_msec() - t0 < 10000:
+		await process_frame
 	await _frames(14)
 	return await _drain_ceremonies()
 

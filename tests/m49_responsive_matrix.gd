@@ -4,7 +4,7 @@ extends SceneTree
 ## the project's stretch result (canvas_items / expand on a 1080x2160 reference):
 ##   m01 layout classes · m02 Home · m03 gameplay L1 (5 slots) · m04 real-tap touch mapping
 ##   m05 +1 Slot sixth slot · m06 rectangular / 59x59 boards · m07 popups + deep links under a
-##   notch · m08 Results journey / Next Cleanup.
+##   notch · m08 Results LOST CTAs.
 ## Pure measurement: no production source is changed by this suite.
 ##
 ## Run: godot --headless --path . -s res://tests/m49_responsive_matrix.gd
@@ -30,7 +30,7 @@ const EMU := InputEvent.DEVICE_ID_EMULATION
 
 var EXPECTED_CASES := [
 	"m01_layout_classes", "m02_home_matrix_notch", "m03_gameplay_matrix_notch", "m04_real_tap_mapping",
-	"m05_sixth_slot_matrix", "m06_rect_and_max_boards", "m07_popups_deeplinks_notch", "m08_results_journey",
+	"m05_sixth_slot_matrix", "m06_rect_and_max_boards", "m07_popups_deeplinks_notch", "m08_results_lost_ctas",
 ]
 
 var _fail := 0
@@ -232,23 +232,19 @@ func _m07() -> void:
 	_complete("m07_popups_deeplinks_notch")
 
 func _m08() -> void:
-	print("[m08 Results WON: HOME >= 88 px inside; journey strip inside]")
+	print("[m08 Results LOST: RETRY / HOME >= 88 px inside (a WON shows no Results, SB-PHONE-2026-11-12-E)]")
 	for phys in [Vector2i(720, 1280), Vector2i(1080, 2160), Vector2i(1440, 3200)]:
 		var lv := _logical(phys)
 		await _boot("m08", lv)
 		var res = _root.get_results_screen()
 		res.visible = true
-		res.show_model(_root._results_model({"status": "WON", "level": 1, "attempt": 1}))
+		res.show_model(_root._results_model({"status": "LOST", "level": 1, "attempt": 1}))
 		await _frames(6)
 		var vp := Rect2(Vector2.ZERO, Vector2(lv))
-		var b: Button = res.get_primary_button()
-		var br: Rect2 = b.get_global_rect()
-		var j = res.get_journey_strip()
-		var j_ok: bool = j == null or not (j as Control).is_visible_in_tree() or _inside((j as Control).get_global_rect(), vp)
-		_ok(_inside(br, vp) and br.size.y >= TOUCH - 0.5 and j_ok, "%s (logical %s): CTA %s; journey inside when shown" % [str(phys), str(lv), _rs(br)])
-		# Peer review D3: visibility is RECORDED (rows 031/032 stay partial until asserted).
-		print("    diag: journey visible=%s" % str(j != null and (j as Control).is_visible_in_tree()))
-	_complete("m08_results_journey")
+		var br: Rect2 = res.get_primary_button().get_global_rect()
+		var hr: Rect2 = res.get_home_button().get_global_rect()
+		_ok(_inside(br, vp) and br.size.y >= TOUCH - 0.5 and _inside(hr, vp) and hr.size.y >= TOUCH - 0.5, "%s (logical %s): RETRY %s, HOME %s" % [str(phys), str(lv), _rs(br), _rs(hr)])
+	_complete("m08_results_lost_ctas")
 
 # ------------------------------------------------------------------ helpers ----
 

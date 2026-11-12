@@ -1,7 +1,7 @@
 extends SceneTree
 ## M55-C001 — long-run / lifecycle chaos QA through the REAL app root
 ## (scenes/app/main.tscn -> NavigationController -> Home -> ProductionGameplayHost ->
-## Results -> AppState economy/progression/save).
+## win -> Home (SB-PHONE-2026-11-12-E; Results for a loss) -> AppState economy/progression/save).
 ## Rows: SB-M55-008 repeated scene transitions, 009 long high-load session,
 ## 010 memory growth, 011 duplicate signals, 012 orphan Nodes, 013 duplicate rewards.
 ## Bounded pass rules are fixed up front (see constants) — never "looks stable".
@@ -291,7 +291,7 @@ func _drive(host) -> Dictionary:
 
 ## Plays Levels 1..LEVELS back-to-back; returns the HOME sample at the end of the lap.
 func _long_session(root, base: Dictionary, lap: int) -> Dictionary:
-	print("[SB-M55-009/013 long session lap %d: Levels 1..%d back-to-back through Home -> Gameplay -> Results -> Home]" % [lap, LEVELS])
+	print("[SB-M55-009/013 long session lap %d: Levels 1..%d back-to-back through Home -> Gameplay -> win -> Home]" % [lap, LEVELS])
 	var app = root.get_app_state()
 	var eco = app.economy
 	var nav = root.get_navigation()
@@ -334,10 +334,10 @@ func _long_session(root, base: Dictionary, lap: int) -> Dictionary:
 			_ok(false, "level %d terminal %s after %d frames, %d plan clicks (active left %d) %s" % [n, str(terminals), d["frames"], d["clicks"], host.get_board().count_cells_by_state(BoardState.CellState.ACTIVE), d["rejected"]])
 			break
 		won += 1
-		# 011: exactly one RESULTS route per terminal; one clear per cell.
-		var to_results: int = _routes.slice(r0).filter(func(x): return x[1] == NavigationController.Route.RESULTS).size()
-		if to_results != 1 or nav.current() != NavigationController.Route.RESULTS or clears["events"] != cells or clears["dups"] != 0:
-			signal_bad.append([n, to_results, clears["events"], cells, clears["dups"]])
+		# 011: exactly one HOME route per WON terminal (no Results); one clear per cell.
+		var after: Array = _routes.slice(r0).map(func(x): return x[1])
+		if after != [NavigationController.Route.HOME] or nav.current() != NavigationController.Route.HOME or clears["events"] != cells or clears["dups"] != 0:
+			signal_bad.append([n, str(after), clears["events"], cells, clears["dups"]])
 		# 013: SB delta == first-clear(class) + streak position reward; exact reward tx set.
 		var want_sb: int = cfg.first_clear_sb(app.progression.class_for(n)) + cfg.win_streak_sb(streak0 + 1)
 		var got_sb: int = eco.wallet.scrub_bucks() - sb0
@@ -345,7 +345,7 @@ func _long_session(root, base: Dictionary, lap: int) -> Dictionary:
 		if got_sb != want_sb or tx1 <= tx0 or eco.streak.streak() != streak0 + 1 or eco.wallet.bot_parts() <= parts0:
 			reward_bad.append([n, got_sb, want_sb, tx1 - tx0])
 		# 013: chaos on the terminal — re-emitted terminal signal, repeated host terminal
-		# handler, repeated FirstClear commit and 10 same-frame Results HOME taps, then Home PLAY.
+		# handler, repeated FirstClear commit and 10 same-frame Back presses on Home, then Home PLAY.
 		var sb1: int = eco.wallet.scrub_bucks()
 		var rr := _routes.size()
 		host.get_completion().terminal_reached.emit(&"WON", {})
@@ -355,8 +355,8 @@ func _long_session(root, base: Dictionary, lap: int) -> Dictionary:
 			dup_bad.append([n, "re-terminal", eco.wallet.scrub_bucks() - sb1, _routes.size() - rr])
 		var rt0 := _routes.size()
 		for _k in range(10):
-			root.get_results_screen().get_primary_button().pressed.emit()
-		var home_ok: bool = nav.current() == NavigationController.Route.HOME and _routes.size() == rt0 + 1 and root.get_gameplay_host() == null
+			root.handle_back()
+		var home_ok: bool = nav.current() == NavigationController.Route.HOME and _routes.size() == rt0 and root.get_gameplay_host() == null
 		if not home_ok:
 			dup_bad.append([n, "home", _routes.size() - rt0])
 		var cont_ok := 1 if root.play_current_frontier().get("ok", false) else 0
@@ -376,13 +376,13 @@ func _long_session(root, base: Dictionary, lap: int) -> Dictionary:
 	_ok(won == LEVELS, "all %d production levels WON back-to-back in one app session" % LEVELS)
 	_ok(app.progression.current_level() == LEVELS + 1, "frontier advanced to %d (got %d)" % [LEVELS + 1, app.progression.current_level()])
 	_completed["009_long_session"] = true
-	_ok(signal_bad.is_empty(), "each level: exactly one RESULTS transition and one clear event per cell %s" % str(signal_bad))
+	_ok(signal_bad.is_empty(), "each level: exactly one HOME transition (no Results) and one clear event per cell %s" % str(signal_bad))
 	_ok(reward_bad.is_empty(), "each WON: SB == first_clear_sb(class) + win_streak_sb(position), reward tx grew, Bot Parts grew, streak +1 %s" % str(reward_bad))
-	_ok(dup_bad.is_empty(), "re-emitted terminal / re-run handler / re-committed FirstClear / 10 Results HOME taps: zero extra SB, tx, one HOME route; Home PLAY -> exactly one next host %s" % str(dup_bad))
+	_ok(dup_bad.is_empty(), "re-emitted terminal / re-run handler / re-committed FirstClear / 10 Back presses: zero extra SB, tx, routes; Home PLAY -> exactly one next host %s" % str(dup_bad))
 	# After frontier LEVELS + 1 (no content) return HOME and compare with the transition baseline.
-	_ok(nav.current() == NavigationController.Route.HOME, "WON Results -> HOME after Level %d (no content past it)" % LEVELS)
+	_ok(nav.current() == NavigationController.Route.HOME, "WON -> HOME after Level %d (no content past it)" % LEVELS)
 	await _settle()
-	# Sample at feel quiescence: presentation-feel bursts (Results WIN confetti, the Home
+	# Sample at feel quiescence: presentation-feel bursts (the win's Home reward pickups, the Home
 	# ceremony's REWARD burst) are transient Nodes the adapter frees within its per-tier ceiling
 	# (<= 1.3 s). Counting one mid-flight is timing noise, not a leak; a leaked burst would
 	# outlive the adapter's ownership and still be counted below. Quiet = a STREAK of zero-owned

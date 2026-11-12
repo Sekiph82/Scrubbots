@@ -1,7 +1,7 @@
 extends "res://tests/m49_surface_matrix.gd"
 ## M50 rendered text contrast + font floor (SB-M50-004, SB-M50-007) on every M43/M44 surface the
 ## factory 118 walk reaches (tests/m49_surface_matrix.gd rows: Home + every Home popup, Collection,
-## Robots, ceremonies, packs, gameplay HUD + its popups, Level Intro, Results WON / LOST), REAL app
+## Robots, ceremonies, packs, gameplay HUD + its popups, Level Intro, the win animation, Results LOST), REAL app
 ## root on throw-away saves, one phone size: 1080x2400.
 ##   c01 every visible Label / Button text (disabled buttons are WCAG-exempt inactive controls):
 ##       render the surface (A), hide only the text colours (B), ink = pixels where A != B inside
