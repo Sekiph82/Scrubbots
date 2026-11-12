@@ -149,7 +149,7 @@
     "hearts_empty": {
       "task": "SB-M56-007",
       "params": {
-        "at": {"type": "enum", "values": ["home_play", "results_continue", "results_retry", "other"], "fallback": "other", "required": true}
+        "at": {"type": "enum", "values": ["home_play", "results_retry", "other"], "fallback": "other", "required": true}
       }
     },
     "pack_opened": {
@@ -243,21 +243,6 @@
       "task": "SB-M56-012",
       "params": {
         "dest": {"type": "enum", "values": ["home", "daily", "tasks", "gift_bar", "events", "shop", "collection", "robots", "profile", "none"], "fallback": "home", "required": true}
-      }
-    },
-    "next_cleanup_shown": {
-      "task": "SB-M56-017",
-      "params": {
-        "available": {"type": "bool", "required": true},
-        "image": {"type": "bool", "required": true},
-        "reason": {"type": "enum", "values": ["ok", "CONTENT_MISSING", "CATALOG_INVALID", "LEVEL_DISABLED", "APP_BLOCKED", "other"], "fallback": "other", "required": true}
-      }
-    },
-    "next_cleanup_tap": {
-      "task": "SB-M56-017",
-      "params": {
-        "ok": {"type": "bool", "required": true},
-        "reason": {"type": "enum", "values": ["ok", "not_results", "stale_results", "not_won", "no_next_content", "no_hearts", "APP_BLOCKED", "CONTENT_MISSING", "CATALOG_INVALID", "LEVEL_DISABLED", "other"], "fallback": "other", "required": true}
       }
     },
     "journey_progress": {

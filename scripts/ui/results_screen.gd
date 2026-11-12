@@ -3,7 +3,7 @@ extends Control
 ##
 ## M42 (SB-M42-007) — the Results navigation surface shown once per gameplay terminal.
 ## M43-C001A — presents ONE read-only Results model built by the app root:
-##   {status, level, attempt, receipt, continue:{available, reason, next_level}, reduced_effects}
+##   {status, level, attempt, receipt, momentum, reduced_effects, robot_id}
 ## where `receipt` is the host's committed TerminalRewardReceipt. It never computes
 ## rewards or mutates any state (the terminal economy/save already ran inside the
 ## gameplay host before this is shown); re-showing/refreshing the same model is pure
@@ -15,9 +15,9 @@ extends Control
 ##     above and overlaps the frame; a small Victory emblem sits in the header;
 ##   - reward rows come ONLY from receipt.reveal_queue (+ gift follow-up), in that order,
 ##     each with an existing approved icon + live text;
-##   - green Life/Help-family Continue CTA, subordinate Home;
+##   - green Life/Help-family Home CTA (SB-PHONE-2026-11-12-B: the only WON action);
 ##   - a short ordered row reveal (presentation only; rows exist from the start, grants
-##     are already committed, Continue is never gated by it). Reduced Effects shows every
+##     are already committed, Home is never gated by it). Reduced Effects shows every
 ##     row immediately. M43-C005-C005: driven by the shared RevealSequencer.
 ## M43-C004 (SB-M43-050) — LOST is the production Fail surface in the same family: the
 ##   existing help Scrubby pose (no sad pose exists yet) above the cream frame, the
@@ -26,24 +26,24 @@ extends Control
 ##   Home secondary. No Victory art, no Replay, no ad CTA. It only presents the loss the
 ##   host already committed; Retry/Home apply nothing here.
 ## ERROR keeps the technical fallback layout with NO Victory art.
-## M43-C001R (SB-M43-R01-001..004) — WON momentum corridor, after the committed reward rows:
-##   compact 10-Level Cleaning Journey (shared JourneyStrip) -> Next Cleanup teaser (a
-##   cropped AtlasTexture region of the REAL next preview; the full image is never drawn)
-##   -> dominant CLEAN NEXT (the existing Continue intent) -> Home secondary. Read-only:
-##   model["momentum"] comes from ResultsMomentum; nothing here grants or resolves content.
-##   Ceremony barrier seam (future M43-C005): while any barrier is set, the teaser and
-##   CLEAN NEXT are held; releasing shows the same already-resolved teaser.
+## M43-C001R (SB-M43-R01-001..004) — WON momentum: the compact 10-Level Cleaning Journey
+##   (shared JourneyStrip) after the committed reward rows. Read-only: model["momentum"] comes
+##   from ResultsMomentum; nothing here grants or resolves content.
+## SB-PHONE-2026-11-12-B (owner 2026-11-12, supersedes the M43-C001R CLEAN NEXT CTA + Next
+##   Cleanup teaser): a win goes back Home. WON has no next-level action or teaser; its one
+##   action is HOME (the green primary). The next level starts only from Home PLAY.
+##   Ceremony barrier seam (M43-C005): while any barrier is set the primary's emphasis waits.
 ## There is no Replay control (owner A1-NO).
 ## M43-C005F-PHASE2 (SB-M43-C005F-003 / -004) — optional presentation feel through the ONE app
 ##   feel adapter (set_feedback; null = exactly the native Results above). Only for WON, only
 ##   after the committed terminal already exists, every event one-shot per terminal identity
-##   ("results:WON:a<attempt>:L<level>[:...]") so re-show / resize / refresh / barrier / Continue
-##   re-arm never replays:
+##   ("results:WON:a<attempt>:L<level>[:...]") so re-show / resize / refresh / barrier never
+##   replays:
 ##     - WIN: bounded confetti at the robot (adapter WIN) + one restrained native emblem pop;
 ##     - each committed reward row, as its reveal step starts: adapter REWARD pickup at the row
 ##       + a tiny native settle (at most ROW_FEEL_MAX rows; rows / order / text untouched);
-##     - CLEAN NEXT: one subtle native pulse once the reveal is done, no ceremony barrier holds
-##       it and it is actionable (never disables, delays or latches anything).
+##     - the primary (HOME): one subtle native pulse once the reveal is done, no ceremony barrier
+##       holds it and it is actionable (never disables, delays or latches anything).
 ##   Reduced Effects: keys are consumed but nothing moves and no plugin work happens.
 ## SB-POLISH-011 V1 — WON / LOST robot motion (CharacterMotion `win` / `lose`) on the existing
 ##   pose, independent of the adapter: draw-only (layout and input untouched), Reduced = static,
@@ -55,14 +55,10 @@ extends Control
 ##   Other robots, or a video that fails to load / play, keep the approved pose + CharacterMotion.
 ##
 ## Actions (intents only; the app root performs them):
-##   HOME                -> home_requested
-##   WON:  CONTINUE      -> continue_requested(attempt)  (next canonical frontier)
-##         latched: the first accepted tap disables Continue; later taps are no-ops
-##         until the app root re-shows a model (e.g. a Continue that failed to launch).
+##   HOME (WON primary, LOST / ERROR secondary) -> home_requested
 ##   LOST: RETRY         -> retry_requested     (M30 transaction-safe retry)
 
 signal home_requested
-signal continue_requested(attempt: int)
 signal retry_requested
 
 const UiTokens = preload("res://scripts/ui/ui_tokens.gd")
@@ -103,7 +99,6 @@ const ROBOT_OVERLAP := 96
 const EMBLEM_SIZE := 96
 const ICON_SIZE := 76
 const REVEAL_STEP_S := 0.16   ## per-row fade; visual-only candidate timing (owner gate)
-const TEASER_SIZE := 132
 const JOURNEY_H := 76   ## V02: proportionally larger for the beat size hierarchy (V01 56)
 
 ## Warm Life/Help-family palette (native chrome; values only).
@@ -115,7 +110,6 @@ const INK := Color(0.106, 0.180, 0.349)
 
 var _payload: Dictionary = {}
 var _model: Dictionary = {}
-var _continue_latched := false
 var _victory := false
 ## Production family chrome (WON Victory or LOST Fail); false = ERROR technical fallback.
 var _styled := false
@@ -136,13 +130,6 @@ var _reveal_serial := 0   ## each show_model builds fresh rows = a new presentat
 var _momentum: VBoxContainer
 var _journey_caption: Label
 var _journey
-var _next: PanelContainer
-var _teaser: TextureRect
-var _teaser_none: Label
-var _next_title: Label
-var _next_level: Label
-var _next_facts: Label
-var _has_next := false
 var _barriers: Dictionary = {}   ## ceremony barrier id -> true (presentation hold only)
 var _victory_theme: Theme
 ## M43-C005F-PHASE2: optional presentation feel (the app root's feel adapter); never authority.
@@ -154,7 +141,7 @@ const ROW_FEEL_MAX := 6        ## at most this many reward-row feel events per R
 const EMBLEM_POP := 0.12       ## WON emblem: one sine bump 1.0 -> 1.12 -> 1.0
 const EMBLEM_POP_S := 0.36
 const ROW_SETTLE := 0.04       ## row: scale 0.96 -> 1.0 while its fade runs
-const NEXT_POP := 0.05         ## CLEAN NEXT: one sine bump 1.0 -> 1.05 -> 1.0
+const NEXT_POP := 0.05         ## primary: one sine bump 1.0 -> 1.05 -> 1.0
 const NEXT_POP_S := 0.40
 
 func _init() -> void:
@@ -164,7 +151,7 @@ func _init() -> void:
 	_victory_theme = HomeStyle.make_theme()
 	_reveal = RevealSequencer.new(self)
 	_reveal.step_started.connect(_on_reveal_step)
-	_reveal.completed.connect(func(_k): call_deferred("_maybe_emphasize_next"))
+	_reveal.completed.connect(func(_k): call_deferred("_maybe_emphasize_primary"))
 	var dim := ColorRect.new()
 	dim.name = "Dim"
 	dim.color = Color(0, 0, 0, 0.6)
@@ -238,42 +225,6 @@ func _build_momentum(col: VBoxContainer) -> void:
 	_journey = JourneyStrip.new()
 	_journey.custom_minimum_size = Vector2(0, JOURNEY_H)
 	_momentum.add_child(_journey)
-	_next = PanelContainer.new()
-	_next.name = "NextCleanup"
-	_next.add_theme_stylebox_override("panel", HomeStyle.pad(HomeStyle.box(ROW, ROYAL, 3, 26, 0), UiTokens.SPACE_MD, UiTokens.SPACE_SM))
-	_momentum.add_child(_next)
-	var h := HBoxContainer.new()
-	h.add_theme_constant_override("separation", UiTokens.SPACE_MD)
-	_next.add_child(h)
-	var frame := PanelContainer.new()
-	frame.name = "TeaserFrame"
-	frame.custom_minimum_size = Vector2(TEASER_SIZE, TEASER_SIZE)
-	frame.add_theme_stylebox_override("panel", HomeStyle.box(Color(0.125, 0.145, 0.2), ROYAL_EDGE, 4, 18, 0))
-	h.add_child(frame)
-	_teaser = TextureRect.new()
-	_teaser.name = "TeaserImage"
-	_teaser.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	_teaser.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	_teaser.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	_teaser.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	frame.add_child(_teaser)
-	_teaser_none = Label.new()
-	_teaser_none.name = "TeaserUnavailable"
-	_teaser_none.text = "?"
-	_teaser_none.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_teaser_none.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	_teaser_none.add_theme_font_size_override("font_size", 72)
-	frame.add_child(_teaser_none)
-	var info := VBoxContainer.new()
-	info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	info.alignment = BoxContainer.ALIGNMENT_CENTER
-	h.add_child(info)
-	_next_title = _ink_label("NextTitle", 26)
-	_next_level = _ink_label("NextLevel", 40)
-	_next_facts = _ink_label("NextFacts", 26)
-	for l in [_next_title, _next_level, _next_facts]:
-		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-		info.add_child(l)
 
 func _ink_label(n: String, fs: int) -> Label:
 	var l := Label.new()
@@ -289,8 +240,6 @@ func _ink_label(n: String, fs: int) -> Label:
 ## WON momentum from model["momentum"] (ResultsMomentum.results_model). Hidden otherwise.
 func _render_momentum(won: bool) -> void:
 	var m: Dictionary = _model.get("momentum", {})
-	_has_next = false
-	_teaser.texture = null
 	_momentum.visible = won and bool(m.get("ok", false))
 	if not _momentum.visible:
 		_sync_barrier()
@@ -298,38 +247,10 @@ func _render_momentum(won: bool) -> void:
 	var j: Dictionary = m.get("journey", {})
 	_journey.set_model(j)
 	_journey_caption.text = UiText.t("JOURNEY_CAPTION", [int(j.get("completed", 0)), int(j.get("length", 10))]) if j.get("ok", false) else ""
-	var n: Dictionary = m.get("next", {})
-	_has_next = true
-	_next_title.text = UiText.t("NEXT_CLEANUP_TITLE")
-	_next_level.text = UiText.t("NEXT_CLEANUP_LEVEL", [int(n.get("level", 0))])
-	if bool(n.get("available", false)):
-		var facts := UiText.t("DIFFICULTY_" + String(n.get("difficulty", "")))
-		if int(n.get("color_count", -1)) > 0:
-			facts = UiText.t("NEXT_CLEANUP_FACTS", [facts, int(n["color_count"])])
-		_next_facts.text = facts
-	else:
-		_next_facts.text = UiText.t("NEXT_CLEANUP_SOON")
-	# Only the crop region is ever bound; without an honest crop there is no image at all.
-	if bool(n.get("available", false)) and bool(n.get("image_ok", false)):
-		var full = load(String(n["preview_path"])) as Texture2D
-		if full != null:
-			var at := AtlasTexture.new()
-			at.atlas = full
-			at.region = Rect2(n["crop"])
-			_teaser.texture = at
-	_teaser_none.visible = _teaser.texture == null
 	_sync_barrier()
 
-## V02 owner decision: when the Next Cleanup card already states this unavailable frontier
-## ("Coming soon"), the older note above CLEAN NEXT would repeat it, so it is suppressed.
-## Without a momentum card (e.g. malformed config) the note remains the honest message.
-func _momentum_shows_unavailable(level: int) -> bool:
-	var m: Dictionary = _model.get("momentum", {})
-	var n: Dictionary = m.get("next", {})
-	return bool(m.get("ok", false)) and not bool(n.get("available", true)) and int(n.get("level", -1)) == level
-
-## Future M43-C005 seam: hold (active) / release the teaser + CLEAN NEXT for a mandatory
-## ceremony `id`. Presentation only; rewards / progression / economy are never touched.
+## M43-C005 seam: hold (active) / release the primary's emphasis for a mandatory ceremony `id`.
+## Presentation only; rewards / progression / economy are never touched.
 func set_ceremony_barrier(id: String, active: bool) -> void:
 	if active:
 		_barriers[id] = true
@@ -341,26 +262,10 @@ func has_ceremony_barrier() -> bool:
 	return not _barriers.is_empty()
 
 func _sync_barrier() -> void:
-	_next.visible = _has_next and _barriers.is_empty()
-	_sync_primary()
-	call_deferred("_maybe_emphasize_next")
-
-func _sync_primary() -> void:
-	var status := String(_payload.get("status", ""))
-	var won := status == "WON"
-	var available := bool((_model.get("continue", {}) as Dictionary).get("available", false))
-	# WON continues only to real next-frontier content and never while latched or held by a
-	# ceremony barrier; LOST may Retry; ERROR only HOME.
-	_primary.disabled = (won and (not available or _continue_latched or not _barriers.is_empty())) or not (won or status == "LOST")
-
-func get_teaser_image() -> TextureRect:
-	return _teaser
+	call_deferred("_maybe_emphasize_primary")
 
 func get_journey_strip():
 	return _journey
-
-func get_next_cleanup_panel() -> PanelContainer:
-	return _next
 
 func get_momentum_section() -> VBoxContainer:
 	return _momentum
@@ -374,27 +279,21 @@ func _button(n: String, cb: Callable) -> Button:
 	b.pressed.connect(cb)
 	return b
 
-## M42 compatibility: payload + next-frontier availability, no receipt.
-func show_result(payload: Dictionary, continue_available: bool) -> void:
-	var m := payload.duplicate(true)
-	m["continue"] = {"available": continue_available}
-	show_model(m)
-
-## Show one terminal Results model (see header). Re-arms the Continue latch.
+## Show one terminal Results model (see header).
 func show_model(model: Dictionary) -> void:
 	_model = model.duplicate(true)
 	_payload = {"status": _model.get("status", ""), "level": _model.get("level", 0), "attempt": _model.get("attempt", 0)}
-	_continue_latched = false
 	var status := String(_payload["status"])
 	var won := status == "WON"
-	var cont: Dictionary = _model.get("continue", {})
-	var continue_available := bool(cont.get("available", false))
 	_apply_layout(status)
 	_title.text = UiText.t("RESULTS_WON" if won else ("RESULTS_LOST" if status == "LOST" else "RESULTS_ERROR"))
 	_level.text = UiText.t("RESULTS_LEVEL", [int(_payload["level"])])
-	_primary.text = UiText.t("RESULTS_CLEAN_NEXT" if won else "RESULTS_RETRY")
+	# WON: HOME is the one (primary) action; LOST: Retry + Home; ERROR: Home only.
+	_primary.text = UiText.t("RESULTS_HOME" if won else "RESULTS_RETRY")
 	_primary.visible = won or status == "LOST"
+	_primary.disabled = not _primary.visible
 	_home.text = UiText.t("RESULTS_HOME")
+	_home.visible = not won
 	_clear_lines()
 	var receipt: Dictionary = _model.get("receipt", {})
 	for r in (reward_rows(receipt) if won else loss_rows(receipt)):
@@ -404,11 +303,8 @@ func show_model(model: Dictionary) -> void:
 		_note.text = UiText.t("FAIL_ENCOURAGE")
 	elif won and bool(receipt.get("already_cleared", false)):
 		_note.text = UiText.t("RESULTS_ALREADY_CLEARED")
-	elif won and not continue_available and cont.has("next_level") and not _momentum_shows_unavailable(int(cont["next_level"])):
-		_note.text = UiText.t("RESULTS_NEXT_UNAVAILABLE", [int(cont["next_level"])])
 	_note.visible = not _note.text.is_empty()
 	_render_momentum(won)
-	_sync_primary()
 	_start_reveal(bool(_model.get("reduced_effects", false)))
 	if _styled:
 		var intro := _feel_id() != _motion_id
@@ -581,9 +477,9 @@ func _plain_line(text: String) -> Label:
 	return l
 
 ## Ordered row reveal. Presentation only: every row already exists and every grant is
-## already committed; Continue/Home stay live throughout. Reduced Effects (or no tree)
+## already committed; the actions stay live throughout. Reduced Effects (or no tree)
 ## shows all rows immediately. One RevealSequencer step per committed row, then (M43-C001R)
-## the momentum section after its configured delay (the teaser is the crop at every alpha).
+## the journey section after its configured delay.
 func _start_reveal(reduced: bool) -> void:
 	_momentum.modulate.a = 1.0
 	var steps: Array = []
@@ -618,7 +514,6 @@ func _notification(what: int) -> void:
 	if what == NOTIFICATION_VISIBILITY_CHANGED and not visible and _lines != null:
 		_clear_lines()
 		_barriers.clear()   # a ceremony hold belongs to the Results it was set on
-		_teaser.texture = null
 
 ## Display rows for a receipt, in its committed reveal_queue order (then follow-ups):
 ## [{kind, icon, text}]. Nothing outside the receipt can create a row.
@@ -671,11 +566,7 @@ func _on_primary() -> void:
 	if _primary.disabled:
 		return
 	if String(_payload.get("status", "")) == "WON":
-		if _continue_latched:
-			return
-		_continue_latched = true
-		_primary.disabled = true
-		continue_requested.emit(int(_payload.get("attempt", 0)))
+		home_requested.emit()
 	else:
 		retry_requested.emit()
 
@@ -760,7 +651,7 @@ func _celebrate_win(id: String) -> void:
 	if _feel == null or not _victory or id != _feel_id() or not visible:
 		return
 	if not _feel_event("WIN", _robot_slot, id + ":win"):   # the slot: the robot itself is moving
-		return   # already consumed (re-show / refresh / resize / Continue re-arm)
+		return   # already consumed (re-show / refresh / resize)
 	if not _feel_reduced():
 		_pop(_emblem, EMBLEM_POP, EMBLEM_POP_S)
 
@@ -786,9 +677,9 @@ func _row_feel(id: String, index: int, row: Control) -> void:
 		tw.tween_method(func(t: float): row.scale = Vector2.ONE * lerpf(1.0 - ROW_SETTLE, 1.0, t), 0.0, 1.0, REVEAL_STEP_S)
 		_feel_tweens.append(tw)
 
-## CLEAN NEXT emphasis: only after the reveal, with no ceremony barrier, when actionable.
+## Primary (HOME) emphasis: only after the reveal, with no ceremony barrier, when actionable.
 ## Always reached deferred, so a barrier set later in the same frame is seen first.
-func _maybe_emphasize_next() -> void:
+func _maybe_emphasize_primary() -> void:
 	if _feel == null or not _victory or not visible or _reveal.is_active() or not _barriers.is_empty():
 		return
 	if not _primary.visible or _primary.disabled:

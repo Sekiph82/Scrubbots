@@ -10,7 +10,7 @@ extends SceneTree
 ##       placeholder / dummy / lorem / TODO copy in the shipped English table
 ##   SB-M60-003 a brand-new save (shipping FTUE + Level Intro policy, no debug / test unlock):
 ##       first Home, Welcome task claimed through the real TASKS popup, L1 -> L3 played for real
-##       (RealPlayDriver human policy on the shipped host) through Results CLEAN NEXT, tutorial
+##       (RealPlayDriver human policy on the shipped host) through Results HOME + Home PLAY, tutorial
 ##       window closed at L4
 ##   SB-M60-004 no ad / store provider: Shop SB packs + No Ads, Home SB +, Life / Rewarded Ads
 ##       video offers are honestly UNAVAILABLE and pressing them grants or charges nothing
@@ -178,11 +178,17 @@ func _g001() -> void:
 	if gp_ok:
 		var lv := int(host.progression_level)
 		res["won"] = await _terminal(host, &"WON", rs.get_primary_button())
+		# SB-PHONE-2026-11-12-B: the WON Results' one action is HOME; Home PLAY starts the next level.
+		res["won_home_only"] = not rs.get_home_button().visible and rs.get_primary_button().text == UiText.t("RESULTS_HOME")
 		rs.get_primary_button().pressed.emit()
 		await _frames(6)
+		res["won_home"] = nav.current() == NavigationController.Route.HOME and _root.get_gameplay_host() == null
+		ms.clear("test")
+		_root.get_home().get_region("PlayButton").pressed.emit()
+		await _frames(6)
 		host = _root.get_gameplay_host()
-		res["clean_next"] = nav.current() == NavigationController.Route.GAMEPLAY and host != null and int(host.progression_level) == lv + 1
-		if res["clean_next"]:
+		res["home_play"] = nav.current() == NavigationController.Route.GAMEPLAY and host != null and int(host.progression_level) == lv + 1
+		if res["home_play"]:
 			host.get_runtime().set_process(false)
 			res["lost"] = await _terminal(host, &"LOST", rs.get_primary_button())
 			rs.get_primary_button().pressed.emit()
@@ -195,8 +201,8 @@ func _g001() -> void:
 				rs.get_home_button().pressed.emit()
 				await _frames(4)
 				res["home"] = nav.current() == NavigationController.Route.HOME
-	var res_ok: bool = res.size() == 6 and res.values().all(func(v): return v == true)
-	_check(g, "results_buttons", res_ok, "WON -> Results, CLEAN NEXT -> next level; LOST -> Results, RETRY -> same level; LOST -> Results, HOME -> Home %s" % str(res))
+	var res_ok: bool = res.size() == 8 and res.values().all(func(v): return v == true)
+	_check(g, "results_buttons", res_ok, "WON -> Results with HOME only, HOME -> Home, PLAY -> next level; LOST -> Results, RETRY -> same level; LOST -> Results, HOME -> Home %s" % str(res))
 	# Registry ledger: every route source is walked and lands on its registry destination.
 	var reg = JSON.parse_string(FileAccess.get_file_as_string(REGISTRY))
 	# Route source -> where its press landed in this walk (Home buttons by node name).
@@ -213,7 +219,7 @@ func _g001() -> void:
 		"bottom_nav.ranks": landed.get("Nav_leaderboard"), "bottom_nav.settings": landed.get("SettingsButton"),
 		"gameplay.pause": hud.get("pause"), "gameplay.speed_no_entitlement": hud.get("speed"),
 		"gameplay.booster_no_charge": boosters_landed[0] if boosters_landed.all(func(x): return x == boosters_landed[0]) else null,
-		"attempt.zero_hearts": zero, "results.clean_next": "gameplay" if res.get("clean_next", false) else null,
+		"attempt.zero_hearts": zero,
 		"results.retry": "gameplay" if res.get("retry", false) else null, "results.home": "home" if res.get("home", false) else null}
 	## Routes not reachable from a plain Home / HUD tap, walked by their own suites.
 	var by_suite := {"progression.third_consecutive_fail": "tests/m43_c004_c001_fail_need_a_hand.gd",
@@ -376,13 +382,16 @@ func _g003() -> void:
 			won_all = false
 			break
 		var rs = _root.get_results_screen()
-		var b: Button = rs.get_primary_button() if n < 3 else rs.get_home_button()
+		var b: Button = rs.get_primary_button()   # WON: HOME is the one action
 		await _settle(b)
 		b.pressed.emit()
 		await _frames(6)
 		await _drain_popups()
+		if n < 3:
+			home.get_region("PlayButton").pressed.emit()
+			await _frames(6)
 	_check(g, "l1_l3_real_play", won_all and nav.current() == NavigationController.Route.HOME and app.progression.current_level() == 4 and app.economy.ftue.closed,
-		"L1..L3 under the human policy on the shipped host, Results CLEAN NEXT / HOME buttons: %s; at Home L%d, FTUE window closed %s" % [str(steps), app.progression.current_level(), str(app.economy.ftue.closed)])
+		"L1..L3 under the human policy on the shipped host, Results HOME then Home PLAY: %s; at Home L%d, FTUE window closed %s" % [str(steps), app.progression.current_level(), str(app.economy.ftue.closed)])
 	_check(g, "no_debug_tools", not AppStateScript.test_unlock_all and app.unlocks.cfg["unlocks"]["robots"] == 25,
 		"no test unlock, no debug_set_current_level, no injected terminal: the shipped unlock table and real wins only")
 	MainScript.boot_ftue_override = -1

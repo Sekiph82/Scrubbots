@@ -344,8 +344,7 @@ func _info(r) -> Dictionary:
 		"kinds": _rows(r).map(func(c): return c.get_meta("kind")),
 		"texts": r.shown_row_texts(),
 		"alphas": _rows(r).map(func(c): return c.modulate.a),
-		"momentum": [r.get_momentum_section().visible, r.get_momentum_section().modulate.a, r.get_next_cleanup_panel().visible],
-		"teaser": r.get_teaser_image().texture != null,
+		"momentum": [r.get_momentum_section().visible, r.get_momentum_section().modulate.a],
 		"primary": [r.get_primary_button().text, r.get_primary_button().disabled],
 		"note": r.get_note_label().text,
 	}

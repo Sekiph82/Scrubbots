@@ -131,11 +131,13 @@ func _click_c(c: Control) -> void:
 	_mouse(p, false)
 	await _settle()
 
-## Level -> Results (real terminal path) -> Continue: returns the NEW host.
+## Level -> Results (real terminal path) -> HOME -> Home PLAY: returns the NEW host.
 func _win_and_continue() -> void:
 	_host.get_completion().terminal_reached.emit(&"WON", {})
 	await _settle()
-	var r: Dictionary = _root.continue_from_results()
+	_root.get_results_screen().get_primary_button().pressed.emit()   # SB-PHONE-2026-11-12-B: a win goes Home
+	_root.get_modal_stack().clear("t")
+	var r: Dictionary = _root.play_current_frontier()
 	await _settle()
 	_host = _root.get_gameplay_host()
 	_host.get_runtime().set_process(false)

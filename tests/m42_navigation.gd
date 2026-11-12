@@ -89,6 +89,12 @@ func _nav_terminal_latch() -> void:
 	_ok(n.on_gameplay_terminal(a, &"WON", 1) and n.current() == R.RESULTS, "terminal -> RESULTS")
 	_ok(n.last_payload() == {"status": "WON", "level": 1, "attempt": a}, "minimal results payload")
 	_ok(not n.on_gameplay_terminal(a, &"WON", 1) and n.transition_id() == 3, "repeated terminal ignored")
+	# SB-PHONE-2026-11-12-B: a WON Results never enters GAMEPLAY (no next level from a win).
+	_ok(not n.can_go(R.GAMEPLAY) and not n.go(R.GAMEPLAY) and not n.resume_gameplay_after_retry()
+		and n.current() == R.RESULTS and n.transition_id() == 3 and n.can_go(R.HOME), "WON RESULTS -> GAMEPLAY refused; only HOME")
+	_ok(n.go(R.HOME) and n.go(R.GAMEPLAY), "WON -> HOME -> GAMEPLAY (Home PLAY starts the next level)")
+	a = n.attempt_id()
+	_ok(n.on_gameplay_terminal(a, &"LOST", 1) and n.can_go(R.GAMEPLAY), "LOST RESULTS may still enter GAMEPLAY (Retry)")
 	_ok(n.resume_gameplay_after_retry() and n.attempt_id() == a + 1, "RESULTS -> GAMEPLAY retry = new attempt")
 	_ok(not n.on_gameplay_terminal(a, &"LOST", 1), "stale attempt terminal ignored after retry")
 	_ok(n.on_gameplay_terminal(a + 1, &"LOST", 1) and n.last_payload()["status"] == "LOST", "new attempt terminal accepted once")
@@ -175,7 +181,7 @@ func _home_to_gameplay_once() -> void:
 func _results_on_real_won() -> void:
 	print("[results on real WON]")
 	var path := _uniq("won")
-	_seed_gift_past_m1(path)   # SB-POLISH-002: else the Level 1 win crosses Gift 1 and its ceremony holds CONTINUE
+	_seed_gift_past_m1(path)   # SB-POLISH-002: else the Level 1 win crosses Gift 1 and its ceremony opens over Results
 	var root = await _boot_main(path)
 	var app = root.get_app_state()
 	var nav = root.get_navigation()
@@ -195,14 +201,15 @@ func _results_on_real_won() -> void:
 	_ok(nav.last_payload() == {"status": "WON", "level": 1, "attempt": 1}, "minimal payload %s" % str(nav.last_payload()))
 	_ok(seen["sb_at_results"] > sb0 and app.progression.current_level() == 2, "first-clear economy + progression committed before Results")
 	var res = root.get_results_screen()
-	_ok(res.visible and res.get_payload()["status"] == "WON" and res.get_primary_button().text == "CLEAN NEXT", "Results visible: WON / CLEAN NEXT (M43-C001R label of the Continue intent)")
-	# M52-C001: next frontier (level 2) is real catalog content (Apple).
-	_ok(not res.get_primary_button().disabled, "CONTINUE enabled: next frontier (level 2) has content")
+	# SB-PHONE-2026-11-12-B: a win goes Home; HOME is the one (primary) action.
+	_ok(res.visible and res.get_payload()["status"] == "WON" and res.get_primary_button().text == "HOME" and not res.get_primary_button().disabled
+		and not res.get_home_button().visible, "Results visible: WON / primary HOME, no second button")
 	h.get_completion().terminal_reached.emit(&"WON", {})
 	_ok(seen["count"] == 1 and nav.current() == R.RESULTS, "repeated terminal callback ignored")
-	res.get_home_button().pressed.emit()
+	res.get_primary_button().pressed.emit()
 	await process_frame
-	_ok(nav.current() == R.HOME and root.get_gameplay_host() == null and not res.visible, "HOME from Results releases the host")
+	_ok(nav.current() == R.HOME and root.get_gameplay_host() == null and not res.visible and app.progression.current_level() == 2,
+		"primary HOME from WON Results releases the host; no level started, frontier stays 2 for Home PLAY")
 	_shutdown(root)
 	_complete("results_on_real_won")
 
@@ -265,8 +272,8 @@ func _duplicate_transitions() -> void:
 	res.get_home_button().pressed.emit()
 	res.get_primary_button().pressed.emit()
 	await process_frame
-	_ok(nav.current() == R.HOME and nav.transition_id() == t0 + 1 and _hosts(root) == 0, "double HOME + late CONTINUE -> one transition, no host")
-	_ok(not root.retry_from_results() and not root.continue_from_results().get("ok", true), "Results actions refused outside RESULTS")
+	_ok(nav.current() == R.HOME and nav.transition_id() == t0 + 1 and _hosts(root) == 0, "double HOME + late primary (HOME) -> one transition, no host")
+	_ok(not root.retry_from_results() and not root.has_method("continue_from_results"), "Retry refused outside RESULTS; no Continue action exists")
 	root.open_settings()
 	root.open_settings()
 	_ok(root.find_children("*", "", true, false).filter(func(n): return n == root.get_settings_panel()).size() == 1 and nav.is_settings_open(), "double Settings open -> one overlay")

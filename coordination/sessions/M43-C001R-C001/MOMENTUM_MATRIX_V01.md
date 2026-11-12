@@ -1,5 +1,7 @@
 # M43-C001R-C001 — Momentum Matrix V01
 
+> **Superseded in part (owner 2026-11-12, SB-PHONE-2026-11-12-B):** after a win the player goes back to Home. Results no longer shows CLEAN NEXT or the Next Cleanup teaser; its only WON action is HOME (green primary), and the next level starts from Home PLAY. `continue_requested` / `continue_from_results`, `ResultsMomentum.next_cleanup` / `crop_rect` and the `next_cleanup_shown` / `next_cleanup_tap` events were removed. The 10-Level Cleaning Journey and the reward rows stay. The rows below about CLEAN NEXT and the teaser are history.
+
 Date: 2026-10-02
 Scope: SB-M43-R01-001..008
 Focused suite: `tests/m43_c001r_c001_results_momentum.gd` (34 cases)

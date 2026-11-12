@@ -24,12 +24,12 @@
         },
         {
           "check": "results_buttons",
-          "evidence": "WON -> Results, CLEAN NEXT -> next level; LOST -> Results, RETRY -> same level; LOST -> Results, HOME -> Home { \"won\": true, \"clean_next\": true, \"lost\": true, \"retry\": true, \"lost_again\": true, \"home\": true }",
+          "evidence": "WON -> Results with HOME only, HOME -> Home, PLAY -> next level; LOST -> Results, RETRY -> same level; LOST -> Results, HOME -> Home { \"won\": true, \"won_home_only\": true, \"won_home\": true, \"home_play\": true, \"lost\": true, \"retry\": true, \"lost_again\": true, \"home\": true }",
           "result": "PASS"
         },
         {
           "check": "registry_routes",
-          "evidence": "27 ui_surface_registry routes, each walked here or by its suite [\"progression.third_consecutive_fail\", \"collection.cards_exchange\", \"collection.pack_open\", \"reward.robot_unlock\", \"reward.world_unlock\"]; failing / unwalked []; walked but not in the registry []; reached surfaces / route destinations outside the registry []",
+          "evidence": "26 ui_surface_registry routes, each walked here or by its suite [\"progression.third_consecutive_fail\", \"collection.cards_exchange\", \"collection.pack_open\", \"reward.robot_unlock\", \"reward.world_unlock\"]; failing / unwalked []; walked but not in the registry []; reached surfaces / route destinations outside the registry []",
           "result": "PASS"
         },
         {
@@ -57,7 +57,7 @@
         },
         {
           "check": "no_placeholder_copy",
-          "evidence": "597 English UiText strings, none contains placeholder / dummy / lorem / TODO / TBD / FIXME copy []",
+          "evidence": "591 English UiText strings, none contains placeholder / dummy / lorem / TODO / TBD / FIXME copy []",
           "result": "PASS"
         }
       ],
@@ -80,7 +80,7 @@
         },
         {
           "check": "l1_l3_real_play",
-          "evidence": "L1..L3 under the human policy on the shipped host, Results CLEAN NEXT / HOME buttons: [\"L1 tip l1_tap_front: WON -> RESULTS\", \"L2 tip -: WON -> RESULTS\", \"L3 tip l3_speed: WON -> RESULTS\"]; at Home L4, FTUE window closed true",
+          "evidence": "L1..L3 under the human policy on the shipped host, Results HOME then Home PLAY: [\"L1 tip l1_tap_front: WON -> RESULTS\", \"L2 tip -: WON -> RESULTS\", \"L3 tip l3_speed: WON -> RESULTS\"]; at Home L4, FTUE window closed true",
           "result": "PASS"
         },
         {

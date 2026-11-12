@@ -9,7 +9,7 @@ extends SceneTree
 ## stays inside the safe rect, no popup is left busy, a real tap still reaches the top, the stack
 ## returns to its pre-overlay depth and the Home banner slot matches StoreService.ads_allowed.
 ##   r01 Shop store purchase   r02 Shop restore   r03 Results LOST -> Need a Hand rewarded
-##   r04 Results -> Continue interstitial   r05 Home Rewarded Ads card   r06 Life rewarded heart
+##   r04 WON -> Home PLAY interstitial   r05 Home Rewarded Ads card   r06 Life rewarded heart
 ## Sizes: tests/m49_responsive_matrix.gd 720x1280 + 1170x2532 with its notch, 1080x2160 without.
 ## Real AdMob / Play Billing / StoreKit overlays stay a device check.
 ##
@@ -188,7 +188,7 @@ func _r03() -> void:
 	_complete("r03_results_need_a_hand_rewarded")
 
 func _r04() -> void:
-	print("[r04 Results WON -> Continue with a due interstitial: overlay over the next level]")
+	print("[r04 Results WON -> Home -> PLAY with a due interstitial: overlay over the next level]")
 	for sz in SIZES:
 		for outcome in OUTCOMES:
 			await _boot("r04", sz[0], sz[1])
@@ -199,8 +199,8 @@ func _r04() -> void:
 			_eco().ads.import_snapshot({"plays": 5, "last_interstitial": 0})
 			_ads.fill = outcome != "failed"
 			await _frames(2)
-			host = await _start(_root.continue_from_results().get("ok", false))
-			_ok(_ads.interstitials == ["interstitial_between_levels"] and _ads.requests.is_empty(), "%s: interstitial requested at Continue (only there)" % _tag(outcome))
+			host = await _start(_home_play())
+			_ok(_ads.interstitials == ["interstitial_between_levels"] and _ads.requests.is_empty(), "%s: interstitial requested at Home PLAY (the next attempt start)" % _tag(outcome))
 			_ok(_eco().ads.interstitial_due() == (outcome == "failed"), "%s: cadence (no fill stays due)" % _tag(outcome))
 			var pre := _layout()
 			await _return_check(pre, outcome)
@@ -522,3 +522,8 @@ func _done() -> void:
 		print("  FAIL: case ledger incomplete, missing %s" % str(missing))
 	print("M49 ad/store return layout evidence: %s (%d/%d cases, %d fail)" % ["PASS" if _fail == 0 else "FAIL", _completed.size(), EXPECTED_CASES.size(), _fail])
 	quit(1 if _fail > 0 else 0)
+
+## SB-PHONE-2026-11-12-B: a win goes Home (the WON primary), then Home PLAY starts the next level.
+func _home_play() -> bool:
+	_root.get_results_screen().get_primary_button().pressed.emit()
+	return _root.play_current_frontier().get("ok", false)

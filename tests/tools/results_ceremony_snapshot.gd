@@ -44,7 +44,7 @@ func _run(size: Vector2i) -> void:
 	h.get_completion().terminal_reached.emit(&"WON", {})
 	var res = root.get_results_screen()
 	await _frames(3)
-	_shot(sub, "1_results_held_by_barrier", size, res.has_ceremony_barrier() and not res.get_next_cleanup_panel().visible)
+	_shot(sub, "1_results_held_by_barrier", size, res.has_ceremony_barrier())
 	res.finish_reveal()
 	var top = null
 	for _i in range(30):
@@ -59,7 +59,7 @@ func _run(size: Vector2i) -> void:
 		top._on_action("continue")
 	for _i in range(8):
 		await RenderingServer.frame_post_draw
-	_shot(sub, "3_barrier_released_clean_next", size, not res.has_ceremony_barrier() and res.get_next_cleanup_panel().visible)
+	_shot(sub, "3_barrier_released_home", size, not res.has_ceremony_barrier())
 	root.free()
 	sub.free()
 	MainScript.boot_save_path_override = ""

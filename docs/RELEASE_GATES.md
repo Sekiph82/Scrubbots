@@ -23,21 +23,21 @@ Release ready: **NO**
 - PASS `nav_tabs_live`: with every feature unlocked no BottomNav tab is disabled / COMING LATER []
 - PASS `deep_links`: every notification deep link opens its surface { "home": "", "daily": "daily", "tasks": "tasks", "gift_bar": "gift_bar", "events": "events", "shop": "shop", "collection": "collection", "robots": "robots", "profile": "profile" }; dead []
 - PASS `gameplay_hud`: Home PLAY -> GAMEPLAY; HUD controls -> { "pause": "pause", "speed": "speed_acquire", "booster_plus_one_slot": "booster_acquire", "booster_random": "booster_acquire", "booster_selector": "booster_acquire", "booster_tornado": "booster_acquire" }; dead []
-- PASS `results_buttons`: WON -> Results, CLEAN NEXT -> next level; LOST -> Results, RETRY -> same level; LOST -> Results, HOME -> Home { "won": true, "clean_next": true, "lost": true, "retry": true, "lost_again": true, "home": true }
-- PASS `registry_routes`: 27 ui_surface_registry routes, each walked here or by its suite ["progression.third_consecutive_fail", "collection.cards_exchange", "collection.pack_open", "reward.robot_unlock", "reward.world_unlock"]; failing / unwalked []; walked but not in the registry []; reached surfaces / route destinations outside the registry []
+- PASS `results_buttons`: WON -> Results with HOME only, HOME -> Home, PLAY -> next level; LOST -> Results, RETRY -> same level; LOST -> Results, HOME -> Home { "won": true, "won_home_only": true, "won_home": true, "home_play": true, "lost": true, "retry": true, "lost_again": true, "home": true }
+- PASS `registry_routes`: 26 ui_surface_registry routes, each walked here or by its suite ["progression.third_consecutive_fail", "collection.cards_exchange", "collection.pack_open", "reward.robot_unlock", "reward.world_unlock"]; failing / unwalked []; walked but not in the registry []; reached surfaces / route destinations outside the registry []
 - PASS `no_debug_surface`: no shipping script under ["scripts/app", "scripts/ui", "scripts/economy", "scripts/progression", "scripts/gameplay", "scripts/save"] reaches a debug scene / debug UI script []
 
 ## SB-M60-002: PASS
 
 - PASS `manifest_bound`: 42 surfaces: 40 bound (script + live data + evidence suite exist), 2 explicitly not built: ["account_cloud_sync_conflict (no cloud provider yet: Play Games Saved Games / Game Center + iCloud plugins (SB-M43-153))", "friends_postlaunch (post-launch)"]; unbound / broken []
 - PASS `registry_covered`: every ui_surface_registry screen / popup has a manifest surface; missing []
-- PASS `no_placeholder_copy`: 597 English UiText strings, none contains placeholder / dummy / lorem / TODO / TBD / FIXME copy []
+- PASS `no_placeholder_copy`: 591 English UiText strings, none contains placeholder / dummy / lorem / TODO / TBD / FIXME copy []
 
 ## SB-M60-003: PASS
 
 - PASS `first_home`: fresh profile boots to Home at L1 with the first-Home DAILY tip (route HOME, step home_daily)
 - PASS `welcome_task`: TASKS at first Home shows the Welcome task; CLAIM through the popup button: 1000 -> 1100 SB
-- PASS `l1_l3_real_play`: L1..L3 under the human policy on the shipped host, Results CLEAN NEXT / HOME buttons: ["L1 tip l1_tap_front: WON -> RESULTS", "L2 tip -: WON -> RESULTS", "L3 tip l3_speed: WON -> RESULTS"]; at Home L4, FTUE window closed true
+- PASS `l1_l3_real_play`: L1..L3 under the human policy on the shipped host, Results HOME then Home PLAY: ["L1 tip l1_tap_front: WON -> RESULTS", "L2 tip -: WON -> RESULTS", "L3 tip l3_speed: WON -> RESULTS"]; at Home L4, FTUE window closed true
 - PASS `no_debug_tools`: no test unlock, no debug_set_current_level, no injected terminal: the shipped unlock table and real wins only
 
 ## SB-M60-004: PASS

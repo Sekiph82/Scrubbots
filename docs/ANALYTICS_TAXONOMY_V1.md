@@ -74,8 +74,6 @@ Not sent: transaction ids, tokens and receipts (forbidden names; the ad result o
 
 | Event | Task | Call site | Params |
 |---|---|---|---|
-| `next_cleanup_shown` | 017 | `main.gd` WON Results route (`_track_results_momentum`, once per Results) | available (the next frontier resolves to content), image (the cropped teaser could be drawn), reason (ok or the launch resolver reason: CONTENT_MISSING, CATALOG_INVALID, LEVEL_DISABLED, APP_BLOCKED) |
-| `next_cleanup_tap` | 017 | `main.gd` `continue_from_results` (CLEAN NEXT, every request) | ok, reason (ok, not_results, stale_results, not_won, no_next_content, no_hearts, or the launch refusal) |
 | `journey_progress` | 018 | `main.gd` WON Results route (the Results journey, anchor = the won level) | slot (1..10), cycle (1..), cycle_complete (slot 10 of 10), first_clear (progression win vs replay) |
 | `daily_order_done` | 020 | `ProductionGameplayHost` committed progression win (`DailyOrders.on_level_won` newly done) | tier (easy / normal / stretch), metric (archetype metric), target |
 | `daily_order_claim` | 020 | `AppState` on the facade `action_committed` (`claim_daily_task`, `claim_daily_all_tasks`) | tier (easy / normal / stretch; scrubbox = the all-3 bonus) |
@@ -116,7 +114,7 @@ Definitions only; there is no dashboard server. "Player-day" = one installation 
 | Rewarded funnel | `ad_offer_shown` (available) -> `ad_request` ok -> `ad_result` granted, by placement / product |
 | Shop entry | `shop_open` by source per DAU |
 | Collection | `pack_opened` new_cards share, duplicate share, `collection_set_complete` by set |
-| Next Cleanup conversion (017) | impressions = `next_cleanup_shown` available; conversion = `next_cleanup_tap` ok / impressions; next-level start = the `level_start` launch right after a tap ok. Frontier / unavailable states (available false, by reason) and refused taps (by reason) are reported apart, never counted as player choice |
+| Next Cleanup conversion (017) | retired 2026-11-12 (SB-PHONE-2026-11-12-B): Results no longer offers CLEAN NEXT or the Next Cleanup teaser (a win goes Home), so `next_cleanup_shown` / `next_cleanup_tap` were removed. The next level starts from Home PLAY (`level_start`) |
 | Journey (018) | reach of slot s = players with `journey_progress` slot s / players with slot 1 in the same cycle; drop-off after slot s = 1 - reach(s+1) / reach(s); cycle completion = `journey_progress` cycle_complete with first_clear / cycles started. Content tuning only, never a per-player difficulty change |
 | Collection fairness (019) | new-card rate = packs with new_cards != 0 / `pack_opened`; dry-streak distribution = `pack_opened.dry_streak`; pity frequency = `pack_opened` with pity / all; guarantee fulfilment = pity packs with new_cards != 0 / pity packs; Set-1 completion level = distribution of `collection_set_complete.level` where set = 1 |
 | Daily Scrub Orders (020) | completion per archetype = `daily_order_done` by (tier, metric, target) / player-days; 3/3 = player-days with three `daily_order_done`; ScrubBox claim = `daily_order_claim` scrubbox / player-days with 3/3; grind / Heart waste check = `hearts_empty` and `level_end` lost per player-day, by the archetype active that day |

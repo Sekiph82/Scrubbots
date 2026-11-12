@@ -39,7 +39,7 @@ const ART_SHA := {
 var EXPECTED_CASES := [
 	"won_composition_bound", "rows_match_receipt_order", "reveal_presentation_only",
 	"reduced_effects_static", "no_replay", "lost_no_victory_art", "level30_unavailable_visual",
-	"continue_once_visual", "hide_show_no_leak", "responsive_fit", "art_and_manifest_governance",
+	"home_once_visual", "hide_show_no_leak", "responsive_fit", "art_and_manifest_governance",
 ]
 
 var _fail := 0
@@ -55,7 +55,7 @@ func _initialize() -> void:
 	_no_replay()
 	await _lost_no_victory_art()
 	await _level30_unavailable_visual()
-	await _continue_once_visual()
+	await _home_once_visual()
 	await _hide_show_no_leak()
 	await _responsive_fit()
 	_art_and_manifest_governance()
@@ -85,9 +85,9 @@ func _won_composition_bound() -> void:
 	var frame := res.get_panel().get_theme_stylebox("panel") as StyleBoxFlat
 	_ok(frame != null and frame.bg_color == ResultsScreen.CREAM and frame.border_color == ResultsScreen.ROYAL, "warm cream frame with royal-blue rim (Life/Help family)")
 	var cta := res.get_primary_button().get_theme_stylebox("normal") as StyleBoxFlat
-	_ok(cta != null and cta.bg_color == HomeStyle.GREEN, "Continue uses the green Life/Help-family CTA")
-	_ok(res.get_home_button().size.y < res.get_primary_button().size.y and (res.get_home_button().get_theme_stylebox("normal") as StyleBoxFlat).bg_color != HomeStyle.GREEN, "Home is visually subordinate")
-	_ok(res.get_primary_button().text == UiText.t("RESULTS_CLEAN_NEXT") and res.get_panel().find_child("Title", true, false).text == UiText.t("RESULTS_WON") and res.get_panel().find_child("LevelLabel", true, false).text == UiText.t("RESULTS_LEVEL", [1]), "title / level / CTA are live UiText")
+	_ok(cta != null and cta.bg_color == HomeStyle.GREEN, "HOME uses the green Life/Help-family CTA (SB-PHONE-2026-11-12-B)")
+	_ok(not res.get_home_button().visible, "no second (secondary Home) button after a win")
+	_ok(res.get_primary_button().text == UiText.t("RESULTS_HOME") and res.get_panel().find_child("Title", true, false).text == UiText.t("RESULTS_WON") and res.get_panel().find_child("LevelLabel", true, false).text == UiText.t("RESULTS_LEVEL", [1]), "title / level / CTA are live UiText")
 	_shutdown(root)
 	_complete("won_composition_bound")
 
@@ -147,7 +147,7 @@ func _reveal_presentation_only() -> void:
 	res.get_primary_button().pressed.emit()
 	res.get_primary_button().pressed.emit()
 	await process_frame
-	_ok(nav.current() == R.GAMEPLAY and nav.transition_id() == t0 + 1 and _econ(app.economy) == e0, "Continue works mid-reveal, exactly once, no grant")
+	_ok(nav.current() == R.HOME and nav.transition_id() == t0 + 1 and _econ(app.economy) == e0, "HOME works mid-reveal, exactly once, no grant")
 	_shutdown(root)
 	_complete("reveal_presentation_only")
 
@@ -183,8 +183,8 @@ func _no_replay() -> void:
 	var buttons: Array = res.find_children("*", "Button", true, false).map(func(b): return String(b.name))
 	var sigs: Array = res.get_signal_list().map(func(s): return String(s["name"]))
 	res.free()
-	_ok(buttons == ["PrimaryButton", "HomeButton"], "Results has exactly Continue/Retry + Home buttons %s" % str(buttons))
-	_ok(sigs.has("continue_requested") and sigs.has("retry_requested") and sigs.has("home_requested") and sigs.filter(func(s): return s.to_lower().find("replay") != -1).is_empty(), "no replay intent signal")
+	_ok(buttons == ["PrimaryButton", "HomeButton"], "Results has exactly primary (Home / Retry) + Home buttons %s" % str(buttons))
+	_ok(not sigs.has("continue_requested") and sigs.has("retry_requested") and sigs.has("home_requested") and sigs.filter(func(s): return s.to_lower().find("replay") != -1).is_empty(), "no replay intent signal")
 	_complete("no_replay")
 
 ## Owner B3-A: LOST uses no Victory art; Retry still works; clean WON<->LOST switching.
@@ -205,7 +205,10 @@ func _lost_no_victory_art() -> void:
 	_ok(nav.current() == R.GAMEPLAY and nav.attempt_id() == 2 and root.get_gameplay_host() == h, "Retry still M30 same-host, attempt 2")
 	_drain(h)
 	_ok(res.is_victory_layout() and res.get_robot().texture != null, "later WON on the same screen gets the Victory layout")
-	res.get_primary_button().pressed.emit()
+	res.get_primary_button().pressed.emit()   # WON: HOME
+	await process_frame
+	root.get_modal_stack().clear("t")
+	root.play_current_frontier()
 	await process_frame
 	var h2 = root.get_gameplay_host()
 	h2.get_runtime().set_process(false)
@@ -229,35 +232,31 @@ func _level30_unavailable_visual() -> void:
 	h.get_completion().terminal_reached.emit(&"WON", {})
 	var res = root.get_results_screen()
 	await _frames(2)
-	# M43-C001R V02 owner decision: the coming-soon message lives once, in the Next Cleanup card;
-	# the older duplicate note above CLEAN NEXT is suppressed.
-	var note: Label = res.find_child("NextFacts", true, false)
-	_ok(res.is_victory_layout() and res.get_primary_button().disabled and not res.get_note_label().is_visible_in_tree() and note.is_visible_in_tree() and note.text == UiText.t("NEXT_CLEANUP_SOON"), "Level 30: Victory layout, Continue disabled, readable coming-soon card")
-	_ok(res.get_panel().get_global_rect().encloses(note.get_global_rect()), "coming-soon card sits inside the frame")
+	# SB-PHONE-2026-11-12-B: no next-level teaser / coming-soon card; HOME is the one action.
+	_ok(res.is_victory_layout() and not res.get_primary_button().disabled and res.get_primary_button().text == UiText.t("RESULTS_HOME")
+		and not res.get_note_label().is_visible_in_tree() and res.find_child("NextFacts", true, false) == null, "Level 30: Victory layout, HOME live, no next-level card")
 	var e0: Dictionary = _econ(app.economy)
 	var t0: int = nav.transition_id()
 	for _i in range(3):
 		res.get_primary_button().pressed.emit()
-	_ok(_econ(app.economy) == e0 and nav.transition_id() == t0 and nav.current() == R.RESULTS, "disabled Continue: no mutation, no transition")
+	_ok(_econ(app.economy) == e0 and nav.transition_id() == t0 + 1 and nav.current() == R.HOME and _hosts(root) == 0, "HOME: no mutation, one transition, no level started")
 	_shutdown(root)
 	_complete("level30_unavailable_visual")
 
-func _continue_once_visual() -> void:
-	print("[continue once visual]")
+func _home_once_visual() -> void:
+	print("[home once visual]")
 	var root = await _boot_main(_uniq("once"))
 	var nav = root.get_navigation()
 	var h = await _play(root)
 	_drain(h)
 	var res = root.get_results_screen()
-	var emitted := [0]
-	res.continue_requested.connect(func(_a): emitted[0] += 1)
 	var t0: int = nav.transition_id()
 	for _i in range(10):
 		res.get_primary_button().pressed.emit()
 	await process_frame
-	_ok(emitted[0] == 1 and nav.transition_id() == t0 + 1 and _hosts(root) == 1 and int(root.get_gameplay_host().progression_level) == 2, "10 taps on the styled CTA -> 1 Continue, Level 2")
+	_ok(nav.transition_id() == t0 + 1 and nav.current() == R.HOME and _hosts(root) == 0, "10 taps on the styled CTA -> 1 HOME transition, no level started")
 	_shutdown(root)
-	_complete("continue_once_visual")
+	_complete("home_once_visual")
 
 ## Hide/show cycles and repeated refreshes never accumulate nodes, tweens or connections.
 func _hide_show_no_leak() -> void:
@@ -312,7 +311,7 @@ func _responsive_fit() -> void:
 			if l.is_visible_in_tree():
 				texts_ok = texts_ok and panel.encloses(l.get_global_rect())
 		var touch_ok := true
-		for b in [res.get_primary_button(), res.get_home_button()]:
+		for b in [res.get_primary_button()]:   # WON: HOME is the one action (secondary hidden)
 			var br: Rect2 = b.get_global_rect()
 			touch_ok = touch_ok and br.size.y >= UiTokens.TOUCH_MIN and br.size.x >= 300 and vp.encloses(br)
 		_ok(inside and texts_ok and touch_ok, "%dx%d: frame %s + robot on screen, all text inside frame, touch targets >= %d px" % [size.x, size.y, str(panel), UiTokens.TOUCH_MIN])

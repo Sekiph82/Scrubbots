@@ -14,7 +14,8 @@ extends RefCounted
 ##   HOME -> GAMEPLAY
 ##   GAMEPLAY -> RESULTS           (authoritative terminal only, once per attempt)
 ##   GAMEPLAY -> HOME              (pre-action exit only; caller proves it)
-##   RESULTS -> HOME | GAMEPLAY    (continue next frontier / retry)
+##   RESULTS -> HOME | GAMEPLAY    (GAMEPLAY = Retry after a LOST only; SB-PHONE-2026-11-12-B:
+##                                 a WON goes Home, the next level starts from Home PLAY)
 ## Settings is an overlay flag, openable only from HOME.
 ##
 ## Every transition is deterministic: an illegal edge, an unknown route, a re-entrant
@@ -66,6 +67,8 @@ func last_payload() -> Dictionary:
 	return _last_payload.duplicate(true)
 
 func can_go(to: int) -> bool:
+	if _route == Route.RESULTS and to == Route.GAMEPLAY and String(_last_payload.get("status", "")) == "WON":
+		return false
 	return not _in_transition and _EDGES.has(_route) and (_EDGES[_route] as Array).has(to)
 
 ## Request a route change. Returns true only when the transition was accepted.

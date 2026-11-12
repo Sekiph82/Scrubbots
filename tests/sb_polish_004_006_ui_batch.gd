@@ -24,7 +24,7 @@ const UiTokens = preload("res://scripts/ui/ui_tokens.gd")
 const R := NavigationController.Route
 
 var EXPECTED_CASES := [
-	"p004_pause_popup_not_under_hit_areas", "p004_hit_areas_off_after_terminal", "p004_clean_next_first_tap", "p004_retry_restores_hit_areas",
+	"p004_pause_popup_not_under_hit_areas", "p004_hit_areas_off_after_terminal", "p004_won_home_first_tap", "p004_retry_restores_hit_areas",
 	"p005_scrubby_row_detail", "p005_moppy_row_detail", "p005_buttons_unchanged", "p005_swipe_opens_nothing",
 	"p006_sb_plus_focused_popup", "p006_more_in_shop",
 ]
@@ -93,14 +93,18 @@ func _p004() -> void:
 			await process_frame
 			if _sub.gui_get_hovered_control() != b:
 				bad.append("%s->%s" % [str(p), str(_sub.gui_get_hovered_control())])
-	_ok(nav.current() == R.RESULTS and not b.disabled and b.text == UiText.t("RESULTS_CLEAN_NEXT") and r.size.y >= UiTokens.TOUCH_MIN and r.size.x >= UiTokens.TOUCH_MIN,
-		"CLEAN NEXT live, hit area %s >= %d px" % [str(r.size), UiTokens.TOUCH_MIN])
-	_ok(bad.is_empty(), "15 points across CLEAN NEXT all pick the button itself %s" % str(bad))
+	# SB-PHONE-2026-11-12-B: the WON primary is HOME (the one action after a win).
+	_ok(nav.current() == R.RESULTS and not b.disabled and b.text == UiText.t("RESULTS_HOME") and r.size.y >= UiTokens.TOUCH_MIN and r.size.x >= UiTokens.TOUCH_MIN,
+		"WON primary HOME live, hit area %s >= %d px" % [str(r.size), UiTokens.TOUCH_MIN])
+	_ok(bad.is_empty(), "15 points across HOME all pick the button itself %s" % str(bad))
 	var t0: int = nav.transition_id()
 	await _click(r.get_center())
 	await _frames(2)
-	_ok(nav.current() == R.GAMEPLAY and nav.transition_id() == t0 + 1 and int(_root.get_gameplay_host().progression_level) == 2, "ONE real tap -> next level (Level 2)")
-	_complete("p004_clean_next_first_tap")
+	_ok(nav.current() == R.HOME and nav.transition_id() == t0 + 1 and _root.get_gameplay_host() == null, "ONE real tap -> Home (no level started)")
+	_root.get_modal_stack().clear("t")
+	_ok(_root.play_current_frontier().get("ok", false) and int(_root.get_gameplay_host().progression_level) == 2, "Home PLAY -> next level (Level 2)")
+	await _frames(2)
+	_complete("p004_won_home_first_tap")
 	var h2 = _root.get_gameplay_host()
 	var hits2 := _hit_areas(h2)
 	_ok(not hits2.is_empty() and hits2.all(func(c): return c.mouse_filter == Control.MOUSE_FILTER_STOP), "the new level's fronts pick again")

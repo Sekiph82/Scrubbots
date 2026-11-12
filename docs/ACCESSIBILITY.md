@@ -88,7 +88,7 @@ a ceremony. Each row's REDUCED arm is tested by the suite in `REDUCED_LEDGER`
 | gameplay_screen.gd | booster activation burst + BoosterVfx, batch-complete pop | burst fade only, no BoosterVfx / pops |
 | booster_vfx.gd | tornado vortex 0.85 s, +1 slot glow 0.7 s, random dice flicker 0.6 s, selector reticle 0.8 s, batch pop 1.6 s | not played |
 | five_slot_strip.gd, batch_slot_view.gd | WAITING slot pulse | static tile at full alpha |
-| results_screen.gd | reveal rows, CLEAN NEXT bump, win / lose robot video | all rows shown at once, still pose |
+| results_screen.gd | reveal rows, primary (Home / Retry) bump, win / lose robot video | all rows shown at once, still pose |
 | reveal_sequencer.gd | stepped reveal | exact final state immediately |
 | meta_ceremonies.gd, ceremony_presenter.gd | turning glow, hero motion, set / gift / region videos | static glow and art, same labels and values |
 | standard_pack_ceremony.gd, premium_pack_ceremony.gd, pack_presenter.gd | opening video, drop / shake / rays / confetti (48 / 90) / card flip | short version: no drop, shake, particles, burst, flip or spin; same cards and taps |

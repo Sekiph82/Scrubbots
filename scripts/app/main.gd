@@ -156,7 +156,6 @@ func _ready() -> void:
 	_results.visible = false
 	add_child(_results)
 	_results.home_requested.connect(func(): nav.go(NavigationController.Route.HOME, {"via": "results"}))
-	_results.continue_requested.connect(continue_from_results)
 	_results.retry_requested.connect(retry_from_results)
 	_build_settings_entry()
 	# Home hides its action layer while any stacked popup owns input (existing seam);
@@ -329,10 +328,10 @@ func _on_route_changed(_from: int, to: int, _payload: Dictionary) -> void:
 
 ## SB-M43-013: a WON Results whose committed terminal (economy + save already done inside the
 ## host) produced a ceremony event (Gift milestone, set, Master, robot) hands off to it: the
-## teaser + CLEAN NEXT are held by a ceremony barrier, the ceremonies open one at a time AFTER
+## primary's emphasis is held by a ceremony barrier, the ceremonies open one at a time AFTER
 ## the committed reward-row reveal, and the barrier releases when none is left. Presentation
-## only — Continue / rewards / progression are untouched; a route change leaves any unshown
-## ceremony pending for Home.
+## only — rewards / progression are untouched; a route change leaves any unshown ceremony
+## pending for Home.
 const RESULTS_CEREMONY_BARRIER := "meta_ceremonies"
 
 func _begin_results_ceremonies() -> void:
@@ -362,25 +361,23 @@ func _offer_need_a_hand() -> void:
 		host.note_assistance_shown()
 
 ## M43-C001A: the ONE Results model for a RESULTS route payload. The receipt is the
-## host's committed terminal truth (never recomputed here); continue availability is the
-## canonical frontier resolver. Pure read: building it any number of times grants nothing.
+## host's committed terminal truth (never recomputed here). Pure read: building it any
+## number of times grants nothing. SB-PHONE-2026-11-12-B: no next-level availability (a win
+## goes Home; the next level starts from Home PLAY).
 func _results_model(payload: Dictionary) -> Dictionary:
 	var m := payload.duplicate(true)
 	m["receipt"] = _gameplay_host.get_terminal_receipt() if _gameplay_host != null and is_instance_valid(_gameplay_host) else {}
-	var launch := GameplayLaunchResolver.resolve(app_state)
-	m["continue"] = {"available": bool(launch.get("ok", false)), "reason": String(launch.get("reason", "")),
-		"next_level": int(launch.get("level", 0))}
-	# M43-C001R: journey (anchor = the just-completed level) + Next Cleanup from the SAME
-	# resolved launch CLEAN NEXT uses. Read-only; a malformed config just omits it.
+	# M43-C001R: journey (anchor = the just-completed level). Read-only; a malformed config
+	# just omits it.
 	if String(m.get("status", "")) == "WON":
-		m["momentum"] = ResultsMomentum.results_model(app_state, int(m.get("level", 0)), launch, momentum_cfg)
+		m["momentum"] = ResultsMomentum.results_model(app_state, int(m.get("level", 0)), momentum_cfg)
 	# M43-C001B: presentation-only Reduced Effects flag (canonical settings service).
 	m["reduced_effects"] = app_state != null and app_state.effects != null and app_state.effects.is_reduced()
 	# M43-C008 (SB-M43-108): the active robot's approved victory / help pose (presentation only).
 	m["robot_id"] = app_state.economy.robots.active_robot() if app_state != null and app_state.economy != null else ""
 	return m
 
-## SB-M56-017/018: a WON Results shows its journey node and the Next Cleanup teaser state.
+## SB-M56-018: a WON Results shows its journey node.
 func _track_results_momentum() -> void:
 	var m: Dictionary = _results.get_model()
 	var mo: Dictionary = m.get("momentum", {})
@@ -390,8 +387,6 @@ func _track_results_momentum() -> void:
 	if bool(j.get("ok", false)):
 		_track("journey_progress", {"slot": j["slot"], "cycle": j["cycle"], "cycle_complete": j["slot"] == j["length"],
 			"first_clear": bool(m["receipt"].get("first_clear", false))})
-	var nx: Dictionary = mo["next"]
-	_track("next_cleanup_shown", {"available": nx["available"], "image": nx["image_ok"], "reason": "ok" if nx["available"] else nx["reason"]})
 
 ## SB-M56-022: a genuine absence opened a return window (Catch-Up offered when configured).
 ## Returns whether it opened.
@@ -880,6 +875,7 @@ func play_current_frontier() -> Dictionary:
 		return {"ok": false, "reason": "not_home"}
 	if _zero_heart_gate("attempt_gate", "home_play"):
 		return {"ok": false, "reason": "no_hearts"}
+	_between_levels_ad()
 	var r := launch_gameplay()
 	if r.get("ok", false):
 		nav.go(NavigationController.Route.GAMEPLAY, {"level": r["launch"]["level"], "entry_id": r["launch"]["entry_id"]})
@@ -897,8 +893,8 @@ func _bind_terminal(host) -> void:
 	if completion == null:
 		return
 	completion.terminal_reached.connect(func(status, _detail):
-		# CP06: a WON may land the frontier on a disabled level; skip it before Results reads
-		# Continue. The host's own (economy + save) terminal handler has already committed.
+		# CP06: a WON may land the frontier on a disabled level; skip it before Results and
+		# Home read it. The host's own (economy + save) terminal handler has already committed.
 		if host == _gameplay_host and String(status) == "WON" and app_state != null:
 			app_state.reconcile_disabled_frontier()
 		if host == _gameplay_host and nav.on_gameplay_terminal(nav.attempt_id(), status, int(host.progression_level)):
@@ -915,48 +911,12 @@ func _terminal_bridge(host, status: String) -> void:
 		return
 	feel.play("SMALL", host.get_screen().get_profile_portrait(), "c005f010:a%d:L%d" % [nav.attempt_id(), int(host.progression_level)])
 
-## RESULTS (WON) -> next canonical frontier, only when it has content. Exactly one
-## accepted launch per Results: the first success leaves RESULTS, so every later/rapid
-## call is refused. attempt (from ResultsScreen) must match the shown Results attempt,
-## so a stale Continue from an earlier Results can never launch. Never grants rewards.
-## SB-M56-017: every request is one next_cleanup_tap (ok / refusal reason).
-func continue_from_results(attempt: int = -1) -> Dictionary:
-	var r := _continue_from_results(attempt)
-	_track("next_cleanup_tap", {"ok": bool(r.get("ok", false)), "reason": "ok" if r.get("ok", false) else String(r.get("reason", ""))})
-	return r
-
-func _continue_from_results(attempt: int) -> Dictionary:
-	if nav.current() != NavigationController.Route.RESULTS:
-		return {"ok": false, "reason": "not_results"}
-	var shown: Dictionary = nav.last_payload()
-	if attempt >= 0 and attempt != int(shown.get("attempt", -1)):
-		return {"ok": false, "reason": "stale_results"}
-	if String(shown.get("status", "")) != "WON":
-		return {"ok": false, "reason": "not_won"}
-	if not GameplayLaunchResolver.resolve(app_state).get("ok", false):
-		_results.show_model(_results_model(shown))
-		return {"ok": false, "reason": "no_next_content"}
-	if _zero_heart_gate("attempt_gate", "results_continue"):
-		_results.show_model(_results.get_model())   # re-arm Continue
-		return {"ok": false, "reason": "no_hearts"}
-	_between_levels_ad()
-	var r := launch_gameplay()
-	if r.get("ok", false):
-		nav.go(NavigationController.Route.GAMEPLAY, {"level": r["launch"]["level"], "entry_id": r["launch"]["entry_id"]})
-		_bind_terminal(r["host"])
-		_show_level_intro(r["host"])
-	elif nav.current() == NavigationController.Route.RESULTS:
-		# Launch failed with no transition: re-show the same committed model (re-arms
-		# Continue). launch_gameplay released the old host, so the receipt comes from
-		# the Results model already shown.
-		var m: Dictionary = _results.get_model()
-		m["continue"] = _results_model(shown)["continue"]
-		_results.show_model(m)
-	return r
-
-## RESULTS (LOST) -> M30 transaction-safe Retry of the same host, new attempt id.
+## RESULTS (LOST) -> M30 transaction-safe Retry of the same host, new attempt id. Never after a
+## WON (SB-PHONE-2026-11-12-B: a win goes Home).
 func retry_from_results() -> bool:
 	if nav.current() != NavigationController.Route.RESULTS or _gameplay_host == null:
+		return false
+	if String(nav.last_payload().get("status", "")) == "WON":
 		return false
 	if _zero_heart_gate("attempt_gate", "results_retry"):
 		return false
@@ -968,8 +928,9 @@ func retry_from_results() -> bool:
 	_show_level_intro(_gameplay_host)
 	return true
 
-## SB-M57-001: the every-5-plays interstitial, only here (Results -> next attempt), never
-## during gameplay. AdService decides (No Ads, cadence); the null provider shows nothing.
+## SB-M57-001: the every-5-plays interstitial, only at the next attempt (Home PLAY or Results
+## Retry; SB-PHONE-2026-11-12-B: a win goes Home first), never during gameplay. AdService
+## decides (No Ads, cadence); the null provider shows nothing.
 func _between_levels_ad() -> void:
 	if app_state != null and app_state.economy != null:
 		if app_state.economy.ads.try_interstitial():

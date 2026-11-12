@@ -291,7 +291,7 @@ func _drive(host) -> Dictionary:
 
 ## Plays Levels 1..LEVELS back-to-back; returns the HOME sample at the end of the lap.
 func _long_session(root, base: Dictionary, lap: int) -> Dictionary:
-	print("[SB-M55-009/013 long session lap %d: Levels 1..%d back-to-back through Home -> Gameplay -> Results -> Continue]" % [lap, LEVELS])
+	print("[SB-M55-009/013 long session lap %d: Levels 1..%d back-to-back through Home -> Gameplay -> Results -> Home]" % [lap, LEVELS])
 	var app = root.get_app_state()
 	var eco = app.economy
 	var nav = root.get_navigation()
@@ -345,7 +345,7 @@ func _long_session(root, base: Dictionary, lap: int) -> Dictionary:
 		if got_sb != want_sb or tx1 <= tx0 or eco.streak.streak() != streak0 + 1 or eco.wallet.bot_parts() <= parts0:
 			reward_bad.append([n, got_sb, want_sb, tx1 - tx0])
 		# 013: chaos on the terminal — re-emitted terminal signal, repeated host terminal
-		# handler, repeated FirstClear commit and 10 same-frame Continue taps.
+		# handler, repeated FirstClear commit and 10 same-frame Results HOME taps, then Home PLAY.
 		var sb1: int = eco.wallet.scrub_bucks()
 		var rr := _routes.size()
 		host.get_completion().terminal_reached.emit(&"WON", {})
@@ -353,18 +353,21 @@ func _long_session(root, base: Dictionary, lap: int) -> Dictionary:
 		var refc: Dictionary = preload("res://scripts/economy/first_clear_transaction.gd").commit(app.progression, eco, n)
 		if eco.wallet.scrub_bucks() != sb1 or eco.reward.applied_transaction_count() != tx1 or refc.get("ok", false) or _routes.size() != rr:
 			dup_bad.append([n, "re-terminal", eco.wallet.scrub_bucks() - sb1, _routes.size() - rr])
-		var cont_ok := 0
+		var rt0 := _routes.size()
 		for _k in range(10):
-			if root.continue_from_results().get("ok", false):
-				cont_ok += 1
+			root.get_results_screen().get_primary_button().pressed.emit()
+		var home_ok: bool = nav.current() == NavigationController.Route.HOME and _routes.size() == rt0 + 1 and root.get_gameplay_host() == null
+		if not home_ok:
+			dup_bad.append([n, "home", _routes.size() - rt0])
+		var cont_ok := 1 if root.play_current_frontier().get("ok", false) else 0
 		await _settle()
 		var s := _sample(root)
 		per_level.append([n, cells, d["frames"], d["clicks"], got_sb, s["nodes"], s["orphans"], s["objects"], s["static_mem"]])
 		if n < LEVELS:
 			if cont_ok != 1 or s["hosts"] != 1 or nav.current() != NavigationController.Route.GAMEPLAY:
-				dup_bad.append([n, "continue", cont_ok, s["hosts"]])
+				dup_bad.append([n, "play", cont_ok, s["hosts"]])
 		elif cont_ok != 0:
-			dup_bad.append([n, "continue past content", cont_ok])
+			dup_bad.append([n, "play past content", cont_ok])
 	var ms := Time.get_ticks_msec() - t0
 	print("    per level [n, cells, frames, clicks, SB, nodes, orphans, objects, static_mem]:")
 	for row in per_level:
@@ -375,9 +378,9 @@ func _long_session(root, base: Dictionary, lap: int) -> Dictionary:
 	_completed["009_long_session"] = true
 	_ok(signal_bad.is_empty(), "each level: exactly one RESULTS transition and one clear event per cell %s" % str(signal_bad))
 	_ok(reward_bad.is_empty(), "each WON: SB == first_clear_sb(class) + win_streak_sb(position), reward tx grew, Bot Parts grew, streak +1 %s" % str(reward_bad))
-	_ok(dup_bad.is_empty(), "re-emitted terminal / re-run handler / re-committed FirstClear / 10 Continue taps: zero extra SB, tx, route; exactly one next host %s" % str(dup_bad))
+	_ok(dup_bad.is_empty(), "re-emitted terminal / re-run handler / re-committed FirstClear / 10 Results HOME taps: zero extra SB, tx, one HOME route; Home PLAY -> exactly one next host %s" % str(dup_bad))
 	# After frontier LEVELS + 1 (no content) return HOME and compare with the transition baseline.
-	_ok(nav.go(NavigationController.Route.HOME, {"via": "results"}), "RESULTS -> HOME after Level %d" % LEVELS)
+	_ok(nav.current() == NavigationController.Route.HOME, "WON Results -> HOME after Level %d (no content past it)" % LEVELS)
 	await _settle()
 	# Sample at feel quiescence: presentation-feel bursts (Results WIN confetti, the Home
 	# ceremony's REWARD burst) are transient Nodes the adapter frees within its per-tier ceiling

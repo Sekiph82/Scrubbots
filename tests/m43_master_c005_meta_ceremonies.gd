@@ -603,7 +603,8 @@ func _e27_results_handoff() -> void:
 	var receipt: Dictionary = h.get_terminal_receipt()
 	var follow: Array = receipt.get("follow_ups", []).map(func(f): return f["kind"])
 	_ok(_root.get_navigation().route_name() == "RESULTS" and follow.has("gift_milestone"), "real WON committed; receipt follow-up = gift_milestone")
-	_ok(res.has_ceremony_barrier() and res.get_primary_button().disabled and not res.get_next_cleanup_panel().visible, "ceremony barrier holds CLEAN NEXT + teaser")
+	_ok(res.has_ceremony_barrier() and res.get_primary_button().text == UiText.t("RESULTS_HOME") and res.find_child("NextCleanup", true, false) == null,
+		"ceremony barrier set; WON primary is HOME, no next-level teaser (SB-PHONE-2026-11-12-B)")
 	var a0: Dictionary = _root.get_app_state().economy.snapshot()
 	res.finish_reveal()
 	var top = null
@@ -617,7 +618,7 @@ func _e27_results_handoff() -> void:
 	_ok(a1["reward"] == a0["reward"] and a1["gift"] == a0["gift"] and a1["collection"] == a0["collection"], "presenting granted nothing (wallet / applied ids / Gift / Collection unchanged)")
 	_close_cta(top)
 	await _frames(4)
-	_ok(not res.has_ceremony_barrier() and not res.get_primary_button().disabled and res.get_next_cleanup_panel().visible, "barrier released: CLEAN NEXT + teaser back")
+	_ok(not res.has_ceremony_barrier() and not res.get_primary_button().disabled and _root.get_navigation().route_name() == "RESULTS", "barrier released: HOME live, still on Results (no level started)")
 	_ok(_root.get_app_state().economy.meta_ui.is_seen("gift:gift_ms:c0:m10") and _root.get_app_state().economy.gift.claimable().size() == 3, "acknowledged; reward still waits in the Gift Bar (m1 / m5 seed + m10)")
 	_end_app()
 	_complete("e27_results_handoff")
@@ -628,7 +629,7 @@ func _e28_results_no_event_no_hold() -> void:
 	var res = _root.get_results_screen()
 	res.finish_reveal()
 	await _frames(4)
-	_ok(not res.has_ceremony_barrier() and _root.get_modal_stack().depth() == 0 and not res.get_primary_button().disabled, "no barrier, no popup, CLEAN NEXT live")
+	_ok(not res.has_ceremony_barrier() and _root.get_modal_stack().depth() == 0 and not res.get_primary_button().disabled, "no barrier, no popup, HOME live")
 	_end_app()
 	_complete("e28_results_no_event_no_hold")
 

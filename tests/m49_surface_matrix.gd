@@ -206,7 +206,7 @@ func _walk(phys: Vector2i) -> void:
 		res.show_model(model)
 		await _frames(4)
 		res.finish_reveal()
-		await create_timer(0.5).timeout   # the CLEAN NEXT emphasis bump (0.40 s) settles
+		await create_timer(0.5).timeout   # the primary emphasis bump (0.40 s) settles
 		await _scan(phys, lv, "results_" + status, res)
 		if status == "WON":
 			_track_results(phys, lv, res, Rect2(Vector2.ZERO, Vector2(lv)))
@@ -402,10 +402,9 @@ func _journey_ok(phys: Vector2i, where: String, j, avoid: Array) -> void:
 func _track_results(phys: Vector2i, lv: Vector2i, res, safe: Rect2) -> void:
 	_journey_ok(phys, "results", res.get_journey_strip(), [])
 	var bad: Array = []
-	var nc: Control = res.get_next_cleanup_panel()
-	if not nc.is_visible_in_tree() or not _inside(nc.get_global_rect(), safe):
-		bad.append("next_cleanup %s" % _rs(nc.get_global_rect()))
-	for b in [res.get_primary_button(), res.get_home_button()]:
+	if res.get_home_button().visible or res.find_child("NextCleanup", true, false) != null:
+		bad.append("WON shows more than the one HOME action")
+	for b in [res.get_primary_button()]:
 		var r: Rect2 = (b as Control).get_global_rect()
 		if not _inside(r, safe) or r.size.x < TOUCH - 0.5 or r.size.y < TOUCH - 0.5:
 			bad.append("%s %s" % [b.name, _rs(r)])
@@ -414,7 +413,7 @@ func _track_results(phys: Vector2i, lv: Vector2i, res, safe: Rect2) -> void:
 		bad.append("content %s" % _rs(stack.get_global_rect()))
 	if not res.shown_row_texts().any(func(t): return String(t).contains(UiText.t("RESULTS_CATCHUP", ["", "", ""]).get_slice(" ", 0))):
 		bad.append("no Catch-Up row %s" % str(res.shown_row_texts()))
-	_ok(bad.is_empty(), "%s Results WON: Next Cleanup, CTAs >= 88, Catch-Up row, content inside %s %s" % [str(phys), _rs(safe), str(bad)])
+	_ok(bad.is_empty(), "%s Results WON: HOME only (>= 88), Catch-Up row, content inside %s %s" % [str(phys), _rs(safe), str(bad)])
 
 func _track_events(phys: Vector2i, p) -> void:
 	var bad: Array = []

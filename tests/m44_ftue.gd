@@ -640,7 +640,8 @@ func _t20() -> void:
 	var o: Array = e.orders.orders()
 	_ok(o.size() == 3 and bool(o[1]["available"]) and bool(o[2]["available"]), "Daily Scrub Orders live from day one (slots 1, 2)")
 	var m: Dictionary = _root._results_model({"status": "WON", "level": 1, "attempt": 1})
-	_ok(m.has("momentum") and bool(m["continue"].get("available", false)) and int(m["continue"].get("next_level", 0)) == 1, "Results journey / Next Cleanup from the canonical resolver (no invented level)")
+	_ok(m.has("momentum") and bool(m["momentum"].get("ok", false)) and int(m["momentum"]["journey"].get("anchor", 0)) == 1 and not m.has("continue"),
+		"Results journey from the canonical progression (no invented level, no next-level offer)")
 	_complete("t20_fresh_meta_dependencies")
 
 func _t21() -> void:

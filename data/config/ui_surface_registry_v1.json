@@ -144,10 +144,6 @@
       "destination": "popup:world_unlock"
     },
     {
-      "source": "results.clean_next",
-      "destination": "gameplay"
-    },
-    {
       "source": "results.retry",
       "destination": "gameplay"
     },

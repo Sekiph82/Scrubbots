@@ -1,5 +1,6 @@
 extends SceneTree
-## M43-C001A — Results foundation evidence (receipt/model, reward + Continue idempotency).
+## M43-C001A — Results foundation evidence (receipt/model, reward idempotency; since
+## SB-PHONE-2026-11-12-B a WON Results only goes Home, never starts the next level).
 ## Production path: real main.tscn root, real AppState graph, real ProductionGameplayHost
 ## terminal transaction, real ResultsScreen. Expected/completed case ledger.
 ##
@@ -19,7 +20,7 @@ const R := NavigationController.Route
 
 var EXPECTED_CASES := [
 	"receipt_matches_commit", "already_cleared_and_rollback", "duplicate_terminal_open_refresh",
-	"rapid_continue_once", "stale_continue_rejected", "level10_no_next_content",
+	"rapid_home_once", "won_never_starts_level", "level30_won_home_only",
 	"gift_milestone_handoff", "follow_ups_authoritative_only", "lost_retry_regression",
 	"m42_contract_preserved", "results_never_grants_source",
 ]
@@ -33,9 +34,9 @@ func _initialize() -> void:
 	await _receipt_matches_commit()
 	await _already_cleared_and_rollback()
 	await _duplicate_terminal_open_refresh()
-	await _rapid_continue_once()
-	await _stale_continue_rejected()
-	await _level10_no_next_content()
+	await _rapid_home_once()
+	await _won_never_starts_level()
+	await _level30_won_home_only()
 	await _gift_milestone_handoff()
 	_follow_ups_authoritative_only()
 	await _lost_retry_regression()
@@ -73,7 +74,7 @@ func _receipt_matches_commit() -> void:
 	_ok(rc["follow_ups"].is_empty(), "no follow-up ceremony without committed truth")
 	var res = root.get_results_screen()
 	var model: Dictionary = res.get_model()
-	_ok(model["receipt"] == rc and model["attempt"] == 1 and model["continue"]["available"] and model["continue"]["next_level"] == 2, "Results model binds the host receipt + canonical next frontier")
+	_ok(model["receipt"] == rc and model["attempt"] == 1 and not model.has("continue"), "Results model binds the host receipt; no next-level availability")
 	_ok(_labels(res.get_reward_lines_node()) == ResultsScreen.reward_lines(rc) and _labels(res.get_reward_lines_node()).size() == 4, "Results shows every committed reveal line at once (Reduced-Effects safe)")
 	_ok(_labels(res.get_reward_lines_node())[0] == UiText.t("RESULTS_FIRST_CLEAR_SB", [fc_sb]), "first line = first-clear SB")
 	var copy: Dictionary = h.get_terminal_receipt()
@@ -149,68 +150,66 @@ func _duplicate_terminal_open_refresh() -> void:
 	_shutdown(root)
 	_complete("duplicate_terminal_open_refresh")
 
-## SB-M43-005/008/014: rapid Continue -> exactly one transition, one host, exact frontier.
-func _rapid_continue_once() -> void:
-	print("[rapid continue once]")
+## SB-PHONE-2026-11-12-B: rapid taps on the WON primary (HOME) -> exactly one HOME transition,
+## no host, no level started, nothing granted.
+func _rapid_home_once() -> void:
+	print("[rapid home once]")
 	var root = await _boot_main(_uniq("rapid"))
 	var app = root.get_app_state()
 	var nav = root.get_navigation()
 	var h = await _play(root)
 	_drain(h)
-	var rc: Dictionary = h.get_terminal_receipt()
 	var e0: Dictionary = _econ(app.economy)
+	var p0: Dictionary = app.progression.snapshot()
 	var t0: int = nav.transition_id()
-	var emitted := [0]
+	var a0: int = nav.attempt_id()
 	var res = root.get_results_screen()
-	res.continue_requested.connect(func(_a): emitted[0] += 1)
+	var homes := [0]
+	res.home_requested.connect(func(): homes[0] += 1)
+	_ok(res.get_primary_button().text == UiText.t("RESULTS_HOME") and not res.get_primary_button().disabled and not res.get_home_button().visible,
+		"WON: the one visible action is the primary HOME")
 	for _i in range(10):
 		res.get_primary_button().pressed.emit()   # same-frame taps
-	var extra := 0
-	for _i in range(5):
-		if root.continue_from_results().get("ok", false):
-			extra += 1
 	await process_frame
-	var h2 = root.get_gameplay_host()
-	_ok(emitted[0] == 1 and extra == 0, "10 taps -> 1 Continue intent; 5 late direct calls refused")
-	_ok(nav.transition_id() == t0 + 1 and nav.current() == R.GAMEPLAY and nav.attempt_id() == 2 and _hosts(root) == 1, "one transition, one new attempt, one host")
-	_ok(h2 != h and int(h2.progression_level) == rc["frontier"]["after"] and int(h2.progression_level) == app.progression.current_level(), "launched the exact canonical frontier (level %d)" % int(h2.progression_level))
-	_ok(_econ(app.economy) == e0, "Continue grants nothing")
+	_ok(homes[0] >= 1 and nav.current() == R.HOME and nav.transition_id() == t0 + 1 and nav.attempt_id() == a0 and _hosts(root) == 0,
+		"10 taps -> one HOME transition, no new attempt, no host")
+	_ok(_econ(app.economy) == e0 and app.progression.snapshot() == p0 and app.progression.current_level() == 2, "HOME grants nothing; frontier 2 waits for Home PLAY")
 	_shutdown(root)
-	_complete("rapid_continue_once")
+	_complete("rapid_home_once")
 
-## Stale Continue from an earlier Results can never launch.
-func _stale_continue_rejected() -> void:
-	print("[stale continue]")
-	var root = await _boot_main(_uniq("stale"))
+## SB-PHONE-2026-11-12-B: no path starts the next level from a WON Results (no Continue API,
+## navigation refuses RESULTS -> GAMEPLAY, Back goes Home); Home PLAY then starts it.
+func _won_never_starts_level() -> void:
+	print("[won never starts level]")
+	var root = await _boot_main(_uniq("won"))
 	var nav = root.get_navigation()
 	var h = await _play(root)
 	_drain(h)
 	var res = root.get_results_screen()
-	res.get_primary_button().pressed.emit()        # attempt 1 -> Level 2
+	var t0: int = nav.transition_id()
+	_ok(not root.has_method("continue_from_results") and not res.has_signal("continue_requested"), "no Continue intent / handler exists")
+	_ok(not nav.can_go(R.GAMEPLAY) and not nav.go(R.GAMEPLAY) and not nav.resume_gameplay_after_retry() and not root.retry_from_results(),
+		"navigation refuses RESULTS(WON) -> GAMEPLAY; Retry refused on a win")
+	_ok(nav.current() == R.RESULTS and nav.transition_id() == t0 and root.get_gameplay_host() == h, "no transition, host kept")
+	var visible_actions: Array = res.find_children("*", "Button", true, false).filter(func(b): return b.is_visible_in_tree())
+	_ok(visible_actions.size() == 1 and visible_actions[0] == res.get_primary_button() and visible_actions[0].text == UiText.t("RESULTS_HOME"),
+		"exactly one visible button: HOME %s" % str(visible_actions.map(func(b): return b.text)))
+	_ok(root.handle_back() == "home" and nav.current() == R.HOME and _hosts(root) == 0, "Back from WON Results -> HOME, no level started")
+	var r: Dictionary = root.play_current_frontier()
 	await process_frame
+	_ok(r.get("ok", false) and nav.current() == R.GAMEPLAY and int(root.get_gameplay_host().progression_level) == 2, "Home PLAY starts the next level (2)")
+	# LOST Results: Retry still re-enters GAMEPLAY.
 	var h2 = root.get_gameplay_host()
 	h2.get_runtime().set_process(false)
-	h2.get_completion().terminal_reached.emit(&"WON", {})   # attempt 2 Results
-	_ok(nav.current() == R.RESULTS and nav.last_payload()["attempt"] == 2, "attempt 2 Results shown")
-	var t0: int = nav.transition_id()
-	var r: Dictionary = root.continue_from_results(1)
-	res.continue_requested.emit(1)
-	_ok(r.get("reason", "") == "stale_results" and nav.transition_id() == t0 and root.get_gameplay_host() == h2, "stale attempt-1 Continue refused, no transition/host change")
-	var cur: Dictionary = root.continue_from_results(2)
-	_ok(cur.get("ok", false) and nav.current() == R.GAMEPLAY and nav.transition_id() == t0 + 1, "current attempt-2 Continue accepted once")
-	# LOST Results never accept a Continue.
-	var h3 = root.get_gameplay_host()
-	h3.get_runtime().set_process(false)
-	h3.get_completion().terminal_reached.emit(&"LOST", {})
-	var t1: int = nav.transition_id()
-	_ok(root.continue_from_results().get("reason", "") == "not_won" and nav.transition_id() == t1 and root.get_gameplay_host() == h3, "LOST Results: Continue refused")
+	h2.get_completion().terminal_reached.emit(&"LOST", {})
+	_ok(nav.current() == R.RESULTS and nav.can_go(R.GAMEPLAY) and root.retry_from_results() and nav.current() == R.GAMEPLAY, "LOST Results: Retry unchanged")
 	_shutdown(root)
-	_complete("stale_continue_rejected")
+	_complete("won_never_starts_level")
 
-## Last builtin level (30 since SB-CAMPAIGN-L11-L30) -> frontier 31 CONTENT_MISSING: clean
-## unavailable Continue, no mutation.
-func _level10_no_next_content() -> void:
-	print("[level 30 no next content]")
+## Last builtin level (30 since SB-CAMPAIGN-L11-L30) -> frontier 31 CONTENT_MISSING: the WON
+## Results shows no next-level teaser / note; HOME is the only action.
+func _level30_won_home_only() -> void:
+	print("[level 30 won home only]")
 	var root = await _boot_main(_uniq("l10"))
 	var app = root.get_app_state()
 	var nav = root.get_navigation()
@@ -221,28 +220,15 @@ func _level10_no_next_content() -> void:
 	var rc: Dictionary = h.get_terminal_receipt()
 	_ok(rc["first_clear"] and rc["frontier"] == {"before": 30, "after": 31} and rc["rewards"]["first_clear_sb"] == app.economy.config.first_clear_sb(app.progression.class_for(30)), "Level 30 first clear committed")
 	var res = root.get_results_screen()
-	var model: Dictionary = res.get_model()
-	_ok(model["continue"] == {"available": false, "reason": "CONTENT_MISSING", "next_level": 31}, "model: next frontier 31 CONTENT_MISSING")
-	# M43-C001R V02 owner decision: the Next Cleanup card carries the unavailable frontier; the
-	# older duplicate note above CLEAN NEXT is suppressed in that case.
-	_ok(res.get_primary_button().disabled and not res.get_note_label().visible and res.find_child("NextLevel", true, false).text == UiText.t("NEXT_CLEANUP_LEVEL", [31])
-		and res.find_child("NextFacts", true, false).text == UiText.t("NEXT_CLEANUP_SOON"), "Continue disabled with clear unavailable state (Next Cleanup: Level 31 coming soon)")
+	_ok(not res.get_note_label().visible and res.find_child("NextCleanup", true, false) == null and res.find_child("NextLevel", true, false) == null,
+		"no next-level teaser or coming-soon note")
 	var e0: Dictionary = _econ(app.economy)
 	var p0: Dictionary = app.progression.snapshot()
-	var t0: int = nav.transition_id()
-	var emitted := [0]
-	res.continue_requested.connect(func(_a): emitted[0] += 1)
-	for _i in range(3):
-		res.get_primary_button().pressed.emit()
-	var r: Dictionary = root.continue_from_results()
-	_ok(emitted[0] == 0 and r.get("reason", "") == "no_next_content", "taps no-op; direct Continue -> no_next_content")
-	_ok(_econ(app.economy) == e0 and app.progression.snapshot() == p0 and nav.transition_id() == t0 and root.get_gameplay_host() == h and nav.current() == R.RESULTS, "no mutation, no transition, host kept")
-	_ok(res.get_primary_button().disabled and res.get_model()["receipt"] == rc, "still a clean unavailable Continue with the same receipt")
-	res.get_home_button().pressed.emit()
+	res.get_primary_button().pressed.emit()
 	await process_frame
-	_ok(nav.current() == R.HOME, "HOME still works")
+	_ok(nav.current() == R.HOME and _hosts(root) == 0 and _econ(app.economy) == e0 and app.progression.snapshot() == p0, "primary HOME: no mutation, no level started")
 	_shutdown(root)
-	_complete("level10_no_next_content")
+	_complete("level30_won_home_only")
 
 ## SB-M43-012: crossing a Gift Meter milestone is handed off (queued, unclaimed), never granted by Results.
 func _gift_milestone_handoff() -> void:
@@ -314,7 +300,7 @@ func _lost_retry_regression() -> void:
 	_shutdown(root)
 	_complete("lost_retry_regression")
 
-## M42 contract: nav payload stays minimal; show_result() compatibility; ERROR = HOME only.
+## M42 contract: nav payload stays minimal; a receipt-less model renders; ERROR = HOME only.
 func _m42_contract_preserved() -> void:
 	print("[M42 contract preserved]")
 	var root = await _boot_main(_uniq("m42"))
@@ -325,9 +311,9 @@ func _m42_contract_preserved() -> void:
 	_shutdown(root)
 	var res = ResultsScreen.new()
 	get_root().add_child(res)
-	res.show_result({"status": "WON", "level": 3, "attempt": 1}, true)
-	_ok(res.get_payload() == {"status": "WON", "level": 3, "attempt": 1} and not res.get_primary_button().disabled and _labels(res.get_reward_lines_node()).is_empty(), "legacy show_result still works (no receipt -> no lines)")
-	res.show_result({"status": "ERROR", "level": 3, "attempt": 1}, true)
+	res.show_model({"status": "WON", "level": 3, "attempt": 1})
+	_ok(res.get_payload() == {"status": "WON", "level": 3, "attempt": 1} and not res.get_primary_button().disabled and _labels(res.get_reward_lines_node()).is_empty(), "payload-only model still works (no receipt -> no lines)")
+	res.show_model({"status": "ERROR", "level": 3, "attempt": 1})
 	_ok(not res.get_primary_button().visible, "ERROR: HOME only")
 	res.free()
 	_complete("m42_contract_preserved")

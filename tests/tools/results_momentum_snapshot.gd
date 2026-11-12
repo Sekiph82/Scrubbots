@@ -102,9 +102,7 @@ func _shot(out_dir: String, shot: Array) -> void:
 		print("REJECTED ", path)
 	else:
 		var img := sub.get_texture().get_image()
-		var res2 = root.get_results_screen()
-		print("SNAPSHOT ", path, " err=", img.save_png(path), " frontier=", app.progression.current_level(),
-			" teaser=", res2.get_teaser_image().texture.region if res2.visible and res2.get_teaser_image().texture != null else "-")
+		print("SNAPSHOT ", path, " err=", img.save_png(path), " frontier=", app.progression.current_level())
 	root.free()
 	sub.queue_free()
 	await process_frame

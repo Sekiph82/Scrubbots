@@ -6,7 +6,7 @@ extends SceneTree
 ## booster use, FailureAssistanceService + AcquisitionFlow Need a Hand / booster acquisition,
 ## wallet sources / sinks, Hearts gate, packs / Collection / robots, Home navigation, Shop,
 ## rewarded offers / requests / results (provider double), reminders + permission, deep links,
-## and the feature measures (SB-M56-011, 017..022): Next Cleanup / journey on WON Results, pack
+## and the feature measures (SB-M56-011, 018..022; 017 Next Cleanup retired by SB-PHONE-2026-11-12-B): journey on WON Results, pack
 ## pity, Daily Scrub Orders, Weekly / First-Try, Comeback Catch-Up, Ranks view.
 ## Real app root (main.tscn) on throw-away save paths only (boot_save_path_override).
 ##
@@ -32,7 +32,7 @@ var EXPECTED_CASES := [
 	"batching", "retention_markers", "consent_persist_revoke", "session_events", "level_funnel",
 	"pause_restart_and_exit", "assistance", "booster_acquire_rewarded", "booster_use",
 	"economy_events", "collection_robot_events", "navigation_events", "ads_store_events",
-	"notification_events", "next_cleanup_journey", "collection_pity", "daily_orders", "weekly_first_try",
+	"notification_events", "journey_home_play", "collection_pity", "daily_orders", "weekly_first_try",
 	"comeback_catchup", "ranks_view", "provider_offline", "no_economy_change", "pii_scan",
 ]
 
@@ -202,8 +202,8 @@ func _config_schema() -> void:
 				bad.append("%s.%s fallback" % [ev, k])
 	_ok(bad.is_empty(), "every param is int/bool/enum/enum_list, no forbidden (PII) name, enums + fallbacks resolve: %s" % str(bad))
 	var want: Array = ["SB-M56-002", "SB-M56-003", "SB-M56-004", "SB-M56-005", "SB-M56-006", "SB-M56-007", "SB-M56-008", "SB-M56-009", "SB-M56-010", "SB-M56-011", "SB-M56-012",
-		"SB-M56-017", "SB-M56-018", "SB-M56-020", "SB-M56-021", "SB-M56-022"]
-	_ok(tasks.keys().size() == want.size() and want.all(func(t): return tasks.has(t)), "events cover SB-M56-002..012 + 017..022 (019 extends pack_opened): %s" % str(tasks.keys()))
+		"SB-M56-018", "SB-M56-020", "SB-M56-021", "SB-M56-022"]
+	_ok(tasks.keys().size() == want.size() and want.all(func(t): return tasks.has(t)), "events cover SB-M56-002..012 + 018..022 (019 extends pack_opened; 017 retired): %s" % str(tasks.keys()))
 	_ok(not types.has("string"), "no free-text param type exists")
 	var tax_doc := FileAccess.get_file_as_string("res://" + String(_cfg["doc"]))
 	var inv_doc := FileAccess.get_file_as_string("res://docs/PRIVACY_DATA_INVENTORY.md")
@@ -741,7 +741,7 @@ func _win_current() -> void:
 
 ## 011 + 017..022 on their real paths, from Home at frontier F with Hearts: a 3-day absence
 ## (return window + Catch-Up), Weekly + First-Try joined, today's orders win_1 / win_2 / win_3
-## one win from done, a pity-due pack, WON F -> CLEAN NEXT (+ a stale second tap) -> WON F+1,
+## one win from done, a pity-due pack, WON F -> Results HOME -> Home PLAY -> WON F+1,
 ## then the order / First-Try / milestone claims and the Ranks screen.
 func _tour_features() -> void:
 	_load_events()
@@ -759,9 +759,10 @@ func _tour_features() -> void:
 	_root.play_current_frontier()
 	await _settle()
 	await _win_current()
-	_root.continue_from_results()
+	_root.get_results_screen().get_primary_button().pressed.emit()   # SB-PHONE-2026-11-12-B: a win goes Home
 	await _settle()
-	_root.continue_from_results()
+	_root.play_current_frontier()
+	await _settle()
 	await _win_current()
 	for i in range(3):
 		_app().actions.claim_daily_task(i)
@@ -776,17 +777,16 @@ func _feature_events() -> void:
 	print("[011 / 017..022 feature measures]")
 	await _boot()
 	await _tour_features()
-	print("[017 Next Cleanup + 018 journey]")
+	print("[018 journey; 017 Next Cleanup retired]")
 	_ok(_params("journey_progress") == [{"slot": LEVEL, "cycle": 1, "cycle_complete": false, "first_clear": true},
 		{"slot": LEVEL + 1, "cycle": 1, "cycle_complete": false, "first_clear": true}], "two WON Results -> journey node (cadence slot, cycle): %s" % str(_params("journey_progress")))
-	var shown: Array = _params("next_cleanup_shown")
-	_ok(shown.size() == 2 and shown.all(func(p): return p["available"] and p["reason"] == "ok"), "WON Results -> teaser shown, next frontier available: %s" % str(shown))
-	_ok(_params("next_cleanup_tap") == [{"ok": true, "reason": "ok"}, {"ok": false, "reason": "not_results"}], "CLEAN NEXT -> ok; stale second tap -> refusal reason: %s" % str(_params("next_cleanup_tap")))
+	_ok(_params("next_cleanup_shown").is_empty() and _params("next_cleanup_tap").is_empty() and not _cfg["events"].has("next_cleanup_shown")
+		and not _cfg["events"].has("next_cleanup_tap"), "no Next Cleanup teaser / CLEAN NEXT events (retired)")
 	var st: Array = _params("level_start")
-	_ok(st.size() == 2 and st[1]["level"] == LEVEL + 1 and st[1]["entry"] == "launch", "the accepted tap starts the next level (conversion)")
+	_ok(st.size() == 2 and st[1]["level"] == LEVEL + 1 and st[1]["entry"] == "launch", "Home PLAY after the win starts the next level")
 	var j := ResultsMomentum.journey(_app().progression, "results", 10, ResultsMomentum.load_config())
 	_ok(j["slot"] == 10 and j["slot"] == j["length"], "cycle_complete = slot 10 of 10 (the L10 Results journey)")
-	_complete("next_cleanup_journey")
+	_complete("journey_home_play")
 	print("[019 pack pity / dry streak / set level]")
 	var pk: Array = _params("pack_opened")
 	_ok(pk.size() >= 1 and pk[0]["pity"] and pk[0]["new_cards"] != "0" and pk[0]["dry_streak"] == "0", "pity-due pack -> pity true, guarantee fulfilled (new card), dry streak reset: %s" % str(pk))

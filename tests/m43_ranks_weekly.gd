@@ -155,7 +155,7 @@ func _r05() -> void:
 	_ok(r.weekly_count() == 1 and _app().progression.current_level() == 3, "WON with a booster -> exactly 1 (level 2 completed)")
 	_root.get_modal_stack().clear("t")
 	await _settle()
-	await _start(_root.continue_from_results().get("ok", false))
+	await _start(_home_play())   # a win goes Home; Home PLAY starts the next level
 	await _terminal(&"WON")
 	_ok(r.weekly_count() == 2, "second WON -> 2")
 	_root.get_modal_stack().clear("t")
@@ -308,3 +308,8 @@ func _done() -> void:
 		print("  FAIL: case ledger incomplete, missing %s" % str(missing))
 	print("M43 ranks weekly evidence: %s (%d/%d cases, %d fail)" % ["PASS" if _fail == 0 else "FAIL", _completed.size(), EXPECTED_CASES.size(), _fail])
 	quit(1 if _fail > 0 else 0)
+
+## SB-PHONE-2026-11-12-B: a win goes Home (the WON primary), then Home PLAY starts the next level.
+func _home_play() -> bool:
+	_root.get_results_screen().get_primary_button().pressed.emit()
+	return _root.play_current_frontier().get("ok", false)

@@ -2,7 +2,7 @@ extends SceneTree
 ## SB-M57-001..011 (provider-independent part, owner 2026-10-22) — AdService over the AdProvider
 ## seam with a MockProvider (no SDK, no network): the shipping null provider shows nothing; an
 ## interstitial is due on every 5th finished play (win or loss) and is shown only at the real
-## app's Results -> next attempt transition, never mid-level; No Ads removes the banner and
+## app's next attempt start (Home PLAY after a win, Results Retry after a loss), never mid-level; No Ads removes the banner and
 ## interstitials but not rewarded; a rewarded video grants only on a verified completed view
 ## (through RewardedGrantService), never on cancel / skip / fail; the play counter is saved.
 ##
@@ -105,7 +105,7 @@ func _a02() -> void:
 	_complete("a02_every_fifth_play")
 
 func _a03() -> void:
-	print("[a03 real app: win and lose each count; the ad only at Results -> next attempt]")
+	print("[a03 real app: win and lose each count; the ad only at the next attempt start]")
 	await _boot(_tmp_path("a03"), 2)
 	var m := MockProvider.new()
 	_eco().ads.set_provider(m)
@@ -121,7 +121,7 @@ func _a03() -> void:
 			_eco().hearts.import_snapshot({"hearts": 5, "anchor": int(Time.get_unix_time_from_system())})
 			_root.get_modal_stack().clear("t")
 			await _settle()
-			await _start(_root.continue_from_results().get("ok", false) if plan[i] == &"WON" else _root.retry_from_results())
+			await _start(_home_play() if plan[i] == &"WON" else _root.retry_from_results())
 	_ok(mid_level_shown == 0 and m.interstitials.is_empty(), "5th play finished: nothing shown during gameplay or at the terminal")
 	_eco().hearts.import_snapshot({"hearts": 5, "anchor": int(Time.get_unix_time_from_system())})
 	_root.get_modal_stack().clear("t")
@@ -131,8 +131,8 @@ func _a03() -> void:
 	await _terminal(&"WON")
 	_root.get_modal_stack().clear("t")
 	await _settle()
-	await _start(_root.continue_from_results().get("ok", false))
-	_ok(m.interstitials.size() == 1 and _eco().ads.plays() == 6, "play 6 -> Continue: no second interstitial")
+	await _start(_home_play())
+	_ok(m.interstitials.size() == 1 and _eco().ads.plays() == 6, "play 6 -> Home -> PLAY: no second interstitial")
 	var c0: int = _eco().boosters.charges("tornado")
 	_ok(_app().actions.start_rewarded("booster:tornado")["ok"], "app facade starts a rewarded video through the shared provider")
 	m.finish("cancelled")
@@ -295,3 +295,8 @@ func _done() -> void:
 		print("  FAIL: case ledger incomplete, missing %s" % str(missing))
 	print("M57 ads cadence evidence: %s (%d/%d cases, %d fail)" % ["PASS" if _fail == 0 else "FAIL", _completed.size(), EXPECTED_CASES.size(), _fail])
 	quit(1 if _fail > 0 else 0)
+
+## SB-PHONE-2026-11-12-B: a win goes Home (the WON primary), then Home PLAY starts the next level.
+func _home_play() -> bool:
+	_root.get_results_screen().get_primary_button().pressed.emit()
+	return _root.play_current_frontier().get("ok", false)

@@ -160,11 +160,11 @@ func _results() -> void:
 	res.show_model(_model("WON", 20))
 	await process_frame
 	var got := [0]
-	res.continue_requested.connect(func(_a): got[0] += 1)
+	res.home_requested.connect(func(): got[0] += 1)
 	var primary: Button = res.get_primary_button()
-	_ok(CharacterMotion.is_playing(robot) and robot.mouse_filter == Control.MOUSE_FILTER_IGNORE and not primary.disabled, "during the intro: robot ignores input, CLEAN NEXT enabled")
+	_ok(CharacterMotion.is_playing(robot) and robot.mouse_filter == Control.MOUSE_FILTER_IGNORE and not primary.disabled, "during the intro: robot ignores input, primary (HOME) enabled")
 	primary.pressed.emit()
-	_ok(got[0] == 1, "CLEAN NEXT accepted mid-animation")
+	_ok(got[0] == 1, "primary (HOME) accepted mid-animation")
 	_complete("results_input_live")
 	res.free()
 
@@ -180,7 +180,7 @@ func _video() -> void:
 	var v: VideoStreamPlayer = res.get_result_video()
 	_ok(v != null and v.is_playing() and v.stream.resource_path == ResultsScreen.WIN_VIDEO and (v.material as ShaderMaterial).shader == ResultsScreen.CHROMA_KEY, "Scrubby WON: keyed WIN video playing")
 	_ok(robot.texture.resource_path == ResultsScreen.WIN_STILL and robot.self_modulate.a == 0.0 and not CharacterMotion.is_playing(robot), "Scrubby WON: still bound under the video, no tween")
-	_ok(_players(res) == 1 and v.mouse_filter == Control.MOUSE_FILTER_IGNORE and not res.get_primary_button().disabled, "one decoder, ignores input, CLEAN NEXT live")
+	_ok(_players(res) == 1 and v.mouse_filter == Control.MOUSE_FILTER_IGNORE and not res.get_primary_button().disabled, "one decoder, ignores input, primary live")
 	res.show_model(_model("LOST", 2, false, "scrubby"))
 	await process_frame
 	v = res.get_result_video()

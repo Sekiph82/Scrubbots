@@ -1,6 +1,6 @@
 extends SceneTree
 ## M43-C005F-PHASE2 — Results + pack feel on real shipping surfaces:
-##   w*: SB-M43-C005F-003 WON Results one-shot celebration + CLEAN NEXT emphasis;
+##   w*: SB-M43-C005F-003 WON Results one-shot celebration + primary (HOME) emphasis;
 ##   r*: SB-M43-C005F-004 Results reward-row feedback by committed reward kind;
 ##   p*: SB-M43-C005F-005 Standard / Premium pack + card reveal feel;
 ##   g*: global — app wiring, static boundary, real plugins on a CanvasLayer / SubViewport.
@@ -12,6 +12,7 @@ extends SceneTree
 const FeedbackAdapter = preload("res://scripts/ui/feel/feedback_adapter.gd")
 const EffectsSettingsService = preload("res://scripts/settings/effects_settings_service.gd")
 const ResultsScreen = preload("res://scripts/ui/results_screen.gd")
+const UiText = preload("res://scripts/ui/ui_text.gd")
 const ModalStack = preload("res://scripts/ui/popup/modal_stack.gd")
 const StandardPackCeremony = preload("res://scripts/ui/ceremony/standard_pack_ceremony.gd")
 const PremiumPackCeremony = preload("res://scripts/ui/ceremony/premium_pack_ceremony.gd")
@@ -52,7 +53,7 @@ class SparkSpy extends Node:
 
 var EXPECTED_CASES := [
 	"w01_won_plays_one_win", "w02_refresh_resize_barrier_rearm_no_replay", "w03_new_attempt_plays_once",
-	"w04_lost_error_no_win", "w05_continue_home_live_barrier_unchanged", "w06_reduced_no_plugin_static",
+	"w04_lost_error_no_win", "w05_home_live_barrier_holds_emphasis", "w06_reduced_no_plugin_static",
 	"w07_missing_or_throwing_plugin_never_blocks", "w08_native_motion_restrained_and_restored",
 	"r01_rows_unchanged_one_event_each", "r02_refresh_no_row_replay", "r03_reduced_immediate_rows_no_plugin",
 	"r04_bounded_row_events", "r05_no_authority_calls",
@@ -220,7 +221,7 @@ func _w01() -> void:
 	_complete("w01_won_plays_one_win")
 
 func _w02() -> void:
-	print("[w02 re-show / resize / barrier / Continue re-arm never replay the same WIN]")
+	print("[w02 re-show / resize / barrier / HOME tap + re-show never replay the same WIN]")
 	var f := _feel()
 	var res = _results(f)
 	var m := _won(1, _rich_receipt())
@@ -235,11 +236,11 @@ func _w02() -> void:
 	res.set_ceremony_barrier("x", false)
 	res.finish_reveal()
 	await _frames(2)
-	res.get_primary_button().pressed.emit()   # Continue latches ...
-	res.show_model(res.get_model())           # ... and the app root re-arms it by re-showing
+	res.get_primary_button().pressed.emit()   # HOME intent ...
+	res.show_model(res.get_model())           # ... and a re-show of the same terminal
 	await _frames(3)
 	_ok(_keys_of(f[0], "WIN").size() == 1, "still exactly one WIN %s" % str(_keys_of(f[0], "WIN")))
-	_ok(_keys_of(f[0], "MICRO").size() <= 1, "CLEAN NEXT emphasis at most once %s" % str(_keys_of(f[0], "MICRO")))
+	_ok(_keys_of(f[0], "MICRO").size() <= 1, "primary emphasis at most once %s" % str(_keys_of(f[0], "MICRO")))
 	_free_results(res)
 	_drop(f)
 	_complete("w02_refresh_resize_barrier_rearm_no_replay")
@@ -274,29 +275,27 @@ func _w04() -> void:
 	_complete("w04_lost_error_no_win")
 
 func _w05() -> void:
-	print("[w05 Continue / Home stay live; ceremony barrier semantics unchanged]")
+	print("[w05 HOME stays live; a ceremony barrier holds only the emphasis]")
 	var f := _feel()
 	var res = _results(f)
-	var cont := [0]
 	var home := [0]
-	res.continue_requested.connect(func(_a): cont[0] += 1)
 	res.home_requested.connect(func(): home[0] += 1)
 	res.show_model(_won(1, _rich_receipt()))
 	res.set_ceremony_barrier("meta", true)   # what the app root does right after show_model
 	await _frames(3)
-	_ok(res.get_primary_button().disabled and not res.get_next_cleanup_panel().visible, "barrier holds CLEAN NEXT + teaser exactly as before")
+	_ok(not res.get_primary_button().disabled and res.get_primary_button().text == UiText.t("RESULTS_HOME") and not res.get_home_button().visible,
+		"WON primary is HOME, live under the barrier; no second button")
 	res.finish_reveal()
 	await _frames(3)
-	_ok(_keys_of(f[0], "MICRO").is_empty(), "no CLEAN NEXT emphasis while the barrier holds it")
+	_ok(_keys_of(f[0], "MICRO").is_empty(), "no primary emphasis while the barrier holds it")
 	res.set_ceremony_barrier("meta", false)
 	await _frames(2)
-	_ok(not res.get_primary_button().disabled and _keys_of(f[0], "MICRO") == ["results:WON:a1:L10:next"], "release: CLEAN NEXT actionable, one emphasis %s" % str(_keys_of(f[0], "MICRO")))
+	_ok(not res.get_primary_button().disabled and _keys_of(f[0], "MICRO") == ["results:WON:a1:L10:next"], "release: one emphasis %s" % str(_keys_of(f[0], "MICRO")))
 	res.get_primary_button().pressed.emit()
-	res.get_home_button().pressed.emit()
-	_ok(cont[0] == 1 and home[0] == 1 and res.get_primary_button().disabled, "Continue fires immediately (and latches as before); Home fires immediately")
+	_ok(home[0] == 1, "HOME fires immediately")
 	_free_results(res)
 	_drop(f)
-	_complete("w05_continue_home_live_barrier_unchanged")
+	_complete("w05_home_live_barrier_holds_emphasis")
 
 func _w06() -> void:
 	print("[w06 Reduced Effects: keys consumed, zero plugin work, static approved Results]")
@@ -308,8 +307,8 @@ func _w06() -> void:
 		await process_frame
 		scales.append(res.get_emblem().scale.x)
 	_ok(f[2].calls.is_empty() and f[3].calls.is_empty() and f[0].owned_count() == 0, "no plugin call at all")
-	_ok(_keys_of(f[0], "WIN") == ["results:WON:a1:L10:win"] and _keys_of(f[0], "MICRO").size() == 1, "WIN + CLEAN NEXT keys consumed (no replay if FULL returns)")
-	_ok(scales.all(func(s): return is_equal_approx(s, 1.0)) and is_equal_approx(res.get_primary_button().scale.x, 1.0), "emblem / CLEAN NEXT never move")
+	_ok(_keys_of(f[0], "WIN") == ["results:WON:a1:L10:win"] and _keys_of(f[0], "MICRO").size() == 1, "WIN + primary emphasis keys consumed (no replay if FULL returns)")
+	_ok(scales.all(func(s): return is_equal_approx(s, 1.0)) and is_equal_approx(res.get_primary_button().scale.x, 1.0), "emblem / primary never move")
 	_ok(_rows(res).all(func(r): return is_equal_approx(r.modulate.a, 1.0) and is_equal_approx(r.scale.x, 1.0)) and not res.is_revealing(), "every committed row visible immediately, unscaled")
 	f[1].set_reduced(false)
 	res.show_model(_won(1, _rich_receipt(), false))
@@ -342,14 +341,14 @@ func _w07() -> void:
 	f[3].fault = true
 	res = _results(f)
 	var cont := [0]
-	res.continue_requested.connect(func(_a): cont[0] += 1)
+	res.home_requested.connect(func(): cont[0] += 1)
 	print("  EXPECTED_FAULT_INJECTION: the next SCRIPT ERROR ('explode' on null) is deliberately raised inside a spy plugin")
 	res.show_model(_won(1, rc))
 	await _frames(3)
 	res.finish_reveal()
 	await _frames(2)
 	res.get_primary_button().pressed.emit()
-	_ok(cont[0] == 1 and res.is_victory_layout() and _rows(res).size() == 5, "throwing plugin: Results shown, rows intact, Continue still fires")
+	_ok(cont[0] == 1 and res.is_victory_layout() and _rows(res).size() == 5, "throwing plugin: Results shown, rows intact, HOME still fires")
 	_free_results(res)
 	_drop(f)
 	_complete("w07_missing_or_throwing_plugin_never_blocks")
@@ -371,9 +370,9 @@ func _w08() -> void:
 		await process_frame
 		npeak = maxf(npeak, res.get_primary_button().scale.x)
 		if _i == 5:
-			_ok(not res.get_primary_button().disabled, "CLEAN NEXT never disabled by its pulse")
+			_ok(not res.get_primary_button().disabled, "primary never disabled by its pulse")
 	await _wait(ResultsScreen.NEXT_POP_S + 0.1)
-	_ok(npeak > 1.0 and npeak <= 1.0 + ResultsScreen.NEXT_POP + 0.001 and is_equal_approx(res.get_primary_button().scale.x, 1.0), "CLEAN NEXT pulse peak %.3f <= 1.05, back to 1" % npeak)
+	_ok(npeak > 1.0 and npeak <= 1.0 + ResultsScreen.NEXT_POP + 0.001 and is_equal_approx(res.get_primary_button().scale.x, 1.0), "primary pulse peak %.3f <= 1.05, back to 1" % npeak)
 	res.visible = false   # hidden Results settles every native feel tween
 	_ok(is_equal_approx(res.get_emblem().scale.x, 1.0) and is_equal_approx(res.get_primary_button().scale.x, 1.0), "hide settles native motion")
 	_free_results(res)
@@ -464,7 +463,7 @@ func _r05() -> void:
 	var code := _code("res://scripts/ui/results_screen.gd")
 	var start := code.find("func set_feedback(")
 	var feel_code := code.substr(start)
-	var bad: Array = ["grant(", "request_save", "economy", ".commit(", "claim", "nav.", "go(", "set_ceremony_barrier", "_continue_latched =", ".disabled ="].filter(func(w): return feel_code.contains(w))
+	var bad: Array = ["grant(", "request_save", "economy", ".commit(", "claim", "nav.", "go(", "set_ceremony_barrier", ".disabled ="].filter(func(w): return feel_code.contains(w))
 	_ok(start > 0 and bad.is_empty(), "Results feel functions: no authority call / latch / barrier write %s" % str(bad))
 	_complete("r05_no_authority_calls")
 

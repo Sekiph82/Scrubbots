@@ -232,7 +232,7 @@ func _m07() -> void:
 	_complete("m07_popups_deeplinks_notch")
 
 func _m08() -> void:
-	print("[m08 Results WON: CLEAN NEXT >= 88 px inside; journey strip inside]")
+	print("[m08 Results WON: HOME >= 88 px inside; journey strip inside]")
 	for phys in [Vector2i(720, 1280), Vector2i(1080, 2160), Vector2i(1440, 3200)]:
 		var lv := _logical(phys)
 		await _boot("m08", lv)
@@ -247,8 +247,7 @@ func _m08() -> void:
 		var j_ok: bool = j == null or not (j as Control).is_visible_in_tree() or _inside((j as Control).get_global_rect(), vp)
 		_ok(_inside(br, vp) and br.size.y >= TOUCH - 0.5 and j_ok, "%s (logical %s): CTA %s; journey inside when shown" % [str(phys), str(lv), _rs(br)])
 		# Peer review D3: visibility is RECORDED (rows 031/032 stay partial until asserted).
-		var nc = res.get_next_cleanup_panel()
-		print("    diag: journey visible=%s next_cleanup visible=%s" % [str(j != null and (j as Control).is_visible_in_tree()), str(nc != null and nc.is_visible_in_tree())])
+		print("    diag: journey visible=%s" % str(j != null and (j as Control).is_visible_in_tree()))
 	_complete("m08_results_journey")
 
 # ------------------------------------------------------------------ helpers ----

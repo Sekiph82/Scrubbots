@@ -121,7 +121,7 @@ params only, no ids or timestamps. In the current build no event is stored or se
 | `screen_view`, `shop_open`, `launch_failed` | screen name, Shop entry source, launch refusal reason |
 | `ad_offer_shown`, `ad_request`, `ad_result` | placement, product, available / ok, refusal reason, outcome (no tokens or transaction ids) |
 | `notify_toggle`, `notification_prompt`, `deep_link_open` | reminder category on / off, explainer step and OS answer, deep link destination |
-| `next_cleanup_shown`, `next_cleanup_tap`, `journey_progress` | teaser available / image flags, refusal reason, journey slot / cycle number, first-clear flag |
+| `journey_progress` | journey slot / cycle number, first-clear flag |
 | `daily_order_done`, `daily_order_claim` | order tier, metric, target number |
 | `weekly_event`, `first_try`, `comeback_window`, `catchup_step` | step, milestone number, run depth, Catch-Up offered flag, step number |
 | `ranks_view` | table (all-time / weekly), rank band number |
