@@ -905,6 +905,14 @@ func _p16() -> void:
 
 # ------------------------------------------------------------------ R02 cases ----
 
+## Empty slots a pick can land in now (SB-PHONE-2026-11-12-F: a slot whose finish pop still plays
+## is EMPTY but takes no pick).
+func _pickable(h) -> int:
+	var n := 0
+	for i in range(h.get_slots().get_slot_count()):
+		n += 1 if h.get_slots().is_empty(i) and not h.get_slots().is_finish_held(i) else 0
+	return n
+
 func _occupied(h) -> int:
 	var n := 0
 	for s in h.get_slots().snapshot():
@@ -1458,7 +1466,7 @@ func _calib() -> float:
 ## Stop topping up slots and run the level until at least `n` slots are free (bounded).
 func _wait_free_slots(h, n: int) -> void:
 	for _i in range(6000):
-		if h.get_slots().snapshot().size() - _occupied(h) >= n:
+		if _pickable(h) >= n:
 			return
 		h.get_runtime().tick(DT)
 		await process_frame
@@ -1559,7 +1567,7 @@ func _p20() -> void:
 			# Random's owner rule proves 3 consecutive accepted front placements on the live slot
 			# state, so it needs 3 free slots; Selector needs the rightmost empty one.
 			var need: int = 3 if which == "random" else 1
-			if h.get_slots().snapshot().size() - _occupied(h) >= need:
+			if _pickable(h) >= need:
 				hold = false
 				var id: String = RANDOM if which == "random" else SELECTOR
 				tries[which] += 1
@@ -1669,7 +1677,7 @@ func _p20() -> void:
 ## Tick without topping up slots until `free` slots are empty (robots may keep moving).
 func _hold_until_free(h, free: int) -> void:
 	for _i in range(6000):
-		if h.get_slots().snapshot().size() - _occupied(h) >= free:
+		if _pickable(h) >= free:
 			return
 		h.get_runtime().tick(DT)
 		await process_frame

@@ -15,7 +15,8 @@ extends Control
 ## (mouse_filter IGNORE). Each effect is <= 0.85 s; Reduced Effects -> no effect at all.
 ## SB-POLISH-012 (owner 2026-10-31): every slot batch that finishes (slot empties) gets a short
 ## lift + pop + star burst (pop_batch). Pops are plain dict entries drawn here (no nodes made, so
-## nothing to pool or leak), run alongside a booster effect, and never hold the slot.
+## nothing to pool or leak) and run alongside a booster effect. SB-PHONE-2026-11-12-F: the host
+## holds the finished slot against new picks for pop_duration() (FiveSlotBatchEngine finish hold).
 ## SB-POLISH-013 (owner 2026-11-03): the pop is slower and higher, in three strictly ordered
 ## phases: LIFT (the batch tile rises, ease-in-out, until its bottom edge is POP_GAP x slot
 ## height above the former slot top), BURST (the tile explodes into the burst art), STARS (eight

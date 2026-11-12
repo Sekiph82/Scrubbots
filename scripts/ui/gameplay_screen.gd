@@ -183,8 +183,10 @@ func update_snapshots(slot_snapshots: Array, supply_snapshot: Array) -> void:
 
 ## SB-POLISH-012: a slot whose batch finished (occupied -> EMPTY on the runtime sync) pops
 ## (BoosterVfx.pop_batch) unless `batch_fx` is false (Retry reset) or Reduced Effects. Booster
-## purges (Tornado) arrive through update_snapshots() and never pop.
-func refresh_slot_snapshot(slot_snapshots: Array, batch_fx: bool = true) -> void:
+## purges (Tornado) arrive through update_snapshots() and never pop. Returns the indices of
+## the slots that started a pop (SB-PHONE-2026-11-12-F: the host holds them that long).
+func refresh_slot_snapshot(slot_snapshots: Array, batch_fx: bool = true) -> Array:
+	var popped: Array = []
 	if batch_fx and not _reduced_effects and _booster_vfx != null and _five_slot_strip != null:
 		var views: Array = _five_slot_strip.get_slot_views()
 		for i in range(mini(mini(_slot_snapshots.size(), slot_snapshots.size()), views.size())):
@@ -192,10 +194,12 @@ func refresh_slot_snapshot(slot_snapshots: Array, batch_fx: bool = true) -> void
 			var now = slot_snapshots[i]
 			if was is Dictionary and now is Dictionary and was.get("occupied", false) and not now.get("occupied", false):
 				_booster_vfx.pop_batch(views[i].get_tile().get_global_rect(), _color_of(int(was.get("color_id", -1))))
+				popped.append(i)
 	_slot_snapshots = slot_snapshots.duplicate(true)
 	if _five_slot_strip != null:
 		_five_slot_strip.bind_snapshots(_slot_snapshots, _palette_colors)
 	_sync_shell()
+	return popped
 
 func set_synthetic_safe_insets(left: int, top: int, right: int, bottom: int) -> void:
 	if _safe_root != null:

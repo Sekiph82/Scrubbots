@@ -460,6 +460,7 @@ func build() -> bool:
 	_input.activation_result.connect(_on_activation_event)
 	# Live five-slot presentation sync AND completion evaluation after every driven tick.
 	_runtime.set_state_sync(Callable(self, "_on_runtime_tick"))
+	_runtime.set_finish_hold_slots(_slots)
 
 	_apply_default_speed()
 	_wire_controls()
@@ -657,7 +658,18 @@ func _on_runtime_tick() -> void:
 ## Push a fresh detached M24 snapshot into the live five-slot strip (runtime state-sync).
 func _sync_slots() -> void:
 	if _screen != null and is_instance_valid(_screen) and _slots != null:
-		_screen.refresh_slot_snapshot(_slots.snapshot())
+		_refresh_slots()
+
+## SB-PHONE-2026-11-12-F (owner 2026-11-12): a slot whose finish pop starts takes no new pick
+## until the pop (lift + burst + stars, BoosterVfx.pop_duration()) is over. The hold is exactly
+## what is shown: no pop (Reduced Effects, Retry reset) means no hold, and once no pop is
+## live any more (Reduced Effects switched on, overlay gone) every hold is released.
+func _refresh_slots() -> void:
+	var vfx = _screen.get_booster_vfx()
+	for i in _screen.refresh_slot_snapshot(_slots.snapshot()):
+		_slots.hold_finished_slot(i, vfx.pop_duration())
+	if not is_instance_valid(vfx) or vfx.pop_count() == 0:
+		_slots.clear_finish_holds()
 
 func _on_clear_event(_owner_id, _target_index, _color_id, _agent) -> void:
 	if _completion != null:
@@ -894,7 +906,7 @@ func terminal_context() -> Dictionary:
 	for c in counts:
 		top = maxi(top, int(counts[c]))
 	return {
-		"slots_full": _slots != null and _slots.rightmost_empty_index() == -1,
+		"slots_full": _slots != null and _slots.is_full(),
 		"dominant_color": total > 0 and _assist != null and float(top) / float(total) >= float(_assist.dominant_share),
 		"supply_remaining": _supply != null and not _supply.is_exhausted(),
 	}
@@ -1644,12 +1656,12 @@ func activate_plus_one_slot() -> bool:
 		_economy.boosters.refund(BoosterInventory.PLUS_ONE_SLOT, res)
 		_economy.capacity.begin_new_attempt()   # pre-state was (5, unused): exact
 		if _screen != null:
-			_screen.refresh_slot_snapshot(_slots.snapshot())
+			_refresh_slots()
 		last_plus_one_refusal = "activation_failed"
 		return false
 	# Push a fresh 6-slot snapshot so the newly appended view has content.
 	if _screen != null and _slots != null:
-		_screen.refresh_slot_snapshot(_slots.snapshot())
+		_refresh_slots()
 	# M40 V03 (F-M40-V02-008): a durable meta mutation is a defined save boundary.
 	_flush_durable_save()
 	return true

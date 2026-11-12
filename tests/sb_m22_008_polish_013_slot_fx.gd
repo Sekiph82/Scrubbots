@@ -6,7 +6,8 @@ extends SceneTree
 ##   - the pop: presets A 0.95 / B 1.25 / C 1.60 s (default, owner 2026-11-06); LIFT -> BURST -> STARS strictly in
 ##     order; the lifted tile's bottom edge clears the former slot top by >= 0.25 x slot height;
 ##     ease-in-out lift with no jump at t = 0; overlapping pops bounded; Reduced Effects -> no pop;
-##     the slot is EMPTY the moment the batch finishes (no gameplay delay).
+##     the slot is EMPTY the moment the batch finishes (the pick hold during the pop is
+##     tests/sb_phone_2026_11_12_f_slot_pop_hold.gd).
 ## Run: godot --headless --path . -s res://tests/sb_m22_008_polish_013_slot_fx.gd
 
 const MainScene = preload("res://scenes/app/main.tscn")

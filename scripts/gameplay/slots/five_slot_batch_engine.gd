@@ -60,6 +60,10 @@ var _live_work: Dictionary = {}     # work_id -> {"slot": int, "batch_id": Strin
 var _draining: Dictionary = {}
 var _busy: bool = false             # re-entrancy guard for the external-collaborator path
 var _paused: bool = false           # informational; M24 state is time-independent
+## SB-PHONE-2026-11-12-F (owner 2026-11-12): slot index -> seconds left of its finish pop. A
+## held slot is EMPTY truth (proof, completion, scheduler unchanged) but takes no new supply
+## pick until its hold runs out; the host sets it and the runtime clock advances it.
+var _finish_hold: Dictionary = {}
 
 func _init() -> void:
 	for _i in range(SLOT_COUNT):
@@ -145,6 +149,7 @@ func rollback_grow_to_sixth() -> bool:
 		if int(_live_work[wid]["slot"]) == MAX_CAPACITY - 1:
 			return false
 	_slots.resize(SLOT_COUNT)
+	_finish_hold.erase(MAX_CAPACITY - 1)
 	return true
 
 func is_paused() -> bool:
@@ -284,13 +289,36 @@ func snapshot() -> Array:
 		out.append(s.to_dict())
 	return out
 
-## Index of the rightmost EMPTY slot, or -1 if all occupied. Honors the current
-## active capacity (5 or 6).
+## Index of the rightmost EMPTY slot that can take a pick (not finish-held), or -1 if none.
+## Honors the current active capacity (5 or 6).
 func rightmost_empty_index() -> int:
 	for i in range(_slots.size() - 1, -1, -1):
-		if _slots[i].is_empty():
+		if _slots[i].is_empty() and not _finish_hold.has(i):
 			return i
 	return -1
+
+# ------------------------------------------ finish hold (SB-PHONE-2026-11-12-F) --
+
+## Slot `index` just finished its batch and shows its finish pop for `seconds`: it takes no
+## supply pick until advance_finish_holds() has run that long. Ignored for a non-EMPTY slot.
+func hold_finished_slot(index, seconds: float) -> void:
+	if _valid_index(index) and _slots[index].is_empty() and seconds > 0.0:
+		_finish_hold[index] = seconds
+
+func advance_finish_holds(delta: float) -> void:
+	for i in _finish_hold.keys():
+		_finish_hold[i] -= delta
+		if _finish_hold[i] <= 0.0001:   # float drift of summed deltas; never outlasts the pop
+			_finish_hold.erase(i)
+
+func is_finish_held(index) -> bool:
+	return _finish_hold.has(index)
+
+func has_finish_hold() -> bool:
+	return not _finish_hold.is_empty()
+
+func clear_finish_holds() -> void:
+	_finish_hold.clear()
 
 # ----------------------------------------------- supply -> slot placement (WP02) --
 
@@ -575,6 +603,7 @@ func reset() -> bool:
 		_slots.append(SlotBatchState.make_empty())
 	_live_work.clear()
 	_draining.clear()
+	_finish_hold.clear()
 	_next_sequence = INITIAL_SEQUENCE
 	_paused = false
 	return true

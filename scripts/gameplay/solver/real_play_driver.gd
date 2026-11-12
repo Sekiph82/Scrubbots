@@ -15,7 +15,9 @@ extends RefCounted
 ## Human policy: before every tick (frame 0 included), while a slot is free
 ## (slots.rightmost_empty_index() != -1) and a click remains, place the next column. The five
 ## slots fill at frame 0 and a slot freed while other bots still fly is refilled on the next
-## frame boundary; the driver never waits for quiescence or landings. Without a plan (Level 1,
+## frame boundary once its finish-pop hold is over (SB-PHONE-2026-11-12-F, the game's own
+## rule: the host's screen pops and holds the slot exactly as on a phone); the driver never
+## waits for quiescence or landings. Without a plan (Level 1,
 ## M23 generator) the choice is the first column with a front batch (the first whose
 ## activate_front succeeds); should that ever lose, the searched clicks are kept in the level's
 ## provenance record instead.
@@ -125,9 +127,11 @@ static func _slot_state(slots) -> Array:
 			"remaining": slots.get_remaining(k), "committed": slots.get_committed(k)})
 	return out
 
-## Nothing can change until the next click: no live assignment, no moving bot, every
-## occupied slot WAITING.
+## Nothing can change until the next click: no live assignment, no moving bot, no slot
+## finish hold still running (SB-PHONE-2026-11-12-F), every occupied slot WAITING.
 static func _quiescent(host) -> bool:
+	if host.get_slots().has_finish_hold():
+		return false
 	var scheduler = host.get_scheduler()
 	if scheduler.live_assignment_count() != 0:
 		return false

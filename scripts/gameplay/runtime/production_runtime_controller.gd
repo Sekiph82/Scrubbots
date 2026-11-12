@@ -60,6 +60,8 @@ var _accum := 0.0
 ## scheduler-driven mutations (commit / WAITING / wake / rollback / finalize / completion),
 ## not only after player placement. Presentation-only; it must not mutate gameplay truth.
 var _state_sync: Callable = Callable()
+## SB-PHONE-2026-11-12-F: the FiveSlotBatchEngine whose finish holds this clock advances.
+var _hold_slots = null
 
 func _ready() -> void:
 	# Keep processing even if the SceneTree is globally paused, so this controller — not
@@ -95,6 +97,10 @@ func is_bound() -> bool:
 ## Install the live five-slot presentation sync callback (see _state_sync).
 func set_state_sync(cb: Callable) -> void:
 	_state_sync = cb
+
+## SB-PHONE-2026-11-12-F: advance `slots`' finish holds by every tick's real delta.
+func set_finish_hold_slots(slots) -> void:
+	_hold_slots = slots
 
 func get_speed_authority() -> GameplaySpeedAuthority:
 	return _speed
@@ -185,6 +191,10 @@ func _process(delta: float) -> void:
 func tick(delta: float) -> void:
 	if not _bound or delta <= 0.0:
 		return
+	# SB-PHONE-2026-11-12-F: a finish hold follows its pop, which plays in real time through
+	# pause, terminal and 2x, so the hold clock runs unscaled before every freeze below.
+	if _hold_slots != null:
+		_hold_slots.advance_finish_holds(delta)
 	if _terminal_stopped:
 		# Terminal WON/LOST/ERROR freezes cadence + travel just like pause, but is its own
 		# reason so a result is never mistaken for a user pause. Retry clears it.
