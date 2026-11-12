@@ -1,0 +1,2 @@
+# Decision 150-phone-copy-state — APPROVE (orchestrator, CLAUDE_PEER_REVIEW round 1 PASS)
+Full hearts show DOLU/FULL with no timer (HUD + CAN popup); Collection set names and rarity letters localized (TR S/N/E/EF); Scrubby perk player-facing ("Takım Lideri"); DailyService.display_streak() is the one read-only streak truth for Daily header, claim popup, Profile, Home. Superseded 15:00-when-full lines marked in two OWNER_* docs per owner 2026-11-12 phone feedback; roster perk name synced. Review re-ran sb_phone_2026_11_12_c_copy_state 8/8, m43_master_c009_daily 12/12.
