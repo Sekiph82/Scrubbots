@@ -302,7 +302,7 @@ static func _day_card(day: int, reward: Dictionary) -> Control:
 
 static func refresh_daily(p: BasePopup, app) -> void:
 	var d = app.economy.daily
-	(p.find_child("Streak", true, false) as Label).text = UiText.t("DAILY_CONSECUTIVE", [UiText.num(int(d.streak()))])
+	(p.find_child("Streak", true, false) as Label).text = UiText.t("DAILY_CONSECUTIVE", [UiText.num(int(d.display_streak()))])
 	var states := day_states(d)
 	for day in range(1, 6):
 		var card: Control = p.find_child("Day_%d" % day, true, false)
@@ -327,7 +327,7 @@ static func open_daily_reward(stack, app, result: Dictionary) -> BasePopup:
 	p.set_hero(ART["calendar"], Vector2(240, 240), 80)
 	p.set_title(UiText.t("DAILY_DAY", [day]))
 	p.add_body_line(UiText.reward_text(result.get("reward", {})), "RewardText", BasePopup.ROYAL_EDGE, 32)
-	p.add_body_line(UiText.t("DAILY_CYCLE_DONE") if day == 5 else UiText.t("DAILY_CONSECUTIVE", [UiText.num(int(app.economy.daily.streak()))]), "Streak", BasePopup.INK, 24)
+	p.add_body_line(UiText.t("DAILY_CYCLE_DONE") if day == 5 else UiText.t("DAILY_CONSECUTIVE", [UiText.num(int(app.economy.daily.display_streak()))]), "Streak", BasePopup.INK, 24)
 	p.add_action("ok", UiText.t("POPUP_COLLECT"), "primary", true)
 	if not stack.push(p):
 		p.free()

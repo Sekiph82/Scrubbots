@@ -98,14 +98,18 @@ func cycle_day() -> int:
 func claimed_today() -> bool:
 	return _last_claim_day >= 0 and _today() <= _last_claim_day
 
+## The one player-facing login streak (Daily header, claim popup, Profile, Home): the
+## streak INCLUDING today — the committed streak once today is claimed, else the streak
+## today's claim will make (a missed day already reads 1, before the claim; owner 2026-11-12).
+func display_streak() -> int:
+	if claimed_today():
+		return _streak
+	return (_streak + 1) if (_last_claim_day >= 0 and _today() == _last_claim_day + 1) else 1
+
 ## Cycle day (1..5) a claim made today would grant (streak continues only when the last
 ## claim was exactly yesterday, mirroring claim_login()).
 func next_claim_cycle_day() -> int:
-	var today := _today()
-	var next_streak := (_streak + 1) if (_last_claim_day >= 0 and today == _last_claim_day + 1) else 1
-	if claimed_today():
-		next_streak = _streak
-	return ((max(next_streak, 1) - 1) % LOGIN_CYCLE_DAYS) + 1
+	return ((max(display_streak(), 1) - 1) % LOGIN_CYCLE_DAYS) + 1
 
 ## Configured login reward bundle for cycle day 1..5 (detached copy).
 func login_reward_for(day: int) -> Dictionary:

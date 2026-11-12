@@ -169,7 +169,7 @@ func _t06() -> void:
 	for day in range(1, 6):
 		rewards_ok = rewards_ok and _txt_in(p, "Day_%d" % day, "RewardText") == UiText.reward_text(d.login_reward_for(day))
 	_ok(rewards_ok and JSON.stringify(d.login_reward_for(5)) == JSON.stringify(_eco().config.daily_config()["login_rewards"]["5"]), "D1..D5 rewards from config")
-	_ok(_states(p) == ["today", "upcoming", "upcoming", "upcoming", "upcoming"] and _txt_in(p, "StreakRow", "Streak") == UiText.t("DAILY_CONSECUTIVE", ["0"]), "fresh: D1 today, count 0")
+	_ok(_states(p) == ["today", "upcoming", "upcoming", "upcoming", "upcoming"] and _txt_in(p, "StreakRow", "Streak") == UiText.t("DAILY_CONSECUTIVE", ["1"]), "fresh: D1 today, count 1 (the streak today's claim makes)")
 	_tap("claim")
 	await _frames(1)
 	_ok(_states(p) == ["claimed_today", "upcoming", "upcoming", "upcoming", "upcoming"] and d.streak() == 1 and bool(p.get_action_button("claim").disabled), "claimed today, count 1, claim blocked")

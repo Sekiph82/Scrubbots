@@ -58,7 +58,7 @@ static func open_profile(stack, app) -> BasePopup:
 		["Collection", "home/shortcuts/icon_shortcut_collection.png", UiText.t("PROFILE_COLLECTION"), UiText.t("HOME_RATIO", [UiText.num(int(s["cards_unique"])), UiText.num(e.collection.all_card_ids().size())])],
 		["Robots", "common/navigation/icon_nav_robots.png", UiText.t("PROFILE_ROBOTS"), UiText.t("HOME_RATIO", [UiText.num(int(s["robots_unlocked"])), UiText.num(RobotRoster.ids().size())])],
 		["AchievementSummary", "profile/profile_trophy_icon.png", UiText.t("PROFILE_ACHIEVEMENTS"), UiText.t("HOME_RATIO", [UiText.num(done), UiText.num(ach.size())])],
-		["LoginDays", "daily/daily_login_calendar.png", UiText.t("PROFILE_LOGIN_DAYS"), UiText.num(int(e.daily.streak()))],
+		["LoginDays", "daily/daily_login_calendar.png", UiText.t("PROFILE_LOGIN_DAYS"), UiText.num(int(e.daily.display_streak()))],
 	]:
 		grid.add_child(_tile(t[0], t[1], t[2], t[3], UiText.num(level) if t[0] == "Level" else ""))
 	var r = e.records

@@ -51,7 +51,7 @@ static func build(app) -> Dictionary:
 		"gift_claimable": e.gift.claimable().size(),
 		"win_streak": streak,
 		"win_streak_track": track,
-		"daily_streak": int(e.daily.streak()),
+		"daily_streak": int(e.daily.display_streak()),
 		"daily_cycle_day": int(e.daily.cycle_day()),
 		"daily_claimed_today": bool(e.daily.claimed_today()),
 		"daily_next_day": int(e.daily.next_claim_cycle_day()),

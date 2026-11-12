@@ -104,7 +104,7 @@ func _m03() -> void:
 	var grid: GridContainer = p.find_child("ProfileStats", true, false)
 	var s := Achievements.stats(_root.get_app_state())
 	var want := {"Level": "4", "Cleared": str(int(s["levels_completed"])), "Collection": "0/135", "Robots": "1/10",
-		"AchievementSummary": "0/%d" % Achievements.load_defs().size(), "LoginDays": str(int(e.daily.streak()))}
+		"AchievementSummary": "0/%d" % Achievements.load_defs().size(), "LoginDays": str(int(e.daily.display_streak()))}
 	var tiles_ok: bool = grid != null and grid.columns == 2 and grid.get_child_count() == 6
 	for n in want:
 		var t: Node = grid.get_node_or_null(n) if grid != null else null
