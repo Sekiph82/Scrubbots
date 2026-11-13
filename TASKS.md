@@ -6,7 +6,7 @@ Completed items and older status history: docs/migration/legacy-task-trackers/TA
 
 ## Autonomous Queue
 <!-- Maintained by the factory loop (CLAUDE.md §0D). One row per item: `- READY|OWNER|DONE <TASK-ID> — <one line>`. First READY row is next. -->
-- READY SB-EV02-001 — Read full docs/SCRUBBOTS_24_EVENTS_OWNER_PLAN_2026-11-13.md, V02 catalog and visual reference intake; audit existing EventService, game receipt metrics, economy/reward gates, canonical robot assets and dirty worktree in isolated clean worktree. Document exact gaps, hashes, 24-event compliance, and verified master paths without asking for optional ZIP.
+- DONE SB-EV02-001 — Factory 158 audit at source 39d65814ab7be53290692c7ab616a732f1499fdf: 24 catalog rows, service/receipt/reward/L30 gaps, canonical + legacy hashes, absent V02 output and optional ZIP inventory; no code or payout changes. Evidence: docs/SCRUBBOTS_EVENTS_V02_SOURCE_AUDIT_2026-11-13.md.
 - READY SB-EV02-002 — Implement/configure 24 V02 event definitions and instance IDs from data/config/events_v02_catalog.json; schedule 3–5 active with overlap-aware rotation, upcoming/ended states, tested 28-day fairness and unexpired continuity; production payouts remain disabled until validated.
 - READY SB-EV02-003 — Canonical normal-cleaning completion telemetry for first-clear/new-level, true first attempt, active/colored pixels, booster usage and streak; dedupe per event instance receipt, save/restart and migration tests, no gameplay/solver alterations.
 - READY SB-EV02-004 — Enforce feature_unlocks_v1.json Events Level 30 across Home, navigation/deeplinks, calendar, details, tutorials, join/claim and fresh/old/imported saves; prove Level 29 locked and 30 unlocked without modifying unrelated unlocks.
