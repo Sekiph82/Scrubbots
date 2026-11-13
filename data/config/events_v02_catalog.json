@@ -4,7 +4,7 @@
   "design_status": "owner_v02_plan_with_level30_amendment",
   "runtime_enabled": false,
   "not_runtime_schedule": true,
-  "source": "docs/SCRUBBOTS_EVENTS_V02_IMPLEMENTATION_BIBLE.md",
+  "source": "docs/SCRUBBOTS_24_EVENTS_OWNER_PLAN_2026-11-13.md",
   "event_unlock_feature": "events",
   "event_unlock_level_reference": "data/config/feature_unlocks_v1.json",
   "expected_unlock_level": 30,
@@ -44,7 +44,45 @@
       "production_schedule": null,
       "reward_quantities": null,
       "reward_expiry_policy": null,
-      "implementation_status": "specification_only_not_scheduled"
+      "implementation_status": "specification_only_not_scheduled",
+      "proposed_duration_hours": 48,
+      "duration_status": "IMPLEMENTATION_PROPOSAL_NOT_OWNER_APPROVED",
+      "tutorial": [
+        {
+          "step": 1,
+          "kind": "intro",
+          "source": "res://assets/ui/final/events/heroes/scrub_sprint.png",
+          "purpose": "15 yeni seviye kazan; her ilk tamamlanan yeni seviye yarış göstergesinde bir adım. Rakipten önce bitir."
+        },
+        {
+          "step": 2,
+          "kind": "how_to_play",
+          "source": "ACTUAL_NORMAL_PIXEL_ART_BOARD",
+          "metric": "first_clear_new_level",
+          "visual": "display the REAL normal pixel-art cleaning game board and the relevant signal `first_clear_new_level` applied once to the temizlik pistinde 5 robotun ilerleme çubukları. No other gameplay screen."
+        },
+        {
+          "step": 3,
+          "kind": "reward_path",
+          "source": "EXISTING_REWARD_ASSETS",
+          "production_claims_enabled": false
+        }
+      ],
+      "lifecycle_states": [
+        "upcoming",
+        "active",
+        "ended",
+        "claimable",
+        "expired"
+      ],
+      "required_visual_qa": [
+        "independent PNG",
+        "no event index number",
+        "canonical robot source layers",
+        "exactly two arms and hands",
+        "spelling correct",
+        "mobile fit"
+      ]
     },
     {
       "id": "first_brush_race",
@@ -61,7 +99,45 @@
       "production_schedule": null,
       "reward_quantities": null,
       "reward_expiry_policy": null,
-      "implementation_status": "specification_only_not_scheduled"
+      "implementation_status": "specification_only_not_scheduled",
+      "proposed_duration_hours": 48,
+      "duration_status": "IMPLEMENTATION_PROPOSAL_NOT_OWNER_APPROVED",
+      "tutorial": [
+        {
+          "step": 1,
+          "kind": "intro",
+          "source": "res://assets/ui/final/events/heroes/first_brush_race.png",
+          "purpose": "3 veya 5 seviyeyi ilk denemede temizle; kaybedilen seviyeler etkinliğe puan kazandırmaz."
+        },
+        {
+          "step": 2,
+          "kind": "how_to_play",
+          "source": "ACTUAL_NORMAL_PIXEL_ART_BOARD",
+          "metric": "first_attempt_new_level_win",
+          "visual": "display the REAL normal pixel-art cleaning game board and the relevant signal `first_attempt_new_level_win` applied once to the i̇lk deneme başarılarının sayımı. No other gameplay screen."
+        },
+        {
+          "step": 3,
+          "kind": "reward_path",
+          "source": "EXISTING_REWARD_ASSETS",
+          "production_claims_enabled": false
+        }
+      ],
+      "lifecycle_states": [
+        "upcoming",
+        "active",
+        "ended",
+        "claimable",
+        "expired"
+      ],
+      "required_visual_qa": [
+        "independent PNG",
+        "no event index number",
+        "canonical robot source layers",
+        "exactly two arms and hands",
+        "spelling correct",
+        "mobile fit"
+      ]
     },
     {
       "id": "scrubbots_royale",
@@ -78,7 +154,45 @@
       "production_schedule": null,
       "reward_quantities": null,
       "reward_expiry_policy": null,
-      "implementation_status": "specification_only_not_scheduled"
+      "implementation_status": "specification_only_not_scheduled",
+      "proposed_duration_hours": 72,
+      "duration_status": "IMPLEMENTATION_PROPOSAL_NOT_OWNER_APPROVED",
+      "tutorial": [
+        {
+          "step": 1,
+          "kind": "intro",
+          "source": "res://assets/ui/final/events/heroes/scrubbots_royale.png",
+          "purpose": "5 aşamalı eleme; her aşamada tanımlanan sayıda yeni seviyeyi ilk denemede tamamlayan ilerler. Aşamaların seviyeleri V02'de sayısal tanımlı değil."
+        },
+        {
+          "step": 2,
+          "kind": "how_to_play",
+          "source": "ACTUAL_NORMAL_PIXEL_ART_BOARD",
+          "metric": "first_attempt_new_level_win",
+          "visual": "display the REAL normal pixel-art cleaning game board and the relevant signal `first_attempt_new_level_win` applied once to the 100 sanal rakipten aşamalı elenme şeması. No other gameplay screen."
+        },
+        {
+          "step": 3,
+          "kind": "reward_path",
+          "source": "EXISTING_REWARD_ASSETS",
+          "production_claims_enabled": false
+        }
+      ],
+      "lifecycle_states": [
+        "upcoming",
+        "active",
+        "ended",
+        "claimable",
+        "expired"
+      ],
+      "required_visual_qa": [
+        "independent PNG",
+        "no event index number",
+        "canonical robot source layers",
+        "exactly two arms and hands",
+        "spelling correct",
+        "mobile fit"
+      ]
     },
     {
       "id": "golden_brush_championship",
@@ -95,7 +209,45 @@
       "production_schedule": null,
       "reward_quantities": null,
       "reward_expiry_policy": null,
-      "implementation_status": "specification_only_not_scheduled"
+      "implementation_status": "specification_only_not_scheduled",
+      "proposed_duration_hours": 72,
+      "duration_status": "IMPLEMENTATION_PROPOSAL_NOT_OWNER_APPROVED",
+      "tutorial": [
+        {
+          "step": 1,
+          "kind": "intro",
+          "source": "res://assets/ui/final/events/heroes/golden_brush_championship.png",
+          "purpose": "Çeyrek final, yarı final, final. Her turda belirlenen süre boyunca daha fazla uygun yeni seviye kazanan ilerler; eşitlik ve tur süresi tasarlanıp test edilir."
+        },
+        {
+          "step": 2,
+          "kind": "how_to_play",
+          "source": "ACTUAL_NORMAL_PIXEL_ART_BOARD",
+          "metric": "first_clear_new_level",
+          "visual": "display the REAL normal pixel-art cleaning game board and the relevant signal `first_clear_new_level` applied once to the 8 kişilik çeyrek finalden finale turnuva ağacı. No other gameplay screen."
+        },
+        {
+          "step": 3,
+          "kind": "reward_path",
+          "source": "EXISTING_REWARD_ASSETS",
+          "production_claims_enabled": false
+        }
+      ],
+      "lifecycle_states": [
+        "upcoming",
+        "active",
+        "ended",
+        "claimable",
+        "expired"
+      ],
+      "required_visual_qa": [
+        "independent PNG",
+        "no event index number",
+        "canonical robot source layers",
+        "exactly two arms and hands",
+        "spelling correct",
+        "mobile fit"
+      ]
     },
     {
       "id": "weekly_scrub_league",
@@ -112,7 +264,45 @@
       "production_schedule": null,
       "reward_quantities": null,
       "reward_expiry_policy": null,
-      "implementation_status": "specification_only_not_scheduled"
+      "implementation_status": "specification_only_not_scheduled",
+      "proposed_duration_hours": 168,
+      "duration_status": "IMPLEMENTATION_PROPOSAL_NOT_OWNER_APPROVED",
+      "tutorial": [
+        {
+          "step": 1,
+          "kind": "intro",
+          "source": "res://assets/ui/final/events/heroes/weekly_scrub_league.png",
+          "purpose": "Haftalık sıralamayı yeni seviyelerde temizlenen gerçek aktif piksel sayısı belirler; replay/tekrar oynama sıralamayı şişiremez."
+        },
+        {
+          "step": 2,
+          "kind": "how_to_play",
+          "source": "ACTUAL_NORMAL_PIXEL_ART_BOARD",
+          "metric": "cleaned_active_pixels_on_new_levels",
+          "visual": "display the REAL normal pixel-art cleaning game board and the relevant signal `cleaned_active_pixels_on_new_levels` applied once to the piksel sayısına göre sıralama tablosu. No other gameplay screen."
+        },
+        {
+          "step": 3,
+          "kind": "reward_path",
+          "source": "EXISTING_REWARD_ASSETS",
+          "production_claims_enabled": false
+        }
+      ],
+      "lifecycle_states": [
+        "upcoming",
+        "active",
+        "ended",
+        "claimable",
+        "expired"
+      ],
+      "required_visual_qa": [
+        "independent PNG",
+        "no event index number",
+        "canonical robot source layers",
+        "exactly two arms and hands",
+        "spelling correct",
+        "mobile fit"
+      ]
     },
     {
       "id": "weekly_cleanup_challenge",
@@ -129,7 +319,45 @@
       "production_schedule": null,
       "reward_quantities": null,
       "reward_expiry_policy": null,
-      "implementation_status": "specification_only_not_scheduled"
+      "implementation_status": "specification_only_not_scheduled",
+      "proposed_duration_hours": 168,
+      "duration_status": "IMPLEMENTATION_PROPOSAL_NOT_OWNER_APPROVED",
+      "tutorial": [
+        {
+          "step": 1,
+          "kind": "intro",
+          "source": "res://assets/ui/final/events/heroes/weekly_cleanup_challenge.png",
+          "purpose": "Hafta boyunca yeni seviye temizleyerek 3/7/12/20 dönüm noktası ödüllerini aç."
+        },
+        {
+          "step": 2,
+          "kind": "how_to_play",
+          "source": "ACTUAL_NORMAL_PIXEL_ART_BOARD",
+          "metric": "first_clear_new_level",
+          "visual": "display the REAL normal pixel-art cleaning game board and the relevant signal `first_clear_new_level` applied once to the haftalık dört ödül basamağı. No other gameplay screen."
+        },
+        {
+          "step": 3,
+          "kind": "reward_path",
+          "source": "EXISTING_REWARD_ASSETS",
+          "production_claims_enabled": false
+        }
+      ],
+      "lifecycle_states": [
+        "upcoming",
+        "active",
+        "ended",
+        "claimable",
+        "expired"
+      ],
+      "required_visual_qa": [
+        "independent PNG",
+        "no event index number",
+        "canonical robot source layers",
+        "exactly two arms and hands",
+        "spelling correct",
+        "mobile fit"
+      ]
     },
     {
       "id": "perfect_first_clean",
@@ -146,7 +374,45 @@
       "production_schedule": null,
       "reward_quantities": null,
       "reward_expiry_policy": null,
-      "implementation_status": "specification_only_not_scheduled"
+      "implementation_status": "specification_only_not_scheduled",
+      "proposed_duration_hours": 72,
+      "duration_status": "IMPLEMENTATION_PROPOSAL_NOT_OWNER_APPROVED",
+      "tutorial": [
+        {
+          "step": 1,
+          "kind": "intro",
+          "source": "res://assets/ui/final/events/heroes/perfect_first_clean.png",
+          "purpose": "Yeni seviyelerin ilk denemesinde galibiyet kazanarak 3/5/10 dönüm noktasına ulaş."
+        },
+        {
+          "step": 2,
+          "kind": "how_to_play",
+          "source": "ACTUAL_NORMAL_PIXEL_ART_BOARD",
+          "metric": "first_attempt_new_level_win",
+          "visual": "display the REAL normal pixel-art cleaning game board and the relevant signal `first_attempt_new_level_win` applied once to the i̇lk deneme zaferlerinin sayımı. No other gameplay screen."
+        },
+        {
+          "step": 3,
+          "kind": "reward_path",
+          "source": "EXISTING_REWARD_ASSETS",
+          "production_claims_enabled": false
+        }
+      ],
+      "lifecycle_states": [
+        "upcoming",
+        "active",
+        "ended",
+        "claimable",
+        "expired"
+      ],
+      "required_visual_qa": [
+        "independent PNG",
+        "no event index number",
+        "canonical robot source layers",
+        "exactly two arms and hands",
+        "spelling correct",
+        "mobile fit"
+      ]
     },
     {
       "id": "sparkling_streak",
@@ -163,7 +429,45 @@
       "production_schedule": null,
       "reward_quantities": null,
       "reward_expiry_policy": null,
-      "implementation_status": "specification_only_not_scheduled"
+      "implementation_status": "specification_only_not_scheduled",
+      "proposed_duration_hours": 72,
+      "duration_status": "IMPLEMENTATION_PROPOSAL_NOT_OWNER_APPROVED",
+      "tutorial": [
+        {
+          "step": 1,
+          "kind": "intro",
+          "source": "res://assets/ui/final/events/heroes/sparkling_streak.png",
+          "purpose": "Art arda uygun galibiyetlerle 3/5/7/10 kilometre taşlarına ulaş. Kaybedince yalnızca etkinlikteki aktif seri son kontrol noktasına döner; ana seviye ilerlemesi sıfırlanmaz."
+        },
+        {
+          "step": 2,
+          "kind": "how_to_play",
+          "source": "ACTUAL_NORMAL_PIXEL_ART_BOARD",
+          "metric": "consecutive_qualifying_wins",
+          "visual": "display the REAL normal pixel-art cleaning game board and the relevant signal `consecutive_qualifying_wins` applied once to the temiz park yolu ve kontrol noktaları. No other gameplay screen."
+        },
+        {
+          "step": 3,
+          "kind": "reward_path",
+          "source": "EXISTING_REWARD_ASSETS",
+          "production_claims_enabled": false
+        }
+      ],
+      "lifecycle_states": [
+        "upcoming",
+        "active",
+        "ended",
+        "claimable",
+        "expired"
+      ],
+      "required_visual_qa": [
+        "independent PNG",
+        "no event index number",
+        "canonical robot source layers",
+        "exactly two arms and hands",
+        "spelling correct",
+        "mobile fit"
+      ]
     },
     {
       "id": "stain_busters",
@@ -180,7 +484,45 @@
       "production_schedule": null,
       "reward_quantities": null,
       "reward_expiry_policy": null,
-      "implementation_status": "specification_only_not_scheduled"
+      "implementation_status": "specification_only_not_scheduled",
+      "proposed_duration_hours": 72,
+      "duration_status": "IMPLEMENTATION_PROPOSAL_NOT_OWNER_APPROVED",
+      "tutorial": [
+        {
+          "step": 1,
+          "kind": "intro",
+          "source": "res://assets/ui/final/events/heroes/stain_busters.png",
+          "purpose": "Normal seviyelerde gerçekten temizlenen aktif pikselleri say; hedef miktar V02'de belirlenmedi ve config/economy çalışmasıyla netleştirilmeli."
+        },
+        {
+          "step": 2,
+          "kind": "how_to_play",
+          "source": "ACTUAL_NORMAL_PIXEL_ART_BOARD",
+          "metric": "cleaned_active_pixels",
+          "visual": "display the REAL normal pixel-art cleaning game board and the relevant signal `cleaned_active_pixels` applied once to the aktif piksel sayacının artışı. No other gameplay screen."
+        },
+        {
+          "step": 3,
+          "kind": "reward_path",
+          "source": "EXISTING_REWARD_ASSETS",
+          "production_claims_enabled": false
+        }
+      ],
+      "lifecycle_states": [
+        "upcoming",
+        "active",
+        "ended",
+        "claimable",
+        "expired"
+      ],
+      "required_visual_qa": [
+        "independent PNG",
+        "no event index number",
+        "canonical robot source layers",
+        "exactly two arms and hands",
+        "spelling correct",
+        "mobile fit"
+      ]
     },
     {
       "id": "pure_scrub_challenge",
@@ -197,7 +539,45 @@
       "production_schedule": null,
       "reward_quantities": null,
       "reward_expiry_policy": null,
-      "implementation_status": "specification_only_not_scheduled"
+      "implementation_status": "specification_only_not_scheduled",
+      "proposed_duration_hours": 72,
+      "duration_status": "IMPLEMENTATION_PROPOSAL_NOT_OWNER_APPROVED",
+      "tutorial": [
+        {
+          "step": 1,
+          "kind": "intro",
+          "source": "res://assets/ui/final/events/heroes/pure_scrub_challenge.png",
+          "purpose": "Booster kullanmadan kazanılan uygun seviyelerden 3/5/10 ödül hedefi. Booster harcanıp sonra geri alınmışsa kullanım sayılmalıdır; uygulamadaki gerçek kullanım kaydı doğrulanmalı."
+        },
+        {
+          "step": 2,
+          "kind": "how_to_play",
+          "source": "ACTUAL_NORMAL_PIXEL_ART_BOARD",
+          "metric": "win_without_booster_usage",
+          "visual": "display the REAL normal pixel-art cleaning game board and the relevant signal `win_without_booster_usage` applied once to the boostersız galibiyet gösterimi. No other gameplay screen."
+        },
+        {
+          "step": 3,
+          "kind": "reward_path",
+          "source": "EXISTING_REWARD_ASSETS",
+          "production_claims_enabled": false
+        }
+      ],
+      "lifecycle_states": [
+        "upcoming",
+        "active",
+        "ended",
+        "claimable",
+        "expired"
+      ],
+      "required_visual_qa": [
+        "independent PNG",
+        "no event index number",
+        "canonical robot source layers",
+        "exactly two arms and hands",
+        "spelling correct",
+        "mobile fit"
+      ]
     },
     {
       "id": "scrub_squad_tournament",
@@ -214,7 +594,45 @@
       "production_schedule": null,
       "reward_quantities": null,
       "reward_expiry_policy": null,
-      "implementation_status": "specification_only_not_scheduled"
+      "implementation_status": "specification_only_not_scheduled",
+      "proposed_duration_hours": 72,
+      "duration_status": "IMPLEMENTATION_PROPOSAL_NOT_OWNER_APPROVED",
+      "tutorial": [
+        {
+          "step": 1,
+          "kind": "intro",
+          "source": "res://assets/ui/final/events/heroes/scrub_squad_tournament.png",
+          "purpose": "Sanal ekiplerin normal seviyelerdeki kazanımlarına dayalı takım yarışı; diğer ekip sayısı ve karşılaşma biçimi V02'de belirtilmedi."
+        },
+        {
+          "step": 2,
+          "kind": "how_to_play",
+          "source": "ACTUAL_NORMAL_PIXEL_ART_BOARD",
+          "metric": "virtual_team_qualifying_level_wins",
+          "visual": "display the REAL normal pixel-art cleaning game board and the relevant signal `virtual_team_qualifying_level_wins` applied once to the robot takım arkadaşları ve takım puanı. No other gameplay screen."
+        },
+        {
+          "step": 3,
+          "kind": "reward_path",
+          "source": "EXISTING_REWARD_ASSETS",
+          "production_claims_enabled": false
+        }
+      ],
+      "lifecycle_states": [
+        "upcoming",
+        "active",
+        "ended",
+        "claimable",
+        "expired"
+      ],
+      "required_visual_qa": [
+        "independent PNG",
+        "no event index number",
+        "canonical robot source layers",
+        "exactly two arms and hands",
+        "spelling correct",
+        "mobile fit"
+      ]
     },
     {
       "id": "clean_team_treasure",
@@ -231,7 +649,45 @@
       "production_schedule": null,
       "reward_quantities": null,
       "reward_expiry_policy": null,
-      "implementation_status": "specification_only_not_scheduled"
+      "implementation_status": "specification_only_not_scheduled",
+      "proposed_duration_hours": 72,
+      "duration_status": "IMPLEMENTATION_PROPOSAL_NOT_OWNER_APPROVED",
+      "tutorial": [
+        {
+          "step": 1,
+          "kind": "intro",
+          "source": "res://assets/ui/final/events/heroes/clean_team_treasure.png",
+          "purpose": "Takım üyelerinin normal seviye temizliğinden gelen ortak puanla hazine sandığı basamaklarını aç."
+        },
+        {
+          "step": 2,
+          "kind": "how_to_play",
+          "source": "ACTUAL_NORMAL_PIXEL_ART_BOARD",
+          "metric": "virtual_team_cleaning_points",
+          "visual": "display the REAL normal pixel-art cleaning game board and the relevant signal `virtual_team_cleaning_points` applied once to the ortak hazinenin basamakları. No other gameplay screen."
+        },
+        {
+          "step": 3,
+          "kind": "reward_path",
+          "source": "EXISTING_REWARD_ASSETS",
+          "production_claims_enabled": false
+        }
+      ],
+      "lifecycle_states": [
+        "upcoming",
+        "active",
+        "ended",
+        "claimable",
+        "expired"
+      ],
+      "required_visual_qa": [
+        "independent PNG",
+        "no event index number",
+        "canonical robot source layers",
+        "exactly two arms and hands",
+        "spelling correct",
+        "mobile fit"
+      ]
     },
     {
       "id": "scrub_relay",
@@ -248,7 +704,45 @@
       "production_schedule": null,
       "reward_quantities": null,
       "reward_expiry_policy": null,
-      "implementation_status": "specification_only_not_scheduled"
+      "implementation_status": "specification_only_not_scheduled",
+      "proposed_duration_hours": 48,
+      "duration_status": "IMPLEMENTATION_PROPOSAL_NOT_OWNER_APPROVED",
+      "tutorial": [
+        {
+          "step": 1,
+          "kind": "intro",
+          "source": "res://assets/ui/final/events/heroes/scrub_relay.png",
+          "purpose": "Takım üyelerinin normal seviye tamamlamalarıyla sıralı etapların ilerlemesi; bayrak yarışı yalnızca görsel ilerleme."
+        },
+        {
+          "step": 2,
+          "kind": "how_to_play",
+          "source": "ACTUAL_NORMAL_PIXEL_ART_BOARD",
+          "metric": "virtual_team_sequential_clears",
+          "visual": "display the REAL normal pixel-art cleaning game board and the relevant signal `virtual_team_sequential_clears` applied once to the sırayla ilerleyen robot katkı göstergesi. No other gameplay screen."
+        },
+        {
+          "step": 3,
+          "kind": "reward_path",
+          "source": "EXISTING_REWARD_ASSETS",
+          "production_claims_enabled": false
+        }
+      ],
+      "lifecycle_states": [
+        "upcoming",
+        "active",
+        "ended",
+        "claimable",
+        "expired"
+      ],
+      "required_visual_qa": [
+        "independent PNG",
+        "no event index number",
+        "canonical robot source layers",
+        "exactly two arms and hands",
+        "spelling correct",
+        "mobile fit"
+      ]
     },
     {
       "id": "mega_stain_cleanup",
@@ -265,7 +759,45 @@
       "production_schedule": null,
       "reward_quantities": null,
       "reward_expiry_policy": null,
-      "implementation_status": "specification_only_not_scheduled"
+      "implementation_status": "specification_only_not_scheduled",
+      "proposed_duration_hours": 72,
+      "duration_status": "IMPLEMENTATION_PROPOSAL_NOT_OWNER_APPROVED",
+      "tutorial": [
+        {
+          "step": 1,
+          "kind": "intro",
+          "source": "res://assets/ui/final/events/heroes/mega_stain_cleanup.png",
+          "purpose": "Büyük kir hedefini oyuncunun ve sanal takımın normal seviyelerde temizlediği pikseller azaltır. 50.000 piksel V02'de sadece örnektir, kesin hedef değildir; dev kirli görsel mini oyun değildir."
+        },
+        {
+          "step": 2,
+          "kind": "how_to_play",
+          "source": "ACTUAL_NORMAL_PIXEL_ART_BOARD",
+          "metric": "virtual_team_cleaned_active_pixels",
+          "visual": "display the REAL normal pixel-art cleaning game board and the relevant signal `virtual_team_cleaned_active_pixels` applied once to the dev kirli panonun aşamalı temizlenmesi. No other gameplay screen."
+        },
+        {
+          "step": 3,
+          "kind": "reward_path",
+          "source": "EXISTING_REWARD_ASSETS",
+          "production_claims_enabled": false
+        }
+      ],
+      "lifecycle_states": [
+        "upcoming",
+        "active",
+        "ended",
+        "claimable",
+        "expired"
+      ],
+      "required_visual_qa": [
+        "independent PNG",
+        "no event index number",
+        "canonical robot source layers",
+        "exactly two arms and hands",
+        "spelling correct",
+        "mobile fit"
+      ]
     },
     {
       "id": "scrubbys_cleanup_workshop",
@@ -282,7 +814,45 @@
       "production_schedule": null,
       "reward_quantities": null,
       "reward_expiry_policy": null,
-      "implementation_status": "specification_only_not_scheduled"
+      "implementation_status": "specification_only_not_scheduled",
+      "proposed_duration_hours": 168,
+      "duration_status": "IMPLEMENTATION_PROPOSAL_NOT_OWNER_APPROVED",
+      "tutorial": [
+        {
+          "step": 1,
+          "kind": "intro",
+          "source": "res://assets/ui/final/events/heroes/scrubbys_cleanup_workshop.png",
+          "purpose": "Normal seviyelerle atölye ödül basamakları açılır; ayrı atölye oynanışı veya üretim mini oyunu yok. Ödül kategorisi SB/booster."
+        },
+        {
+          "step": 2,
+          "kind": "how_to_play",
+          "source": "ACTUAL_NORMAL_PIXEL_ART_BOARD",
+          "metric": "first_clear_new_level",
+          "visual": "display the REAL normal pixel-art cleaning game board and the relevant signal `first_clear_new_level` applied once to the atölye ödül yolunun aşamaları. No other gameplay screen."
+        },
+        {
+          "step": 3,
+          "kind": "reward_path",
+          "source": "EXISTING_REWARD_ASSETS",
+          "production_claims_enabled": false
+        }
+      ],
+      "lifecycle_states": [
+        "upcoming",
+        "active",
+        "ended",
+        "claimable",
+        "expired"
+      ],
+      "required_visual_qa": [
+        "independent PNG",
+        "no event index number",
+        "canonical robot source layers",
+        "exactly two arms and hands",
+        "spelling correct",
+        "mobile fit"
+      ]
     },
     {
       "id": "robot_parts_recovery",
@@ -299,7 +869,45 @@
       "production_schedule": null,
       "reward_quantities": null,
       "reward_expiry_policy": null,
-      "implementation_status": "specification_only_not_scheduled"
+      "implementation_status": "specification_only_not_scheduled",
+      "proposed_duration_hours": 72,
+      "duration_status": "IMPLEMENTATION_PROPOSAL_NOT_OWNER_APPROVED",
+      "tutorial": [
+        {
+          "step": 1,
+          "kind": "intro",
+          "source": "res://assets/ui/final/events/heroes/robot_parts_recovery.png",
+          "purpose": "Temizlik ilerlemesiyle Robot Parts kazan; robot parçalarını yerleştirme/montaj mini oyunu yok."
+        },
+        {
+          "step": 2,
+          "kind": "how_to_play",
+          "source": "ACTUAL_NORMAL_PIXEL_ART_BOARD",
+          "metric": "first_clear_new_level",
+          "visual": "display the REAL normal pixel-art cleaning game board and the relevant signal `first_clear_new_level` applied once to the kazandırılan robot parts. No other gameplay screen."
+        },
+        {
+          "step": 3,
+          "kind": "reward_path",
+          "source": "EXISTING_REWARD_ASSETS",
+          "production_claims_enabled": false
+        }
+      ],
+      "lifecycle_states": [
+        "upcoming",
+        "active",
+        "ended",
+        "claimable",
+        "expired"
+      ],
+      "required_visual_qa": [
+        "independent PNG",
+        "no event index number",
+        "canonical robot source layers",
+        "exactly two arms and hands",
+        "spelling correct",
+        "mobile fit"
+      ]
     },
     {
       "id": "lost_card_rescue",
@@ -316,7 +924,45 @@
       "production_schedule": null,
       "reward_quantities": null,
       "reward_expiry_policy": null,
-      "implementation_status": "specification_only_not_scheduled"
+      "implementation_status": "specification_only_not_scheduled",
+      "proposed_duration_hours": 72,
+      "duration_status": "IMPLEMENTATION_PROPOSAL_NOT_OWNER_APPROVED",
+      "tutorial": [
+        {
+          "step": 1,
+          "kind": "intro",
+          "source": "res://assets/ui/final/events/heroes/lost_card_rescue.png",
+          "purpose": "Normal temizleme görevleri ile Card Pack kazan; kart arama mini oyunu yok."
+        },
+        {
+          "step": 2,
+          "kind": "how_to_play",
+          "source": "ACTUAL_NORMAL_PIXEL_ART_BOARD",
+          "metric": "first_clear_new_level",
+          "visual": "display the REAL normal pixel-art cleaning game board and the relevant signal `first_clear_new_level` applied once to the temizlik sonunda kart paket ödülü. No other gameplay screen."
+        },
+        {
+          "step": 3,
+          "kind": "reward_path",
+          "source": "EXISTING_REWARD_ASSETS",
+          "production_claims_enabled": false
+        }
+      ],
+      "lifecycle_states": [
+        "upcoming",
+        "active",
+        "ended",
+        "claimable",
+        "expired"
+      ],
+      "required_visual_qa": [
+        "independent PNG",
+        "no event index number",
+        "canonical robot source layers",
+        "exactly two arms and hands",
+        "spelling correct",
+        "mobile fit"
+      ]
     },
     {
       "id": "seasonal_scrub_festival",
@@ -333,7 +979,45 @@
       "production_schedule": null,
       "reward_quantities": null,
       "reward_expiry_policy": null,
-      "implementation_status": "specification_only_not_scheduled"
+      "implementation_status": "specification_only_not_scheduled",
+      "proposed_duration_hours": 168,
+      "duration_status": "IMPLEMENTATION_PROPOSAL_NOT_OWNER_APPROVED",
+      "tutorial": [
+        {
+          "step": 1,
+          "kind": "intro",
+          "source": "res://assets/ui/final/events/heroes/seasonal_scrub_festival.png",
+          "purpose": "Cadılar Bayramı, Noel, yaz temizliği vb. mevsim görünümüyle normal seviyelerden etkinlik ilerlemesi. Her dönem için isim/takvim/ödül ayarları config ile belirlenir."
+        },
+        {
+          "step": 2,
+          "kind": "how_to_play",
+          "source": "ACTUAL_NORMAL_PIXEL_ART_BOARD",
+          "metric": "seasonal_qualifying_level_progress",
+          "visual": "display the REAL normal pixel-art cleaning game board and the relevant signal `seasonal_qualifying_level_progress` applied once to the sezonluk görev ve ödüller. No other gameplay screen."
+        },
+        {
+          "step": 3,
+          "kind": "reward_path",
+          "source": "EXISTING_REWARD_ASSETS",
+          "production_claims_enabled": false
+        }
+      ],
+      "lifecycle_states": [
+        "upcoming",
+        "active",
+        "ended",
+        "claimable",
+        "expired"
+      ],
+      "required_visual_qa": [
+        "independent PNG",
+        "no event index number",
+        "canonical robot source layers",
+        "exactly two arms and hands",
+        "spelling correct",
+        "mobile fit"
+      ]
     },
     {
       "id": "master_cleaner_quest",
@@ -350,7 +1034,45 @@
       "production_schedule": null,
       "reward_quantities": null,
       "reward_expiry_policy": null,
-      "implementation_status": "specification_only_not_scheduled"
+      "implementation_status": "specification_only_not_scheduled",
+      "proposed_duration_hours": 168,
+      "duration_status": "IMPLEMENTATION_PROPOSAL_NOT_OWNER_APPROVED",
+      "tutorial": [
+        {
+          "step": 1,
+          "kind": "intro",
+          "source": "res://assets/ui/final/events/heroes/master_cleaner_quest.png",
+          "purpose": "Birden fazla farklı etkinlikteki hedefleri tamamlayarak büyük ödül sandığı aç. Alt hedefler ve çift sayım semantiği açık konfigürasyonda olmalı."
+        },
+        {
+          "step": 2,
+          "kind": "how_to_play",
+          "source": "ACTUAL_NORMAL_PIXEL_ART_BOARD",
+          "metric": "qualified_cross_event_objectives",
+          "visual": "display the REAL normal pixel-art cleaning game board and the relevant signal `qualified_cross_event_objectives` applied once to the birden fazla etkinliğin ilerleme görselleştirmesi. No other gameplay screen."
+        },
+        {
+          "step": 3,
+          "kind": "reward_path",
+          "source": "EXISTING_REWARD_ASSETS",
+          "production_claims_enabled": false
+        }
+      ],
+      "lifecycle_states": [
+        "upcoming",
+        "active",
+        "ended",
+        "claimable",
+        "expired"
+      ],
+      "required_visual_qa": [
+        "independent PNG",
+        "no event index number",
+        "canonical robot source layers",
+        "exactly two arms and hands",
+        "spelling correct",
+        "mobile fit"
+      ]
     },
     {
       "id": "scrub_season_pass",
@@ -367,7 +1089,45 @@
       "production_schedule": null,
       "reward_quantities": null,
       "reward_expiry_policy": null,
-      "implementation_status": "specification_only_not_scheduled"
+      "implementation_status": "specification_only_not_scheduled",
+      "proposed_duration_hours": 672,
+      "duration_status": "IMPLEMENTATION_PROPOSAL_NOT_OWNER_APPROVED",
+      "tutorial": [
+        {
+          "step": 1,
+          "kind": "intro",
+          "source": "res://assets/ui/final/events/heroes/scrub_season_pass.png",
+          "purpose": "Normal seviyeleri temizledikçe ücretsiz sezon ödül yolunda ilerle; V02 ücretli premium yol tanımlamaz."
+        },
+        {
+          "step": 2,
+          "kind": "how_to_play",
+          "source": "ACTUAL_NORMAL_PIXEL_ART_BOARD",
+          "metric": "first_clear_new_level",
+          "visual": "display the REAL normal pixel-art cleaning game board and the relevant signal `first_clear_new_level` applied once to the ücretsiz sezon ödül yolu. No other gameplay screen."
+        },
+        {
+          "step": 3,
+          "kind": "reward_path",
+          "source": "EXISTING_REWARD_ASSETS",
+          "production_claims_enabled": false
+        }
+      ],
+      "lifecycle_states": [
+        "upcoming",
+        "active",
+        "ended",
+        "claimable",
+        "expired"
+      ],
+      "required_visual_qa": [
+        "independent PNG",
+        "no event index number",
+        "canonical robot source layers",
+        "exactly two arms and hands",
+        "spelling correct",
+        "mobile fit"
+      ]
     },
     {
       "id": "color_scrub_rush",
@@ -384,7 +1144,45 @@
       "production_schedule": null,
       "reward_quantities": null,
       "reward_expiry_policy": null,
-      "implementation_status": "specification_only_not_scheduled"
+      "implementation_status": "specification_only_not_scheduled",
+      "proposed_duration_hours": 48,
+      "duration_status": "IMPLEMENTATION_PROPOSAL_NOT_OWNER_APPROVED",
+      "tutorial": [
+        {
+          "step": 1,
+          "kind": "intro",
+          "source": "res://assets/ui/final/events/heroes/color_scrub_rush.png",
+          "purpose": "Normal seviyelerde gerçek temizlenen pikselleri renklerine göre sayarak hedef renk sayaçlarını doldur. Yalnızca normal seviyede bulunan renkler sayılabilir."
+        },
+        {
+          "step": 2,
+          "kind": "how_to_play",
+          "source": "ACTUAL_NORMAL_PIXEL_ART_BOARD",
+          "metric": "cleaned_pixels_by_color",
+          "visual": "display the REAL normal pixel-art cleaning game board and the relevant signal `cleaned_pixels_by_color` applied once to the renk sayaçlarının dolması. No other gameplay screen."
+        },
+        {
+          "step": 3,
+          "kind": "reward_path",
+          "source": "EXISTING_REWARD_ASSETS",
+          "production_claims_enabled": false
+        }
+      ],
+      "lifecycle_states": [
+        "upcoming",
+        "active",
+        "ended",
+        "claimable",
+        "expired"
+      ],
+      "required_visual_qa": [
+        "independent PNG",
+        "no event index number",
+        "canonical robot source layers",
+        "exactly two arms and hands",
+        "spelling correct",
+        "mobile fit"
+      ]
     },
     {
       "id": "scrubbys_rescue_mission",
@@ -401,7 +1199,45 @@
       "production_schedule": null,
       "reward_quantities": null,
       "reward_expiry_policy": null,
-      "implementation_status": "specification_only_not_scheduled"
+      "implementation_status": "specification_only_not_scheduled",
+      "proposed_duration_hours": 72,
+      "duration_status": "IMPLEMENTATION_PROPOSAL_NOT_OWNER_APPROVED",
+      "tutorial": [
+        {
+          "step": 1,
+          "kind": "intro",
+          "source": "res://assets/ui/final/events/heroes/scrubbys_rescue_mission.png",
+          "purpose": "Birkaç normal seviye kazanıldığında kayıp ScrubBots kurtarma hikâyesinin yeni basamağı görünür; kurtarma ayrı bir oyun değil."
+        },
+        {
+          "step": 2,
+          "kind": "how_to_play",
+          "source": "ACTUAL_NORMAL_PIXEL_ART_BOARD",
+          "metric": "first_clear_new_level",
+          "visual": "display the REAL normal pixel-art cleaning game board and the relevant signal `first_clear_new_level` applied once to the seviye galibiyetiyle ilerleyen kurtarma hikâyesi. No other gameplay screen."
+        },
+        {
+          "step": 3,
+          "kind": "reward_path",
+          "source": "EXISTING_REWARD_ASSETS",
+          "production_claims_enabled": false
+        }
+      ],
+      "lifecycle_states": [
+        "upcoming",
+        "active",
+        "ended",
+        "claimable",
+        "expired"
+      ],
+      "required_visual_qa": [
+        "independent PNG",
+        "no event index number",
+        "canonical robot source layers",
+        "exactly two arms and hands",
+        "spelling correct",
+        "mobile fit"
+      ]
     },
     {
       "id": "world_cleanup_cup",
@@ -418,7 +1254,45 @@
       "production_schedule": null,
       "reward_quantities": null,
       "reward_expiry_policy": null,
-      "implementation_status": "specification_only_not_scheduled"
+      "implementation_status": "specification_only_not_scheduled",
+      "proposed_duration_hours": 168,
+      "duration_status": "IMPLEMENTATION_PROPOSAL_NOT_OWNER_APPROVED",
+      "tutorial": [
+        {
+          "step": 1,
+          "kind": "intro",
+          "source": "res://assets/ui/final/events/heroes/world_cleanup_cup.png",
+          "purpose": "Yeni seviyelerde kazanılan temizlik puanlarına göre 20 sanal rakiple dünya kupası sıralaması; gerçek canlı dünya sıralaması gibi sunulamaz."
+        },
+        {
+          "step": 2,
+          "kind": "how_to_play",
+          "source": "ACTUAL_NORMAL_PIXEL_ART_BOARD",
+          "metric": "first_clear_new_level_cleanup_score",
+          "visual": "display the REAL normal pixel-art cleaning game board and the relevant signal `first_clear_new_level_cleanup_score` applied once to the sanal dünya sıralaması. No other gameplay screen."
+        },
+        {
+          "step": 3,
+          "kind": "reward_path",
+          "source": "EXISTING_REWARD_ASSETS",
+          "production_claims_enabled": false
+        }
+      ],
+      "lifecycle_states": [
+        "upcoming",
+        "active",
+        "ended",
+        "claimable",
+        "expired"
+      ],
+      "required_visual_qa": [
+        "independent PNG",
+        "no event index number",
+        "canonical robot source layers",
+        "exactly two arms and hands",
+        "spelling correct",
+        "mobile fit"
+      ]
     },
     {
       "id": "mystery_scrubbox_hunt",
@@ -435,7 +1309,97 @@
       "production_schedule": null,
       "reward_quantities": null,
       "reward_expiry_policy": null,
-      "implementation_status": "specification_only_not_scheduled"
+      "implementation_status": "specification_only_not_scheduled",
+      "proposed_duration_hours": 72,
+      "duration_status": "IMPLEMENTATION_PROPOSAL_NOT_OWNER_APPROVED",
+      "tutorial": [
+        {
+          "step": 1,
+          "kind": "intro",
+          "source": "res://assets/ui/final/events/heroes/mystery_scrubbox_hunt.png",
+          "purpose": "Belirlenen sayıda normal seviyeyi temizledikçe sürpriz ScrubBox sandıkları açılır; sandık açma mevcut ödül törenidir, ayrı oynanış değil."
+        },
+        {
+          "step": 2,
+          "kind": "how_to_play",
+          "source": "ACTUAL_NORMAL_PIXEL_ART_BOARD",
+          "metric": "first_clear_new_level",
+          "visual": "display the REAL normal pixel-art cleaning game board and the relevant signal `first_clear_new_level` applied once to the temizlik ilerlemesiyle açılan sandıklar. No other gameplay screen."
+        },
+        {
+          "step": 3,
+          "kind": "reward_path",
+          "source": "EXISTING_REWARD_ASSETS",
+          "production_claims_enabled": false
+        }
+      ],
+      "lifecycle_states": [
+        "upcoming",
+        "active",
+        "ended",
+        "claimable",
+        "expired"
+      ],
+      "required_visual_qa": [
+        "independent PNG",
+        "no event index number",
+        "canonical robot source layers",
+        "exactly two arms and hands",
+        "spelling correct",
+        "mobile fit"
+      ]
     }
-  ]
+  ],
+  "authoritative_spec": "docs/SCRUBBOTS_24_EVENTS_OWNER_PLAN_2026-11-13.md",
+  "unlock_owner_decision": "Level 30; the older draft's Level 1 is superseded by explicit 2026-11-13 owner instruction.",
+  "activation_policy": {
+    "minimum_active": 3,
+    "maximum_active": 5,
+    "never_end_early": true,
+    "eligible_campaign_level": 30,
+    "source": "data/config/feature_unlocks_v1.json",
+    "rotation": "persistent overlapping instances, fair coverage of 24 types",
+    "upcoming_preview_only_when_unlocked": true
+  },
+  "event_lifecycle": [
+    "upcoming",
+    "active",
+    "ended",
+    "claimable",
+    "expired"
+  ],
+  "telemetry_contract": [
+    "receipt_id",
+    "level_id",
+    "first_clear_new_level",
+    "first_attempt_new_level_win",
+    "cleaned_active_pixels",
+    "cleaned_pixels_by_color",
+    "win_without_booster_usage",
+    "consecutive_qualifying_wins",
+    "completed_at_utc",
+    "booster_use_count"
+  ],
+  "economy_policy": {
+    "approved_reward_types": [
+      "scrub_bucks",
+      "bot_parts",
+      "standard_card_packs",
+      "premium_card_packs",
+      "random_any_booster_charges",
+      "selected_booster_charges"
+    ],
+    "production_claims_enabled": false,
+    "reward_amounts": "TBD economy modeling: propose/test before production enable",
+    "grant_service": "res://scripts/economy/reward_grant_service.gd",
+    "grant_tx_id": "event:<instance_id>:<milestone_id>:<reward_policy_version>",
+    "simulate_concurrent_events": 5
+  },
+  "visual_reference_contract": {
+    "mandatory": "Canonical robot PNGs from existing repo, unchanged, exactly 2 arms+2 hands each",
+    "optional_zip": "scrubbots_events_master_references.zip",
+    "optional_zip_is_blocker": false,
+    "reference_doc": "docs/SCRUBBOTS_EVENTS_VISUAL_REFERENCE_INTAKE_2026-11-13.md",
+    "images_not_yet_in_github": true
+  }
 }
