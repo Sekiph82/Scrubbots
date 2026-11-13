@@ -43,7 +43,7 @@ All 24 Events launch in the FIRST game release. The player ONLY plays normal Scr
 - Friday (5): Golden Brush Championship; Mega Stain Cleanup; Scrub Season Pass; Mystery ScrubBox Hunt; Color Scrub Rush.
 - Saturday (5): ScrubBots Royale; Master Cleaner Quest; Seasonal Scrub Festival; Scrub Season Pass; Mega Stain Cleanup.
 - Sunday (3): World Cleanup Cup; Perfect First Clean; Scrubby's Rescue Mission.
-- **ACCESS POLICY CONFLICT, DO NOT SILENTLY RESOLVE:** Owner's V02 explicitly says Events accessible at **Level 0001**. The newer repo setting `data/config/feature_unlocks_v1.json` (owner 2026-11-03) says Events unlock at **Level 30** and AGENTS.md repeats that policy. Treat this as an explicit decision conflict: preserve current Level 30 gate until a fresh owner decision authorizes migration to Level 1. Do not mark the Level 1 acceptance requirement as passed before the owner resolves it.
+- **FINAL OWNER DECISION (2026-11-13): EVENTS UNLOCK AT LEVEL 30.** This explicitly supersedes the original attached V02 sentence proposing Level 0001 access. All 24 events must exist in the first release, but the Events feature, entry points, cards, calendar, tutorial launches, JOIN and CLAIM become accessible only when the canonical campaign frontier reaches **Level 30**, consistently across fresh/existing/imported/debug profiles. Maintain the existing authoritative `data/config/feature_unlocks_v1.json` `unlocks.events = 30` and `AGENTS.md` gate; never introduce independent hard-coded unlock values. At Levels 1–29, respect the game's existing locked-feature presentation; no event rewards/claims or deep-link bypass. Level 30 and higher may access the 3–5 active-event rotation. No retrospective pre-unlock progress or rewards unless separately authorized.
 - Existing booster gates Level 6 / 11 / 16 / 21 stay; Event objectives before unlock must not require unavailable boosters.
 
 ## Competitors and friends
@@ -73,6 +73,9 @@ All 24 Events launch in the FIRST game release. The player ONLY plays normal Scr
 - Tests: 3–5 concurrency, expiry without day-cutover, persisted progress, no level double-counting, first-attempt semantics, verified pixel/color counts, booster-free wins, virtual rival ethics, offline operation, event payouts idempotency, unlock conflict gated, tutorials and every unique event visual.
 - Open real Godot app at 720x1520 and 1170x2532, capture human-reviewable screenshots; don't label ready from tests alone.
 - Commit / push / verify GitHub assets and code in manageable batches. Preserve unrelated work. Keep root TASKS.md authoritative; other docs are specifications only.
+
+## Final owner resolution (2026-11-13)
+Events unlock at **Level 30**, not Level 1. This is an explicit post-V02 owner amendment and is authoritative over any contrary V02 statement, earlier summary, tutorial proposal or generated mockup. Regression coverage must check level 29 blocked, level 30 unlocked, direct entry, card/calendar/tutorial/deep link, JOIN/CLAIM, and migrated or imported saves. Do not change feature gates for any other feature.
 
 ## Delivery truth
 As of 2026-11-13 the original V02 plan is now incorporated in this spec, but this document DOES NOT certify that 24 events, image assets, replacement masters, tutorials or implementation have been delivered.
