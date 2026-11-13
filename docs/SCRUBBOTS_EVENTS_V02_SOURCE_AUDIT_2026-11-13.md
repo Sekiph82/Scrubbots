@@ -2,7 +2,7 @@
 
 **Audit task:** SB-EV02-001
 **Source revision:** `origin/main` / `39d65814ab7be53290692c7ab616a732f1499fdf`
-**Worktree:** isolated `factory/158-events-v02-audit` worktree at the revision above. The worktree was clean at job start. Godot import inspection generated untracked `.uid` files, which remain untracked; tracked `.import` sidecars were restored after confirming the changes were import-only line-ending churn. No generated sidecars are included in this audit commit. No code, V1 event config, or gameplay data was changed.
+**Worktree:** isolated `factory/158-events-v02-audit` worktree at the revision above; clean at job start. After Godot import inspection, current status has 696 untracked `.uid` and 485 untracked `.import` sidecars. Tracked `.import` sidecars that showed import-only line-ending churn were restored; current status has 0 tracked `.import` modifications. No generated sidecars are in this commit. No code, V1 event config, or gameplay data was changed.
 **Scope:** static source/config/art inventory. No Godot visual run, screenshot, or test suite is claimed for this documentation-only audit.
 
 ## Executive findings
@@ -52,38 +52,37 @@ V02 catalog reward quantities and expiry are null; event schedules are null, cat
 
 The following rows preserve every catalog ID, metric, owner condition and participant count without merging or renaming event types. Every row has exactly three tutorial definitions in the catalog; every catalog `hero_path`/`icon_path` is unique and ID-matched (`data/config/events_v02_catalog.json`, row citations below). Catalog duration is explicitly a proposed value with `IMPLEMENTATION_PROPOSAL_NOT_OWNER_APPROVED`; it is not an approved schedule. Null schedule/reward fields remain TBD.
 
-| # | Stable ID | Metric | Owner condition / rule | Participants | Duration status |
+| # | Stable ID | Metric | Owner condition / rule | Participants | Duration status | Catalog evidence |
 |---:|---|---|---|---|---|
-| 1 | `scrub_sprint` | `first_clear_new_level` | 15 new levels | 4 virtual + player (5) | **PROPOSAL/TBD** 48h |
-| 2 | `first_brush_race` | `first_attempt_new_level_win` | 3 or 5 per instance | 4 virtual + player (5) | **PROPOSAL/TBD** 48h |
-| 3 | `scrubbots_royale` | `first_attempt_new_level_win` | 5 rounds; per-round thresholds **TBD** | 99 virtual (100 total) | **PROPOSAL/TBD** 72h |
-| 4 | `golden_brush_championship` | `first_clear_new_level` | 8-player bracket / 3 elimination rounds | 7 virtual (8 total) | **PROPOSAL/TBD** 72h |
-| 5 | `weekly_scrub_league` | `cleaned_active_pixels_on_new_levels` | Weekly ranking / 20 entries | 19 virtual (20 total) | **PROPOSAL/TBD** 168h |
-| 6 | `weekly_cleanup_challenge` | `first_clear_new_level` | 3 / 7 / 12 / 20 milestones | Solo | **PROPOSAL/TBD** 168h |
-| 7 | `perfect_first_clean` | `first_attempt_new_level_win` | 3 / 5 / 10 milestones | Solo | **PROPOSAL/TBD** 72h |
-| 8 | `sparkling_streak` | `consecutive_qualifying_wins` | 3 / 5 / 7 / 10 checkpoints; loss rollback is event-only | Solo | **PROPOSAL/TBD** 72h |
-| 9 | `stain_busters` | `cleaned_active_pixels` | Target **TBD after balancing** | Solo | **PROPOSAL/TBD** 72h |
-| 10 | `pure_scrub_challenge` | `win_without_booster_usage` | 3 / 5 / 10 | Solo | **PROPOSAL/TBD** 72h |
-| 11 | `scrub_squad_tournament` | `virtual_team_qualifying_level_wins` | Team size 10; win threshold **TBD** | 10-person virtual team | **PROPOSAL/TBD** 72h |
-| 12 | `clean_team_treasure` | `virtual_team_cleaning_points` | Team size 10; milestones **TBD** | 10-person virtual team | **PROPOSAL/TBD** 72h |
-| 13 | `scrub_relay` | `virtual_team_sequential_clears` | Team size 5; stage thresholds **TBD** | 5-person virtual team | **PROPOSAL/TBD** 48h |
-| 14 | `mega_stain_cleanup` | `virtual_team_cleaned_active_pixels` | Team size 20; target **TBD** (50,000 is example only) | 20-person virtual team | **PROPOSAL/TBD** 72h |
-| 15 | `scrubbys_cleanup_workshop` | `first_clear_new_level` | Milestones **TBD**; SB/booster reward category | Solo | **PROPOSAL/TBD** 168h |
-| 16 | `robot_parts_recovery` | `first_clear_new_level` | Milestones **TBD**; Robot Parts | Solo | **PROPOSAL/TBD** 72h |
-| 17 | `lost_card_rescue` | `first_clear_new_level` | Milestones **TBD**; Card Pack | Solo | **PROPOSAL/TBD** 72h |
-| 18 | `seasonal_scrub_festival` | `seasonal_qualifying_level_progress` | Seasonal thresholds/config **TBD** | Solo | **PROPOSAL/TBD** 168h |
-| 19 | `master_cleaner_quest` | `qualified_cross_event_objectives` | Required objectives/dedupe **TBD** | Solo | **PROPOSAL/TBD** 168h |
-| 20 | `scrub_season_pass` | `first_clear_new_level` | Free track only; thresholds **TBD** | Solo | **PROPOSAL/TBD** 672h |
-| 21 | `color_scrub_rush` | `cleaned_pixels_by_color` | Target colors and thresholds **TBD** | Solo | **PROPOSAL/TBD** 48h |
-| 22 | `scrubbys_rescue_mission` | `first_clear_new_level` | Story milestone thresholds **TBD** | Solo | **PROPOSAL/TBD** 72h |
-| 23 | `world_cleanup_cup` | `first_clear_new_level_cleanup_score` | 20 virtual rivals; scoring weights **TBD** | Player + 20 virtual (21 entries) | **PROPOSAL/TBD** 168h |
-| 24 | `mystery_scrubbox_hunt` | `first_clear_new_level` | Chest thresholds **TBD** | Solo | **PROPOSAL/TBD** 72h |
+| 1 | `scrub_sprint` | `first_clear_new_level` | 15 new levels | 4 virtual + player (5) | **PROPOSAL/TBD** 48h | `data/config/events_v02_catalog.json:33-87` |
+| 2 | `first_brush_race` | `first_attempt_new_level_win` | 3 or 5 per instance | 4 virtual + player (5) | **PROPOSAL/TBD** 48h | `data/config/events_v02_catalog.json:88-142` |
+| 3 | `scrubbots_royale` | `first_attempt_new_level_win` | 5 rounds; per-round thresholds **TBD** | 99 virtual (100 total) | **PROPOSAL/TBD** 72h | `data/config/events_v02_catalog.json:143-197` |
+| 4 | `golden_brush_championship` | `first_clear_new_level` | 8-player bracket / 3 elimination rounds | 7 virtual (8 total) | **PROPOSAL/TBD** 72h | `data/config/events_v02_catalog.json:198-252` |
+| 5 | `weekly_scrub_league` | `cleaned_active_pixels_on_new_levels` | Weekly ranking / 20 entries | 19 virtual (20 total) | **PROPOSAL/TBD** 168h | `data/config/events_v02_catalog.json:253-307` |
+| 6 | `weekly_cleanup_challenge` | `first_clear_new_level` | 3 / 7 / 12 / 20 milestones | Solo | **PROPOSAL/TBD** 168h | `data/config/events_v02_catalog.json:308-362` |
+| 7 | `perfect_first_clean` | `first_attempt_new_level_win` | 3 / 5 / 10 milestones | Solo | **PROPOSAL/TBD** 72h | `data/config/events_v02_catalog.json:363-417` |
+| 8 | `sparkling_streak` | `consecutive_qualifying_wins` | 3 / 5 / 7 / 10 checkpoints; loss rollback is event-only | Solo | **PROPOSAL/TBD** 72h | `data/config/events_v02_catalog.json:418-472` |
+| 9 | `stain_busters` | `cleaned_active_pixels` | Target **TBD after balancing** | Solo | **PROPOSAL/TBD** 72h | `data/config/events_v02_catalog.json:473-527` |
+| 10 | `pure_scrub_challenge` | `win_without_booster_usage` | 3 / 5 / 10 | Solo | **PROPOSAL/TBD** 72h | `data/config/events_v02_catalog.json:528-582` |
+| 11 | `scrub_squad_tournament` | `virtual_team_qualifying_level_wins` | Team size 10; win threshold **TBD** | 10-person virtual team | **PROPOSAL/TBD** 72h | `data/config/events_v02_catalog.json:583-637` |
+| 12 | `clean_team_treasure` | `virtual_team_cleaning_points` | Team size 10; milestones **TBD** | 10-person virtual team | **PROPOSAL/TBD** 72h | `data/config/events_v02_catalog.json:638-692` |
+| 13 | `scrub_relay` | `virtual_team_sequential_clears` | Team size 5; stage thresholds **TBD** | 5-person virtual team | **PROPOSAL/TBD** 48h | `data/config/events_v02_catalog.json:693-747` |
+| 14 | `mega_stain_cleanup` | `virtual_team_cleaned_active_pixels` | Team size 20; target **TBD** (50,000 is example only) | 20-person virtual team | **PROPOSAL/TBD** 72h | `data/config/events_v02_catalog.json:748-802` |
+| 15 | `scrubbys_cleanup_workshop` | `first_clear_new_level` | Milestones **TBD**; SB/booster reward category | Solo | **PROPOSAL/TBD** 168h | `data/config/events_v02_catalog.json:803-857` |
+| 16 | `robot_parts_recovery` | `first_clear_new_level` | Milestones **TBD**; Robot Parts | Solo | **PROPOSAL/TBD** 72h | `data/config/events_v02_catalog.json:858-912` |
+| 17 | `lost_card_rescue` | `first_clear_new_level` | Milestones **TBD**; Card Pack | Solo | **PROPOSAL/TBD** 72h | `data/config/events_v02_catalog.json:913-967` |
+| 18 | `seasonal_scrub_festival` | `seasonal_qualifying_level_progress` | Seasonal thresholds/config **TBD** | Solo | **PROPOSAL/TBD** 168h | `data/config/events_v02_catalog.json:968-1022` |
+| 19 | `master_cleaner_quest` | `qualified_cross_event_objectives` | Required objectives/dedupe **TBD** | Solo | **PROPOSAL/TBD** 168h | `data/config/events_v02_catalog.json:1023-1077` |
+| 20 | `scrub_season_pass` | `first_clear_new_level` | Free track only; thresholds **TBD** | Solo | **PROPOSAL/TBD** 672h | `data/config/events_v02_catalog.json:1078-1132` |
+| 21 | `color_scrub_rush` | `cleaned_pixels_by_color` | Target colors and thresholds **TBD** | Solo | **PROPOSAL/TBD** 48h | `data/config/events_v02_catalog.json:1133-1187` |
+| 22 | `scrubbys_rescue_mission` | `first_clear_new_level` | Story milestone thresholds **TBD** | Solo | **PROPOSAL/TBD** 72h | `data/config/events_v02_catalog.json:1188-1242` |
+| 23 | `world_cleanup_cup` | `first_clear_new_level_cleanup_score` | 20 virtual rivals; scoring weights **TBD** | Player + 20 virtual (21 entries) | **PROPOSAL/TBD** 168h | `data/config/events_v02_catalog.json:1243-1297` |
+| 24 | `mystery_scrubbox_hunt` | `first_clear_new_level` | Chest thresholds **TBD** | Solo | **PROPOSAL/TBD** 72h | `data/config/events_v02_catalog.json:1298-1342` |
 
-Catalog row-level evidence (ID, metric, condition, hero/icon paths, 3-step tutorial): `data/config/events_v02_catalog.json:33-87` (1), `:88-142` (2), `:143-197` (3), `:198-252` (4), `:253-307` (5), `:308-362` (6), `:363-417` (7), `:418-472` (8), `:473-527` (9), `:528-582` (10), `:583-637` (11), `:638-692` (12), `:693-747` (13), `:748-802` (14), `:803-857` (15), `:858-912` (16), `:913-967` (17), `:968-1022` (18), `:1023-1077` (19), `:1078-1132` (20), `:1133-1187` (21), `:1188-1242` (22), `:1243-1297` (23), `:1298-1342` (24). Catalog-wide policy is `:1-31`.
 
 ## Canonical robot sources and reference-image status
 
-The roster identifies these ten master PNGs as the robot identity masters (`data/config/robot_roster_v1.json`; owner-approved roster whose per-robot `assets.master` field identifies the source PNG).. Hashes below were computed from checked-out PNG bytes with SHA-256. They are the only robot identity source paths in this audit; `.import` sidecars are excluded.
+The owner-approved roster `data/config/robot_roster_v1.json` identifies these ten master PNGs via each robot record assets.master field. Hashes below were computed from checked-out PNG bytes with SHA-256. `.import` sidecars are excluded from the canonical identity list.
 
 | Robot | Canonical repository PNG | SHA-256 |
 |---|---|---|
