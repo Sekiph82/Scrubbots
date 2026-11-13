@@ -36,6 +36,7 @@ const BoardState = preload("res://scripts/gameplay/board/board_state.gd")
 const ProductionRoutingSystem = preload("res://scripts/gameplay/routing/production_routing_system.gd")
 const ProductionAccessQuery = preload("res://scripts/gameplay/routing/production_access_query.gd")
 const ProductionTargetAccess = preload("res://scripts/gameplay/dispatch/production_target_access.gd")
+const RouteRequest = preload("res://scripts/gameplay/routing/route_request.gd")
 
 ## One golden file per set: golden_<set>.json.
 const GOLDEN_FMT := "res://tests/fixtures/difficulty_v1_identical/golden_%s.json"
@@ -107,7 +108,9 @@ func _initialize() -> void:
 	_done()
 
 ## Verdict-only ProductionTargetAccess (ProofKernel / analyzer) == the full route probe, cell by
-## cell, for several slot origins on sampled states of a VOID level and a maze anchor.
+## cell, for several slot origins on sampled states of a VOID level and a maze anchor. On the same
+## states, the canonical-access railroad Dijkstra (fast path) returns exactly the points of the
+## generic Dijkstra (forced by a non-canonical access subclass) for every third targetable cell.
 func _verdict_equivalence() -> void:
 	var cases: Array = []
 	for inp in _inputs("campaign"):
@@ -121,6 +124,8 @@ func _verdict_equivalence() -> void:
 	var checked := 0
 	var positive := 0
 	var mismatches := 0
+	var routes := 0
+	var route_mismatches := 0
 	for inp in cases:
 		var kernel = ProofKernel.new()
 		var state = kernel.quiesce(ProofState.from_level_and_supply(inp["level"], inp["make"].call()))["state"]
@@ -145,6 +150,11 @@ func _verdict_equivalence() -> void:
 						positive += int(v)
 						if v != full.is_targetable(i):
 							mismatches += 1
+						if v and positive % 3 == 0:
+							var req = RouteRequest.for_target(board, origin, i)
+							routes += 1
+							if routing.compute_route(req, board, raccess).get_points() 									!= routing.compute_route(req, board, _GenericAccess.new(board)).get_points():
+								route_mismatches += 1
 			if step == cols.size():
 				break
 			var r: Dictionary = kernel.apply_placement(state, int(cols[step]))
@@ -153,6 +163,12 @@ func _verdict_equivalence() -> void:
 			state = r["state"]
 	_ok(cases.size() == 2 and checked > 10000 and positive > 1000 and mismatches == 0,
 		"verdict-only is_targetable == full route probe on %d cells (%d targetable, %d mismatches)" % [checked, positive, mismatches])
+	_ok(routes > 500 and route_mismatches == 0,
+		"fast railroad Dijkstra == generic Dijkstra route points on %d routes (%d mismatches)" % [routes, route_mismatches])
+
+## Same access truth, different script: forces the generic (reference) railroad Dijkstra.
+class _GenericAccess extends "res://scripts/gameplay/routing/production_access_query.gd":
+	pass
 
 func _diff(want: Dictionary, got: Dictionary) -> String:
 	if want.is_empty():

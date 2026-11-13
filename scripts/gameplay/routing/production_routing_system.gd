@@ -226,14 +226,24 @@ func _railroad_route(request, board, access_query) -> RefCounted:
 		var rail_dist: float = geom.rail_dist(entry, rp)
 		var cost0: float = connector_len + rail_dist + rp.distance_to(cc)
 		sources.append({"cell": cy * w + cx, "rp": rp, "side": side, "seq": seq, "cost0": cost0})
-	for x in range(w):  # BOTTOM (side 0)
-		_add_source.call(x, h - 1, Vector2(float(x) + 0.5, geom.bottom_y()), 0, x)
-	for y in range(h):  # LEFT (side 1)
-		_add_source.call(0, y, Vector2(geom.left_x(), float(y) + 0.5), 1, y)
-	for y in range(h):  # RIGHT (side 2)
-		_add_source.call(w - 1, y, Vector2(geom.right_x(), float(y) + 0.5), 2, y)
-	for x in range(w):  # TOP (side 3)
-		_add_source.call(x, 0, Vector2(float(x) + 0.5, geom.top_y()), 3, x)
+	var st_fast := PackedByteArray()
+	if fast:
+		# Same entries, order and cost0 as the loops below (cached per start, see _perimeter_sources);
+		# only the non-BLOCKED filter (CLEARED, or the target itself) depends on the board.
+		st_fast = board.get_cell_states_copy()
+		for s in _perimeter_sources(geom, w, h, start, entry, connector_len):
+			var c: int = s["cell"]
+			if c == idx or st_fast[c] == BoardState.CellState.CLEARED:
+				sources.append(s)
+	else:
+		for x in range(w):  # BOTTOM (side 0)
+			_add_source.call(x, h - 1, Vector2(float(x) + 0.5, geom.bottom_y()), 0, x)
+		for y in range(h):  # LEFT (side 1)
+			_add_source.call(0, y, Vector2(geom.left_x(), float(y) + 0.5), 1, y)
+		for y in range(h):  # RIGHT (side 2)
+			_add_source.call(w - 1, y, Vector2(geom.right_x(), float(y) + 0.5), 2, y)
+		for x in range(w):  # TOP (side 3)
+			_add_source.call(x, 0, Vector2(float(x) + 0.5, geom.top_y()), 3, x)
 	RuntimePerfProbe.add("route_sources", tp_src)
 	if sources.is_empty():
 		return RouteResult.failure(RouteResult.FailureReason.NO_ROUTE, idx)
@@ -260,6 +270,13 @@ func _railroad_route(request, board, access_query) -> RefCounted:
 				break
 	if not touchable:
 		return RouteResult.failure(RouteResult.FailureReason.NO_ROUTE, idx)
+	if fast:
+		var tp_fast := RuntimePerfProbe.now()
+		var res := _railroad_dijkstra_fast(st_fast, sources, w * h, w, target_lin)
+		RuntimePerfProbe.add("route_dijkstra", tp_fast)
+		if res.is_empty():
+			return RouteResult.failure(RouteResult.FailureReason.NO_ROUTE, idx)
+		return _railroad_finish(request, board, access_query, geom, start, entry, res["rp"], res["chain"], w, idx)
 
 	# --- deterministic Dijkstra: sources seed board cells with their rail cost0;
 	# interior edges cost 1.0 (unit orthogonal step). Tie-break on (cost, side, seq).
@@ -344,6 +361,210 @@ func _railroad_route(request, board, access_query) -> RefCounted:
 		chain.push_front(cur)
 		cur = parent[cur]
 	return _railroad_finish(request, board, access_query, geom, start, entry, src_rp[chain[0]], chain, w, idx)
+
+## Canonical-access Dijkstra (SB-PERF-ROUTE-2026-11-13): EXACTLY the generic Dijkstra below for
+## the exact ProductionAccessQuery (same seeding, same relax/eps/tie-break arithmetic, same strict
+## (cost, side, seq, cell) pop order, hence the same parents), but read from one detached state
+## snapshot with the binary heap inlined over local packed arrays: no per-cell method calls and no
+## per-step allocation. Returns {"chain": source -> ... -> target cells, "rp": ingress rail point},
+## or {} when the target is not reached.
+func _railroad_dijkstra_fast(st: PackedByteArray, sources: Array, n_cells: int, w: int, target_lin: int) -> Dictionary:
+	var cleared: int = BoardState.CellState.CLEARED
+	var step: float = interior_step_cost
+	var dist := PackedFloat64Array()
+	dist.resize(n_cells)
+	dist.fill(INF)
+	var side_of := PackedInt32Array()
+	side_of.resize(n_cells)
+	var seq_of := PackedInt32Array()
+	seq_of.resize(n_cells)
+	var parent := PackedInt32Array()
+	parent.resize(n_cells)
+	var src_rp: Dictionary = {}
+	# Heap entries (cost, side, seq, cell) in parallel arrays; capacity grows by doubling.
+	var hc := PackedFloat64Array()
+	var hs := PackedInt32Array()
+	var hq := PackedInt32Array()
+	var hl := PackedInt32Array()
+	var cap: int = 256
+	hc.resize(cap)
+	hs.resize(cap)
+	hq.resize(cap)
+	hl.resize(cap)
+	var hn: int = 0
+	# Seeds (also the relaxations below) are pushed through one queue so the push code exists once.
+	var pend_c := PackedFloat64Array()
+	var pend_s := PackedInt32Array()
+	var pend_q := PackedInt32Array()
+	var pend_l := PackedInt32Array()
+	for s in sources:
+		var c: int = s["cell"]
+		var c0: float = s["cost0"]
+		var sd: int = s["side"]
+		var sq: int = s["seq"]
+		var better = dist[c] == INF or c0 < dist[c] - _RAIL_LEN_EPS \
+			or (absf(c0 - dist[c]) <= _RAIL_LEN_EPS and _rank_lt(sd, sq, side_of[c], seq_of[c]))
+		if better:
+			dist[c] = c0; side_of[c] = sd; seq_of[c] = sq
+			parent[c] = -1; src_rp[c] = s["rp"]
+			pend_c.append(c0); pend_s.append(sd); pend_q.append(sq); pend_l.append(c)
+	var u: int = -1
+	var found := false
+	while true:
+		# Push every pending entry (sift-up with a hole).
+		for k in range(pend_l.size()):
+			var ec: float = pend_c[k]
+			var es: int = pend_s[k]
+			var eq: int = pend_q[k]
+			var el: int = pend_l[k]
+			if hn == cap:
+				cap *= 2
+				hc.resize(cap)
+				hs.resize(cap)
+				hq.resize(cap)
+				hl.resize(cap)
+			var i: int = hn
+			hn += 1
+			while i > 0:
+				var p: int = (i - 1) >> 1
+				var pc: float = hc[p]
+				var lt: bool
+				if ec != pc:
+					lt = ec < pc
+				elif es != hs[p]:
+					lt = es < hs[p]
+				elif eq != hq[p]:
+					lt = eq < hq[p]
+				else:
+					lt = el < hl[p]
+				if not lt:
+					break
+				hc[i] = pc; hs[i] = hs[p]; hq[i] = hq[p]; hl[i] = hl[p]
+				i = p
+			hc[i] = ec; hs[i] = es; hq[i] = eq; hl[i] = el
+		pend_c.clear()
+		pend_s.clear()
+		pend_q.clear()
+		pend_l.clear()
+		if hn == 0:
+			break
+		# Pop the minimum (sift-down of the last entry with a hole).
+		var top_cost: float = hc[0]
+		u = hl[0]
+		hn -= 1
+		if hn > 0:
+			var lc: float = hc[hn]
+			var ls: int = hs[hn]
+			var lq: int = hq[hn]
+			var ll: int = hl[hn]
+			var i: int = 0
+			while true:
+				var l: int = 2 * i + 1
+				if l >= hn:
+					break
+				var m: int = l
+				var r: int = l + 1
+				if r < hn:
+					var lt_rl: bool
+					if hc[r] != hc[l]:
+						lt_rl = hc[r] < hc[l]
+					elif hs[r] != hs[l]:
+						lt_rl = hs[r] < hs[l]
+					elif hq[r] != hq[l]:
+						lt_rl = hq[r] < hq[l]
+					else:
+						lt_rl = hl[r] < hl[l]
+					if lt_rl:
+						m = r
+				var lt_m: bool
+				if hc[m] != lc:
+					lt_m = hc[m] < lc
+				elif hs[m] != ls:
+					lt_m = hs[m] < ls
+				elif hq[m] != lq:
+					lt_m = hq[m] < lq
+				else:
+					lt_m = hl[m] < ll
+				if not lt_m:
+					break
+				hc[i] = hc[m]; hs[i] = hs[m]; hq[i] = hq[m]; hl[i] = hl[m]
+				i = m
+			hc[i] = lc; hs[i] = ls; hq[i] = lq; hl[i] = ll
+		if top_cost > dist[u] + _RAIL_LEN_EPS:
+			continue  # stale
+		if u == target_lin:
+			found = true
+			break
+		var ux: int = u % w
+		var du: float = dist[u]
+		var su: int = side_of[u]
+		var qu: int = seq_of[u]
+		# Neighbours in the generic order: up, right, down, left.
+		for d in range(4):
+			var nlin: int
+			if d == 0:
+				if u < w:
+					continue
+				nlin = u - w
+			elif d == 1:
+				if ux >= w - 1:
+					continue
+				nlin = u + 1
+			elif d == 2:
+				nlin = u + w
+				if nlin >= n_cells:
+					continue
+			else:
+				if ux == 0:
+					continue
+				nlin = u - 1
+			if nlin != target_lin and st[nlin] != cleared:
+				continue
+			var ncost: float = du + step
+			var dn: float = dist[nlin]
+			var relax = dn == INF or ncost < dn - _RAIL_LEN_EPS \
+				or (absf(ncost - dn) <= _RAIL_LEN_EPS and _rank_lt(su, qu, side_of[nlin], seq_of[nlin]))
+			if relax:
+				dist[nlin] = ncost; side_of[nlin] = su; seq_of[nlin] = qu
+				parent[nlin] = u
+				pend_c.append(ncost); pend_s.append(su); pend_q.append(qu); pend_l.append(nlin)
+	if not found:
+		return {}
+	var chain: Array = []
+	var cur: int = target_lin
+	while cur != -1:
+		chain.push_front(cur)
+		cur = parent[cur]
+	return {"chain": chain, "rp": src_rp[chain[0]]}
+
+## Every perimeter rail-ingress entry for one start on a w x h board, in the generic scan order
+## (BOTTOM x, LEFT y, RIGHT y, TOP x) with the identical cost0 expression. Board-independent, so
+## it is computed once per (start, w, h) on this instance (SB-PERF-ROUTE-2026-11-13).
+var _source_tables: Dictionary = {}
+
+func _perimeter_sources(geom, w: int, h: int, start: Vector2, entry: Vector2, connector_len: float) -> Array:
+	var key := [start, w, h]
+	var table = _source_tables.get(key)
+	if table != null:
+		return table
+	table = []
+	var add := func(cx: int, cy: int, rp: Vector2, side: int, seq: int) -> void:
+		var cc := Vector2(float(cx) + 0.5, float(cy) + 0.5)
+		var rail_dist: float = geom.rail_dist(entry, rp)
+		var cost0: float = connector_len + rail_dist + rp.distance_to(cc)
+		table.append({"cell": cy * w + cx, "rp": rp, "side": side, "seq": seq, "cost0": cost0})
+	for x in range(w):
+		add.call(x, h - 1, Vector2(float(x) + 0.5, geom.bottom_y()), 0, x)
+	for y in range(h):
+		add.call(0, y, Vector2(geom.left_x(), float(y) + 0.5), 1, y)
+	for y in range(h):
+		add.call(w - 1, y, Vector2(geom.right_x(), float(y) + 0.5), 2, y)
+	for x in range(w):
+		add.call(x, 0, Vector2(float(x) + 0.5, geom.top_y()), 3, x)
+	if _source_tables.size() >= 16:
+		_source_tables.clear()   # bounded: a handful of slot origins per board
+	_source_tables[key] = table
+	return table
 
 ## Shared tail of the Railroad route: prepend connector + rail + ingress to the interior cell
 ## chain (source cell -> ... -> target), dedup, collinear-collapse and whole-route validate.

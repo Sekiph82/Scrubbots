@@ -82,6 +82,7 @@ name: Android Family First10 APK
 # SB-PHONE-2026-11-12-F a finished slot takes no new pick until its finish pop is over (other empty slots stay usable; all finishing = no free slot; Reduced = no hold; pause / terminal / reset never stick; +1 Slot): + sb_phone_2026_11_12_f_slot_pop_hold (exact 46/46 guard).
 # SB-PERF-DIFF-2026-11-13 faster Difficulty V1 analysis / ProofKernel with byte-identical output (fast CI subset +
 #   verdict-only == full route probe): + difficulty_v1_identical_output (exact 8/8 guard).
+# SB-PERF-ROUTE-2026-11-13 canonical-access railroad Dijkstra fast path (fast == generic route points case): difficulty_v1_identical_output guard now exact 9/9.
 
 on:
   workflow_dispatch:
@@ -439,10 +440,10 @@ jobs:
           else
             echo "SLOT-POP-HOLD verdict=FAIL (exact 46/46 summary missing)" | tee -a "$S"; fail=1
           fi
-          if grep -qxF 'Difficulty V1 identical output: PASS (8/8 cases, 0 fail)' validate_logs/difficulty_v1_identical_output.log 2>/dev/null; then
-            echo "DIFFICULTY-V1-IDENTICAL verdict=PASS (8/8)" | tee -a "$S"
+          if grep -qxF 'Difficulty V1 identical output: PASS (9/9 cases, 0 fail)' validate_logs/difficulty_v1_identical_output.log 2>/dev/null; then
+            echo "DIFFICULTY-V1-IDENTICAL verdict=PASS (9/9)" | tee -a "$S"
           else
-            echo "DIFFICULTY-V1-IDENTICAL verdict=FAIL (exact 8/8 summary missing)" | tee -a "$S"; fail=1
+            echo "DIFFICULTY-V1-IDENTICAL verdict=FAIL (exact 9/9 summary missing)" | tee -a "$S"; fail=1
           fi
           if grep -qxF 'M44 robot assembly stages evidence: PASS (4/4 cases, 0 fail)' validate_logs/m44_robot_assembly_stages.log 2>/dev/null; then
             echo "M44-ASSEMBLY verdict=PASS (4/4)" | tee -a "$S"
