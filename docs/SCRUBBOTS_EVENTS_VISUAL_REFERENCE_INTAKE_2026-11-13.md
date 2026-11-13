@@ -1,5 +1,13 @@
 # ScrubBots Events | Visual Reference Intake (2026-11-13)
 
+## NEW OWNER TUTORIAL VISUAL REFERENCES (2026-11-13)
+
+The owner supplied multiple external game screenshots illustrating a **sequence of guided coachmarks**. These screenshots are VISUAL INTERACTION REFERENCES, not licensed source graphics. The required visual interpretation for ScrubBots is: a portrait in-game Events screen behind a dark translucent scrim; the relevant UI element spotlighted sharply; a blue-bordered, cream-colored speech callout with readable copy and pointed triangular tail; focus/bubble locations change from frame to frame while background and layout remain continuous. Teach one fact per step. Use only ScrubBots-owned environments, true pixel-art cleaning board and owner-approved actual robot PNG sources. Never copy third-party lava, photo-avatar imagery, rewards, world art or branding.
+
+Three tutorial pictures per event are insufficient. A newly documented **6–10 individually composed portrait images per event** visual storyboard (172 tutorial PNGs total as a working production target) exists under `docs/SCRUBBOTS_24_EVENTS_OWNER_PLAN_2026-11-13.md` section `OWNER VISUAL ADDENDUM`; these are IN ADDITION TO the 56 original art assets. Current working target = **228 individual images**. The 172 step allocation is a production plan proposal rather than a historical owner-fixed numeric decision.
+
+All current Codex-produced PNG outputs go ONLY to `C:\Users\sekip\Desktop\ScrubBots Events PNG\`, with staged tutorial images under `tutorials\<event_id>\tutorial_01.png`, etc. Every tutorial picture 1170×2532. NEVER write/commit/upload these images to the repository, never code Godot or edit game files. Future Claude can read the documentation in GitHub after the user expressly asks to implement tutorial UI.
+
 ## OWNER OVERRIDE — CURRENT CODEX ART OUTPUT IS LOCAL ONLY
 For the current image-production-only mission, the only output root is `C:\Users\sekip\Desktop\ScrubBots Events PNG\`. Produce heroes/, icons/, backgrounds/, decorations/ and masters/ there. **Do not put newly generated PNGs in the ScrubBots repo and do not commit or upload them to GitHub.** All repository destinations described further below are FUTURE GAME-INTEGRATION targets, not current delivery destinations. Canonical robot images from the repo are read-only source references. Missing optional ZIP is not a blocker.
 
