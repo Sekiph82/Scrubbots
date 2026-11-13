@@ -1,0 +1,157 @@
+{
+	"levels": {
+		"campaign/level_002_apple": {
+			"kernel": "61b7679c6b3c2344820e5e42db581e1a31d23f8f0d8ca71e8af3da064e6ca5fe",
+			"measure": "245bdfa735ab91c42a4e2e9b5dec26f4a7cd4d1493aa01b95b689d1eb9e2a0f3",
+			"score": "d524ba63dfb6ca9aa1542a3f1fba47447eea7a2841c93f523b72af4422902d8f"
+		},
+		"campaign/level_003_palm_tree": {
+			"kernel": "bf8a02b840bce637423c3b2a8c777ecb38a9655d5b27506f0b952231c2119579",
+			"measure": "937ca1be02db6edf7c7dc6de227a56e7610bbd084b2c22d2b9f52fac003b85e7",
+			"score": "5030d79e98fafd93d53ab328b60f860f7a2dee96858722b1cf61b6b159630ff6"
+		},
+		"campaign/level_004_orange_cat": {
+			"kernel": "b9a1005cb1aa1fb5cc2c617ced2d19508791a76897866106205436c67bb68084",
+			"measure": "3f56905c6066371b28e538e4c7603e6e39dec2bc36ec88280bfea1b7323f7b2c",
+			"score": "242da5c9510a73f21c43d729d24a9fc1a90f7ab2c968499dab1b607917a385ac"
+		},
+		"campaign/level_005_party_toucan": {
+			"kernel": "424241e8dfd4344824cd3c0932aa558d51af8fb2f4ee4fdd855a561367af1e71",
+			"measure": "92d4335501e4efa87e74c1cec923a85bfe249458a40df10563ac7ff592a7164c",
+			"score": "d3b5ad1fbc07b3942331484105e72a16316179dae6e141102e8198e6bf700ad5"
+		},
+		"campaign/level_006_chicken": {
+			"kernel": "6811ae6fca7adc8e1b6897d6dfaff486f697675469546978bb838f7c9d77b65a",
+			"measure": "9a630974982e5578d60e72151a1976300ddad93a86a08e1ec1a563d27fda4278",
+			"score": "14adad30bfa8bcc4c1d52fa6b3b12c6a10192d4ce8e7a6d75fb16121f3efeb74"
+		},
+		"campaign/level_007_pigeon": {
+			"kernel": "1c8be7a15a9029c53a4efd8dd66555ff84db1a5ec5bdf6892ae9c20414ae5756",
+			"measure": "f52ef04bd44d570f0fd19196ba8230d94b6a5b4bf3dc2d699919ab0c71f37dba",
+			"score": "73b729edf04c82e50abea3e2945f8bded7099625b8392b64410d15351f17710f"
+		},
+		"campaign/level_008_butterfly": {
+			"kernel": "8ef622fcb3faaeaff84a9be59c65624639fc17e1c33c901db6f13850c707ed4b",
+			"measure": "19a2ad178370044a264d520e54df63a3b640320abf2135d251a2c70b4220a159",
+			"score": "c3d12041ce01ab2b60509d0f09408b014c1ce771cf2b39c0aadcdb0b473277f2"
+		},
+		"campaign/level_009_frog": {
+			"kernel": "48656091200f47deaa69ad641fe2dfd08d688bdfff8d0ec06930560ddf833a0e",
+			"measure": "da9e9bd90a977b5d3a8c91468af68c6cf521ac766a3da974b8a47a791f881c2f",
+			"score": "6f22ec44348727533c7c65c8303709d499dabb4a311049d0a20dee365c32892b"
+		},
+		"campaign/level_010_ice_cube": {
+			"kernel": "b2757971cb417d83e95f836c991e0f6502436cc4805a79fbeca74a4692352b42",
+			"measure": "cc9012a084a3ce923850134103c3829a79b5c6f0b9abd8248c79f42ae3e339e0",
+			"score": "7e34d76626f63851284318653b63cac16c76c48ae17077e8a68bdbb363fcf1bf"
+		},
+		"campaign/level_011_duckling": {
+			"kernel": "7f83853041523168e34bc9bcc97effd19e9f20920f2db2726a15e183dc60d5bd",
+			"measure": "03742423e12cf342d835c381457876a31226cb2f2845cf245db94c165a2608cd",
+			"score": "1d9feaf3e196a73b04ff3afcb187bd3386cc6381658719e5c1be6840bc8ae64a"
+		},
+		"campaign/level_012_ladybug": {
+			"kernel": "9d0a8a60d5a20b94440e3e9ad61e044f69dffc40fdf7dddcaf575ab5529ed733",
+			"measure": "8288cd676bda3edc4859b97ce4e039f45d0a98b515f73a4f3cb444d379b640ce",
+			"score": "3448cec77854d8e682f6a4e25698f6de69f79294f1726880199ef3dfe6684192"
+		},
+		"campaign/level_013_goldfish": {
+			"kernel": "032c6ef450f614039251b12d8f18db59f315c05032a907cb696fcfb5bc220a2b",
+			"measure": "4cc1d1688dc806a94362e864cb6808c9ff27dd6b100edc61c5050dab0eda47b8",
+			"score": "9e25dee1f4f3017864541b21f2aa1606078a8a52d7e32dcaab9e44aa0ad0dcc9"
+		},
+		"campaign/level_014_goose": {
+			"kernel": "aea0812de3d31a3811d7123c19895e68322c39f59e7cf94a52e3c9ef9afba97e",
+			"measure": "2e76348a1f00cbc96c7489e84ca4d822e08db158833fb703db0ff03253c6f807",
+			"score": "428dbe737bbd09102412524f801949caa66d12ccca7f2b374701130ad69fe279"
+		},
+		"campaign/level_015_octopus": {
+			"kernel": "699278d28e2b4760e69821db8b14355a884e85dd6ad6a50f3f927846cbfcfd12",
+			"measure": "a59afe0d13751867fa14fc5cde1493b4c3dd5aaaef77ea3b5e0a71588d7496f9",
+			"score": "8ee07f7daa2eb2399682abe321aecac2fae62e553013528bf3fb768b5ea3c32b"
+		},
+		"campaign/level_016_teddy_bear": {
+			"kernel": "d906377d287b387f8fb66c5cb2963d01351e24d61dfab978867b9dca102558b5",
+			"measure": "0d94653d498f43a2f55750d0246928ecb272f345ae143b6ce0a50c09cf8ebe86",
+			"score": "25ebaaca017f947a49388e649a6e66adfb66bca3cbce4d747e9e9212117059bf"
+		},
+		"campaign/level_017_ninja": {
+			"kernel": "c66feda01eef60abbb64b95feaf78bb9c28d676470628979704009537a048e63",
+			"measure": "efb1ea3743a52f2a1e6ae3a4ade60d73d787ddbabaaa8df1fa3dadd9f0e486e3",
+			"score": "6a7f798e402311c9eae11defa42bc33edb62777ab2cfceece85a87402deae5a6"
+		},
+		"campaign/level_018_wizard": {
+			"kernel": "05473e21671a7534851d4f681d959b0763750db3d113d494f3421147976b41fb",
+			"measure": "9f22a1027f0f2b4893a55a4a76e191c77ec4b9142d3646542a3b391ee71dff6e",
+			"score": "45abbaf959437eec54b87c5550882db8bedc2cc88a8c5484ee312860a6b15d5a"
+		},
+		"campaign/level_019_whale": {
+			"kernel": "e6e601e6c19b6859273e1e5841d278c92b2bdf0d09355aa9f862934fc3f2a70f",
+			"measure": "e6139e863e36e4f021a8c9c824f8fe48eac1c14e3fb000ce027720b7d1a6000e",
+			"score": "b9b6f66937c90f4240762b62722000108aef4fca4fa36e27be1a7068106c945c"
+		},
+		"campaign/level_020_detective": {
+			"kernel": "a554f755f75e049398588ec836d714e5b66f0f2dba92c2389005af2d510f86ff",
+			"measure": "8c6805dff541e758959d648796ba9fb23b00a4e25e3aba3b53df79358a4a8f91",
+			"score": "131eacfc18dd69cf0fac8d5a21a55ac5e4cf439b8c98e67d220d5510c8c7355f"
+		},
+		"campaign/level_021_bunny": {
+			"kernel": "73a67006f38f66a2ac9942773047e83949b8caebcc01f23536b470061081b968",
+			"measure": "3897635e59ea105e83de24ffb15091f8cd480578e951105570e4209328fe365a",
+			"score": "f4d37c2359b43d6a9897896eb23d6bd8781fe6e65bfa1a728c64cc4de8028483"
+		},
+		"campaign/level_022_crab": {
+			"kernel": "0e82eacc6dd3e0073823c8414c388e47d07066b7c29b0f6026fdba49bf1ffd73",
+			"measure": "bde9af866445a7c83acc7243d43b7012bfd6d94383ec1698fd992c5b0dca7212",
+			"score": "8ffd95bde0fa6c0f062812a9774b5fb610462e8c817c1c84d641dc5f4c4c9962"
+		},
+		"campaign/level_023_bumblebee": {
+			"kernel": "e158c052ea9eec6f9d726150c93b3da0cc4878b8a0360db71f0fd589a1acdf07",
+			"measure": "18c0085fb7a03727bd80806fb5b05d989b7b19443996616f02cf3f969fcbf22d",
+			"score": "7d16ce0e89b9e1913bab55d1c626cf3bd6b2ffa75183c6b8b05ce016a14d6c78"
+		},
+		"campaign/level_024_chef": {
+			"kernel": "e0b0bdeebed81e9c88695e4eeeab3d55a971419791b095aae07d09df9ca5f526",
+			"measure": "81a375e7ab91b7a2db12ddbbda73e485d82c07ea645bc73557ba07e09b869c15",
+			"score": "bb32bc96424a5e7827f3d27f6bb8bf3e56a7470910ac73e4504a0793dba83e7d"
+		},
+		"campaign/level_025_knight": {
+			"kernel": "82e9084ff5f61475df436f2215f843e6490dda4d5d0a02a34b55e221ef4b7256",
+			"measure": "d9abf6c2ec98344d2502ae9f4a8ce26bc68b7b202da26f7fb4eeb2b210948795",
+			"score": "2a41955437565f6db455553c45b9d11f5dd10dd9969e55c7c1e9a8cffc2d3954"
+		},
+		"campaign/level_026_sheep": {
+			"kernel": "7ed3c8a24da6fe2e08cc7fbc7add57e0cee7c5b5a5de712a11e6ec988620d374",
+			"measure": "0241280cb0dd0c7a007048323ec9208d163391667b249c136742b48c36788785",
+			"score": "aaec2bb475b69870c839ff276d329cf8f3a1881a69024c87db6677b2ff12b470"
+		},
+		"campaign/level_027_black_cat": {
+			"kernel": "628a00230f0eba85f9e64316793311d7257cd3d75c44fb4f24205ea0304ee874",
+			"measure": "fb568641adb2cfff2fdd072a6df466ad5e78a4e468b36daec12532cf43dcde53",
+			"score": "0c4714123194463d229d4175aef2982b5d8b3868f02e0d86a509c26b8f53da2e"
+		},
+		"campaign/level_028_squirrel": {
+			"kernel": "cac746062c322c10fa76b672004427a3718f5463f49134269e1cb8eb645ae62f",
+			"measure": "3ec964022e02f1772945322007df5a33f714c04918d844afc5645f8727b5acfc",
+			"score": "f37455ff4f8070f62e936d9726d4d089e040116676c634a1b72b9a3f8ec9420a"
+		},
+		"campaign/level_029_turtle": {
+			"kernel": "a580040f550d3402c6361f9de61de9af15b6893e5ec2adaaaa3dcb77c70aa025",
+			"measure": "8e882a9970e332e2c31c511f8521bcb4be221e022ec28e743190bcdc8fe8e9cc",
+			"score": "7c2dc2b47a07200e73ea7d84aed701700187c7c88156f631e0c6c555c2028b72"
+		},
+		"campaign/level_030_clown": {
+			"kernel": "aeadbf7121f4f467cfd2a0c0f80a4967255167cc5c36dd9c4ec734142c8d6d60",
+			"measure": "e864b7372e0f7e7578a187a14b52f3adaa4b4b796e6386ad6a4b609f6e9e8eb7",
+			"score": "2571728ee6a41ea0c992402d2d0dbdfbe6d11ed0a837c1d5e6dbc8ffe471f1ba"
+		},
+		"campaign/m21_level_001_hazard_bot": {
+			"kernel": "25cdcc7827d620adb48ec904115522cd3529c5326f9821d1ad85c8e5fd46b6dd",
+			"measure": "294892ac87850de52c53e19c969a615209ac4b445b5f0d0cae752eabfde08be7",
+			"score": "c3296bd42157eab6a0118efa957b3a95b70c517057e9e8f05a21f1893ec4742f",
+			"solver": "4f2716d807c7dc5cbe7ddd869597db0c142eaa54a96bb150664f522a8647e813"
+		}
+	},
+	"note": "SHA-256 of canonical JSON records written from the unoptimized analyzer/kernel (5d19621c)",
+	"schema": "scrubbots.difficulty_v1_identical_output.v1"
+}

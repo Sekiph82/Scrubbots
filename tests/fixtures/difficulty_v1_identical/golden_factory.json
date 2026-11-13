@@ -1,0 +1,16 @@
+{
+	"levels": {
+		"factory/LF-000147": {
+			"kernel": "bfd3aaf1f894e2b46af710b2d89650c7abbbf3dfe16fd93f20017f8fca4992fe",
+			"measure": "0ccac527f5d94361f09637f13e0469c9b54a9876f6081bc78cd736042ac5e777",
+			"score": "f4f74476ab27e25e7f3e7f3cdacbdf6c772242b63c67a1d7d8246d4032bc5a79"
+		},
+		"factory/LF-000148": {
+			"kernel": "60b7a67e49c30e4ef042a66f8c48fe90cdc50d4b44b73b7e79956c15ba748917",
+			"measure": "26240585ce6d49933936b28bab7d7614cf4308c7519e1b8a72bff2dad1c6378d",
+			"score": "e87d11fb6867b41498859307237a082d97524ef5eeb5eb39b5ba0ec6fa01ad36"
+		}
+	},
+	"note": "SHA-256 of canonical JSON records written from the unoptimized analyzer/kernel (5d19621c)",
+	"schema": "scrubbots.difficulty_v1_identical_output.v1"
+}

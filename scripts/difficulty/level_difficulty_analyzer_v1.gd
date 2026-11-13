@@ -248,6 +248,7 @@ func peel_waves(level) -> Dictionary:
 	var wave := 0
 	while remaining > 0:
 		var access = ProductionTargetAccess.new(routing, raccess, board, origin)
+		access.verdict_only = true
 		var hit: Array = []
 		for i in range(n):
 			if waves[i] == -1 and not board.is_void(i) and access.is_targetable(i):
@@ -408,6 +409,7 @@ func _reach(board, routing, raccess, kernel, slot: int, w: int, h: int, cap: int
 		return int(cache[key])
 	var origin: Vector2 = kernel._origin_for_slot(maxi(slot, 0), w, h, cap)
 	var access = ProductionTargetAccess.new(routing, raccess, board, origin)
+	access.verdict_only = true
 	var n := 0
 	for i in range(board.get_cell_count()):
 		if board.get_cell_state(i) == BoardState.CellState.ACTIVE and board.get_color_id(i) == color \

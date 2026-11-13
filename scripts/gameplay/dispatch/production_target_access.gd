@@ -31,6 +31,8 @@ const RouteResult = preload("res://scripts/gameplay/routing/route_result.gd")
 const RouteValidator = preload("res://scripts/gameplay/routing/route_validator.gd")
 const BoardState = preload("res://scripts/gameplay/board/board_state.gd")
 const RuntimePerfProbe = preload("res://scripts/debug/runtime_perf_probe.gd")
+const ProductionRoutingSystem = preload("res://scripts/gameplay/routing/production_routing_system.gd")
+const ProductionAccessQuery = preload("res://scripts/gameplay/routing/production_access_query.gd")
 
 var _routing_system
 var _routing_access
@@ -67,6 +69,18 @@ static var _mask_lock := Mutex.new()
 ## and stays unsupported).
 var _support_origin: Vector2 = Vector2(NAN, NAN)
 var _supported: bool = false
+## Verdict-only mode (SB-PERF-DIFF-2026-11-13). Set ONLY by ProofKernel and the offline
+## difficulty analyzer, which need the targetable verdict but never the route (runtime
+## dispatch keeps the default false). For an outside (rail) origin and the exact canonical
+## stack (BoardState + bound ProductionAccessQuery + ProductionRoutingSystem at
+## TOTAL_TRAVEL_COST), touch[i] == 1 on an ACTIVE cell is also SUFFICIENT: every perimeter
+## non-BLOCKED cell is a rail ingress source, so the Dijkstra reaches the target exactly when it
+## is a perimeter cell or 4-adjacent to a reach cell, and the finished route (outside connector
+## and rail, orthogonal ingress, unit steps over CLEARED cells, final arrival at the target) is
+## RouteValidator-clean by construction. The verdict is then answered from the masks without
+## building the route; nothing is memoized, so consume_route() returns null.
+## tests/difficulty_v1_identical_output.gd asserts verdict-only == full probe cell by cell.
+var verdict_only: bool = false
 
 func _init(routing_system, routing_access, board, origin: Vector2 = Vector2.ZERO) -> void:
 	_routing_system = routing_system
@@ -107,6 +121,9 @@ func is_targetable(index: int) -> bool:
 	if not _could_reach(index):
 		_clear_memo()
 		return false
+	if verdict_only and _supported and _canonical_stack():
+		_clear_memo()
+		return _board.get_cell_state(index) == BoardState.CellState.ACTIVE
 	if _probe(index):
 		return true
 	# A failed probe must not leave a stale successful memo queryable.
@@ -178,6 +195,15 @@ func prefilter_maybe_targetable(index: int) -> Variant:
 		return true
 	_clear_memo()
 	return false
+
+## The exact configuration the verdict-only equivalence is proved for (script identity, never
+## a subclass/double).
+func _canonical_stack() -> bool:
+	return _board.get_script() == BoardState \
+		and typeof(_routing_system) == TYPE_OBJECT and _routing_system.get_script() == ProductionRoutingSystem \
+		and _routing_system.interior_step_cost == ProductionRoutingSystem.TOTAL_TRAVEL_COST \
+		and typeof(_routing_access) == TYPE_OBJECT and _routing_access.get_script() == ProductionAccessQuery \
+		and _routing_access.is_bound_to(_board)
 
 func _could_reach(index: int) -> bool:
 	# Unsupported (null) -> probe; let _probe fail closed with its own checks.

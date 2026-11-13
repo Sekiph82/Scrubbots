@@ -241,6 +241,7 @@ func _run_to_quiescence(live: Dictionary, stop_on_clear: bool = false) -> int:
 		for slot in lanes:
 			var origin: Vector2 = _origin_for_slot(slot, live.w, live.h, live.slots.get_slot_count())
 			var access = ProductionTargetAccess.new(live.routing, live.raccess, live.board, origin)
+			access.verdict_only = true   # the kernel never consumes the probe route
 			var batch_id: String = live.slots.get_batch_id(slot)
 			var claim: Dictionary = live.claim.claim_for_slot(slot, access)
 			if claim.get("ok", false):
