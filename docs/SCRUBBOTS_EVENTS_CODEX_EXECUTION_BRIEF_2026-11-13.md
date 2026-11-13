@@ -1,3 +1,15 @@
+# MOST RECENT OWNER VISUAL REQUIREMENT — MULTI-STEP TUTORIALS (2026-11-13)
+
+**THIS OVERRIDES ALL CONTRADICTORY TEXT BELOW.** The owner supplied additional screenshot references of real, multi-step in-game tutorials. They want that **coachmark / guided-tour presentation**, not a generic three-poster tutorial. Three slides per event are NOT sufficient. Follow the full *event-specific* storyboard appendix at the END of `docs/SCRUBBOTS_24_EVENTS_OWNER_PLAN_2026-11-13.md`, with 6–10 distinct portrait tutorial frames per event (172 proposed tutorial images across 24 events). There are still 56 base visual images. **Combined working production plan: 228 independent PNG outputs**, subject to any later explicit owner change. Do NOT misrepresent 172 as already produced or owner-approved exact durations; the owner approved the need for more complex walkthroughs, and 172 is the documented production proposal.
+
+**Visual style:** consistent 1170x2532 phone screenshot composition within each event; dark scrim covering inactive screen areas; one illuminated highlighted target (with soft halo/cutout) per step; bold cream speech bubble, blue border, dark-blue readable copy and triangular pointer to the target; preserve clear actionable UI and actual ScrubBots cleaning gameplay. Follow the *composition grammar*, not the copyrighted art: never copy lava, players' human-photo avatars, characters, screenshots, labels, brands or specific scenery from supplied reference games. Use original ScrubBots park/cleaning theme and genuine canonical robot PNGs. Each frame teaches **one new concept** and the spotlight/bubble move accordingly.
+
+**New local-only output folder:** `C:\Users\sekip\Desktop\ScrubBots Events PNG\tutorials\<event_id>\tutorial_01.png` ... `tutorial_NN.png`. 1170x2532 each, one standalone image per file. For every event, match the exact N and the scene descriptions in the full V02 appendix. All old/current robot source assets are READ ONLY. NEVER write PNGs into GitHub repo. NEVER commit/push changes. NEVER code tutorial screens, gameplay, events services or TASKS.md. This is VISUAL PRODUCTION ONLY.
+
+**Execution:** Read full master plan and catalog, identify canonical robot images, produce the 56 base images plus the 172 staged tutorial PNGs in named local Desktop folders. Visually open every generated PNG and verify no character drift / malformed limbs, coherent continuity, correctly aimed spotlight/pointer, and legible text. Save each independently, no collages, atlases, split poster or dummy images. The optional ZIP is NOT a blocker. Missing a tool/provider does not authorize fake images or a claim of completion. Continue other feasible image composition tasks and report true limitations.
+
+---
+
 # LATEST OWNER OVERRIDE — CODEX ART ONLY, LOCAL DESKTOP DELIVERY
 
 **Effective 2026-11-13. This block supersedes every conflicting instruction below.**
