@@ -1,0 +1,12 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+  ok: analyzer loads 
+  ok: verdict-only is_targetable == full route probe on 20096 cells (2318 targetable, 0 mismatches)
+  ok: factory set has 2 levels
+  ok: factory/LF-000147 identical  (81670 ms)
+  ok: factory/LF-000148 identical  (88889 ms)
+Difficulty V1 identical output: PASS (5/5 cases, 0 fail)
+Game Feel Flow: Initializing...
+GFFEffectConfigManager: Registered configs
+Game Feel Flow: Registered 31 effects
+Game Feel Flow: Ready (31 effects, 15 combos)

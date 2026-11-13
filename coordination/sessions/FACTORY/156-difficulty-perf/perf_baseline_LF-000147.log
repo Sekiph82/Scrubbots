@@ -1,0 +1,16 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+ID LF-000147 ok=true steps=89
+MEASURE totalMs=440238 peelMs=57402 placementsMs=126227 placementMeanMs=1418.3 placementMaxMs=3884 decisionAndRestMs=256609
+  probe access_mask_build { "count": 1375, "total_ms": 5089.224, "max_ms": 6.477, "mean_ms": 3.701 }
+  probe route_sources { "count": 9680, "total_ms": 44487.207, "max_ms": 7.593, "mean_ms": 4.596 }
+  probe route_dijkstra { "count": 9680, "total_ms": 354779.064, "max_ms": 94.239, "mean_ms": 36.651 }
+  probe route_validate { "count": 9680, "total_ms": 4709.666, "max_ms": 1.696, "mean_ms": 0.487 }
+  probe access_compute_route { "count": 8409, "total_ms": 364256.018, "max_ms": 101.708, "mean_ms": 43.317 }
+  probe access_validate { "count": 8409, "total_ms": 3449.591, "max_ms": 1.103, "mean_ms": 0.41 }
+  probe target_selection { "count": 3527, "total_ms": 64991.442, "max_ms": 105.369, "mean_ms": 18.427 }
+KERNEL apply_placement meanMs=764.0 maxMs=2056.8 totalMs=68000 solved=true
+Game Feel Flow: Initializing...
+GFFEffectConfigManager: Registered configs
+Game Feel Flow: Registered 31 effects
+Game Feel Flow: Ready (31 effects, 15 combos)

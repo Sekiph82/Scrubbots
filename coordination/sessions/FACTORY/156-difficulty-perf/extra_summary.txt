@@ -1,0 +1,19 @@
+m25_c003_exact_prefilter exit=0 diag=0 secs=370 | M25-C003 EXACT PREFILTER: PASS
+m25_claim_model_evidence exit=0 diag=0 secs=2 | M25 claim-model evidence: PASS
+m25_scale_evidence exit=0 diag=0 secs=2 | M25 scale evidence: PASS
+m25_v03_exact_work_binding_evidence exit=0 diag=0 secs=3 | M25 V03 exact-work-binding evidence: PASS
+m26_hazard_bot_integration exit=0 diag=0 secs=3 | M26 Hazard Bot integration: PASS
+m27_generation_retry exit=0 diag=0 secs=3 | M27 generation retry: PASS
+m27_hazard_bot_solve exit=0 diag=0 secs=4 | M27 Hazard Bot solvability: PASS
+m27_scale_59 exit=0 diag=0 secs=3 | M27 59x59 scale: PASS
+m36_anchor_calibration exit=0 diag=0 secs=4 | M36 anchor calibration: PASS (126 cases, 0 fail)
+m36_difficulty_v2 exit=0 diag=0 secs=4 | M36 difficulty V2 evidence: PASS (38/38 cases, 0 fail)
+m36_frustration_v1 exit=0 diag=0 secs=149 | M36_FRUSTRATION_V1 PASS (62 cases, 0 fail)
+m46_slot_rebuild exit=0 diag=0 secs=19 | M46 SLOT REBUILD: PASS
+m52_owner_supply_plans exit=0 diag=0 secs=196 | M52 OWNER SUPPLY PLANS: PASS
+m52_r01_parallel_runtime exit=0 diag=0 secs=33 | M52 R01 PARALLEL RUNTIME: PASS
+m52_r02_early_slot_release exit=0 diag=0 secs=9 | M52 R02 EARLY SLOT RELEASE: PASS
+m53_first10_difficulty exit=0 diag=0 secs=8 | M53 FIRST10 DIFFICULTY: PASS
+m53_c002_difficulty_calibration exit=0 diag=0 secs=33 | M53-C002 DIFFICULTY CALIBRATION: PASS
+void_cells_c001 exit=0 diag=0 secs=40 | VOID-CELLS-C001: PASS
+maint_supply_columns_c001 exit=0 diag=0 secs=6 | 
