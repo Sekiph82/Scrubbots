@@ -1,3 +1,22 @@
+# LATEST OWNER OVERRIDE — CODEX ART ONLY, LOCAL DESKTOP DELIVERY
+
+**Effective 2026-11-13. This block supersedes every conflicting instruction below.**
+
+Codex's ONLY task is to READ the Events V02 specification and repository canonical robot images, then PRODUCE 56 real individual event PNG images. DO NOT code any Events functionality, Godot scenes, tutorials, economy, virtual rivals or UI. DO NOT update TASKS.md. DO NOT stage, commit, push, PR or upload any produced image to GitHub. Treat the remainder of this older brief as historical context ONLY when it conflicts with this override.
+
+**Absolute output location OUTSIDE the repository:** `C:\Users\sekip\Desktop\ScrubBots Events PNG\`
+
+- 24 independent 1024x1024 event heroes: `C:\Users\sekip\Desktop\ScrubBots Events PNG\heroes\<event_id>.png`
+- 24 individual event icons: `C:\Users\sekip\Desktop\ScrubBots Events PNG\icons\<event_id>.png`
+- 5 individual backgrounds: `C:\Users\sekip\Desktop\ScrubBots Events PNG\backgrounds\`
+- 2 reward decorations: `C:\Users\sekip\Desktop\ScrubBots Events PNG\decorations\`
+- 1 portrait 1170x2532 Events master: `C:\Users\sekip\Desktop\ScrubBots Events PNG\masters\scrubbots_events_master_v02.png`
+
+The repository at `C:\Users\sekip\Desktop\Scrubbots` is READ ONLY for this Codex art assignment. Only use the 24-event master specification (`docs/SCRUBBOTS_24_EVENTS_OWNER_PLAN_2026-11-13.md`), catalog (`data/config/events_v02_catalog.json`), image reference intake document and existing approved canonical robot PNGs as references. The ChatGPT ZIP is optional and MUST NOT block. Existing old reference heroes have rejected anatomical defects. Use unchanged real approved robot layers with two arms/two hands, new backgrounds, no new robots, no event numbers, no collages, no sprite atlases. Produce and visually QA each standalone PNG individually. Start with `heroes\scrub_sprint.png`, continue one by one. Save all outputs ONLY under the absolute Desktop path above. Final report: actual local files, counts/dimensions and image QA. **GitHub changes must be zero.**
+
+---
+
+## HISTORICAL BRIEF BELOW: FOR REFERENCE ONLY; DO NOT EXECUTE ITS CODING OR GITHUB DELIVERY STEPS
 # CODEX AUTONOMOUS EXECUTION BRIEF | SCRUBBOTS EVENTS V02 | 2026-11-13
 
 ## DO NOT ASK FOR DOCUMENTS OR MASTER ZIP. ALL DECISIONS REQUIRED TO START ARE IN GITHUB.
