@@ -1,65 +1,78 @@
-# ScrubBots | 24 Events Owner-Approved Production Plan
+# SCRUBBOTS EVENTS MASTER PLAN V02 | Owner Decisions + Visual Production Addendum
 
-Status: APPROVED SCOPE / IMPLEMENTATION AND ASSETS NOT YET VERIFIED. Date: 2026-11-13.
+**Design basis:** Owner's attached `SCRUBBOTS EVENTS MASTER PLAN V02` supplied 2026-11-13. This file preserves its specific rules, numbers, event types and tutorial concepts. **Not a live task tracker:** only root `TASKS.md` tracks status. Read `CLAUDE.md`, `AGENTS.md`, `TASKS.md` before implementation.
 
-## Authority and scope
-This is a design specification, **not** an alternative project-status tracker. Only root TASKS.md records implementation state. Follow CLAUDE.md / AGENTS.md and project feature unlocks. Owner approved all 24 event concepts. ScrubBots has ONE gameplay mechanic: cleaning pixel-art images in the existing levels. Events are only metadata, objectives, progress, rewards, competition, and UI layered on normal gameplay. Never introduce separate race/arena/fighting/minigame mechanics. No event may alter the canonical real-play rules, five slots, or progression integrity.
+## Non-negotiable gameplay scope
+All 24 Events launch in the FIRST game release. The player ONLY plays normal ScrubBots pixel-art CLEANING levels. Event races, tournament brackets, teams, workshops, huge dirty pictures and rescues are PROGRESS VISUALIZATIONS, not new game modes. No separate racing, match, puzzle, workshop, assembly, rescue or collection minigame. Relevant counters come solely from real normal-level gameplay: NEW levels completed; first-attempt wins; active pixels cleaned; color distribution; booster usage/non-usage; consecutive wins. Verify these signals from actual game engine / receipts before implementation.
 
-## Rotation and availability
-- Maintain 3 active events at all times. Allow 4 or 5 simultaneously on selected periods, with intentional variety and no permanent fixed trio.
-- Events rotate based on configured start/end times and eligibility; avoid overlapping duplicate reward exploits. Persist claim and score ledgers idempotently; deterministic time-zone-safe scheduling, offline/resume handling, server-authoritative mechanics if competitive connected play is implemented.
-- If no live multiplayer backend exists, label computer-controlled opponents honestly; don't simulate people as live players. Never fabricate a live shared global leaderboard.
-- Existing feature unlock gate: Events unlock at campaign level 30; preserve feature_unlocks_v1.json policy.
+## Exact 24 owner-approved events and tutorial themes
+| Event ID | Event name | Participants | Specific goal/conditions from V02 | Tutorial visual scene from V02 |
+|---|---|---|---|---|
+| scrub_sprint | Scrub Sprint | 4 virtual rivals | Clear 15 NEW levels before rivals; each qualified clear advances one step | Five robots on cleanup race progress bars |
+| first_brush_race | First Brush Race | 4 virtual rivals | Clear 3 or 5 levels on FIRST ATTEMPT; failed levels do not count | First-attempt successes on normal boards |
+| scrubbots_royale | ScrubBots Royale | 99 virtual rivals | 100 participant / 5-stage knockout; per-stage first-attempt new-level clearance | Elimination bracket with 100 virtual entries |
+| golden_brush_championship | Golden Brush Championship | 7 virtual rivals | 8 players; quarterfinal, semifinal, final; most levels cleared per round wins | 8-entry bracket from quarterfinal to final |
+| weekly_scrub_league | Weekly Scrub League | 19 virtual rivals | Weekly ranking by total cleaned pixels in NEW levels | Pixel cleanup leaderboard |
+| weekly_cleanup_challenge | Weekly Cleanup Challenge | solo | 3/7/12/20 NEW level milestones | Weekly milestones / rewards |
+| perfect_first_clean | Perfect First Clean | solo | 3/5/10 first-attempt level wins | First-attempt count |
+| sparkling_streak | Sparkling Streak | solo | 3/5/7/10 consecutive wins; losing returns event streak to last checkpoint, NOT main progression | Streak and checkpoints |
+| stain_busters | Stain Busters | solo | Count qualifying active pixels cleaned in normal levels | Active pixel cleanup meter |
+| pure_scrub_challenge | Pure Scrub Challenge | solo | 3/5/10 wins WITHOUT boosters | Booster-free normal level wins |
+| scrub_squad_tournament | Scrub Squad Tournament | virtual teams of 10 | Team competition based on completed normal levels | Virtual robot teammates and team rankings |
+| clean_team_treasure | Clean Team Treasure | virtual team of 10 | Team cleanup points unlock shared chests | Shared chest milestones |
+| scrub_relay | Scrub Relay | virtual team of 5 | Sequential team-stage progress from members' normal level clears | Team relay progress visualization |
+| mega_stain_cleanup | Mega Stain Cleanup | virtual team of 20 | Shared cumulative stain goal, e.g. 50,000 valid pixels; giant stained artwork is DISPLAY ONLY | Giant stained image cleaning progress |
+| scrubbys_cleanup_workshop | Scrubby's Cleanup Workshop | solo | Normal cleanup levels unlock workshop reward milestones (SB, boosters), NO workshop minigame | Workshop reward path |
+| robot_parts_recovery | Robot Parts Recovery | solo | Cleanup levels recover Robot Parts via normal rewards, NO assembly minigame | Recovered robot parts |
+| lost_card_rescue | Lost Card Rescue | solo | Normal cleanup tasks recover Card Packs, NO card-search minigame | Recovered card packs |
+| seasonal_scrub_festival | Seasonal Scrub Festival | seasonal | Halloween / Christmas / Summer Cleanup thematic normal level activity | Seasonal decoration and reward theme |
+| master_cleaner_quest | Master Cleaner Quest | solo / cross-event | Complete objectives across multiple events for large reward chest | Cross-event progress overview |
+| scrub_season_pass | Scrub Season Pass | seasonal | Normal level clears advance FREE seasonal reward track | Free reward track |
+| color_scrub_rush | Color Scrub Rush | solo | Track cleaned pixel counts by color in ordinary gameplay | Color counters |
+| scrubbys_rescue_mission | Scrubby's Rescue Mission | solo / narrative | Advance rescue story after qualifying normal level wins, NO rescue minigame | Rescue story progression |
+| world_cleanup_cup | World Cleanup Cup | 20 virtual rivals | Global-style virtual ranking using normal new-level cleanup points, NOT live world leaderboard | Virtual worldwide cup rankings |
+| mystery_scrubbox_hunt | Mystery ScrubBox Hunt | solo | Reach level-clear thresholds to unlock mystery ScrubBoxes | Mystery boxes unlocked by progress |
 
-## Canonical character art: strict
-ALL depicted robots must be existing, owner-approved, canonical ScrubBots robot PNGs from this repository. Search and verify the canonical sources before any render. Compose existing original robot layers onto separately created environments whenever possible; text-only character recreation is not acceptable. Never invent or restyle robot identities. Exactly two arms and two hands per robot, no extra limbs, merged tools, or distortions. Character design consistency takes priority over dramatic poses.
+## Rotation / examples from V02
+- Always show **minimum 3, maximum 5** active Events, drawn from the 24. Do not run the same permanent trio. Some days 4, special days 5.
+- Rotate by explicit event start/end timestamps; do NOT terminate events merely because the day changes. Expiring events persist through their actual end time. Show upcoming events on a calendar. Keep goals and reward claims deterministic / idempotent; do not change ongoing event progress unfairly.
+- Example Monday (3): Scrub Sprint; Robot Parts Recovery; Weekly Cleanup Challenge.
+- Tuesday (4): Scrub Sprint; Robot Parts Recovery; Weekly Cleanup Challenge; Clean Team Treasure.
+- Wednesday (4): Clean Team Treasure; Color Scrub Rush; Sparkling Streak; Weekly Cleanup Challenge.
+- Thursday (3): First Brush Race; Lost Card Rescue; Scrub Season Pass.
+- Friday (5): Golden Brush Championship; Mega Stain Cleanup; Scrub Season Pass; Mystery ScrubBox Hunt; Color Scrub Rush.
+- Saturday (5): ScrubBots Royale; Master Cleaner Quest; Seasonal Scrub Festival; Scrub Season Pass; Mega Stain Cleanup.
+- Sunday (3): World Cleanup Cup; Perfect First Clean; Scrubby's Rescue Mission.
+- **ACCESS POLICY CONFLICT, DO NOT SILENTLY RESOLVE:** Owner's V02 explicitly says Events accessible at **Level 0001**. The newer repo setting `data/config/feature_unlocks_v1.json` (owner 2026-11-03) says Events unlock at **Level 30** and AGENTS.md repeats that policy. Treat this as an explicit decision conflict: preserve current Level 30 gate until a fresh owner decision authorizes migration to Level 1. Do not mark the Level 1 acceptance requirement as passed before the owner resolves it.
+- Existing booster gates Level 6 / 11 / 16 / 21 stay; Event objectives before unlock must not require unavailable boosters.
 
-## Visual masters and QA
-- Existing repo design references (legacy, with owner-reported anatomy defects): assets/ui/generated/masters/scrubbots_events_master_v01.png and assets/ui/final/events/event_weekly_hero.png. These are **NOT APPROVED FINAL ART** and must be replaced only after QA and owner review. The newly generated ChatGPT conversation mockups are **NOT YET IN THIS REPO**, do not falsely claim availability.
-- Events UI master target: portrait 1170x2532; mobile safe areas and real device verification.
-- Event hero target: standalone 1024x1024 PNG, one event only. No sprite atlas, collage, grid, or printed sequence number; use proper event name as text where applicable. A production event card may use runtime-cropped art, not destructive stretching.
-- 24 heroes + 24 distinct event icons + 3 race backgrounds + 2 team backgrounds + 2 reward decorations = 55 individually delivered PNG files, PLUS 1 portrait Events UI master = 56. Reuse existing art only after its visual QA passes; don't count unapproved drafts as delivered.
-- Asset loading: load only art for 3–5 active event cards plus their required details; release unused textures and limit mobile memory usage.
-- Every event has a 3-step tutorial: introduction (hero), gameplay linkage (actual pixel-art cleaning UI and progress illustration), and rewards (existing reward UI). 24 x 3 = 72 interactive screen STATES, not 72 newly painted full-screen PNGs. Use one shared Godot tutorial component with per-event data.
-- Validation: inspect standalone PNG at native size, canonical robot identity/anatomy, actual alpha/format/dimensions, readable spelling, safe areas, event-specific identity. Real Godot UI screenshot review at 720x1520 and 1170x2532, portrait. Do not claim done for a collage crop or a synthetic robot repaint.
+## Competitors and friends
+- Start with VIRTUAL RIVALS and virtual team members. Reuse the existing 10 approved robot portraits for avatars; vary names, badges and frames, not robot identities. 99 virtual rivals in Royale does NOT require 99 different robots.
+- Label all bots openly as computer-controlled. Do not portray simulated rankings as real users.
+- Never accelerate rivals based on spending / purchases. Work offline in the first version. Preserve separate schemas for future real friend records; real cross-device competitions require server verification.
 
-## 24 approved event records
-| Key | Event | Family | Only permitted gameplay linkage |
-|---|---|---|---|
-| scrub_sprint | Scrub Sprint | competitive | Finish normal pixel-cleaning levels for race progress |
-| first_brush_race | First Brush Race | competitive | First-attempt clears give race points |
-| scrubbots_royale | ScrubBots Royale | competitive | Asynchronous 100-entry leaderboard from normal clears; simulated opponents explicitly labeled |
-| golden_brush_championship | Golden Brush Championship | competitive | Ranked season of level-clear points |
-| weekly_scrub_league | Weekly Scrub League | competitive | Weekly ranked leaderboard from normal clears |
-| weekly_cleanup_challenge | Weekly Cleanup Challenge | milestone | Weekly first-clear milestones |
-| perfect_first_clean | Perfect First Clean | skill | First-try clears tracked |
-| sparkling_streak | Sparkling Streak | streak | Consecutive qualifying pixel-art level clears; no separate gameplay |
-| stain_busters | Stain Busters | milestone | Clean cumulative pixel cells in ordinary levels |
-| pure_scrub_challenge | Pure Scrub Challenge | skill | Finish qualifying levels without boosters |
-| scrub_squad_tournament | Scrub Squad Tournament | team | Aggregate normal level-clear points for an opt-in team |
-| clean_team_treasure | Clean Team Treasure | team | Cooperative milestones from normal clears |
-| scrub_relay | Scrub Relay | team | Consecutive contribution stages from normal clears |
-| mega_stain_cleanup | Mega Stain Cleanup | community | Community aggregate of pixel cells cleaned |
-| scrubbys_cleanup_workshop | Scrubby's Cleanup Workshop | collection | Normal clears yield workshop tokens and rewards |
-| robot_parts_recovery | Robot Parts Recovery | collection | Regular clears yield parts milestones |
-| lost_card_rescue | Lost Card Rescue | collection | Normal clears collect missing-card progress |
-| seasonal_scrub_festival | Seasonal Scrub Festival | seasonal | Seasonal normal-clear milestones, themed art |
-| master_cleaner_quest | Master Cleaner Quest | quest | Multi-step normal-clear missions |
-| scrub_season_pass | Scrub Season Pass | season | Normal clear activity unlocks reward track |
-| color_scrub_rush | Color Scrub Rush | skill | Count colors/pixels cleared in ordinary stages |
-| scrubbys_rescue_mission | Scrubby's Rescue Mission | quest | Clear normal stages to advance rescue story |
-| world_cleanup_cup | World Cleanup Cup | competitive | Asynchronous regional cup based on normal clears |
-| mystery_scrubbox_hunt | Mystery ScrubBox Hunt | collection | Normal clear milestones reveal boxes |
+## Tutorials: exact common system
+- 24 events x 3 steps = **72 distinct SCREEN STATES**, implemented via one shared Godot tutorial component, NOT 72 full-screen raster images.
+- Screen 1: event emblem, original Scrubby or another approved robot, event hero and event objective.
+- Screen 2: actual normal ScrubBots pixel-art board, how real cleared levels affect event progress, event's special qualification rule, progress/rival indicator.
+- Screen 3: event milestones / reward path, earned reward types, timer and START button.
+- All 24 tutorial visual topics are listed in the event table. Do not copy other games' copyrighted character designs or visual assets.
 
-## Outputs and required implementation
-1. A canonical character reference manifest listing approved robot PNG paths and hashes.
-2. 24 individual hero files at assets/ui/final/events/heroes/<key>.png and 24 icons at assets/ui/final/events/icons/<key>.png; backgrounds and decorations as separate named PNG files.
-3. Portrait Events master under assets/ui/generated/masters/ with versioned filename. Keep the legacy file until the replacement is validated; don't overwrite source references blindly.
-4. Configuration-driven event definitions, rotation engine, scoring adapters to real level-completion receipts, rewards ledger, time handling, event cards, tutorial system, localization and accessibility. UI event cards must select imagery by event ID rather than a fixed weekly hero.
-5. Tests for 3-5 concurrent events, weekly rotation, timezone changes, clean replay idempotency, disconnect/offline recovery, localization, unlock policy, memory ceiling and no extra gameplay modes. Exercise the actual Godot UI, show screenshots.
-6. Commit/push in batches, verify remote files and update root TASKS.md; preserve unrelated work and obey repository CI policy.
+## Visual production after owner's later corrections
+- The old repo `assets/ui/generated/masters/scrubbots_events_master_v01.png` and `assets/ui/final/events/event_weekly_hero.png` are legacy references with owner-reported incorrect hands/arms; not final or quality-approved.
+- Use ONLY canonical, OWNER-APPROVED robot images from this repository as source pixels. Create a named SHA-256 manifest of originals. Composite canonical character PNGs directly into separately rendered scenes when feasible. Never synthesize substitute robots. Exactly two arms and two hands per robot; no fused props, extra limbs or anatomy drift.
+- Each event Hero is ONE **standalone** 1024x1024 PNG (including a new Weekly Cleanup Challenge Hero). No printed event numbers, no collage/grid/atlas, no cropping one big AI poster into fake individual assets. A card may display the art at a responsive crop without permanently damaging the original.
+- Add 24 separate event emblem/icon PNGs, 3 racing backgrounds, 2 team backgrounds, 2 reward-road decorations: **24+24+7=55 PNGs**. Add ONE portrait 1170x2532 Events UI master: total **56** distinct approved production files. Treat 56 as target budget, not proof of existing deliverables; use existing approved visuals only after real inspection. ZIP / ChatGPT mockups outside repo must never be claimed as committed.
+- Production directories: `assets/ui/final/events/heroes/<event_id>.png`, `assets/ui/final/events/icons/<event_id>.png`, new `backgrounds/` and `decorations/` as appropriate; final portrait master under `assets/ui/generated/masters/`.
+- `ui_event_card.gd` currently has a legacy fixed weekly hero; audit and change to event-key-driven art with only active 3–5 cards/textures loaded; resource-release tests for mobile.
+- QA each file as one independent PNG: resolution / signature / name / title / zero event numbering / robot source identity / limbs / clean readable text / actual phone layouts / screenshots. Do not call unapproved designs FINAL.
 
-## Delivery state on 2026-11-13
-- Owner has approved conceptual scope and anatomy/format policy.
-- No 24-event implementation, individual artworks, tutorials, or new master files are certified in this document.
-- This design plan alone does not indicate TASKS.md implementation completion.
+## Rewards and implementation obligations
+- Event rewards must use existing SB / Robot Parts / Card Packs / boosters and current RewardGrantService. Define exact quantities only AFTER simulating maximum simultaneous 5 events, to avoid inflation / exploits.
+- Implement 24 data definitions + explicit event duration / rotation frequency / goals / bot behavior / win-loss / reward table / localized tutorial text, and verify against existing economy; V02 did NOT specify all these values, so don't manufacture owner-approved amounts.
+- Tests: 3–5 concurrency, expiry without day-cutover, persisted progress, no level double-counting, first-attempt semantics, verified pixel/color counts, booster-free wins, virtual rival ethics, offline operation, event payouts idempotency, unlock conflict gated, tutorials and every unique event visual.
+- Open real Godot app at 720x1520 and 1170x2532, capture human-reviewable screenshots; don't label ready from tests alone.
+- Commit / push / verify GitHub assets and code in manageable batches. Preserve unrelated work. Keep root TASKS.md authoritative; other docs are specifications only.
+
+## Delivery truth
+As of 2026-11-13 the original V02 plan is now incorporated in this spec, but this document DOES NOT certify that 24 events, image assets, replacement masters, tutorials or implementation have been delivered.
