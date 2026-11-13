@@ -2,6 +2,10 @@
 
 **Owner-approved source:** SCRUBBOTS EVENTS MASTER PLAN V02, shared 2026-11-13; updated with later owner decisions. **This is the single detailed implementation specification for Claude/Codex to read.** It is *not* a live status tracker. Root `TASKS.md` remains the only tracker, per `CLAUDE.md` §0D.
 
+> **OWNER SCOPE CLARIFICATION (2026-11-13):** This is the COMPLETE, persistent **future Claude implementation reference** for the 24 Events. The owner's request to write and commit this specification is DOCUMENTATION ONLY. It does **not** authorize Codex to implement gameplay, event engines, rewards, tutorial code, or other software while working on the separate **visual-production-only** assignment. A future explicit instruction such as "Claude, implement the Events using this master plan" is the trigger for actual implementation. Do not conflate reference-spec authoring, Codex art production, and future Claude code work.
+
+> **Source fidelity:** Confirmed owner V02 requirements include 24 specific event concepts, solo/team/rival participant counts, milestones, one existing pixel-art cleaning mode, 3–5 rotating active events and 72 tutorial UI states. The later owner amendment requires **Level 30** unlock. Values absent from owner V02, including precise reward amounts, some goals, duration selections and rival speeds, are labeled proposals or TBD; never represent them as previously approved numeric decisions.
+
 ## Start here: precedence
 1. Newest explicit owner decision overrides older design statements. Events unlock at **Level 30**, not the V02 draft's Level 1. `data/config/feature_unlocks_v1.json` controls this, do not duplicate the value in UI code.
 2. This implementation bible specifies every event's owner-approved identity, count, rules and tutorial theme. The owner V02 is preserved in `docs/SCRUBBOTS_24_EVENTS_OWNER_PLAN_2026-11-13.md`. If an event detail disagrees, flag the exact disagreement before changing production rules, but continue unrelated tasks.
