@@ -1,5 +1,9 @@
 # SCRUBBOTS | EVENTS V02 IMPLEMENTATION BIBLE
 
+## LATEST OWNER IMAGE-DELIVERY POLICY (2026-11-13)
+The *current Codex visual-only assignment* produces 56 independent PNGs saved exclusively in the LOCAL Windows folder `C:\Users\sekip\Desktop\ScrubBots Events PNG\` (heroes/, icons/, backgrounds/, decorations/, masters/). **No generated image may be written, committed, or pushed to GitHub by Codex.** All older passages of this document about putting Codex-generated art in the repository are superseded for the current art assignment. The repository paths mentioned elsewhere are potential future integration targets, NOT the destination for the current art handoff. This master specification stays on GitHub for future Claude implementation when explicitly requested.
+
+
 **Owner-approved source:** SCRUBBOTS EVENTS MASTER PLAN V02, shared 2026-11-13; updated with later owner decisions. **This is the single detailed implementation specification for Claude/Codex to read.** It is *not* a live status tracker. Root `TASKS.md` remains the only tracker, per `CLAUDE.md` §0D.
 
 > **OWNER SCOPE CLARIFICATION (2026-11-13):** This is the COMPLETE, persistent **future Claude implementation reference** for the 24 Events. The owner's request to write and commit this specification is DOCUMENTATION ONLY. It does **not** authorize Codex to implement gameplay, event engines, rewards, tutorial code, or other software while working on the separate **visual-production-only** assignment. A future explicit instruction such as "Claude, implement the Events using this master plan" is the trigger for actual implementation. Do not conflate reference-spec authoring, Codex art production, and future Claude code work.
