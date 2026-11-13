@@ -1,7 +1,7 @@
 # SCRUBBOTS | EVENTS V02 IMPLEMENTATION BIBLE
 
 ## LATEST OWNER IMAGE-DELIVERY POLICY (2026-11-13)
-The *current Codex visual-only assignment* produces 56 independent PNGs saved exclusively in the LOCAL Windows folder `C:\Users\sekip\Desktop\ScrubBots Events PNG\` (heroes/, icons/, backgrounds/, decorations/, masters/). **No generated image may be written, committed, or pushed to GitHub by Codex.** All older passages of this document about putting Codex-generated art in the repository are superseded for the current art assignment. The repository paths mentioned elsewhere are potential future integration targets, NOT the destination for the current art handoff. This master specification stays on GitHub for future Claude implementation when explicitly requested.
+The *current Codex visual-only assignment* produces 228 independent PNGs (56 base visuals + 172 tutorial walkthroughs) saved exclusively in the LOCAL Windows folder `C:\Users\sekip\Desktop\ScrubBots Events PNG\` (heroes/, icons/, backgrounds/, decorations/, masters/). **No generated image may be written, committed, or pushed to GitHub by Codex.** All older passages of this document about putting Codex-generated art in the repository are superseded for the current art assignment. The repository paths mentioned elsewhere are potential future integration targets, NOT the destination for the current art handoff. This master specification stays on GitHub for future Claude implementation when explicitly requested.
 
 
 **Owner-approved source:** SCRUBBOTS EVENTS MASTER PLAN V02, shared 2026-11-13; updated with later owner decisions. **This is the single detailed implementation specification for Claude/Codex to read.** It is *not* a live status tracker. Root `TASKS.md` remains the only tracker, per `CLAUDE.md` §0D.
@@ -374,3 +374,282 @@ The optional draft file `scrubbots_events_master_references.zip` was generated i
 
 ## Ready-to-code decisions versus proposals
 Every concrete number/threshold explicitly listed in the per-event sections is from V02. All other targets, recurrence weights, duration, AI speed, reward counts and unclaimed-expiry values are implementation proposals to be placed in explicit testable configuration, tuned through simulations, and NOT mislabeled owner-approved. Claude/Codex can autonomously implement their structure and proposed defaults without stopping; only money distribution is fail-closed until evidence supports it. This document is sufficient for coding the 24 mechanics and art pipeline; final art requires separately produced and validated PNGs, not copied screenshot mockups.
+
+
+# OWNER VISUAL ADDENDUM: EVENT TUTORIALS MUST BE MULTI-STEP PHONE WALKTHROUGHS (2026-11-13)
+
+**Owner references:** multiple screenshots of a mobile game's tutorial/coachmark sequence (Lav Serüveni and other event examples) supplied in the conversation on 2026-11-13. They establish desired **interaction and composition style**, not a permission to copy another game's game art, lava setting, avatars, screenshots, text, characters, brand, icons or exact UI. Reinterpret as original ScrubBots cleaning-themed visuals using ONLY the exact approved repo robot PNGs.
+
+**The former fixed 3-tutorial-image rule is superseded.** The owner explicitly said 3 images are insufficient and wants multi-step, staged coachmark visuals. The new recommended production storyboard uses **6–10 standalone tutorial images per event, depending on complexity, 172 total tutorial PNGs**, alongside the original 56 heroes/icons/backgrounds/master, yielding **228 standalone PNG files**. These step counts are the visual storyboard production proposal for this owner's request, not retroactive proof that the owner approved every individual step or that any image was produced. Future Claude may reconstruct interactive tutorial screens with reusable Godot layers; **Codex's CURRENT task is ONLY image production, not coding**.
+
+## Reference-derived visual grammar (must be applied to every walkthrough)
+1. **Full portrait phone screenshot 1170×2532** for each tutorial step, consistent exact UI layout across that event's consecutive frames. Actual production design uses clean ScrubBots world, NOT lava or copied third-party backgrounds.
+2. Dark translucent backdrop dims the inactive parts of the existing event screen. The **current target area remains crisp, bright, or gently highlighted**; use a cutout/spotlight overlay. Progressive focus should move across steps (header -> participants -> goal -> normal board/score -> race/progress -> rewards -> Play). Do not make the entire screen uniformly black/dim.
+3. Large high-contrast **cream tutorial speech bubble** with dark navy/blue text, thick blue border and a clear triangular pointer to the targeted UI element. Place without obscuring the focus region. Use safe margins and legible Turkish reference copy; prepare the wording as data so future Claude can localize to EN/TR. Do not flatten unrelated event UI behind the bubble into illegible mock pixels.
+4. Keep header, icon, panel, main illustration and next/skip/help/close conventions consistent. Show true event objects: 100 entrants/5 stages in Royale, 8 entrants/bracket in Golden Brush, 3/7/12/20 new levels in Weekly, etc. No invented unsupported goals or reward amounts.
+5. Sequence behaves like a real in-game visual lesson: one clear fact per frame, one highlighted location per frame, readable human-size text, polished illustrated scenery, existing ScrubBots characters, rounded polished UI and clear progress/focus.
+6. Never copy actual people from third-party example screenshots. Rival portraits must be original approved ScrubBots robots and visibly computer controlled, not real human photos. Do not copy another game's lava scenery, character art, treasure illustrations or brand. Use ScrubBots cleaning/pixel-art/park visuals.
+7. Make all pictures separate genuine PNGs, NEVER a collage/atlas/sprite sheet or cutouts from a single contact sheet. Save only to the OWNER'S LOCAL DESKTOP folder, NOT GitHub, and do not edit Godot/gameplay source code.
+
+## Tutorial production inventory
+
+| Event # | Event | Staged tutorial PNG count | Local relative path |
+|---:|---|---:|---|
+| 01 | Scrub Sprint | 7 | `tutorials/scrub_sprint/` |
+| 02 | First Brush Race | 7 | `tutorials/first_brush_race/` |
+| 03 | ScrubBots Royale | 10 | `tutorials/scrubbots_royale/` |
+| 04 | Golden Brush Championship | 9 | `tutorials/golden_brush_championship/` |
+| 05 | Weekly Scrub League | 7 | `tutorials/weekly_scrub_league/` |
+| 06 | Weekly Cleanup Challenge | 6 | `tutorials/weekly_cleanup_challenge/` |
+| 07 | Perfect First Clean | 6 | `tutorials/perfect_first_clean/` |
+| 08 | Sparkling Streak | 7 | `tutorials/sparkling_streak/` |
+| 09 | Stain Busters | 6 | `tutorials/stain_busters/` |
+| 10 | Pure Scrub Challenge | 6 | `tutorials/pure_scrub_challenge/` |
+| 11 | Scrub Squad Tournament | 9 | `tutorials/scrub_squad_tournament/` |
+| 12 | Clean Team Treasure | 7 | `tutorials/clean_team_treasure/` |
+| 13 | Scrub Relay | 8 | `tutorials/scrub_relay/` |
+| 14 | Mega Stain Cleanup | 7 | `tutorials/mega_stain_cleanup/` |
+| 15 | Scrubby's Cleanup Workshop | 6 | `tutorials/scrubbys_cleanup_workshop/` |
+| 16 | Robot Parts Recovery | 6 | `tutorials/robot_parts_recovery/` |
+| 17 | Lost Card Rescue | 6 | `tutorials/lost_card_rescue/` |
+| 18 | Seasonal Scrub Festival | 7 | `tutorials/seasonal_scrub_festival/` |
+| 19 | Master Cleaner Quest | 8 | `tutorials/master_cleaner_quest/` |
+| 20 | Scrub Season Pass | 8 | `tutorials/scrub_season_pass/` |
+| 21 | Color Scrub Rush | 6 | `tutorials/color_scrub_rush/` |
+| 22 | Scrubby's Rescue Mission | 8 | `tutorials/scrubbys_rescue_mission/` |
+| 23 | World Cleanup Cup | 8 | `tutorials/world_cleanup_cup/` |
+| 24 | Mystery ScrubBox Hunt | 7 | `tutorials/mystery_scrubbox_hunt/` |
+| | **TOTAL TUTORIAL FILES** | **172** | |
+
+Absolute output root: `C:\Users\sekip\Desktop\ScrubBots Events PNG\tutorials\`.
+For each event: `tutorials/<event_id>/tutorial_01.png` through `tutorial_NN.png`, sequentially. Do not invent a GitHub output path. Required source files / exact subjects are in the V02 master and catalog. In addition to these 172 tutorial images, the pre-existing art scope remains 56, resulting in **228 individual PNGs** in the complete local art handoff. Every tutorial PNG target: 1170×2532 portrait. Tutorial screens may share background/asset layers conceptually but each must be a standalone composed visual representing an individual focus step.
+
+## Event-by-event tutorial storyboards
+
+### 01. Scrub Sprint (7 tutorial images)
+1. `tutorial_01.png`: Yarış pistindeki 5 ScrubBots avatarı ve başlangıç çizgisinin tanıtımı.
+2. `tutorial_02.png`: 4 bilgisayar rakibini ve kendi profilini ayrı ayrı vurgula.
+3. `tutorial_03.png`: 15 yeni seviye hedefini okla göster.
+4. `tutorial_04.png`: Gerçek piksel temizleme seviyesi -> pistte +1 ilerleme göster.
+5. `tutorial_05.png`: Rakip ilerleme çubuklarını, öne geçme/geride kalmayı öğret.
+6. `tutorial_06.png`: Bitiş çizgisi ve etkinlik sonucu anlatımı.
+7. `tutorial_07.png`: Ödüller, etkinlik süresi ve PLAY yönlendirmesi.
+
+### 02. First Brush Race (7 tutorial images)
+1. `tutorial_01.png`: İlk fırça yarışı ve 5 katılımcının tanıtımı.
+2. `tutorial_02.png`: Gerçek normal seviyede ilk denemenin işaretlenmesi.
+3. `tutorial_03.png`: İlk seferde kazanılırsa sayaca +1 eklendiğini göster.
+4. `tutorial_04.png`: Başarısız ilk denemenin puan kazandırmadığını açıkla.
+5. `tutorial_05.png`: 3 veya 5 galibiyet hedefinin seçilmiş etkinlik örneği.
+6. `tutorial_06.png`: Rakip sıralaması, süre ve finiş mantığı.
+7. `tutorial_07.png`: Ödül ve PLAY yönlendirmesi.
+
+### 03. ScrubBots Royale (10 tutorial images)
+1. `tutorial_01.png`: ScrubBots Royale arena teması, oyuncu + 99 sanal yarışmacı.
+2. `tutorial_02.png`: 100 katılımcı kartını ve sanal rakip etiketini vurgula.
+3. `tutorial_03.png`: Beş eleme turunun genel şeması.
+4. `tutorial_04.png`: 1. elemenin şartı ve tur ilerlemesinin gösterimi.
+5. `tutorial_05.png`: Gerçek normal pixel-art tahtasında ilk deneme galibiyeti.
+6. `tutorial_06.png`: Birinci tur sonunda kalan/eliminated katılımcı sayısı.
+7. `tutorial_07.png`: İkinci-üçüncü tur geçişleri ve eşik göstergeleri.
+8. `tutorial_08.png`: Dördüncü tur ve final turu yolu.
+9. `tutorial_09.png`: Kalan oyuncular, sıralama/sonuç ve kurallar.
+10. `tutorial_10.png`: Ödül dağılımı, zaman sayacı ve başla butonu.
+
+### 04. Golden Brush Championship (9 tutorial images)
+1. `tutorial_01.png`: Altın Fırça kupası ve 8 kişilik turnuva tanıtımı.
+2. `tutorial_02.png`: Oyuncu ve 7 bilgisayar rakibinin tanıtımı.
+3. `tutorial_03.png`: Çeyrek final 8->4 turnuva şeması.
+4. `tutorial_04.png`: Gerçek pixel-art temizlemesiyle tur puanı kazanımı.
+5. `tutorial_05.png`: Eşitlik/sonuç ve yarı finale geçiş.
+6. `tutorial_06.png`: Yarı final 4->2 eşleşmesi.
+7. `tutorial_07.png`: Final 2->1 eşleşmesi ve kazanan kupa töreni.
+8. `tutorial_08.png`: Ödül tablosu ve süre.
+9. `tutorial_09.png`: PLAY/katılma yönlendirmesi.
+
+### 05. Weekly Scrub League (7 tutorial images)
+1. `tutorial_01.png`: Haftalık lig ve 20 kişilik sıralama panosu.
+2. `tutorial_02.png`: 19 sanal rakip ve oyuncu ayrımı.
+3. `tutorial_03.png`: YENİ seviyelerde temizlenen piksel puanı gösterimi.
+4. `tutorial_04.png`: Gerçek oynanıştan temizlenen aktif piksel sayısı örneği.
+5. `tutorial_05.png`: Ligde sıralama değişiminin vurgulanması.
+6. `tutorial_06.png`: Haftalık süre ve dönem sıfırlama açıklaması.
+7. `tutorial_07.png`: Ödül ve PLAY yönlendirmesi.
+
+### 06. Weekly Cleanup Challenge (6 tutorial images)
+1. `tutorial_01.png`: Haftalık temizlik etkinliği ve dört ödül basamağı.
+2. `tutorial_02.png`: Yeni bir normal temizleme seviyesi galibiyetinin sayılması.
+3. `tutorial_03.png`: 3/7/12/20 kilometre taşlarının artışı.
+4. `tutorial_04.png`: Tamamlanan basamağın işaretlenmesi, kilitli sıradaki basamak.
+5. `tutorial_05.png`: Gerçek ödül simgeleri ve hak ediş gösterimi.
+6. `tutorial_06.png`: Haftalık süre ve PLAY yönlendirmesi.
+
+### 07. Perfect First Clean (6 tutorial images)
+1. `tutorial_01.png`: İlk denemede mükemmel temizlik rozeti.
+2. `tutorial_02.png`: Normal seviye başlangıcında ilk deneme işareti.
+3. `tutorial_03.png`: İlk galibiyetle 3/5/10 sayaç artışı.
+4. `tutorial_04.png`: Başarısız ilk denemede ilerleme olmaması.
+5. `tutorial_05.png`: Ödül basamakları ve son tarih.
+6. `tutorial_06.png`: PLAY yönlendirmesi.
+
+### 08. Sparkling Streak (7 tutorial images)
+1. `tutorial_01.png`: Temizlenen park yolu ve parlak seri aşamaları.
+2. `tutorial_02.png`: Normal seviyede kazanılan bir seri yıldızı.
+3. `tutorial_03.png`: 3/5/7/10 kontrol noktası yolu.
+4. `tutorial_04.png`: Kazanma sonrası ileri hareket ve tamamlanan kontrol noktası.
+5. `tutorial_05.png`: Kaybedince SADECE etkinlik serisinin checkpoint'e dönmesi.
+6. `tutorial_06.png`: Ana oyun ilerlemesinin etkilenmediğinin açıklanması.
+7. `tutorial_07.png`: Ödül yolu ve PLAY.
+
+### 09. Stain Busters (6 tutorial images)
+1. `tutorial_01.png`: Büyük kirli piksel resmi ve hedef sayaç.
+2. `tutorial_02.png`: Normal oyunda gerçek aktif piksellerin temizlenmesi.
+3. `tutorial_03.png`: Etkinlik sayaç dolumunun görüntülenmesi.
+4. `tutorial_04.png`: Arka plan/VOID piksellerin sayılmadığı örnek.
+5. `tutorial_05.png`: Ödül eşikleri.
+6. `tutorial_06.png`: PLAY ve etkinlik saati.
+
+### 10. Pure Scrub Challenge (6 tutorial images)
+1. `tutorial_01.png`: Booster kullanmadan temizlik meydan okuması.
+2. `tutorial_02.png`: Gerçek normal oyun tahtasında boosterların vurgulanması.
+3. `tutorial_03.png`: Booster kullanmadan galibiyet ve +1.
+4. `tutorial_04.png`: Booster kullanıldığında seviyenin etkinliğe sayılmaması.
+5. `tutorial_05.png`: 3/5/10 hedef ve ödül yolu.
+6. `tutorial_06.png`: PLAY ve süre.
+
+### 11. Scrub Squad Tournament (9 tutorial images)
+1. `tutorial_01.png`: 10 üyeli sanal temizlik takımı tanıtımı.
+2. `tutorial_02.png`: Sanal robot arkadaşların açık etiketlenmesi.
+3. `tutorial_03.png`: İki takımın puan karşılaştırması.
+4. `tutorial_04.png`: Normal seviye galibiyetinden takım puanına geçiş.
+5. `tutorial_05.png`: Oyuncunun bireysel katkısının gösterilmesi.
+6. `tutorial_06.png`: Diğer sanal üyelerin bağımsız katkıları.
+7. `tutorial_07.png`: Sıralama/karşılaşma turu.
+8. `tutorial_08.png`: Ödül ve kazanma koşulu.
+9. `tutorial_09.png`: PLAY ve zaman.
+
+### 12. Clean Team Treasure (7 tutorial images)
+1. `tutorial_01.png`: 10 kişilik sanal temizleme ekibi ve ortak sandık.
+2. `tutorial_02.png`: Gerçek normal seviyenin takım puanı üretmesi.
+3. `tutorial_03.png`: Takım üyelerinin ortak katkı gösterimi.
+4. `tutorial_04.png`: Toplanan puanla dolan hazine yolu.
+5. `tutorial_05.png`: Ödül sandığı kilidinin açılması.
+6. `tutorial_06.png`: Zaman ve kurallar.
+7. `tutorial_07.png`: PLAY.
+
+### 13. Scrub Relay (8 tutorial images)
+1. `tutorial_01.png`: 5 sanal ekip üyesi ve temizlik bayrağı.
+2. `tutorial_02.png`: Etap 1 aktif robotun gösterilmesi.
+3. `tutorial_03.png`: Normal level WIN sonrası etap artışı.
+4. `tutorial_04.png`: Bayrağın sıradaki robota geçmesi: SADECE görsel.
+5. `tutorial_05.png`: Takım katkılarının gösterilmesi.
+6. `tutorial_06.png`: Son etap ve finiş görselleştirmesi.
+7. `tutorial_07.png`: Kazananların sonuç ekranı.
+8. `tutorial_08.png`: Ödül / PLAY.
+
+### 14. Mega Stain Cleanup (7 tutorial images)
+1. `tutorial_01.png`: 20 kişilik sanal ekip, dev kirli panonun tanıtımı.
+2. `tutorial_02.png`: Temizlenmesi gereken büyük kir miktarının gösterimi.
+3. `tutorial_03.png`: Gerçek normal seviyede temizlenen aktif pikseller.
+4. `tutorial_04.png`: Ekip katkıları ve dev kir göstergesinin azalması.
+5. `tutorial_05.png`: Dev kirli resmin ayrı oynanabilir tahta olmadığının açıklaması.
+6. `tutorial_06.png`: Hedefe varış ve kazanma anı.
+7. `tutorial_07.png`: Ödül ve PLAY.
+
+### 15. Scrubby's Cleanup Workshop (6 tutorial images)
+1. `tutorial_01.png`: Scrubby'nin temizlik atölyesi tanıtımı.
+2. `tutorial_02.png`: Atölyenin sadece ödül ilerleme ekranı olduğunun gösterimi.
+3. `tutorial_03.png`: Normal seviye kazanımıyla basamak artışı.
+4. `tutorial_04.png`: Atölyedeki ödül simgelerinin açılması.
+5. `tutorial_05.png`: Ödül teslim görselleştirmesi.
+6. `tutorial_06.png`: PLAY ve süre.
+
+### 16. Robot Parts Recovery (6 tutorial images)
+1. `tutorial_01.png`: Kaybolan robot parçaları teması.
+2. `tutorial_02.png`: Normal temizlik seviyesinin tamamlanması.
+3. `tutorial_03.png`: Robot Parts sayaç ilerlemesi.
+4. `tutorial_04.png`: Parça ödülü kazanma ve koruma.
+5. `tutorial_05.png`: Ödül yolu / hedef.
+6. `tutorial_06.png`: PLAY.
+
+### 17. Lost Card Rescue (6 tutorial images)
+1. `tutorial_01.png`: Kayıp kart paketlerinin tanıtımı.
+2. `tutorial_02.png`: Normal level WIN ve etkinlik puanı.
+3. `tutorial_03.png`: Kayıp kart paketinin ilerleme çizgisi.
+4. `tutorial_04.png`: Kart paketi ödülünün açılması.
+5. `tutorial_05.png`: Koleksiyon uyumluluğunun belirtilmesi.
+6. `tutorial_06.png`: PLAY.
+
+### 18. Seasonal Scrub Festival (7 tutorial images)
+1. `tutorial_01.png`: Mevsim temalı park ve festival etkinliği.
+2. `tutorial_02.png`: Mevsim varyantı rozeti (Halloween/Christmas/Summer).
+3. `tutorial_03.png`: Normal temizleme seviyesi ile katılım.
+4. `tutorial_04.png`: Temalı hedef ve puan yolu.
+5. `tutorial_05.png`: Sezonluk etkinlik takvimi.
+6. `tutorial_06.png`: Mevsimsel ödül vitrini.
+7. `tutorial_07.png`: PLAY.
+
+### 19. Master Cleaner Quest (8 tutorial images)
+1. `tutorial_01.png`: Usta Temizlikçi görevi, çoklu etkinlik haritası.
+2. `tutorial_02.png`: Bağlı etkinliklerin ayrı hedefleri.
+3. `tutorial_03.png`: Birinci etkinlikten doğrulanmış katkı.
+4. `tutorial_04.png`: İkinci etkinlik hedefinin ayrı tamamlanması.
+5. `tutorial_05.png`: Çoklu hedeflerin birleşerek ana görevi ilerletmesi.
+6. `tutorial_06.png`: Tamamlanmamış hedefte ödül kilidinin gösterimi.
+7. `tutorial_07.png`: Büyük sandık final ödülü.
+8. `tutorial_08.png`: PLAY / ilgili etkinliğe git.
+
+### 20. Scrub Season Pass (8 tutorial images)
+1. `tutorial_01.png`: Ücretsiz sezon yolu tanıtımı.
+2. `tutorial_02.png`: Sezon süresi ve bölüm dağılımı.
+3. `tutorial_03.png`: Normal level WIN ile sezon puanı.
+4. `tutorial_04.png`: İlk ödül basamağı açılması.
+5. `tutorial_05.png`: İleri basamaklarda kilitli ödüller.
+6. `tutorial_06.png`: Sezon yolunda ilerleme animasyonu.
+7. `tutorial_07.png`: Ücretsiz olduğu, ücretli yol bulunmadığı bilgisi.
+8. `tutorial_08.png`: PLAY.
+
+### 21. Color Scrub Rush (6 tutorial images)
+1. `tutorial_01.png`: Renkli pixel-art teması ve renk hedefleri.
+2. `tutorial_02.png`: Normal oyundaki renkli pikselleri vurgula.
+3. `tutorial_03.png`: Bir renk temizlendiğinde ilgili sayaç doluyor.
+4. `tutorial_04.png`: Farklı renklerin bağımsız sayaçları.
+5. `tutorial_05.png`: Hedef renk eşikleri / tamamlanan renk.
+6. `tutorial_06.png`: Ödül ve PLAY.
+
+### 22. Scrubby's Rescue Mission (8 tutorial images)
+1. `tutorial_01.png`: Scrubby kurtarma hikâyesi kapağı.
+2. `tutorial_02.png`: Onaylı kayıp robot karakterin gösterimi.
+3. `tutorial_03.png`: Normal seviye galibiyetinin hikâye ilerlemesine dönüşmesi.
+4. `tutorial_04.png`: İlk hikâye bölümünün açılması.
+5. `tutorial_05.png`: Bir sonraki kurtarma kilometre taşı.
+6. `tutorial_06.png`: Kurtarma mini oyunu olmadığı, yalnızca hikâye ilerlemesi.
+7. `tutorial_07.png`: Kurtarma sonucu ve kanonik karakter görüntüsü.
+8. `tutorial_08.png`: Ödül ve PLAY.
+
+### 23. World Cleanup Cup (8 tutorial images)
+1. `tutorial_01.png`: Dünya temizlik kupası ve oyuncu +20 sanal rakip.
+2. `tutorial_02.png`: Gerçek çevrimiçi liderlik olmadığını açıkça belirt.
+3. `tutorial_03.png`: Kıtalar/ülkeler temalı sanal eşleşme panosu.
+4. `tutorial_04.png`: Normal seviyede temizlik skorunun üretilmesi.
+5. `tutorial_05.png`: Puanın sanal dünya sıralamasına eklenmesi.
+6. `tutorial_06.png`: Sıralama yükselişi ve yarışma sonucu.
+7. `tutorial_07.png`: Kupa ödül sahnesi.
+8. `tutorial_08.png`: PLAY ve süre.
+
+### 24. Mystery ScrubBox Hunt (7 tutorial images)
+1. `tutorial_01.png`: Gizemli ScrubBox sandıkları tanıtımı.
+2. `tutorial_02.png`: Normal temizlik seviyeleri ile ilerleme.
+3. `tutorial_03.png`: Kilidi açılacak ilk sandık sayacı.
+4. `tutorial_04.png`: Sandığın ilerlemeyle açılması.
+5. `tutorial_05.png`: Büyük/özel sandık aşamalarının gösterimi.
+6. `tutorial_06.png`: Ödül dağılımı.
+7. `tutorial_07.png`: PLAY ve süre.
+
+## Quality acceptance per tutorial
+- Files 1170x2532 PNG, title spelled exactly, no event index printed, 24 event subfolders, count matches table. Explicit check that 172 is count of separate visuals, not just conceptual states.
+- Within each event the background, layout, robot identities and progress baseline remain consistent across frames; only spotlight/callout/illustrated game progress changes as directed.
+- Every one shows correct target UI emphasis and one coachmark speech bubble readable at phone scale. Text cannot leave bounds or cover target. Minimal repetitive slides; every step explains new information.
+- Use the normal pixel-art cleaning board as the gameplay illustration; race tracks/volcano/treasure settings are UI metaphors ONLY. Never depict another playable mechanic.
+- Use canonical approved original robot art with correct anatomy. No new robots; no human photos, copied third-party screenshots or copyrighted characters from example imagery.
+- These reference screenshots remain **visual art outputs only**. Codex is NOT to code the tutorials, modify the repo, update TASKS.md or upload generated images to GitHub.
