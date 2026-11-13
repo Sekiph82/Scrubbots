@@ -1,5 +1,9 @@
 # ScrubBots Agent Instructions
 
+## EVENTS V02 MASTER (OWNER 2026-11-13)
+For any ScrubBots Events task, first read the ENTIRE single authoritative owner master specification `docs/SCRUBBOTS_24_EVENTS_OWNER_PLAN_2026-11-13.md` and structured 24-event catalogue `data/config/events_v02_catalog.json`. Read image paths and optional ZIP handling in `docs/SCRUBBOTS_EVENTS_VISUAL_REFERENCE_INTAKE_2026-11-13.md`; code handoff `docs/SCRUBBOTS_EVENTS_CODEX_EXECUTION_BRIEF_2026-11-13.md`. Events unlock at LEVEL 30 (older V02 Level 1 superseded), with 3–5 active rotating among 24 events, existing pixel-art cleaning gameplay ONLY. Use repository-approved canonical robot PNGs, never new characters; produce 56 separate PNG assets (24 heroes, 24 icons, 7 decorations, 1 portrait master), no collage/numbered art. All 72 tutorial states are native reusable Godot UI. The optional newer ChatGPT reference ZIP is NOT uploaded to GitHub and is never a blocker: old reference PNG paths exist in GitHub but are not approved final. Do not ask the user to reattach documents already in origin/main. Preserve a dirty worktree; fetch or isolate origin/main non-destructively. Root TASKS.md is the only status tracker; inspect the SB-EV02 READY tasks. This V02 section does not override any broader repository safety or tool-billing rules.
+
+
 ## NEWEST OWNER DECISION 2026-10-22
 `CLAUDE.md` §0D overrides this file: factory peer review closes tasks (no ChatGPT audit required), Actions freeze lifted, worktrees allowed with mandatory cleanup.
 
