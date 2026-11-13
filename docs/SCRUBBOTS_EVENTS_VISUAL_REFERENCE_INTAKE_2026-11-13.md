@@ -1,5 +1,9 @@
 # ScrubBots Events | Visual Reference Intake (2026-11-13)
 
+## OWNER OVERRIDE — CURRENT CODEX ART OUTPUT IS LOCAL ONLY
+For the current image-production-only mission, the only output root is `C:\Users\sekip\Desktop\ScrubBots Events PNG\`. Produce heroes/, icons/, backgrounds/, decorations/ and masters/ there. **Do not put newly generated PNGs in the ScrubBots repo and do not commit or upload them to GitHub.** All repository destinations described further below are FUTURE GAME-INTEGRATION targets, not current delivery destinations. Canonical robot images from the repo are read-only source references. Missing optional ZIP is not a blocker.
+
+
 ## What is actually available in origin/main
 These two files already exist and may be inspected in the checkout:
 - `assets/ui/generated/masters/scrubbots_events_master_v01.png` (LEGACY design reference, OWNER-REJECTED robot anatomy)
