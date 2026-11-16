@@ -21,15 +21,18 @@ const HomeStyle = preload("res://scripts/ui/home/home_style.gd")
 const UiText = preload("res://scripts/ui/ui_text.gd")
 const V = preload("res://scripts/tools/home_asset_manifest_validator.gd")
 
-## M28-C002-C003-R01 V02: the Home background is the owner-selected file below (940x1672,
-## HOME-121); the V04 1080x2160 HOME-120 file stays on disk, retired and never loaded.
-const WORLD_PATH := "res://assets/ui/final/home/background/home_background.png"
-const WORLD_SHA := "9d5db29513d25ad5c0932840c08027be0198d0cd85dc758a69e09e800c7aabe2"
-const WORLD_SLUG := "home_background_whispering_park"
+## SB-HOME-BG-2026-11-16: the Home background is the owner plaza file below (941x1672,
+## HOME-124); the M28 HOME-121 file and the V04 1080x2160 HOME-120 file stay on disk,
+## retired and never loaded.
+const WORLD_PATH := "res://assets/ui/final/home/background/home_background_plaza.png"
+const WORLD_SHA := "0aa7463b12cd156883aeb8d9b91f59632bbe6899ce4a61ad74a6f77026f9cde3"
+const WORLD_SLUG := "home_background_plaza"
 const OLD_WORLD_PATH := "res://assets/ui/final/home/worlds/world_01_whispering_park_1080x2160.png"
+const M28_WORLD_PATH := "res://assets/ui/final/home/background/home_background.png"
+const M28_WORLD_SHA := "9d5db29513d25ad5c0932840c08027be0198d0cd85dc758a69e09e800c7aabe2"
 const FEET := Vector2(470, 1240)
 const SAFE_BOX := Rect2(305, 620, 330, 620)
-const WORLD_ASPECT := 940.0 / 1672.0
+const WORLD_ASPECT := 941.0 / 1672.0
 const MATRIX := [Vector2i(1080, 2160), Vector2i(1170, 2532), Vector2i(1290, 2796), Vector2i(1080, 2400), Vector2i(1440, 3200), Vector2i(1080, 1920), Vector2i(1536, 2048)]
 ## V03 measured references at 1080x2160 (audited V03 build): Bot Parts bar 24 px, icon box
 ## 206x164 inside each shortcut card, PLAY 470x150.
@@ -113,9 +116,10 @@ func _drawn_paths(root: Node) -> Array:
 func _world_identity() -> void:
 	print("[world asset identity]")
 	var img := Image.load_from_file(ProjectSettings.globalize_path(WORLD_PATH))
-	_ok(img != null and img.get_size() == Vector2i(940, 1672), "Home background is exactly 940x1672 (%s)" % str(img.get_size() if img else null))
-	_ok(FileAccess.get_sha256(WORLD_PATH) == WORLD_SHA, "Home background SHA-256 is the owner-selected %s" % WORLD_SHA)
+	_ok(img != null and img.get_size() == Vector2i(941, 1672), "Home background is exactly 941x1672 (%s)" % str(img.get_size() if img else null))
+	_ok(FileAccess.get_sha256(WORLD_PATH) == WORLD_SHA, "Home background SHA-256 is the owner plaza %s" % WORLD_SHA)
 	_ok(FileAccess.file_exists(OLD_WORLD_PATH), "retired HOME-120 file is kept on disk (never deleted or overwritten)")
+	_ok(FileAccess.get_sha256(M28_WORLD_PATH) == M28_WORLD_SHA, "retired HOME-121 file is kept byte-identical on disk")
 	_complete("world_asset_identity")
 
 func _binds(home) -> void:
@@ -125,16 +129,21 @@ func _binds(home) -> void:
 	for a in m["assets"]:
 		if a["slug"] == WORLD_SLUG:
 			entry = a
-	_ok(entry.get("id") == "HOME-121" and entry.get("status") == "APPROVED" and entry.get("approved_sha256") == WORLD_SHA and entry.get("path") == WORLD_PATH.trim_prefix("res://"), "manifest HOME-121 APPROVED with the exact sha + final path")
-	_ok(V.validate(m)["ok"], "manifest validates with HOME-121")
+	_ok(entry.get("id") == "HOME-124" and entry.get("status") == "APPROVED" and entry.get("approved_sha256") == WORLD_SHA and entry.get("path") == WORLD_PATH.trim_prefix("res://"), "manifest HOME-124 APPROVED with the exact sha + final path")
+	_ok(V.validate(m)["ok"], "manifest validates with HOME-124")
 	var binder := HomeArtBinder.new()
 	_ok(binder.state(WORLD_SLUG) == "APPROVED_BOUND", "HomeArtBinder gate: APPROVED_BOUND")
 	var wb: TextureRect = home.get_region("WorldBackground")
-	_ok(wb.texture != null and wb.texture.resource_path == WORLD_PATH and wb.is_visible_in_tree(), "WorldBackground presents HOME-121 (the owner-selected file)")
+	_ok(wb.texture != null and wb.texture.resource_path == WORLD_PATH and wb.is_visible_in_tree(), "WorldBackground presents HOME-124 (the owner plaza file)")
 	var acc: Dictionary = {}
 	for row in home.get_presentation_accounting():
 		acc[row["id"]] = row
-	_ok(acc["HOME-121"]["mode"] == "STATIC" and acc["HOME-121"]["nodes"][0]["name"] == "WorldBackground" and acc["HOME-120"]["mode"] == "OWNER_RETIRED" and (acc["HOME-120"]["nodes"] as Array).is_empty(), "HOME-121 accounted STATIC on WorldBackground; replaced HOME-120 is OWNER_RETIRED with no node")
+	_ok(acc["HOME-124"]["mode"] == "STATIC" and acc["HOME-124"]["nodes"][0]["name"] == "WorldBackground" and acc["HOME-120"]["mode"] == "OWNER_RETIRED" and (acc["HOME-120"]["nodes"] as Array).is_empty(), "HOME-124 accounted STATIC on WorldBackground; replaced HOME-120 is OWNER_RETIRED with no node")
+	var retired_ok := true
+	for id in ["HOME-121", "HOME-123"]:
+		retired_ok = retired_ok and acc[id]["mode"] == "OWNER_RETIRED" and (acc[id]["nodes"] as Array).is_empty()
+	var hero = home.get_region("HomeScrubbyHero")
+	_ok(retired_ok and not hero.has_video() and hero.has_frames() and not home.get_region("WorldStill").visible and home.get_region("WorldStill").texture == null and home.get_region("Art_scrubby").is_visible_in_tree(), "SB-HOME-BG-2026-11-16: HOME-121 + the HOME-123 video still retired; no video set bound, frame-set Scrubby shown over HOME-124")
 	_complete("world_binds_through_lifecycle")
 
 func _no_duplicates(home) -> void:
@@ -161,10 +170,23 @@ func _no_duplicates(home) -> void:
 	_ok(nodes.is_empty(), "no platform / helper / portal / layered-background / live area-title nodes exist %s" % str(nodes))
 	var area_text := false
 	for l in home.find_children("*", "Label", true, false):
+		if l.name in ["HomeAreaTitle", "HomeAreaNumber"]:
+			continue
 		var t := String(l.text).to_upper()
 		if t.find("WHISPERING") != -1 or t.find("AREA") != -1:
 			area_text = true
-	_ok(not area_text, "no live WHISPERING PARK / AREA label over the baked sign")
+	_ok(not area_text, "no stray WHISPERING PARK / AREA text outside the native area label")
+	# SB-HOME-BG-2026-11-16: the area name is native text (no longer baked into the art).
+	var title: Label = home.get_region("HomeAreaTitle")
+	var number: Label = home.get_region("HomeAreaNumber")
+	_ok(title.text == UiText.t("HOME_AREA_TITLE") and number.text == UiText.t("HOME_AREA_NUMBER", [1]) and title.is_visible_in_tree() and number.is_visible_in_tree(), "native area label: %s / %s" % [title.text, number.text])
+	_ok(title.get_theme_constant("outline_size") >= 9 and home.get_region("HomeAreaLabel").get_parent() == home.get_region("Layer_characters"), "area label outlined, in the world character layer (below all live UI)")
+	var prev_locale := UiText.locale
+	UiText.locale = "tr"
+	home.refresh()
+	_ok(title.text == "FISILTILI PARK" and number.text == "BÖLGE 1", "TR area label: %s / %s" % [title.text, number.text])
+	UiText.locale = prev_locale
+	home.refresh()
 	var tex_count := 0
 	for n in home.find_children("*", "TextureRect", true, false):
 		if (n as TextureRect).texture != null and (n as TextureRect).texture.resource_path == WORLD_PATH and n.is_visible_in_tree():
@@ -190,8 +212,8 @@ func _anchor(home) -> void:
 	var feet_screen: Vector2 = home.world_to_screen(FEET)
 	var k: float = c["k"] * t["scale"]
 	_ok(absf(sc.position.y + HomeScreenScript.SCRUBBY_FEET_Y * k - feet_screen.y) < 0.5, "on screen the soles sit on the mapped anchor")
-	var sign: Rect2 = w["baked_sign_rect"]
-	_ok(not vr.intersects(sign), "Scrubby does not cover the baked sign")
+	var sign: Rect2 = w["area_label_rect"]
+	_ok(not vr.intersects(sign), "Scrubby does not cover the area label band")
 	# M42-C002 (owner lock 1.612): the hero bbox edges reach <= 47 canvas px into each bot
 	# rect; pixel-level only the brush bristles enter the left one, the right one gets no
 	# hero pixel (tests/m42_c002_scrubby_scale.gd).
@@ -426,7 +448,7 @@ func _world_seam() -> void:
 	var txt := FileAccess.get_file_as_string(HomeWorldCatalog.PATH).to_lower()
 	_ok(txt.find("level_range") == -1 and txt.find("\"levels\"") == -1 and txt.find("world_02") == -1, "no level ranges / World 02+ invented")
 	var w := HomeWorldCatalog.world("world_01")
-	_ok(w["background_slug"] == WORLD_SLUG and w["canvas"] == Vector2(940, 1672), "world_id -> background slug + canvas + anchor contract")
+	_ok(w["background_slug"] == WORLD_SLUG and w["canvas"] == Vector2(941, 1672), "world_id -> background slug + canvas + anchor contract")
 	_ok(HomeWorldCatalog.world("world_99").is_empty(), "unknown world -> empty (no fallback invention)")
 	_complete("world_seam")
 
@@ -471,7 +493,29 @@ func _matrix() -> void:
 			var ad: Rect2 = home.get_region("AdBannerSlot").get_global_rect()
 			if absf(ad.end.y - safe.end.y) > 1.0:
 				bad.append("ad_not_at_safe_bottom")
-			_ok(bad.is_empty(), "%s insets=%s: touch >= 88 in safe area, world uniform + covering, platform above PLAY, feet on anchor, panels clear of bots/meter, ad at bottom %s" % [str(size), str(insets), str(bad)])
+			# SB-HOME-BG-2026-11-16: the native area label sits in the sky band, one line each,
+			# clear of the HUD, Gift Meter, Scrubby, PLAY and every shortcut panel.
+			# Only the short 16:9 / tablet extras with a deep notch may hide it (no sky left).
+			var al: Rect2 = home.get_region("HomeAreaLabel").get_global_rect()
+			var cv: Rect2 = c["visible_rect"]
+			var hero_r := Rect2(home.world_to_screen(cv.position), cv.size * t["scale"])
+			var shown: bool = home.get_region("HomeAreaLabel").is_visible_in_tree()
+			if MATRIX.find(size) < 5 and not shown:
+				bad.append("area_label_hidden_on_required_viewport")
+			if not shown:
+				al = Rect2()
+			elif al.size.x < 200.0 or al.size.y < 40.0:
+				bad.append("area_label_too_small")
+			for n in ["TopCurrencyHUD", "ProfileCard", "GiftMeter", "PlayButton", "Shortcut_shop", "Shortcut_collection", "Shortcut_tasks", "Shortcut_daily"]:
+				if al.intersects(home.get_region(n).get_global_rect()):
+					bad.append("area_label_over_" + n)
+			if al.intersects(hero_r):
+				bad.append("area_label_over_scrubby")
+			for n in ["HomeAreaTitle", "HomeAreaNumber"]:
+				var l: Label = home.get_region(n)
+				if shown and l.get_line_count() != 1 or l.get_theme_font("font").get_string_size(l.text, HORIZONTAL_ALIGNMENT_LEFT, -1, l.get_theme_font_size("font_size")).x > l.size.x + 0.5:
+					bad.append(n + "_not_fitting")
+			_ok(bad.is_empty(), "%s insets=%s: touch >= 88 in safe area, world uniform + covering, platform above PLAY, feet on anchor, panels clear of bots/meter, ad at bottom, area label clear + fitting %s" % [str(size), str(insets), str(bad)])
 			r[0].free()
 			await process_frame
 	_complete("responsive_matrix")
@@ -486,7 +530,7 @@ func _historical() -> void:
 			n += 1
 			if FileAccess.get_sha256("res://" + String(a["path"])) != String(a["approved_sha256"]):
 				bad.append(a["id"])
-	_ok(n == 54 and bad.is_empty(), "all 54 APPROVED entries (R15-004 + HOME-122 + HOME-123) (incl. retired history) match their pinned sha %s" % str(bad))
+	_ok(n == 55 and bad.is_empty(), "all 55 APPROVED entries (R15-004 + HOME-122 + HOME-123 + HOME-124) (incl. retired history) match their pinned sha %s" % str(bad))
 	_complete("historical_assets_intact")
 
 func _complete(c: String) -> void:

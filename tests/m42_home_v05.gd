@@ -18,23 +18,23 @@ const V = preload("res://scripts/tools/home_asset_manifest_validator.gd")
 
 const WORLD_PATH := "res://assets/ui/final/home/worlds/world_01_whispering_park_1080x2160.png"
 const WORLD_SHA := "8e04eda668aabd9f96172c0e82fd7dd47e61083cb691402a313120443a525e5b"
-## World transforms re-baselined for the owner-selected 940x1672 Home background (M28-C002-C003-R01 V02); the V04 values applied to the retired 1080x2160 world. [size, insets
+## World transforms re-baselined for the owner-selected 940x1672 Home background (M28-C002-C003-R01 V02) and the 941x1672 owner plaza (SB-HOME-BG-2026-11-16: x offset -scale/2); the V04 values applied to the retired 1080x2160 world. [size, insets
 ## top/bottom, scale, offset].
 const V04_TRANSFORMS := [
-	[Vector2i(1080, 2160), 0, 0, 1.23544, Vector2(-40.65534, -74.65048)],
-	[Vector2i(1080, 2160), 132, 96, 1.13337, Vector2(7.314593, -42.05024)],
-	[Vector2i(1170, 2532), 0, 0, 1.4067, Vector2(-76.14832, 0.0)],
-	[Vector2i(1170, 2532), 132, 96, 1.34928, Vector2(-49.16268, 0.0)],
-	[Vector2i(1290, 2796), 0, 0, 1.56459, Vector2(-90.35885, 0.0)],
-	[Vector2i(1290, 2796), 132, 96, 1.50718, Vector2(-63.37321, 0.0)],
-	[Vector2i(1080, 2400), 0, 0, 1.33433, Vector2(-87.13517, 0.0)],
-	[Vector2i(1080, 2400), 132, 96, 1.27691, Vector2(-60.14952, -6.911483)],
-	[Vector2i(1440, 3200), 0, 0, 1.80622, Vector2(-128.9234, 0.0)],
-	[Vector2i(1440, 3200), 132, 96, 1.7488, Vector2(-101.9378, 0.0)],
-	[Vector2i(1080, 1920), 0, 0, 1.04725, Vector2(47.79306, -53.53349)],
-	[Vector2i(1080, 1920), 132, 96, 0.98983, Vector2(74.77871, -77.189)],
-	[Vector2i(1536, 2048), 0, 0, 1.14269, Vector2(230.9357, -56.78947)],
-	[Vector2i(1536, 2048), 132, 96, 1.05981, Vector2(269.89, -48.35885)],
+	[Vector2i(1080, 2160), 0, 0, 1.23544, Vector2(-41.2731, -74.65048)],
+	[Vector2i(1080, 2160), 132, 96, 1.13337, Vector2(6.74791, -42.05024)],
+	[Vector2i(1170, 2532), 0, 0, 1.4067, Vector2(-76.8517, 0.0)],
+	[Vector2i(1170, 2532), 132, 96, 1.34928, Vector2(-49.8373, 0.0)],
+	[Vector2i(1290, 2796), 0, 0, 1.56459, Vector2(-91.1411, 0.0)],
+	[Vector2i(1290, 2796), 132, 96, 1.50718, Vector2(-64.1268, 0.0)],
+	[Vector2i(1080, 2400), 0, 0, 1.33433, Vector2(-87.8023, 0.0)],
+	[Vector2i(1080, 2400), 132, 96, 1.27691, Vector2(-60.788, -6.911483)],
+	[Vector2i(1440, 3200), 0, 0, 1.80622, Vector2(-129.827, 0.0)],
+	[Vector2i(1440, 3200), 132, 96, 1.7488, Vector2(-102.812, 0.0)],
+	[Vector2i(1080, 1920), 0, 0, 1.04725, Vector2(47.2694, -53.53349)],
+	[Vector2i(1080, 1920), 132, 96, 0.98983, Vector2(74.2838, -77.189)],
+	[Vector2i(1536, 2048), 0, 0, 1.14269, Vector2(230.364, -56.78947)],
+	[Vector2i(1536, 2048), 132, 96, 1.05981, Vector2(269.36, -48.35885)],
 ]
 ## V04 audited lower-stack Y at 1080x2160 (a8b953e): PLAY top 1490, ad slot 169 px.
 const V04_PLAY_TOP_1080 := 1490.0
@@ -106,7 +106,7 @@ func _world_fixed(home) -> void:
 	var wb: Control = home.get_region("WorldBackground")
 	var before: Rect2 = wb.get_global_rect()
 	var feet_before: float = home.get_region("Art_scrubby").get_global_rect().position.y
-	_ok(absf(float(home.get_world_transform()["scale"]) - 1.23544) < 0.0005 and (home.get_world_transform()["offset"] as Vector2).distance_to(Vector2(-40.65534, -74.65048)) < 0.6, "1080x2160: scale 1.23544, offset (-40.66,-74.65) (940x1672 Home background)")
+	_ok(absf(float(home.get_world_transform()["scale"]) - 1.23544) < 0.0005 and (home.get_world_transform()["offset"] as Vector2).distance_to(Vector2(-41.27306, -74.65048)) < 0.6, "1080x2160: scale 1.23544, offset (-41.27,-74.65) (941x1672 Home background)")
 	home.set_ad_slot_enabled(false)
 	for _i in range(4):
 		await process_frame
@@ -129,7 +129,7 @@ func _scrubby(home) -> void:
 	_ok(absf(c["center_x"] - 470.0) < 0.01 and absf(c["feet_y"] - 1240.0) < 0.01, "centre X 470 / soles Y 1240 (new world anchor) (%.2f, %.2f)" % [c["center_x"], c["feet_y"]])
 	_ok(absf(float(c["k"]) / float(c["k_v04"]) - HS.SCRUBBY_SCALE) < 0.001 and HS.SCRUBBY_SCALE >= 1.15, "visible scale %.3f x V04 (V05 1.15, V06 1.24, M42-C002 1.612) (k %.5f vs %.5f)" % [HS.SCRUBBY_SCALE, c["k"], c["k_v04"]])
 	var vr: Rect2 = c["visible_rect"]
-	_ok(not vr.intersects(w["baked_sign_rect"]), "clears the baked sign (top %.1f > sign bottom %.1f)" % [vr.position.y, (w["baked_sign_rect"] as Rect2).end.y])
+	_ok(not vr.intersects(w["area_label_rect"]), "clears the area label band (top %.1f > sign bottom %.1f)" % [vr.position.y, (w["area_label_rect"] as Rect2).end.y])
 	# M42-C002 (owner lock 1.612): the hero bbox edges reach <= 47 canvas px into each bot
 	# rect; pixel-level only the brush bristles enter the left one, the right one gets no
 	# hero pixel (tests/m42_c002_scrubby_scale.gd).
@@ -369,7 +369,7 @@ func _assets() -> void:
 			n += 1
 			if FileAccess.get_sha256("res://" + String(a["path"])) != String(a["approved_sha256"]):
 				bad.append(a["id"])
-	_ok(n == 54 and bad.is_empty(), "all 54 approved entries (R15-004 + HOME-122 + HOME-123) match their pins %s" % str(bad))
+	_ok(n == 55 and bad.is_empty(), "all 55 approved entries (R15-004 + HOME-122 + HOME-123 + HOME-124) match their pins %s" % str(bad))
 	_complete("asset_integrity")
 
 func _complete(c: String) -> void:

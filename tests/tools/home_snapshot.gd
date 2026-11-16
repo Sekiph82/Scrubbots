@@ -3,7 +3,8 @@ extends SceneTree
 ## Renders the REAL scenes/ui/home/home_screen.tscn bound to a representative,
 ## non-destructive AppState (isolated temp save) inside a SubViewport and saves PNGs.
 ## Needs a rendering driver (run WITHOUT --headless):
-##   godot --path . -s res://tests/tools/home_snapshot.gd -- <out_dir> [WxH ...] [modals]
+##   godot --path . -s res://tests/tools/home_snapshot.gd -- <out_dir> [WxH ...] [modals] [tr]
+## `tr` renders the Turkish UI text.
 ## `modals` additionally captures, at the first size, the Heart full / after-consume
 ## states, the ad slot collapsed and the Daily popup / Settings panel open over Home.
 ## Output goes to <out_dir> (never to approved art paths).
@@ -12,6 +13,7 @@ const AppState = preload("res://scripts/app/app_state.gd")
 const HomeScreenScene = preload("res://scenes/ui/home/home_screen.tscn")
 const LocalCalendar = preload("res://scripts/economy/local_calendar.gd")
 const SettingsPanelScene = preload("res://scenes/ui/settings_panel.tscn")
+const UiText = preload("res://scripts/ui/ui_text.gd")
 
 const DEFAULT_SIZES := [Vector2i(1080, 2160)]
 
@@ -20,8 +22,10 @@ func _initialize() -> void:
 	var out_dir := "user://home_snapshots"
 	var sizes: Array = []
 	var modals := args.has("modals")
+	if args.has("tr"):
+		UiText.locale = "tr"
 	for a in args:
-		if a == "modals":
+		if a == "modals" or a == "tr":
 			continue
 		if a.find("x") > 0 and a.split("x").size() == 2 and a.split("x")[0].is_valid_int():
 			sizes.append(Vector2i(int(a.split("x")[0]), int(a.split("x")[1])))

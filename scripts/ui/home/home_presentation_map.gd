@@ -70,9 +70,10 @@ const ENTRIES := {
 	"HOME-104": {"slug": "icon_nav_leaderboard", "mode": "STATIC", "slot": "texture", "nodes": ["NavIcon_leaderboard"]},
 	"HOME-105": {"slug": "icon_nav_settings", "mode": "STATIC", "slot": "texture", "nodes": ["NavIcon_settings"]},
 	"HOME-120": {"slug": "world_01_whispering_park_background", "mode": "OWNER_RETIRED", "slot": "texture", "nodes": [], "reason": "M28-C002-C003-R01 V02: replaced as the Home background by the owner-selected HOME-121 (file kept byte-identical, never loaded by Home)"},
-	"HOME-121": {"slug": "home_background_whispering_park", "mode": "STATIC", "slot": "texture", "nodes": ["WorldBackground"]},
+	"HOME-121": {"slug": "home_background_whispering_park", "mode": "OWNER_RETIRED", "slot": "texture", "nodes": [], "reason": "SB-HOME-BG-2026-11-16: replaced as the Home background by the owner plaza HOME-124 (file kept byte-identical, never loaded by Home)"},
 	"HOME-122": {"slug": "icon_shortcut_rewarded_ads", "mode": "STATIC", "slot": "texture", "nodes": ["ShortcutIcon_rewarded_ads"]},
-	"HOME-123": {"slug": "home_scrubby_video_still", "mode": "STATIC", "slot": "texture", "nodes": ["WorldStill"]},
+	"HOME-123": {"slug": "home_scrubby_video_still", "mode": "OWNER_RETIRED", "slot": "texture", "nodes": [], "reason": "SB-HOME-BG-2026-11-16: the old background is baked into the still and every video frame, so it would cover HOME-124 (files kept byte-identical, never loaded by Home)"},
+	"HOME-124": {"slug": "home_background_plaza", "mode": "STATIC", "slot": "texture", "nodes": ["WorldBackground"]},
 }
 
 ## Modes that present nothing in the active Home composition.

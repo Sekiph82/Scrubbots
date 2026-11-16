@@ -29,7 +29,7 @@ static func world(world_id: String = "", catalog: Dictionary = {}) -> Dictionary
 		"scrubby_feet_anchor": Vector2(w["scrubby_feet_anchor"][0], w["scrubby_feet_anchor"][1]),
 		"scrubby_safe_box": _rect(w["scrubby_safe_box"]),
 		"platform_top_rect": _rect(w["platform_top_rect"]),
-		"baked_sign_rect": _rect(w["baked_sign_rect"]),
+		"area_label_rect": _rect(w["area_label_rect"]),
 		"helper_bot_rects": bots,
 	}
 

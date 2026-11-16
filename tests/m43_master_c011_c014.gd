@@ -72,7 +72,7 @@ func _w01() -> void:
 	var w := WorldService.world_for_level(1)
 	_ok(w["id"] == "world_01" and w["name"] == "Whispering Park" and w["first"] == 1 and w["last"] == 150, "world_01 Whispering Park 1-150")
 	var home = JSON.parse_string(FileAccess.get_file_as_string("res://data/config/home_worlds_v1.json"))
-	_ok(home["default_world"] == "world_01" and String(home["worlds"]["world_01"]["background_slug"]) == "home_background_whispering_park", "Home world_01 default, owner background slug")
+	_ok(home["default_world"] == "world_01" and String(home["worlds"]["world_01"]["background_slug"]) == "home_background_plaza", "Home world_01 default, owner background slug")
 	_complete("w01_world01_default_preserved")
 
 func _w02() -> void:

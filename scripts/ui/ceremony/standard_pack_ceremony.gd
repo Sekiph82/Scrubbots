@@ -83,7 +83,7 @@ enum Phase { IDLE, OPENING, AWAIT_ROUTE, ROUTING, COMPLETE }
 const PHASE_NAMES := ["IDLE", "OPENING", "AWAIT_ROUTE", "ROUTING", "COMPLETE"]
 
 ## V04 stage dressing: existing approved art only (Home background, card back, sparkle).
-const HOME_BG := "res://assets/ui/final/home/background/home_background.png"
+const HOME_BG := "res://assets/ui/final/home/background/home_background_plaza.png"
 const CARD_BACK := "res://assets/ui/final/collection/states/card_back.png"
 const SPARKLE := "res://assets/ui/final/gameplay/effects/fx_clean_sparkle.png"
 const ACCENT := Color(0.30, 0.68, 1.0)          ## Standard rim glow / rays (blue)

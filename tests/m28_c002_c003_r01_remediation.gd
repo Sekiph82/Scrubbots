@@ -4,7 +4,8 @@ extends SceneTree
 ##   2 WAITING / ACTIVE words are gone from the five/six-slot row;
 ##   3 railway-first Scrubbot routing (leave the rail at the perimeter point nearest the target);
 ##   4 dynamic logical-pixel grid + subtle bevel (presentation only);
-##   5 Home uses exactly assets/ui/final/home/background/home_background.png.
+##   5 Home uses exactly assets/ui/final/home/background/home_background_plaza.png
+##     (SB-HOME-BG-2026-11-16 owner plaza; it superseded home_background.png).
 ## Real app root (main.tscn) with an injected wall clock for 1/2/5, real routing / board classes
 ## for 3/4. Cases 4's rendered-pixel checks need a GPU: tests/tools/board_grid_probe.gd.
 ##
@@ -30,8 +31,9 @@ const HomeScreenScript = preload("res://scripts/ui/home/home_screen.gd")
 ## Injected clock origin = the real wall clock at start: SaveService validates candidates in a scratch
 ## graph that reads the REAL clock, so a far-future injected origin would not round-trip a save.
 var T0 := int(Time.get_unix_time_from_system()) - 100000
-const HOME_BG := "res://assets/ui/final/home/background/home_background.png"
-const HOME_BG_SHA := "9d5db29513d25ad5c0932840c08027be0198d0cd85dc758a69e09e800c7aabe2"
+const HOME_BG := "res://assets/ui/final/home/background/home_background_plaza.png"
+const HOME_BG_SHA := "0aa7463b12cd156883aeb8d9b91f59632bbe6899ce4a61ad74a6f77026f9cde3"
+const OLD_HOME_BG := "res://assets/ui/final/home/background/home_background.png"
 
 var EXPECTED_CASES := [
 	"t01_timed_next_level_2x", "t02_relaunch_2x", "t03_manual_1x_free_next_level_2x",
@@ -687,19 +689,19 @@ func _grid() -> void:
 # ============================================================ 5 Home ============
 
 func _home() -> void:
-	print("[5 Home background = the owner-selected home_background.png]")
+	print("[5 Home background = the owner plaza home_background_plaza.png]")
 	await _boot(0)
 	var home = _root.get_home()
 	await _settle()
 	var wb: TextureRect = home.get_region("WorldBackground")
 	var tex: Texture2D = wb.texture
-	_ok(FileAccess.get_sha256(HOME_BG) == HOME_BG_SHA and tex != null and tex.resource_path == HOME_BG and tex.get_width() == 940 and tex.get_height() == 1672,
-		"H1 WorldBackground renders exactly %s (940x1672, sha256 matches the owner-selected file)" % HOME_BG)
+	_ok(FileAccess.get_sha256(HOME_BG) == HOME_BG_SHA and tex != null and tex.resource_path == HOME_BG and tex.get_width() == 941 and tex.get_height() == 1672,
+		"H1 WorldBackground renders exactly %s (941x1672, sha256 matches the owner-selected file)" % HOME_BG)
 	var binder := HomeArtBinder.new()
-	_ok(binder.state("home_background_whispering_park") == "APPROVED_BOUND" and binder.texture("home_background_whispering_park") == tex, "H1 the bound texture is the manifest-approved HOME-121 entry")
+	_ok(binder.state("home_background_plaza") == "APPROVED_BOUND" and binder.texture("home_background_plaza") == tex, "H1 the bound texture is the manifest-approved HOME-124 entry")
 	var world: Dictionary = home.get_world()
-	_ok(world["background_slug"] == "home_background_whispering_park" and world["canvas"] == Vector2(940, 1672), "H1 catalog world_01 -> home_background_whispering_park @ 940x1672")
-	_ok(absf(wb.size.x / wb.size.y - 940.0 / 1672.0) < 0.001, "H1 drawn at the image's own aspect (uniform scale, never stretched)")
+	_ok(world["background_slug"] == "home_background_plaza" and world["canvas"] == Vector2(941, 1672), "H1 catalog world_01 -> home_background_plaza @ 941x1672")
+	_ok(absf(wb.size.x / wb.size.y - 941.0 / 1672.0) < 0.001, "H1 drawn at the image's own aspect (uniform scale, never stretched)")
 	_complete("h01_home_uses_exact_asset")
 	# No stale background: nothing else draws the old world / layered backgrounds.
 	var drawn: Array = []
@@ -707,7 +709,7 @@ func _home() -> void:
 		var t: Texture2D = (n as TextureRect).texture
 		if t != null and (n as CanvasItem).is_visible_in_tree():
 			drawn.append(t.resource_path)
-	var stale: Array = drawn.filter(func(p): return String(p).find("worlds/world_01") != -1 or String(p).find("home_bg_") != -1)
+	var stale: Array = drawn.filter(func(p): return String(p).find("worlds/world_01") != -1 or String(p).find("home_bg_") != -1 or p == OLD_HOME_BG or String(p).find("home_scrubby_still") != -1)
 	var count_bg: int = drawn.count(HOME_BG)
 	_ok(stale.is_empty() and count_bg == 1, "H2 the new background is drawn once; no old world / layered background texture is visible (%d, stale %s)" % [count_bg, str(stale)])
 	var wb_index: int = wb.get_index()

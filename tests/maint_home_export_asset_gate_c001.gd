@@ -85,7 +85,7 @@ func _strict_real() -> void:
 func _strict_wrong_pin() -> void:
 	print("[strict: wrong pin]")
 	var m := _m()
-	m["assets"][_idx(m, "home_background_whispering_park")]["approved_sha256"] = "a".repeat(64)
+	m["assets"][_idx(m, "home_background_plaza")]["approved_sha256"] = "a".repeat(64)
 	var r: Dictionary = V.validate(m)
 	_ok(not r["ok"] and _has_err(r, "approved asset changed on disk"), "valid-format but wrong ART pin fails strict %s" % _errs(r))
 	var m2 := _m()
@@ -99,7 +99,7 @@ func _strict_absent() -> void:
 	var r: Dictionary = V.validate(_m(), NO_SOURCE_ROOT, STRICT)
 	_ok(not r["ok"] and _has_err(r, "approved source missing"), "strict with no source tree fails (missing source is an error) %s" % _errs(r))
 	var b = HomeArtBinder.new(null, STRICT, NO_SOURCE_ROOT)
-	_ok(not b.is_manifest_valid() and b.texture("home_background_whispering_park") == null and b.animation_set(SET_ID).is_empty(), "strict binder without sources binds nothing")
+	_ok(not b.is_manifest_valid() and b.texture("home_background_plaza") == null and b.animation_set(SET_ID).is_empty(), "strict binder without sources binds nothing")
 	_complete("strict_source_absent")
 
 func _packaged_without_source() -> void:
@@ -120,8 +120,8 @@ func _packaged_binder() -> void:
 		n += 1
 		if b.state(slug) != "APPROVED_BOUND" or b.texture(slug) == null:
 			bad.append(slug)
-	_ok(bad.is_empty() and n == 54, "all %d approved ART entries APPROVED_BOUND with a texture (R15-004: + HOME-122; SB-POLISH-009: + HOME-123) %s" % [n, str(bad)])
-	for slug in ["home_background_whispering_park", "scrubby_home_pose", "icon_shortcut_shop", "icon_currency_scrub_bucks"]:
+	_ok(bad.is_empty() and n == 55, "all %d approved ART entries APPROVED_BOUND with a texture (R15-004: + HOME-122; SB-POLISH-009: + HOME-123; SB-HOME-BG-2026-11-16: + HOME-124) %s" % [n, str(bad)])
+	for slug in ["home_background_plaza", "scrubby_home_pose", "icon_shortcut_shop", "icon_currency_scrub_bucks"]:
 		if _idx(m, slug) >= 0:
 			_ok(b.texture(slug) != null, "%s binds without source bytes" % slug)
 	_ok(b.state("not_a_slug") == "UNKNOWN", "unknown slug stays UNKNOWN")
@@ -147,15 +147,15 @@ func _packaged_rejections() -> void:
 	m0["schema_version"] = 2
 	_ok(not V.validate(m0, NO_SOURCE_ROOT, PACKAGED)["ok"], "wrong schema_version rejected")
 	var m1 := _m()
-	m1["assets"][_idx(m1, "home_background_whispering_park")]["status"] = "OWNER_REVIEW"
+	m1["assets"][_idx(m1, "home_background_plaza")]["status"] = "OWNER_REVIEW"
 	var b1 = HomeArtBinder.new(m1, PACKAGED, NO_SOURCE_ROOT)
-	_ok(b1.state("home_background_whispering_park") == "NOT_APPROVED" and b1.texture("home_background_whispering_park") == null, "unapproved ART never binds")
+	_ok(b1.state("home_background_plaza") == "NOT_APPROVED" and b1.texture("home_background_plaza") == null, "unapproved ART never binds")
 	var m2 := _m()
-	m2["assets"][_idx(m2, "home_background_whispering_park")]["path"] = "assets/ui/home_background_outside_final.png"
+	m2["assets"][_idx(m2, "home_background_plaza")]["path"] = "assets/ui/home_background_outside_final.png"
 	var r2: Dictionary = V.validate(m2, NO_SOURCE_ROOT, PACKAGED)
 	_ok(not r2["ok"] and _has_err(r2, "under assets/ui/final/"), "approved path outside assets/ui/final/ rejected")
 	var m3 := _m()
-	m3["assets"][_idx(m3, "home_background_whispering_park")]["path"] = "assets/ui/final/home/background/does_not_exist.png"
+	m3["assets"][_idx(m3, "home_background_plaza")]["path"] = "assets/ui/final/home/background/does_not_exist.png"
 	var r3: Dictionary = V.validate(m3, NO_SOURCE_ROOT, PACKAGED)
 	_ok(not r3["ok"] and _has_err(r3, "packaged resource does not resolve"), "missing packaged ART resource rejected %s" % _errs(r3))
 	var b3 = HomeArtBinder.new(m3, PACKAGED, NO_SOURCE_ROOT)
@@ -166,7 +166,7 @@ func _packaged_rejections() -> void:
 	_ok(not r4["ok"] and _has_err(r4, "does not resolve"), "missing packaged animation frame rejected")
 	for spec in [["erase", ""], ["short", "abc"], ["upper", "A".repeat(64)], ["nonhex", "z".repeat(64)]]:
 		var m5 := _m()
-		var a: Dictionary = m5["assets"][_idx(m5, "home_background_whispering_park")]
+		var a: Dictionary = m5["assets"][_idx(m5, "home_background_plaza")]
 		if spec[0] == "erase":
 			a.erase("approved_sha256")
 		else:
@@ -190,12 +190,12 @@ func _strict_tamper() -> void:
 	# Dynamic: diverge source identity AFTER construction; state() re-hashes every call.
 	var live := _m()
 	var bl = HomeArtBinder.new(live, STRICT)
-	var i := _idx(live, "home_background_whispering_park")
-	_ok(bl.state("home_background_whispering_park") == "APPROVED_BOUND", "strict binder binds while bytes == pin")
+	var i := _idx(live, "home_background_plaza")
+	_ok(bl.state("home_background_plaza") == "APPROVED_BOUND", "strict binder binds while bytes == pin")
 	live["assets"][i]["approved_sha256"] = "e".repeat(64)
-	_ok(bl.state("home_background_whispering_park") == "HASH_MISMATCH" and bl.texture("home_background_whispering_park") == null, "strict state() re-hashes on every call: post-construction divergence never binds")
+	_ok(bl.state("home_background_plaza") == "HASH_MISMATCH" and bl.texture("home_background_plaza") == null, "strict state() re-hashes on every call: post-construction divergence never binds")
 	var bp = HomeArtBinder.new(_m(), PACKAGED)
-	_ok(bp.get_mode() == PACKAGED and bp.state("home_background_whispering_park") == "APPROVED_BOUND", "packaged binder never hashes raw source (state via ResourceLoader)")
+	_ok(bp.get_mode() == PACKAGED and bp.state("home_background_plaza") == "APPROVED_BOUND", "packaged binder never hashes raw source (state via ResourceLoader)")
 	_complete("strict_tamper_dynamic")
 
 func _generated() -> void:

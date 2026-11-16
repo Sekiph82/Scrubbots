@@ -1,16 +1,15 @@
 {
   "schema_version": 1,
-  "authority": "coordination/sessions/M28-C002-C003-R01/CHATGPT_PROMPT_V02.md (owner-selected Home background, finding 5); supersedes coordination/OWNER_M42_HOME_REBUILD_V04_SINGLE_WORLD_BACKGROUND.md for the background asset only",
-  "notes": "Home world backgrounds: one complete owner-approved background per world in that image's native pixel space (World 01 = 940x1672, displayed at a uniform scale, never stretched). Level-number -> world mapping lives in data/config/worlds_v1.json (SB-M43-136); a world without its own approved Home background shows the default world's. Rects are [x, y, w, h] in that canvas's pixels.",
+  "authority": "coordination/sessions/M28-C002-C003-R01/CHATGPT_PROMPT_V02.md (owner-selected Home background, finding 5; background replaced by the owner plaza image, SB-HOME-BG-2026-11-16); supersedes coordination/OWNER_M42_HOME_REBUILD_V04_SINGLE_WORLD_BACKGROUND.md for the background asset only",
+  "notes": "Home world backgrounds: one complete owner-approved background per world in that image's native pixel space (World 01 = 941x1672, displayed at a uniform scale, never stretched). Level-number -> world mapping lives in data/config/worlds_v1.json (SB-M43-136); a world without its own approved Home background shows the default world's. Rects are [x, y, w, h] in that canvas's pixels. area_label_rect is the sky band for the native WHISPERING PARK / AREA n label (no text is baked into the art).",
   "default_world": "world_01",
   "worlds": {
     "world_01": {
-      "background_slug": "home_background_whispering_park",
+      "background_slug": "home_background_plaza",
       "canvas": [
-        940,
+        941,
         1672
       ],
-      "baked_title": "WHISPERING PARK / AREA 1",
       "scrubby_feet_anchor": [
         470,
         1240
@@ -27,7 +26,7 @@
         820,
         220
       ],
-      "baked_sign_rect": [
+      "area_label_rect": [
         230,
         405,
         480,

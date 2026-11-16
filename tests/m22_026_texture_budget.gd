@@ -35,7 +35,7 @@ const HOME := [
 	"home/reward_track/reward_gift_100.png", "common/navigation/icon_nav_events.png",
 	"common/navigation/icon_nav_robots.png", "common/navigation/icon_nav_home.png",
 	"common/navigation/icon_nav_leaderboard.png", "common/navigation/icon_nav_settings.png",
-	"home/background/home_background.png",
+	"home/background/home_background_plaza.png",
 ]
 const HOME_FRAMES := {"bow": 15, "full_turn": 17, "turn": 17, "wave": 14}
 ## Gameplay: gameplay_screen (fallback shell, portrait, boosters + state art), scrub rail,
@@ -104,7 +104,7 @@ const CEREMONIES := [
 	"collection/states/card_back.png", "collection/states/card_new_glow.png",
 	"common/currencies/icon_currency_scrub_bucks.png", "common/frames/popup_large_frame.png",
 	"common/frames/popup_medium_frame.png", "common/frames/popup_reward_frame.png",
-	"gameplay/tutorial/speech_bubble.png", "home/background/home_background.png",
+	"gameplay/tutorial/speech_bubble.png", "home/background/home_background_plaza.png",
 	"home/gift_meter/gift_meter_reward_crate.png", "home/shortcuts/icon_shortcut_cards_exchange.png",
 	"home/shortcuts/icon_shortcut_collection.png", "popups/victory/reward_glow.png",
 	"rewards/booster_of_choice.png", "rewards/card_pack_premium.png",

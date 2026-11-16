@@ -7,8 +7,8 @@ extends SceneTree
 ##
 ## Run: godot --headless --path . -s res://tests/m42_c003_scrubby_animation.gd
 ## measure_frames() is shared with tests/tools/m42_c003_animation_evidence.gd.
-## SB-POLISH-009: live Home now runs the World 01 owner video mode; the frame cases below
-## force the frame fallback (_home(video = false)), the video_* cases cover the video mode.
+## SB-POLISH-009 video mode: since SB-HOME-BG-2026-11-16 live Home runs the frame set; the
+## video_* cases inject the pinned video set (_home(video = true)) to keep that seam covered.
 
 const AppState = preload("res://scripts/app/app_state.gd")
 const HomeScreenScene = preload("res://scenes/ui/home/home_screen.tscn")
@@ -99,7 +99,15 @@ func _home(size: Vector2i, app = null, video := false) -> Array:
 		await process_frame
 	var hero = home.get_region("HomeScrubbyHero")
 	hero.set_process(false)
-	if not video:
+	if video:
+		# SB-HOME-BG-2026-11-16: live Home binds no video set any more (its frames bake in the
+		# retired background); inject the pinned SB-POLISH-009 set to keep the seam covered.
+		var bnd = home.get_art_binder()
+		var still: TextureRect = home.get_region("WorldStill")
+		still.texture = bnd.texture("home_scrubby_video_still")
+		hero.set_video(still, home.get_region("WorldVideo"), bnd.video_set(VIDEO_SET_ID))
+		home.get_region("HeroFocusShade").visible = not hero.has_video()
+	else:
 		hero.set_video(home.get_region("WorldStill"), home.get_region("WorldVideo"), {})   # frame fallback
 	hero.set_rng_seed(42)
 	return [sub, home, hero]

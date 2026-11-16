@@ -140,7 +140,7 @@ static func measure(home) -> Dictionary:
 		var r := _local_rect(home, n)
 		var o := opaque_in(img, hr, r)
 		m["ui"][n] = {"rect": r, "bbox_hit": (m["new_visible_screen"] as Rect2).intersects(r), "opaque_px": o["px"], "opaque_rect": o["rect"], "clearance": clearance(img, hr, r)}
-	var sr := _to_screen(home, w["baked_sign_rect"])
+	var sr := _to_screen(home, w["area_label_rect"])
 	var so := opaque_in(img, hr, sr)
 	m["sign"] = {"rect": sr, "bbox_hit": (m["new_visible_screen"] as Rect2).intersects(sr), "opaque_px": so["px"]}
 	for b in w["helper_bot_rects"]:

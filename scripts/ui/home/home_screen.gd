@@ -3,17 +3,18 @@ extends Control
 ##
 ## M42 production Home. V04 (coordination/OWNER_M42_HOME_REBUILD_V04_SINGLE_WORLD_
 ## BACKGROUND.md) supersedes the earlier layered composition: the world is ONE complete
-## owner-approved background per world (HomeWorldCatalog; World 01 = HOME-120 with the
-## city, portal, baked WHISPERING PARK / AREA 1 sign, platform, props and helper bots).
+## owner-approved background per world (HomeWorldCatalog; World 01 = HOME-124, the owner
+## plaza: sky, clouds, trees, tile floor; SB-HOME-BG-2026-11-16). The area name is native text.
 ## Only Scrubby is a separate runtime layer, placed by the world's canonical 1080x2160
 ## anchor contract. Everything else is native Godot UI:
 ##
 ##   HomeScreen (Home theme: bold face + navy outline)
 ##   ├── Background          world canvas (clipped above the ad slot)
-##   │     ├── WorldBackground   HOME-120, uniform scale, never stretched
-##   │     ├── WorldStill / WorldVideo   SB-POLISH-009: background with Scrubby baked in
-##   │     │                       (still + one gesture video), same rect as WorldBackground
-##   │     └── Layer_characters/Art_scrubby   feet on the baked platform
+##   │     ├── WorldBackground   HOME-124, uniform scale, never stretched
+##   │     ├── WorldStill / WorldVideo   SB-POLISH-009 video seam; unbound since
+##   │     │                       SB-HOME-BG-2026-11-16 (its frames bake in the old background)
+##   │     └── Layer_characters/Art_scrubby   feet on the tile floor
+##   │                         └── HomeAreaLabel   native WHISPERING PARK / AREA n (sky band)
 ##   └── SafeAreaRoot/MarginContainer/Content/HomeLayout (VBox)
 ##       ├── TopCurrencyHUD      narrow profile card (portrait in front of its frame,
 ##       │                       bottom-anchored; level badge + thick Bot Parts N/250 bar)
@@ -65,14 +66,12 @@ const JourneyStrip = preload("res://scripts/ui/components/journey_strip.gd")
 const GiftProgressModel = preload("res://scripts/economy/gift_progress_model.gd")
 const GiftTickOverlay = preload("res://scripts/ui/components/gift_tick_overlay.gd")
 const RobotRoster = preload("res://scripts/progression/robot_roster.gd")
+const WorldService = preload("res://scripts/progression/world_service.gd")
 const HomeBadges = preload("res://scripts/ui/home/home_badges.gd")
 const HomeMicroFeel = preload("res://scripts/ui/feel/home_micro_feel.gd")
 const HomeRewardFlight = preload("res://scripts/ui/home/home_reward_flight.gd")
 ## M42-C003 V03 pinned gesture frame set (HOME_ASSET_MANIFEST animation_sets).
 const HERO_ANIMATION_SET := "home_scrubby_gestures_v03"
-## SB-POLISH-009 World 01 owner Flow videos (HOME_ASSET_MANIFEST video_sets); when bound they
-## replace the frame set (which stays the fallback).
-const HERO_VIDEO_SET := "home_scrubby_videos_v1"
 const UiText = preload("res://scripts/ui/ui_text.gd")
 
 ## Popups with a V1 Home destination. Only DAILY is a Home panel in V04; Gifts and Cards
@@ -119,7 +118,7 @@ const V04_REF_AD_MAX := 180.0
 const SCRUBBY_SCALE := 1.612
 ## V06 HeroFocusShade (world canvas px; re-based for the owner-selected 940x1672 Home
 ## background, M28-C002-C003-R01 V02): soft dark radial dimmer behind Scrubby's torso,
-## starting below the baked sign (bottom y 545), peak alpha 0.20 fading to 0.
+## starting below the area label band (bottom y 545), peak alpha 0.20 fading to 0.
 const HERO_SHADE_RECT := Rect2(260, 600, 420, 690)
 const HERO_SHADE_ALPHA := 0.20
 
@@ -131,8 +130,11 @@ const SCRUBBY_FEET_Y := 1318.0
 ## World canonical rows (in the world canvas: the owner-selected 940x1672 Home background)
 ## used to keep the composition readable: the platform row where Scrubby stands (feet y
 ## 1240, dais floor 1180..1400) must stay above the Play CTA (on short screens Play may
-## overlap the lower stone steps); the baked sign's top should stay below the Gift Meter.
+## overlap the lower stone steps); the area label band's top (area_label_rect) should stay below the Gift Meter.
 const PLATFORM_BOTTOM_Y := 1260.0
+## SB-HOME-BG-2026-11-16 native area label fonts (px; _layout_area_label shrinks them to fit).
+const AREA_TITLE_PX := 64
+const AREA_NUMBER_PX := 40
 const SIGN_TOP_Y := 405.0
 
 const BG01 := Color(0.125, 0.145, 0.2, 1.0)   ## Midnight Slate #202533.
@@ -175,6 +177,8 @@ func _ready() -> void:
 	resized.connect(_apply_layout_mode)
 	_nodes["HomeLayout"].resized.connect(_apply_layout_mode)
 	_nodes["PlayButton"].resized.connect(_queue_world)
+	for col in ["LeftShortcutColumn", "RightShortcutColumn"]:
+		_nodes[col].resized.connect(_layout_area_label)
 	_apply_layout_mode()
 	if _art == null:
 		set_art_binder(HomeArtBinder.new())
@@ -212,9 +216,9 @@ func set_art_binder(binder) -> void:
 	var ra: UiShortcutButton = _nodes["RewardedAdsButton"]
 	ra.set_icon_box(ra.get_icon_box())
 	_nodes["HomeScrubbyHero"].set_frames(_art.animation_set(HERO_ANIMATION_SET) if _art.has_method("animation_set") else {})
-	_nodes["HomeScrubbyHero"].set_video(_nodes["WorldStill"], _nodes["WorldVideo"], _art.video_set(HERO_VIDEO_SET) if _art.has_method("video_set") else {})
-	# Scrubby is baked into the video still, so the focus shade would dim him: video mode drops it.
-	_nodes["HeroFocusShade"].visible = not _nodes["HomeScrubbyHero"].has_video()
+	# SB-HOME-BG-2026-11-16: the SB-POLISH-009 still/videos bake in the retired background, so
+	# Home binds no video set and Scrubby uses the frame set over HOME-124.
+	_nodes["HomeScrubbyHero"].set_video(_nodes["WorldStill"], _nodes["WorldVideo"], {})
 	_queue_world()
 
 func get_art_binder():
@@ -344,6 +348,17 @@ func _build() -> void:
 	hero.set_home_rect(sc)
 	chars.add_child(_reg(hero))
 	_nodes["Art_scrubby_gesture"] = hero.get_gesture_rect()
+	# SB-HOME-BG-2026-11-16: native area name in the sky band (HOME_AREA_TITLE / HOME_AREA_NUMBER).
+	var area := Control.new()
+	area.name = "HomeAreaLabel"
+	area.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	chars.add_child(_reg(area))
+	for spec in [["HomeAreaTitle", AREA_TITLE_PX, HomeStyle.TEXT], ["HomeAreaNumber", AREA_NUMBER_PX, HomeStyle.SUBTITLE]]:
+		var l := HomeStyle.label("", spec[1], spec[2], 12)
+		l.name = spec[0]
+		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		l.clip_text = true   # placed and font-fitted by _layout_area_label
+		area.add_child(_reg(l))
 
 	var safe = SafeAreaRootScene.instantiate()
 	safe.name = "SafeAreaRoot"
@@ -761,7 +776,7 @@ func _queue_world() -> void:
 ## bottom and the frozen V04 reference geometry — never of the live HUD, stack or ad
 ## slot. It reproduces the audited V04 transform: s covers the V04 canvas (viewport above
 ## the V04 ad reservation), the baked platform-top region stays above the V04 PLAY line,
-## the baked sign stays below the V04 Gift Meter line (wide/tablet screens then show a
+## the area label band stays below the V04 Gift Meter line (wide/tablet screens then show a
 ## mirrored continuation at the far sides).
 static func compute_world_transform(vp: Vector2, safe_top: float, safe_bottom: float, canvas: Vector2 = Vector2(940, 1672)) -> Dictionary:
 	var mode: int = ResponsiveLayout.get_layout_mode(vp)
@@ -826,6 +841,59 @@ func _layout_world() -> void:
 	shade.position = world_to_screen(HERO_SHADE_RECT.position)
 	shade.size = HERO_SHADE_RECT.size * s
 	_avoid_helper_bots()
+	_layout_area_label()
+
+## New area text (locale / world change) refits at the label's current width.
+func _set_area_text(n: String, text: String) -> void:
+	var l: Label = _nodes[n]
+	if l.text != text:
+		l.text = text
+		_layout_area_label()
+
+## The area label sits in the sky: from the world's area_label_rect top (never above the Gift
+## Meter) down to Scrubby's head, between the shortcut columns and inside the rect's width.
+## Both fonts shrink together to the height, then each to the width (HomeStyle.fit_font).
+func _layout_area_label() -> void:
+	if _world.is_empty():
+		return
+	var band: Rect2 = _world["area_label_rect"]
+	var p := world_to_screen(band.position)
+	var e := world_to_screen(band.end)
+	var left: Rect2 = (_nodes["LeftShortcutColumn"] as Control).get_global_rect()
+	var right: Rect2 = (_nodes["RightShortcutColumn"] as Control).get_global_rect()
+	var gift: Rect2 = (_nodes["GiftMeter"] as Control).get_global_rect()
+	var hero_top: float = world_to_screen((get_scrubby_canonical()["visible_rect"] as Rect2).position).y
+	var x0 := maxf(p.x, left.end.x - global_position.x + 8.0)
+	var x1 := minf(e.x, right.position.x - global_position.x - 8.0)
+	var y0 := maxf(p.y, gift.end.y - global_position.y + 8.0)
+	var y1 := hero_top - 8.0
+	var box := Rect2(x0, y0, maxf(0.0, x1 - x0), maxf(0.0, y1 - y0))
+	var area: Control = _nodes["HomeAreaLabel"]
+	var labels := [[_nodes["HomeAreaTitle"], AREA_TITLE_PX], [_nodes["HomeAreaNumber"], AREA_NUMBER_PX]]
+	# Font metrics, not Label minimum sizes (those refresh a frame after a size override).
+	var natural := 0.0
+	for l in labels:
+		natural += (l[0] as Label).get_theme_font("font").get_height(l[1])
+	var k := minf(1.0, box.size.y / maxf(natural, 1.0))
+	# Short 16:9 screens with a deep notch leave no sky between the meter and Scrubby's head:
+	# the label hides there rather than shrink below 60% or overlap him.
+	area.visible = k >= 0.6
+	area.position = box.position
+	area.size = box.size
+	if not area.visible:
+		return
+	var heights: Array = []
+	var total := 0.0
+	for l in labels:
+		HomeStyle.fit_font(l[0], int(l[1] * k), box.size.x)
+		heights.append((l[0] as Label).get_theme_font("font").get_height((l[0] as Label).get_theme_font_size("font_size")))
+		total += heights[-1]
+	var y := (box.size.y - total) * 0.5
+	for i in labels.size():
+		var l: Label = labels[i][0]
+		l.position = Vector2(0.0, y)
+		l.size = Vector2(box.size.x, heights[i])
+		y += heights[i]
 
 ## Panels must not cover the baked helper bots. When a panel overlaps a bot's mapped
 ## rect: 1) that column's gap tightens (never below the icon pop-out clearance); 2) if
@@ -1306,6 +1374,9 @@ func _render_values() -> void:
 	else:
 		pr.texture = pr.get_meta("binder_tex")
 	(_nodes["ProfileLevel"] as Label).text = UiText.num(_vm["level"])
+	var w := WorldService.world_for_level(int(_vm["level"]))
+	_set_area_text("HomeAreaTitle", UiText.t("HOME_AREA_TITLE"))
+	_set_area_text("HomeAreaNumber", UiText.t("HOME_AREA_NUMBER", [int(w["number"])]) if not w.is_empty() else "")
 	# Bot Parts toward the next 250-part robot (canonical wallet / RobotUnlockService),
 	# never XP — only the live ratio, centred in the bar; gold bar when unlockable.
 	var parts: UiProgressMeter = _nodes["ProfileBotParts"]

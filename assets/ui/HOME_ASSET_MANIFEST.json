@@ -1683,7 +1683,7 @@
       "approved_sha256": "9d5db29513d25ad5c0932840c08027be0198d0cd85dc758a69e09e800c7aabe2",
       "approval_authority": "coordination/sessions/M28-C002-C003-R01/CHATGPT_PROMPT_V02.md",
       "source_path": "assets/ui/final/home/background/home_background.png",
-      "notes": "M28-C002-C003-R01 V02 finding 5: owner-selected Home background (940x1672), used exactly as supplied - not regenerated, redrawn, recoloured or substituted. Presented through the World 01 catalog record at a uniform display scale (never stretched); supersedes HOME-120 as the canonical Home background. HOME-120 stays byte-identical on disk and is never loaded by Home. All live UI (HUD, shortcuts, PLAY, Gift Meter, nav) and Scrubby remain native Godot layers."
+      "notes": "M28-C002-C003-R01 V02 finding 5: owner-selected Home background (940x1672), used exactly as supplied - not regenerated, redrawn, recoloured or substituted. Presented through the World 01 catalog record at a uniform display scale (never stretched); supersedes HOME-120 as the canonical Home background. HOME-120 stays byte-identical on disk and is never loaded by Home. SB-HOME-BG-2026-11-16: retired as the Home background (superseded by HOME-124); file kept byte-identical, never loaded by Home. All live UI (HUD, shortcuts, PLAY, Gift Meter, nav) and Scrubby remain native Godot layers."
     },
     {
       "id": "HOME-122",
@@ -1718,7 +1718,23 @@
       "approved_sha256": "7e89b2458622849ec59d20fc3c25c63c92badbb0c29b85d8eb04b9029b2f419b",
       "approval_authority": "SB-POLISH-009 owner design 2026-10-31 (owner-made Flow videos)",
       "source_path": "assets/ui/final/home/videos/home_scrubby_still.png",
-      "notes": "SB-POLISH-009: frame 0 (720x1280) of the owner's trimmed home_scrubby_turn_master.mp4 (Google Flow, Veo 3.1 Lite), extracted losslessly; it is the full Home background with Scrubby baked in, pixel-aligned to HOME-121 and the first/last frame of all four video_sets clips. Shown as the World 01 Home background while idle; no art changes."
+      "notes": "SB-POLISH-009: frame 0 (720x1280) of the owner's trimmed home_scrubby_turn_master.mp4 (Google Flow, Veo 3.1 Lite), extracted losslessly; it is the full Home background with Scrubby baked in, pixel-aligned to HOME-121 and the first/last frame of all four video_sets clips. Shown as the World 01 Home background while idle; no art changes. SB-HOME-BG-2026-11-16: retired with the old background baked into every frame (superseded by HOME-124); still and videos kept byte-identical, never loaded by Home."
+    },
+    {
+      "id": "HOME-124",
+      "slug": "home_background_plaza",
+      "group": "world",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/home/background/home_background_plaza.png",
+      "generation_required": false,
+      "provider": "owner_supplied",
+      "reusable": false,
+      "status": "APPROVED",
+      "approved_sha256": "0aa7463b12cd156883aeb8d9b91f59632bbe6899ce4a61ad74a6f77026f9cde3",
+      "approval_authority": "SB-HOME-BG-2026-11-16 owner chat 2026-11-16",
+      "source_path": "assets/ui/final/home/background/home_background_plaza.png",
+      "notes": "SB-HOME-BG-2026-11-16: owner-supplied calm plaza Home background (941x1672 RGB: blue sky, clouds, trees, pink tile floor), byte-copy of the owner image - not regenerated, redrawn, recoloured or substituted. Bound to WorldBackground through the World 01 catalog record at a uniform display scale; supersedes HOME-121 and the HOME-123 video still. No baked text: WHISPERING PARK / AREA n is native Home text (HOME_AREA_TITLE / HOME_AREA_NUMBER)."
     }
   ],
   "video_sets": {

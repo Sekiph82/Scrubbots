@@ -23,6 +23,7 @@ const RewardedAdsScreen = preload("res://scripts/ui/daily/rewarded_ads_screen.gd
 const ProfileScreens = preload("res://scripts/ui/profile/profile_screens.gd")
 const HelpTipsScreen = preload("res://scripts/ui/tutorial/help_tips_screen.gd")
 const MetaCeremonies = preload("res://scripts/ui/ceremony/meta_ceremonies.gd")
+const UiText = preload("res://scripts/ui/ui_text.gd")
 const CeremonyEvents = preload("res://scripts/economy/ceremony_events.gd")
 const StandardPackCeremony = preload("res://scripts/ui/ceremony/standard_pack_ceremony.gd")
 const PremiumPackCeremony = preload("res://scripts/ui/ceremony/premium_pack_ceremony.gd")
@@ -259,7 +260,7 @@ func _ceremonies(key: String, phys: Vector2i) -> void:
 	var worlds: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/config/home_worlds_v1.json"))
 	var wid := String(worlds["default_world"])
 	events.append({"key": "world:" + wid, "kind": "world_unlock", "world_id": wid,
-		"title": String(worlds["worlds"][wid]["baked_title"]), "art": F + "home/background/home_background.png"})
+		"title": UiText.t("HOME_AREA_TITLE"), "art": F + "home/background/home_background_plaza.png"})
 	for ev in events:
 		var p = MetaCeremonies.build(ev)
 		if p == null:
