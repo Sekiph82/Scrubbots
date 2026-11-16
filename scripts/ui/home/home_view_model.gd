@@ -48,6 +48,7 @@ static func build(app) -> Dictionary:
 		"gift_progress": gift_progress,
 		"gift_cycle_max": GiftMeterService.CYCLE_MAX,
 		"gift_next_milestone": next_ms,
+		"gift_window_seconds_left": int(e.gift.window_seconds_left()),
 		"gift_claimable": e.gift.claimable().size(),
 		"win_streak": streak,
 		"win_streak_track": track,

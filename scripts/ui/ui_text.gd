@@ -468,6 +468,8 @@ ACTIVE",
 	"RANK_DIAMOND": "Diamond",
 	"RANK_MASTER": "Master",
 	"TIME_DHM": "%dd %dh %dm",
+	"TIME_DH": "%dd %dh",
+	"TIME_M": "%dm",
 	"COMEBACK_TITLE": "WELCOME BACK",
 	"COMEBACK_HEARTS": "Hearts: %s / %s",
 	"COMEBACK_DAILY": "Daily reward ready to claim",
@@ -661,6 +663,12 @@ static func resolve_language(choice: String, device: String) -> String:
 	if LANGUAGES.has(choice):
 		return choice
 	return device if LANGUAGES.has(device) else "en"
+
+## Countdown "1d 23h" / "1g 23sa"; under an hour whole minutes rounded up ("45m" / "45dk").
+static func time_left(seconds: int) -> String:
+	if seconds < 3600:
+		return t("TIME_M", [ceili(seconds / 60.0)])
+	return t("TIME_DH", [seconds / 86400, seconds % 86400 / 3600])
 
 ## Integer with thousands grouping ("1,000"; Turkish "1.000").
 static func num(n: int) -> String:

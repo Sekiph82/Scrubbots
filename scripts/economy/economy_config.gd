@@ -13,7 +13,7 @@ extends RefCounted
 const IntDomain = preload("res://scripts/economy/int_domain.gd")
 
 const DEFAULT_PATH := "res://data/config/economy_rewards_v1.json"
-const EXPECTED_SCHEMA_VERSION := 3   ## 3: SB-POLISH-002 gift cycle 1..1000 + legacy_milestones
+const EXPECTED_SCHEMA_VERSION := 4   ## 3: SB-POLISH-002 gift cycle 1..1000 + legacy_milestones; 4: gift cycle_window_hours
 const DIFFICULTIES := ["EASY", "MEDIUM", "HARD", "VERY_HARD"]
 
 var _ok := false
@@ -83,6 +83,8 @@ func _validate_values(data: Dictionary) -> String:
 	# gift_meter.cycle_max positive int
 	var cm = IntDomain.exact_int(data.get("gift_meter", {}).get("cycle_max", null))
 	if cm == null or cm < 1: return "gift_meter.cycle_max must be a positive integer"
+	var wh = IntDomain.exact_int(data.get("gift_meter", {}).get("cycle_window_hours", null))
+	if wh == null or wh < 1: return "gift_meter.cycle_window_hours must be a positive integer"
 	# Every gift milestone key (current + legacy) is a positive int <= cycle_max with a bundle.
 	for tname in ["milestones", "legacy_milestones"]:
 		var mt = data.get("gift_meter", {}).get(tname, {})
@@ -170,6 +172,9 @@ func bot_parts_every_n_wins() -> int:
 
 func gift_meter_cycle_max() -> int:
 	return int(_data.get("gift_meter", {}).get("cycle_max", 1000))
+
+func gift_meter_cycle_window_hours() -> int:
+	return int(_data.get("gift_meter", {}).get("cycle_window_hours", 48))
 
 func gift_meter_milestone(milestone: int) -> Dictionary:
 	var ms = _data.get("gift_meter", {}).get("milestones", {})

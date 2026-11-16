@@ -1,5 +1,5 @@
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "decision": "coordination/OWNER_ECONOMY_REWARDS_V01.md",
   "currency": {
     "id": "scrub_bucks",
@@ -27,6 +27,7 @@
     "progress_source": "win_streak_sb_only",
     "cycle_max": 1000,
     "rollover": true,
+    "cycle_window_hours": 48,
     "milestones": {
       "1": {
         "scrub_bucks": 25

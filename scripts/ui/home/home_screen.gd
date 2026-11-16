@@ -755,6 +755,17 @@ func _build_gift_meter(gm: MarginContainer) -> void:
 	crate.offset_top = -GIFT_OBJECT * 0.5
 	crate.offset_bottom = GIFT_OBJECT * 0.5
 	panel.add_child(_reg(crate))
+	# SB-GIFT-METER-48H: time left in the cycle's 48 h window, under the bar between emblem
+	# and crate; hidden at 0 progress (no window).
+	var left := HomeStyle.label("", 20, HomeStyle.TEXT, 6)
+	left.name = "GiftWindowLeft"
+	left.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	left.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
+	left.offset_left = -80
+	left.offset_right = 80
+	left.offset_top = -26
+	left.offset_bottom = 0
+	panel.add_child(_reg(left))
 	var count := HomeStyle.label("", 28)
 	count.name = "GiftClaimableBadge"
 	count.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -1401,6 +1412,9 @@ func _render_values() -> void:
 	var gm := GiftProgressModel.build(int(_vm["gift_progress"]), int(_vm["gift_cycle_max"]))
 	gm["cycle_max"] = gnext
 	(_nodes["GiftTickOverlay"] as GiftTickOverlay).set_model(gm, [], "effects" in _app and _app.effects != null and _app.effects.is_reduced())
+	var gleft := int(_vm["gift_window_seconds_left"])
+	(_nodes["GiftWindowLeft"] as Label).visible = gleft > 0
+	(_nodes["GiftWindowLeft"] as Label).text = UiText.time_left(gleft)
 	var gbadge: Label = _nodes["GiftClaimableBadge"]
 	gbadge.text = str(_vm["gift_claimable"])
 	gbadge.visible = _vm["gift_claimable"] > 0

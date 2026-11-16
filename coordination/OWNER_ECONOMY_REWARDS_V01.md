@@ -109,6 +109,8 @@ At 1000 the cycle completes and the meter returns to 0/1. Overflow carries into 
 
 Save migration (economy config schema 3): an older save keeps its progress and every queued/claimed occurrence. In the current cycle only, milestones 1/5/25/100 already passed are queued once (unclaimed). An already-queued unclaimed old milestone 50 stays claimable and pays its old bundle (1 Bot Part + 1 random Booster Charge, `gift_meter.legacy_milestones`).
 
+Amended owner 2026-11-17 (SB-GIFT-METER-48H, "gift meter neden hic sifirlanmiyor. onun bir suresi olmali. en fazla 2 gunde bir sifirdan baslamali"): a cycle lasts at most 48 hours (`gift_meter.cycle_window_hours`, economy config schema 4). The window starts at the first progress of a cycle. When it expires, the meter returns to 0/1 and partial progress towards the next milestone is lost; milestones already crossed and queued in Gift Bar stay claimable. Reaching 1000 inside the window completes the cycle as above (overflow kept) and the next cycle gets a fresh 48 h window. The window uses the economy wall clock like Hearts: a clock moved backwards never expires the window, and the shown time left never exceeds 48 h. Home shows the time left under the meter while progress > 0. Save migration: an older save with progress > 0 gets its 48 h window from the first load of this build.
+
 ### 4.3 Gift Meter rewards
 
 Updated owner 2026-10-31 (SB-POLISH-002). Values are Claude proposals under the owner pre-approval for factory recommendations, existing reward types only.

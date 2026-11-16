@@ -100,7 +100,7 @@ func _init(config_path: String = EconomyConfig.DEFAULT_PATH, clock: Callable = C
 	config = EconomyConfig.new(config_path)
 	wallet = EconomyWallet.new(config.starting_scrub_bucks())
 	reward = RewardGrantService.new(wallet)
-	gift = GiftMeterService.new()
+	gift = GiftMeterService.new(clock, config.gift_meter_cycle_window_hours())
 	first_clear = FirstClearRewardService.new(reward, config)
 	robots = RobotUnlockService.new(wallet, config.robot_unlock_cost(), config.initial_robot_id())
 	hearts = HeartService.new(wallet, config, clock)

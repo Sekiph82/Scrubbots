@@ -18,6 +18,13 @@ extends RefCounted
 ## Full milestone reward payout (booster charges, card packs, guaranteed-new
 ## card) is M39 behavior layered on top of this queue; M38 does not fabricate
 ## those subsystems.
+##
+## SB-GIFT-METER-48H (owner 2026-11-17): a cycle lasts at most `gift_meter.cycle_window_hours`
+## (48 h) from its first progress. When the window expires, unfinished progress is dropped,
+## the meter returns to 0/1 and a new cycle index begins (the window restarts at the next
+## progress). Queued milestones stay claimable. Expiry is applied lazily on every read /
+## progress / snapshot / import against an injected wall clock (HeartService pattern): a
+## clock moved backwards never expires, re-anchors or extends the window.
 
 const IntDomain = preload("res://scripts/economy/int_domain.gd")
 
@@ -26,14 +33,43 @@ const MILESTONES := [1, 5, 10, 25, 100, 250, 500, 1000]
 ## Retired pre-schema-3 milestones: an already-queued occurrence stays importable/claimable
 ## and is paid from `gift_meter.legacy_milestones`.
 const LEGACY_MILESTONES := [50]
+const CYCLE_WINDOW_HOURS := 48
 
 var _cycle_progress: int = 0          ## progress within current cycle [0, CYCLE_MAX).
 var _total_progress: int = 0          ## lifetime streak SB fed in.
-var _cycles_completed: int = 0
+var _cycles_completed: int = 0       ## cycles that reached CYCLE_MAX.
+var _cycles_expired: int = 0         ## cycles dropped by the 48 h window.
+var _expired_progress: int = 0       ## lifetime progress lost to expired windows.
+var _window_start: int = -1          ## wall clock the current window started; -1 = none (progress 0).
+var _window_seconds: int
+var _clock: Callable
 ## Milestone id occurrences queued for Gift Bar. Each entry is
 ## {"cycle": int, "milestone": int}. M39 consumes/claims these.
 var _gift_bar_queue: Array = []
 var _applied_tx: Dictionary = {}      ## tx_id -> true (idempotency).
+
+func _init(clock: Callable = Callable(), window_hours: int = CYCLE_WINDOW_HOURS) -> void:
+	_clock = clock if clock.is_valid() else Callable(self, "_default_clock")
+	_window_seconds = window_hours * 3600
+
+func _default_clock() -> int:
+	return int(Time.get_unix_time_from_system())
+
+func _now() -> int:
+	return int(_clock.call())
+
+## Cycle index used in occurrence ids: completed + expired cycles (unique per cycle).
+func _cycle_index() -> int:
+	return _cycles_completed + _cycles_expired
+
+## Drop the current cycle when its window has run out. Rollback (now < start) never expires.
+func _expire() -> void:
+	if _window_start < 0 or _now() - _window_start < _window_seconds:
+		return
+	_expired_progress += _cycle_progress
+	_cycles_expired += 1
+	_cycle_progress = 0
+	_window_start = -1
 
 ## Feed streak-bonus SB. `tx_id` makes it idempotent. Returns the list of
 ## milestone occurrences newly queued by THIS call (empty if duplicate/no cross).
@@ -42,6 +78,7 @@ func add_streak_sb(tx_id: String, amount: int) -> Array:
 		return []
 	if _applied_tx.has(tx_id):
 		return []
+	_expire()
 	_applied_tx[tx_id] = true
 	_total_progress += amount
 
@@ -49,6 +86,8 @@ func add_streak_sb(tx_id: String, amount: int) -> Array:
 	var remaining := amount
 	while remaining > 0:
 		var before := _cycle_progress
+		if before == 0:
+			_window_start = _now()
 		var room := CYCLE_MAX - before
 		var step: int = min(remaining, room)
 		var after := before + step
@@ -56,8 +95,8 @@ func add_streak_sb(tx_id: String, amount: int) -> Array:
 		for m in MILESTONES:
 			if before < m and after >= m:
 				var occ := {
-					"id": "gift_ms:c%d:m%d" % [_cycles_completed, m],
-					"cycle": _cycles_completed,
+					"id": "gift_ms:c%d:m%d" % [_cycle_index(), m],
+					"cycle": _cycle_index(),
 					"milestone": m,
 					"claimed": false,
 				}
@@ -69,10 +108,20 @@ func add_streak_sb(tx_id: String, amount: int) -> Array:
 			# Complete the cycle, rollover.
 			_cycles_completed += 1
 			_cycle_progress = 0
+			_window_start = -1
 	return newly
 
 func cycle_progress() -> int:
+	_expire()
 	return _cycle_progress
+
+## Seconds left in the current window (0 = no window running). Capped at the full window,
+## so a clock moved backwards never shows more than 48 h.
+func window_seconds_left() -> int:
+	_expire()
+	if _window_start < 0:
+		return 0
+	return clampi(_window_seconds - (_now() - _window_start), 0, _window_seconds)
 
 func total_progress() -> int:
 	return _total_progress
@@ -122,10 +171,14 @@ func full_cycle_bot_parts(config) -> int:
 	return total
 
 func snapshot() -> Dictionary:
+	_expire()
 	return {
 		"cycle_progress": _cycle_progress,
 		"total_progress": _total_progress,
 		"cycles_completed": _cycles_completed,
+		"cycles_expired": _cycles_expired,
+		"expired_progress": _expired_progress,
+		"window_start": _window_start,
 		"gift_bar_queue": _gift_bar_queue.duplicate(true),
 		"applied": _applied_tx.keys(),
 	}
@@ -138,12 +191,23 @@ func import_snapshot(s) -> bool:
 	var cp = IntDomain.nonneg_int(s.get("cycle_progress", 0))
 	var tp = IntDomain.nonneg_int(s.get("total_progress", 0))
 	var cc = IntDomain.nonneg_int(s.get("cycles_completed", 0))
-	if cp == null or tp == null or cc == null:
+	# SB-GIFT-METER-48H: absent = pre-window save (no expired cycles; a running cycle gets
+	# its 48 h window from now); present = strict.
+	var ce = IntDomain.nonneg_int(s.get("cycles_expired", 0))
+	var ep = IntDomain.nonneg_int(s.get("expired_progress", 0))
+	if cp == null or tp == null or cc == null or ce == null or ep == null:
 		return false
 	if int(cp) >= CYCLE_MAX:
 		return false
-	# Coherence: total_progress must equal cycles_completed*CYCLE_MAX + cycle_progress.
-	if int(tp) != int(cc) * CYCLE_MAX + int(cp):
+	var ws: int = -1 if int(cp) == 0 else _now()
+	if s.has("window_start"):
+		var wv = IntDomain.exact_int(s["window_start"])
+		# A window runs exactly while the cycle has progress.
+		if wv == null or int(wv) < -1 or (int(cp) == 0) != (int(wv) == -1):
+			return false
+		ws = int(wv)
+	# Coherence: total_progress = cycles_completed*CYCLE_MAX + expired_progress + cycle_progress.
+	if int(tp) != int(cc) * CYCLE_MAX + int(ep) + int(cp):
 		return false
 	var q = s.get("gift_bar_queue", [])
 	if typeof(q) != TYPE_ARRAY:
@@ -183,15 +247,20 @@ func import_snapshot(s) -> bool:
 	# SB-POLISH-002 migration: in the CURRENT cycle only, queue every milestone already passed
 	# that has no occurrence yet (old saves lack 1/5/25/100). Ids are unique per cycle/milestone,
 	# so a re-import is a no-op and nothing claimed is re-granted. Past cycles are not backfilled.
+	var ci := int(cc) + int(ce)
 	for m in MILESTONES:
-		var mid := "gift_ms:c%d:m%d" % [int(cc), m]
+		var mid := "gift_ms:c%d:m%d" % [ci, m]
 		if m <= int(cp) and not seen_ids.has(mid):
 			seen_ids[mid] = true
-			new_queue.append({"id": mid, "cycle": int(cc), "milestone": m, "claimed": false})
+			new_queue.append({"id": mid, "cycle": ci, "milestone": m, "claimed": false})
 	# All-or-nothing apply (nothing above mutated live state).
 	_cycle_progress = int(cp)
 	_total_progress = int(tp)
 	_cycles_completed = int(cc)
+	_cycles_expired = int(ce)
+	_expired_progress = int(ep)
+	_window_start = ws
 	_gift_bar_queue = new_queue
 	_applied_tx = new_applied
+	_expire()
 	return true
