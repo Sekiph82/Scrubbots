@@ -25,8 +25,8 @@ extends Control
 ## only after the gesture returned to HOME-026. No Timer/Tween/signal is created per cycle.
 ##
 ## SB-POLISH-009 video mode (World 01, takes precedence when set_video() gets streams): the
-## owner's Flow videos are the full Home background with Scrubby baked in. HomeScreen's
-## WorldStill (frame 0 of the videos) replaces the background + HOME-026 while idle; after a
+## owner's Flow videos, since SB-HOME-VIDEO-2026-11-17 with Scrubby keyed onto magenta and
+## chroma-keyed over the background by HomeScreen. WorldStill (frame 0) replaces HOME-026 while idle; after a
 ## 5..6 s hold one video plays (uniform pick, never the same twice) in WorldVideo, the one
 ## VideoStreamPlayer in the same layer, and the still returns when it ends (its first and
 ## last frame are the still). Hidden / modal / backgrounded / Reduced Effects stop the video
@@ -216,6 +216,9 @@ func step(dt: float) -> void:
 	if _gesture != "":
 		_gesture_t += dt     # a running gesture may finish under a modal (no snap)
 		if has_video():
+			# The keyed video no longer covers the still: hide it once the first frame is up.
+			if _still.visible and _video.stream_position > 0.0:
+				_still.visible = false
 			if _gesture_t >= VIDEO_WATCHDOG:
 				_on_video_finished()
 			return
@@ -294,6 +297,8 @@ func _end_gesture() -> void:
 			_video.stop()
 		_video.stream = null
 		_video.visible = false
+	if _still != null:
+		_still.visible = has_video()
 	if _home_rect != null:
 		_home_rect.self_modulate.a = 0.0 if has_video() else 1.0
 

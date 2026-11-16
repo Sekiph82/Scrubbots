@@ -709,8 +709,9 @@ func _home() -> void:
 		var t: Texture2D = (n as TextureRect).texture
 		if t != null and (n as CanvasItem).is_visible_in_tree():
 			drawn.append(t.resource_path)
-	var stale: Array = drawn.filter(func(p): return String(p).find("worlds/world_01") != -1 or String(p).find("home_bg_") != -1 or p == OLD_HOME_BG or String(p).find("home_scrubby_still") != -1)
+	var stale: Array = drawn.filter(func(p): return String(p).find("worlds/world_01") != -1 or String(p).find("home_bg_") != -1 or p == OLD_HOME_BG or String(p).ends_with("home_scrubby_still.png"))
 	var count_bg: int = drawn.count(HOME_BG)
+	# SB-HOME-VIDEO-2026-11-17: the keyed still (Scrubby on magenta) is allowed; the baked one is not.
 	_ok(stale.is_empty() and count_bg == 1, "H2 the new background is drawn once; no old world / layered background texture is visible (%d, stale %s)" % [count_bg, str(stale)])
 	var wb_index: int = wb.get_index()
 	var bgnode: Node = home.get_region("Background")

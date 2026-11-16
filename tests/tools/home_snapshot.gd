@@ -3,8 +3,10 @@ extends SceneTree
 ## Renders the REAL scenes/ui/home/home_screen.tscn bound to a representative,
 ## non-destructive AppState (isolated temp save) inside a SubViewport and saves PNGs.
 ## Needs a rendering driver (run WITHOUT --headless):
-##   godot --path . -s res://tests/tools/home_snapshot.gd -- <out_dir> [WxH ...] [modals] [tr]
+##   godot --path . -s res://tests/tools/home_snapshot.gd -- <out_dir> [WxH ...] [modals] [tr] [video]
 ## `tr` renders the Turkish UI text.
+## `video` additionally captures, at the first size, the keyed Home videos mid-gesture
+## (SB-HOME-VIDEO-2026-11-17) and the frame-set fallback Scrubby for comparison.
 ## `modals` additionally captures, at the first size, the Heart full / after-consume
 ## states, the ad slot collapsed and the Daily popup / Settings panel open over Home.
 ## Output goes to <out_dir> (never to approved art paths).
@@ -22,10 +24,11 @@ func _initialize() -> void:
 	var out_dir := "user://home_snapshots"
 	var sizes: Array = []
 	var modals := args.has("modals")
+	var video := args.has("video")
 	if args.has("tr"):
 		UiText.locale = "tr"
 	for a in args:
-		if a == "modals" or a == "tr":
+		if a == "modals" or a == "tr" or a == "video":
 			continue
 		if a.find("x") > 0 and a.split("x").size() == 2 and a.split("x")[0].is_valid_int():
 			sizes.append(Vector2i(int(a.split("x")[0]), int(a.split("x")[1])))
@@ -66,6 +69,20 @@ func _initialize() -> void:
 		for _i in range(6):
 			await process_frame
 		_save(sub, "%s/home_%dx%d.png" % [out_dir, size.x, size.y])
+		if video and size == sizes[0]:
+			var hero = home.get_region("HomeScrubbyHero")
+			for g in hero.get_streams().keys():
+				for t in [1.6, 3.0]:
+					hero.start_gesture(g)
+					await create_timer(t).timeout
+					_save(sub, "%s/home_video_%s_%.1fs_%dx%d.png" % [out_dir, g, t, size.x, size.y])
+					hero.step(99.0)   # watchdog: back to the still
+					await process_frame
+			hero.set_video(home.get_region("WorldStill"), home.get_region("WorldVideo"), {})
+			home.get_region("HeroFocusShade").visible = true
+			for _i in range(4):
+				await process_frame
+			_save(sub, "%s/home_frame_fallback_%dx%d.png" % [out_dir, size.x, size.y])
 		if modals and size == sizes[0]:
 			# V06: Heart display — full (static 15:00) then immediately after one consume.
 			# Temp-save state only (the snapshot AppState is discarded).

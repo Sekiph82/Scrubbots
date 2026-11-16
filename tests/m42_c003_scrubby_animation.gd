@@ -803,13 +803,19 @@ func _video_real_playback() -> void:
 	var video: VideoStreamPlayer = hero.get_video_player()
 	_ok(hero.start_gesture("wave"), "wave starts")
 	var tex_ok := false
+	var still: TextureRect = r[1].get_region("WorldStill")
+	var still_hidden := false
 	var t0 := Time.get_ticks_msec()
 	while hero.get_state()["gesture"] != "" and Time.get_ticks_msec() - t0 < 12000:
 		await process_frame
+		hero.step(0.0)   # process is off in _home(); the still hand-off runs in step()
 		var tex := video.get_video_texture()
 		tex_ok = tex_ok or (tex != null and Vector2i(tex.get_size()) == Vector2i(720, 1280))
+		still_hidden = still_hidden or (hero.get_state()["gesture"] != "" and video.stream_position > 0.0 and not still.visible)
 	var ms := Time.get_ticks_msec() - t0
 	_ok(tex_ok, "decoder produced 720x1280 frames")
+	# SB-HOME-VIDEO-2026-11-17: keyed frames do not cover the still, so it hides while playing.
+	_ok(still_hidden, "still hidden once the video shows its first frame (no double Scrubby)")
 	_ok(hero.get_state()["gesture"] == "" and ms > 6500 and not video.visible and video.stream == null and r[1].get_region("WorldStill").visible, "finished signal after %d ms -> still, stream released" % ms)
 	var w: float = hero.get_state()["wait"]
 	_ok(w >= Hero.VIDEO_HOLD_MIN and w <= Hero.VIDEO_HOLD_MAX, "next hold %.2f s" % w)

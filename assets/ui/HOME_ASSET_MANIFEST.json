@@ -1735,9 +1735,41 @@
       "approval_authority": "SB-HOME-BG-2026-11-16 owner chat 2026-11-16",
       "source_path": "assets/ui/final/home/background/home_background_plaza.png",
       "notes": "SB-HOME-BG-2026-11-16: owner-supplied calm plaza Home background (941x1672 RGB: blue sky, clouds, trees, pink tile floor), byte-copy of the owner image - not regenerated, redrawn, recoloured or substituted. Bound to WorldBackground through the World 01 catalog record at a uniform display scale; supersedes HOME-121 and the HOME-123 video still. No baked text: WHISPERING PARK / AREA n is native Home text (HOME_AREA_TITLE / HOME_AREA_NUMBER)."
+    },
+    {
+      "id": "HOME-125",
+      "slug": "home_scrubby_video_still_keyed",
+      "group": "world",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/home/videos/home_scrubby_still_keyed.png",
+      "generation_required": false,
+      "provider": "google_flow_veo_3_1_lite",
+      "reusable": false,
+      "status": "APPROVED",
+      "approved_sha256": "aebb88f1863e1cf6241fc381f85cb09a9dd61b3c6988f9204332d193c5e2bd5e",
+      "approval_authority": "SB-HOME-VIDEO-2026-11-17 owner chat 2026-11-17 (videolulari koy; parkli videolardan scrubbyi ayirmaya calis)",
+      "source_path": "assets/ui/final/home/videos/home_scrubby_still_keyed.png",
+      "notes": "SB-HOME-VIDEO-2026-11-17: frame 0 (720x1280) of the owner's home_scrubby_turn_master.mp4 with Scrubby keyed out of the old park (difference matte against the owner Flow background plate, factory/jobs/160-home-scrubby-video-key/key_home_videos.py) onto exact magenta #FF00FF; Scrubby's pixels unchanged. Shown on WorldStill over HOME-124 through chroma_key_magenta.gdshader, in the same rect as WorldBackground (Scrubby where the frame-set Scrubby stands)."
     }
   ],
   "video_sets": {
+    "home_scrubby_videos_keyed_v2": {
+      "status": "APPROVED",
+      "authority": "SB-HOME-VIDEO-2026-11-17 owner chat 2026-11-17",
+      "provenance": "owner Google Flow masters (flow_videos/home_scrubby_{wave,turn}_master.mp4, untouched) with Scrubby keyed out of the old park onto exact magenta #FF00FF (factory/jobs/160-home-scrubby-video-key/key_home_videos.py), re-encoded with ffmpeg libtheora -q:v 8, 720x1280, 24 fps, 185 frames, no audio; keyed at runtime by chroma_key_magenta.gdshader. Bow and full turn are left out: their mattes keep park pixels / holes (owner contact sheets in the job folder).",
+      "still_slug": "home_scrubby_video_still_keyed",
+      "videos": {
+        "wave": {
+          "path": "assets/ui/final/home/videos/home_scrubby_wave_keyed.ogv",
+          "sha256": "a8b14736c3dc2cb3854ea605165ca630db6b3450769271915020a44bf30187f0"
+        },
+        "turn": {
+          "path": "assets/ui/final/home/videos/home_scrubby_turn_keyed.ogv",
+          "sha256": "679d7eaf83460fa5279bd0663357123b15b495137c759df85f911a524f3b6467"
+        }
+      }
+    },
     "home_scrubby_videos_v1": {
       "status": "APPROVED",
       "authority": "SB-POLISH-009 owner design 2026-10-31",

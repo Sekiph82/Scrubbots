@@ -11,8 +11,8 @@ extends Control
 ##   HomeScreen (Home theme: bold face + navy outline)
 ##   ├── Background          world canvas (clipped above the ad slot)
 ##   │     ├── WorldBackground   HOME-124, uniform scale, never stretched
-##   │     ├── WorldStill / WorldVideo   SB-POLISH-009 video seam; unbound since
-##   │     │                       SB-HOME-BG-2026-11-16 (its frames bake in the old background)
+##   │     ├── WorldStill / WorldVideo   SB-POLISH-009 still + one gesture video; since
+##   │     │                       SB-HOME-VIDEO-2026-11-17 Scrubby keyed on magenta (chroma key)
 ##   │     └── Layer_characters/Art_scrubby   feet on the tile floor
 ##   │                         └── HomeAreaLabel   native WHISPERING PARK / AREA n (sky band)
 ##   └── SafeAreaRoot/MarginContainer/Content/HomeLayout (VBox)
@@ -72,6 +72,10 @@ const HomeMicroFeel = preload("res://scripts/ui/feel/home_micro_feel.gd")
 const HomeRewardFlight = preload("res://scripts/ui/home/home_reward_flight.gd")
 ## M42-C003 V03 pinned gesture frame set (HOME_ASSET_MANIFEST animation_sets).
 const HERO_ANIMATION_SET := "home_scrubby_gestures_v03"
+## SB-HOME-VIDEO-2026-11-17: the owner Flow videos with Scrubby keyed out of the old park onto
+## magenta (HOME_ASSET_MANIFEST video_sets); when bound they replace the frame set (fallback).
+const HERO_VIDEO_SET := "home_scrubby_videos_keyed_v2"
+const CHROMA_KEY := preload("res://scripts/ui/feel/chroma_key_magenta.gdshader")
 const UiText = preload("res://scripts/ui/ui_text.gd")
 
 ## Popups with a V1 Home destination. Only DAILY is a Home panel in V04; Gifts and Cards
@@ -216,9 +220,9 @@ func set_art_binder(binder) -> void:
 	var ra: UiShortcutButton = _nodes["RewardedAdsButton"]
 	ra.set_icon_box(ra.get_icon_box())
 	_nodes["HomeScrubbyHero"].set_frames(_art.animation_set(HERO_ANIMATION_SET) if _art.has_method("animation_set") else {})
-	# SB-HOME-BG-2026-11-16: the SB-POLISH-009 still/videos bake in the retired background, so
-	# Home binds no video set and Scrubby uses the frame set over HOME-124.
-	_nodes["HomeScrubbyHero"].set_video(_nodes["WorldStill"], _nodes["WorldVideo"], {})
+	_nodes["HomeScrubbyHero"].set_video(_nodes["WorldStill"], _nodes["WorldVideo"], _art.video_set(HERO_VIDEO_SET) if _art.has_method("video_set") else {})
+	# The focus shade sits above the video layer, so it would dim the keyed Scrubby: video mode drops it.
+	_nodes["HeroFocusShade"].visible = not _nodes["HomeScrubbyHero"].has_video()
 	_queue_world()
 
 func get_art_binder():
@@ -309,13 +313,18 @@ func _build() -> void:
 	var wb := HomeStyle.art("WorldBackground")
 	wb.stretch_mode = TextureRect.STRETCH_SCALE   # sized to the texture aspect by _layout_world
 	bg.add_child(_reg(wb))
+	# SB-HOME-VIDEO-2026-11-17: keyed still + video (Scrubby on magenta) over WorldBackground.
+	var key := ShaderMaterial.new()
+	key.shader = CHROMA_KEY
 	var still := HomeStyle.art("WorldStill")
 	still.stretch_mode = TextureRect.STRETCH_SCALE
+	still.material = key
 	still.visible = false
 	bg.add_child(_reg(still))
 	var video := VideoStreamPlayer.new()
 	video.name = "WorldVideo"
 	video.expand = true
+	video.material = key
 	video.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	video.visible = false
 	bg.add_child(_reg(video))

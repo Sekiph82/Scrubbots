@@ -30,6 +30,8 @@ const WORLD_SLUG := "home_background_plaza"
 const OLD_WORLD_PATH := "res://assets/ui/final/home/worlds/world_01_whispering_park_1080x2160.png"
 const M28_WORLD_PATH := "res://assets/ui/final/home/background/home_background.png"
 const M28_WORLD_SHA := "9d5db29513d25ad5c0932840c08027be0198d0cd85dc758a69e09e800c7aabe2"
+const KEYED_STILL_PATH := "res://assets/ui/final/home/videos/home_scrubby_still_keyed.png"
+const KEYED_GESTURES := ["wave", "turn"]
 const FEET := Vector2(470, 1240)
 const SAFE_BOX := Rect2(305, 620, 330, 620)
 const WORLD_ASPECT := 941.0 / 1672.0
@@ -142,8 +144,15 @@ func _binds(home) -> void:
 	var retired_ok := true
 	for id in ["HOME-121", "HOME-123"]:
 		retired_ok = retired_ok and acc[id]["mode"] == "OWNER_RETIRED" and (acc[id]["nodes"] as Array).is_empty()
+	_ok(retired_ok, "SB-HOME-BG-2026-11-16: HOME-121 + the baked-background HOME-123 video still stay retired")
+	# SB-HOME-VIDEO-2026-11-17: the keyed set (Scrubby on magenta) is bound over HOME-124.
 	var hero = home.get_region("HomeScrubbyHero")
-	_ok(retired_ok and not hero.has_video() and hero.has_frames() and not home.get_region("WorldStill").visible and home.get_region("WorldStill").texture == null and home.get_region("Art_scrubby").is_visible_in_tree(), "SB-HOME-BG-2026-11-16: HOME-121 + the HOME-123 video still retired; no video set bound, frame-set Scrubby shown over HOME-124")
+	var still: TextureRect = home.get_region("WorldStill")
+	var video: VideoStreamPlayer = home.get_region("WorldVideo")
+	var keyed := still.material is ShaderMaterial and (still.material as ShaderMaterial).shader.resource_path.ends_with("chroma_key_magenta.gdshader") and video.material == still.material
+	_ok(acc["HOME-125"]["mode"] == "STATIC" and acc["HOME-125"]["nodes"][0]["name"] == "WorldStill" and still.texture != null and still.texture.resource_path == KEYED_STILL_PATH and still.is_visible_in_tree(), "HOME-125 keyed still bound on WorldStill and shown")
+	_ok(hero.has_video() and hero.get_streams().keys() == KEYED_GESTURES and keyed and not home.get_region("HeroFocusShade").visible and home.get_region("Art_scrubby").self_modulate.a == 0.0, "keyed video set bound (%s), still + player chroma-keyed, shade + frame Scrubby off" % str(hero.get_streams().keys()))
+	_ok(still.get_global_rect().is_equal_approx(wb.get_global_rect()) and video.get_global_rect().is_equal_approx(wb.get_global_rect()), "keyed still + video share the WorldBackground rect (Scrubby where the frame-set Scrubby stands)")
 	_complete("world_binds_through_lifecycle")
 
 func _no_duplicates(home) -> void:
@@ -530,7 +539,7 @@ func _historical() -> void:
 			n += 1
 			if FileAccess.get_sha256("res://" + String(a["path"])) != String(a["approved_sha256"]):
 				bad.append(a["id"])
-	_ok(n == 55 and bad.is_empty(), "all 55 APPROVED entries (R15-004 + HOME-122 + HOME-123 + HOME-124) (incl. retired history) match their pinned sha %s" % str(bad))
+	_ok(n == 56 and bad.is_empty(), "all 56 APPROVED entries (R15-004 + HOME-122 + HOME-123 + HOME-124 + HOME-125) (incl. retired history) match their pinned sha %s" % str(bad))
 	_complete("historical_assets_intact")
 
 func _complete(c: String) -> void:

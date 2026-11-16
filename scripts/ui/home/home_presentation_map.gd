@@ -74,6 +74,7 @@ const ENTRIES := {
 	"HOME-122": {"slug": "icon_shortcut_rewarded_ads", "mode": "STATIC", "slot": "texture", "nodes": ["ShortcutIcon_rewarded_ads"]},
 	"HOME-123": {"slug": "home_scrubby_video_still", "mode": "OWNER_RETIRED", "slot": "texture", "nodes": [], "reason": "SB-HOME-BG-2026-11-16: the old background is baked into the still and every video frame, so it would cover HOME-124 (files kept byte-identical, never loaded by Home)"},
 	"HOME-124": {"slug": "home_background_plaza", "mode": "STATIC", "slot": "texture", "nodes": ["WorldBackground"]},
+	"HOME-125": {"slug": "home_scrubby_video_still_keyed", "mode": "STATIC", "slot": "texture", "nodes": ["WorldStill"]},
 }
 
 ## Modes that present nothing in the active Home composition.
