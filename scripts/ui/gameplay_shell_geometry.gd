@@ -25,10 +25,10 @@ const DIR := "res://assets/ui/final/gameplay/master/"
 const SHA256 := {
 	"5slot_3col": "9242651d436cd354005b0311a0ff2a43f4ff789123fa5741412d9d39123b0e8d",
 	"5slot_4col": "47a8b9f86c74fcda2f94fd144db2d82a42aa9fdc6d2aca83dce6bf3b5722a4d8",
-	"5slot_5col": "4c01e2322c41b3b5ce3d2e8742af7a675ae81ea5a2535b20cba6377d4d099026",
+	"5slot_5col": "ce27985eaa6b883e311f6616a901e7c27a7787ef9ec99ca95334f58c2cf7c231",
 	"6slot_3col": "e7502d7e6286fafa7d02254174fad6f1459c75e9d4f62f53792662f1de4d5ddc",
 	"6slot_4col": "c042c211fdb76c8177062be460fc2b6a95dd5e2b05718b566633a0086cef0272",
-	"6slot_5col": "b796ad4c78a529d8914a9628f2b5837d08664f00370cb3ca14e2492fa1071390",
+	"6slot_5col": "a5e49191891277a15024d47ba1db2657c2934db07c21be2c6a66fff468ca76a8",
 }
 
 ## The rail is the same baked loop in all six masters.
@@ -39,9 +39,9 @@ const CONN_5 := [232.0, 331.0, 429.5, 531.0, 629.5]
 const CONN_6 := [183.0, 282.0, 380.5, 479.5, 581.0, 679.5]
 const COLS_3 := [[297, 373], [394, 471], [491, 568]]
 const COLS_4 := [[249, 325], [346, 423], [443, 520], [540, 617]]
-const COLS_5 := [[228, 290], [314, 376], [401, 463], [488, 550], [575, 637]]
+const COLS_5 := [[223, 296], [311, 383], [398, 470], [485, 557], [572, 644]]
 const ROWS_34 := [[1204, 1279], [1307, 1382], [1409, 1484]]
-const ROWS_5 := [[1212, 1272], [1315, 1374], [1417, 1477]]
+const ROWS_5 := [[1206, 1277], [1309, 1380], [1411, 1483]]
 
 const SHELLS := {
 	"5slot_3col": {"rail": RAIL, "slots": SLOTS_5, "connector_x": CONN_5, "cols": COLS_3, "rows": ROWS_34},

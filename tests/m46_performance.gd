@@ -142,10 +142,12 @@ const WARMUP_OBJ_MAX := 4800
 ## detection floor for steady churn during play is ~4.1 Objects/frame ((70-47.65)*3481/18961);
 ## smaller sustained churn is caught only by the idle windows.
 const LEVEL_OBJ_PER_CLEAR_MAX := 70.0
-## M46-014 floor (RM-001 log): the p13 fixture is deterministic (fixed DT, scripted feeding) and
-## peaks at 114 agents; 90 (~79%) allows legitimate tuning while one-batch-at-a-time feeding
-## (peak 31) or any halving fails.
-const DENSITY_MIN := 90
+## M46-014 floor (RM-001 log): the p13 fixture is deterministic (fixed DT, scripted feeding).
+## Route starts are the visible slot anchors (M29), so the peak follows the shell art: 114 at
+## RM-001, 92 on the v02 shells before the plaza masters, 85 on the 852x1846 plaza masters (job 163,
+## slot->bottom-rail leg ~1 cell shorter on 59x59). Floor kept at ~80% of the measured peak: 68
+## still fails one-batch-at-a-time feeding (peak 31) or any halving.
+const DENSITY_MIN := 68
 
 var EXPECTED_CASES := ["p01_parse", "p02_board_state", "p03_renderer", "p04_index_access", "p05_selector", "p06_routing",
 	"p07_agents", "p08_effects", "p09_memory_baseline", "p10_memory_59", "p11_allocation", "p12_restart",

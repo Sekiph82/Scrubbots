@@ -276,8 +276,8 @@ The six runtime masters are now `assets/ui/final/gameplay/master/gameplay_v03_pl
 five are cut only from the owner image's own pixels (no image generation): one real slot period
 (slot frame + connector pipe + bottom-rail segment) added for 6 slots, one real supply column period
 removed for 3 columns (uncovered floor rebuilt from the floor beside it), and for 5 columns the
-emptied real panel widened 35 px with the real cell tiles (frame + top clip) laid at 0.80 scale and
-an 87 px column pitch (keeps every front hitbox >= 88 px on 1080×1920). The speech bubble is
+emptied real panel widened 40 px with the real cell tiles (frame + top clip) laid at 0.95 scale and
+an 87 px column pitch (job 163: colour symbols stay >= 32 px on 720×1280; keeps every front hitbox >= 88 px on 1080×1920). The speech bubble is
 re-composited from the owner image over any widened part. Generator, measurement script, contact
 sheet and captures: `factory/jobs/159-gameplay-shell-plaza/`.
 
@@ -285,10 +285,10 @@ sheet and captures: `factory/jobs/159-gameplay-shell-plaza/`.
 |---|---|
 | 5slot_3col | `9242651d436cd354005b0311a0ff2a43f4ff789123fa5741412d9d39123b0e8d` |
 | 5slot_4col | `47a8b9f86c74fcda2f94fd144db2d82a42aa9fdc6d2aca83dce6bf3b5722a4d8` (owner image) |
-| 5slot_5col | `4c01e2322c41b3b5ce3d2e8742af7a675ae81ea5a2535b20cba6377d4d099026` |
+| 5slot_5col | `ce27985eaa6b883e311f6616a901e7c27a7787ef9ec99ca95334f58c2cf7c231` |
 | 6slot_3col | `e7502d7e6286fafa7d02254174fad6f1459c75e9d4f62f53792662f1de4d5ddc` |
 | 6slot_4col | `c042c211fdb76c8177062be460fc2b6a95dd5e2b05718b566633a0086cef0272` |
-| 6slot_5col | `b796ad4c78a529d8914a9628f2b5837d08664f00370cb3ca14e2492fa1071390` |
+| 6slot_5col | `a5e49191891277a15024d47ba1db2657c2934db07c21be2c6a66fff468ca76a8` |
 
 All baked reference coordinates (rail, slots, connectors, supply cells, top bar, bubble text mask,
 booster and ad bands) were re-measured by pixel analysis and live in
