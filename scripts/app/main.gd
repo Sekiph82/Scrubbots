@@ -1036,6 +1036,9 @@ func flush_lifecycle(reason: String) -> Dictionary:
 ## M43-C002: any ModalStack popup takes back first; mid-level exit after the first
 ## action is available only through Pause -> Home with its loss confirmation.
 func handle_back() -> String:
+	# SB-HOME-FLIGHT-LOCK-2026-11-17: Home ignores Back until the win's reward flight has landed.
+	if nav.current() == NavigationController.Route.HOME and _home != null and _home.is_reward_flight_running():
+		return "none"
 	# M43-C002 (SB-M43-026): an open popup consumes back first (top only, never leaks).
 	if _modals != null and _modals.handle_back():
 		return "close_modal"

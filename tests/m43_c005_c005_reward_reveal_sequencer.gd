@@ -237,11 +237,13 @@ func _results_cases() -> void:
 	var steps: Array = seq.get_steps()
 	var plan: Array = HomeRewardFlight.plan(rc, home.get_view_model())
 	var shape := true
+	# SB-HOME-FLIGHT-LOCK-2026-11-17: per reward a "+N" fade, then one burst of min(N, 5) copies.
+	var bursts: Array = flight.get_bursts()
 	for k in range(plan.size()):
-		shape = shape and steps[3 * k]["property"] == "modulate:a" and steps[3 * k + 1]["property"] == "position" and steps[3 * k + 2]["property"] == "value" \
-			and float(steps[3 * k + 2]["from"]) == float(plan[k]["from"]) and float(steps[3 * k + 2]["to"]) == float(plan[k]["to"])
-	_ok(seq.is_running() and seq.current_key() == "win:a1:L1" and steps.size() == 3 * plan.size() and plan.size() == 4 and shape,
-		"one key per win; per reward: fade, flight, count-up from the receipt (%d rewards)" % plan.size())
+		shape = shape and steps[2 * k]["property"] == "modulate:a" and steps[2 * k + 1]["property"] == "t" and steps[2 * k + 1]["target"] == bursts[k] \
+			and bursts[k].from == int(plan[k]["from"]) and bursts[k].from + bursts[k].n == int(plan[k]["to"])
+	_ok(seq.is_running() and seq.current_key() == "win:a1:L1" and steps.size() == 2 * plan.size() and plan.size() == 4 and shape,
+		"one key per win; per reward: fade, burst counting from the receipt (%d rewards)" % plan.size())
 	_complete("r01_flight_plan")
 	var e0 := _econ(app.economy)
 	var tx0: int = app.economy.reward.applied_transaction_count()

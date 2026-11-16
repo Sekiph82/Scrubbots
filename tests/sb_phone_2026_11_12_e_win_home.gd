@@ -23,7 +23,7 @@ const R := NavigationController.Route
 var EXPECTED_CASES := [
 	"win_animation_then_home", "back_skips_to_home", "flight_targets_hud", "ceremony_after_flight",
 	"granted_once_no_replay", "loss_results_unchanged", "reduced_effects", "no_interstitial_before_home",
-	"results_won_branch_removed",
+	"results_won_branch_removed", "input_locked_during_flight",
 ]
 
 ## Records interstitial calls (no SDK).
@@ -51,6 +51,7 @@ func _initialize() -> void:
 	await _reduced_effects()
 	await _no_interstitial_before_home()
 	_results_won_branch_removed()
+	await _input_locked_during_flight()
 	_cleanup()
 	_done()
 
@@ -117,7 +118,7 @@ func _flight_and_ceremony() -> void:
 	_ok(_chip(home) == UiText.num(sb0), "HUD starts at the pre-win SB value")
 	home.refresh()
 	_ok(_chip(home) == UiText.num(sb0), "a Home refresh mid-flight keeps the counter (no jump to the final value)")
-	var icon: Control = flight.get_layer().get_node("Fly_scrub_bucks")
+	var icon: Control = flight.get_layer().get_node("Fly_scrub_bucks/Copy0")
 	var dest: Vector2 = home.get_region("ScrubBucksChip").get_global_rect().get_center()
 	var t1 := Time.get_ticks_msec()
 	while flight._seq.current_step() < 2 and Time.get_ticks_msec() - t1 < 3000:
@@ -197,7 +198,7 @@ func _reduced_effects() -> void:
 	var secs := (Time.get_ticks_msec() - t0) / 1000.0
 	_ok(nav.current() == R.HOME and secs < 2.5, "Home after the short Reduced hold (%.1f s)" % secs)
 	var home = root.get_home()
-	_ok(not home.is_reward_flight_running() and home.get_reward_flight().has_played("win:a1:L1") and home.get_reward_flight().get_layer() == null, "no flight: final state landed at once")
+	_ok(not home.is_reward_flight_running() and home.get_reward_flight().has_played("win:a1:L1") and home.get_reward_flight().get_layer() == null, "no flight: final state landed at once, no input lock")
 	_ok(_chip(home) == UiText.num(app.economy.wallet.scrub_bucks()), "HUD at the final values")
 	await _frames(3)
 	_ok(root.get_ceremonies().presented_log().size() == 1, "ceremony follows at once")
@@ -237,6 +238,82 @@ func _results_won_branch_removed() -> void:
 			bad.append(needle)
 	_ok(bad.is_empty(), "flight / overlay never grant, save or acknowledge %s" % str(bad))
 	_complete("results_won_branch_removed")
+
+## SB-HOME-FLIGHT-LOCK-2026-11-17: no Home button (PLAY, shortcut, nav) or Back reacts until the
+## last reward count-up ends; normal Home, an empty receipt and Reduced Effects never lock.
+func _input_locked_during_flight() -> void:
+	print("[Home input locked during the reward flight]")
+	var root = await _boot_main(_uniq("lock"), 0)
+	var nav = root.get_navigation()
+	var home = root.get_home()
+	_ok(home.get_reward_flight().get_layer() == null and not home.is_reward_flight_running(), "normal Home entry: no lock layer")
+	_ok(not home.play_reward_flight({}, "lock:empty") and not home.play_reward_flight({"status": "WON"}, "lock:won_empty") and home.get_reward_flight().get_layer() == null, "empty receipt: no flight, no lock")
+	var names := ["PlayButton", "Shortcut_daily", "Nav_robots"]
+	var hits := {}
+	for n in names:
+		hits[n] = 0
+		home.get_region(n).pressed.connect(func(): hits[n] += 1)
+	var h = await _play(root)
+	_drain(h)
+	var rc: Dictionary = h.get_terminal_receipt()
+	await _frames(2)
+	_ok(nav.current() == R.HOME and home.is_reward_flight_running(), "WON -> Home, flight running")
+	var layer: Control = home.get_reward_flight().get_layer()
+	var bursts: Array = home.get_reward_flight().get_bursts().duplicate()
+	var plan: Array = HomeRewardFlight.plan(rc, home.get_view_model())
+	_ok(bursts.size() == plan.size() and plan.size() >= 3, "one burst per reward kind (%d)" % bursts.size())
+	_ok(plan[0]["kind"] == "scrub_bucks" and int(plan[0]["n"]) == int(rc["wallet_delta"]["scrub_bucks"]) and int(plan[0]["n"]) > 5, "SB N = receipt delta %d (> 5)" % int(plan[0]["n"]))
+	for i in bursts.size():
+		var b = bursts[i]
+		var n := int(plan[i]["n"])
+		var k := mini(n, 5)
+		var amount: Label = b.hero.get_node("Amount")
+		_ok(amount.text == "+" + UiText.num(n) and amount.get_theme_constant("outline_size") > 0 and b.copies.size() == k, "%s: label %s, %d icons = min(N, 5)" % [plan[i]["kind"], amount.text, b.copies.size()])
+	var cards: Array = HomeRewardFlight.plan({"status": "WON", "cards_delta": 7}, home.get_view_model())
+	_ok(cards.size() == 1 and cards[0]["kind"] == "collection_cards" and int(cards[0]["n"]) == 7, "Collection N = cards won (+7)")
+	_ok(layer.mouse_filter == Control.MOUSE_FILTER_STOP and layer.get_global_rect().encloses(home.get_global_rect()), "one full-rect blocker over Home")
+	for n in names:
+		await _tap(home.get_region(n))
+	_ok(hits.values() == [0, 0, 0] and nav.current() == R.HOME and root.get_gameplay_host() == null, "taps on PLAY / shortcut / nav during the flight do nothing %s" % str(hits))
+	_ok(root.handle_back() == "none" and nav.current() == R.HOME and home.is_reward_flight_running(), "Back ignored while locked")
+	var t0 := Time.get_ticks_msec()
+	while home.is_reward_flight_running() and Time.get_ticks_msec() - t0 < 10000:
+		await process_frame
+	await _frames(3)
+	root.get_modal_stack().clear("test")
+	_ok(home.get_reward_flight().get_layer() == null, "lock released with the last count-up")
+	for i in bursts.size():
+		var b = bursts[i]
+		var e: Dictionary = plan[i]
+		var k: int = b.copies.size()
+		var want: Array = []
+		for j in range(1, k + 1):
+			want.append(int(e["from"]) + int(e["n"]) * j / k)
+		_ok(b.landed == want and (e["to"] == e["from"] or int(want[-1]) == int(e["to"])), "%s: counter per arrival %s, final %d" % [e["kind"], str(b.landed), int(e["to"])])
+	_ok(_chip(home) == UiText.num(int(plan[0]["to"])), "SB chip lands exactly on %d" % int(plan[0]["to"]))
+	for n in ["Nav_robots", "Shortcut_daily"]:
+		if not (home.get_region(n) as Button).disabled:
+			await _tap(home.get_region(n))
+			root.get_modal_stack().clear("test")
+			home.close_top_popup()
+			if nav.current() != R.HOME:
+				nav.back(false)
+	_ok(hits["Nav_robots"] + hits["Shortcut_daily"] >= 1, "nav / shortcut respond after the flight %s" % str(hits))
+	await _frames(2)
+	await _tap(home.get_region("PlayButton"))
+	_ok(hits["PlayButton"] == 1 and nav.current() == R.GAMEPLAY, "PLAY works after the flight")
+	_shutdown(root)
+	_complete("input_locked_during_flight")
+
+func _tap(c: Control) -> void:
+	for down in [true, false]:
+		var e := InputEventMouseButton.new()
+		e.button_index = MOUSE_BUTTON_LEFT
+		e.pressed = down
+		e.position = get_root().get_final_transform() * c.get_global_rect().get_center()
+		e.global_position = e.position
+		get_root().push_input(e)
+		await process_frame
 
 # ---------------------------------------------------------------- helpers ----
 
