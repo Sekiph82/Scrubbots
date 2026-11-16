@@ -19,7 +19,7 @@ const SupplyPlanLoader = preload("res://scripts/gameplay/supply/supply_plan_load
 const UiText = preload("res://scripts/ui/ui_text.gd")
 const UiTokens = preload("res://scripts/ui/ui_tokens.gd")
 
-const BAKED_TEXT := Rect2(37, 1200, 150, 117)
+const BAKED_TEXT := Rect2(38, 1168, 158, 130)
 
 var EXPECTED_CASES := [
 	"body_span_2_4", "route_unchanged_by_scale", "echo_proportional", "bubble_live_text",

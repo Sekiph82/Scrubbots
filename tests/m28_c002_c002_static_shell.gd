@@ -25,7 +25,7 @@ const MATRIX := [
 	Vector2i(1440, 3200), Vector2i(1080, 1920), Vector2i(1536, 2048),
 ]
 ## Baked obsolete-instruction bounding box measured on the masters (must be covered).
-const BAKED_TEXT := Rect2(37, 1200, 150, 117)
+const BAKED_TEXT := Rect2(38, 1168, 158, 130)
 
 var EXPECTED_CASES := [
 	"masters_locked", "shell_selection_matrix", "no_duplicate_chrome", "board_on_baked_rail",
@@ -152,8 +152,8 @@ func _masters_locked() -> void:
 	var dims := true
 	for id in Shell.SHA256:
 		var img := Image.load_from_file(ProjectSettings.globalize_path(Shell.texture_path(id)))
-		dims = dims and img != null and img.get_size() == Vector2i(887, 1774)
-	_ok(dims, "all six are 887x1774")
+		dims = dims and img != null and img.get_size() == Vector2i(Shell.SIZE)
+	_ok(dims, "all six are 852x1846")
 	_ok(FileAccess.file_exists("res://assets/ui/final/gameplay/master/scrubbots_gameplay_master.png"), "historical scrubbots_gameplay_master.png preserved")
 	_complete("masters_locked")
 
@@ -456,7 +456,7 @@ func _responsive_transform() -> void:
 		var s = _screen()
 		var sh: Rect2 = s.get_shell_node_rect()   # the REAL shell TextureRect on screen
 		var safe: Rect2 = s.get_safe_rect()
-		var ok: bool = absf(sh.size.x / sh.size.y - 0.5) < 0.002 and safe.grow(1.0).encloses(sh)
+		var ok: bool = absf(sh.size.x / sh.size.y - Shell.SIZE.x / Shell.SIZE.y) < 0.002 and safe.grow(1.0).encloses(sh)
 		ok = ok and _near(sh, s.get_shell_rect(), 1.0)   # image and overlays share one transform
 		ok = ok and (absf(sh.size.x - safe.size.x) < 1.5 or absf(sh.size.y - safe.size.y) < 1.5)
 		ok = ok and _near(s.get_pause_rect(), s.ref_rect_to_global(Shell.rect(Shell.PAUSE)), _tol())
@@ -469,7 +469,7 @@ func _responsive_transform() -> void:
 		var rt := 0.0
 		for p in [Vector2i(0, 0), Vector2i(31, 31), Vector2i(16, 9)]:
 			rt = maxf(rt, s.global_to_board_local(s.cell_center_to_global(p.x, p.y)).distance_to(Vector2(p.x + 0.5, p.y + 0.5)))
-		_ok(ok and rt < 1e-3, "%dx%d: uniform 1:2 aspect-fit (scale %.3f) inside safe rect; overlays follow the same transform; coord round-trip %.6f" % [size.x, size.y, s.get_shell_scale(), rt])
+		_ok(ok and rt < 1e-3, "%dx%d: uniform 852:1846 aspect-fit (scale %.3f) inside safe rect; overlays follow the same transform; coord round-trip %.6f" % [size.x, size.y, s.get_shell_scale(), rt])
 	var s2 = _screen()
 	await _resize(Vector2i(1170, 2532))
 	s2.set_synthetic_safe_insets(0, 141, 0, 102)

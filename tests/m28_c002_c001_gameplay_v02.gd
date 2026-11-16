@@ -152,11 +152,12 @@ func _responsive_matrix() -> void:
 		var sp = s.get_supply_panel()
 		for c in range(sp.get_column_count()):
 			var r: Rect2 = sp.get_column_row_panels(c)[0].get_global_rect()
-			# M28-C002-C002: fronts are the baked master cells (>= 80 px at 16:9 short).
-			fronts_ok = fronts_ok and r.size.x >= 80.0 and r.size.y >= 80.0 and _inside(r, safe)
-		_ok(fronts_ok, "%s: every supply front is a >= 80 px baked-cell target on screen" % tag)
+			# M28-C002-C002: fronts are the baked master cells (>= 76 px at 16:9 short on the 852x1846
+			# plaza masters, job 159; touch reach is the >= 88 px hitbox, m28_c002_c002_r01_visual).
+			fronts_ok = fronts_ok and r.size.x >= 76.0 and r.size.y >= 76.0 and _inside(r, safe)
+		_ok(fronts_ok, "%s: every supply front is a >= 76 px baked-cell target on screen" % tag)
 		var views: Array = s.get_five_slot_strip().get_slot_views()
-		_ok(views.all(func(v): return v.size.x >= 80.0 and v.size.y >= 80.0), "%s: slots readable on the baked frames (>= 80 px)" % tag)
+		_ok(views.all(func(v): return v.size.x >= 76.0 and v.size.y >= 76.0), "%s: slots readable on the baked frames (>= 76 px)" % tag)
 		var rt := _roundtrip(s, bw, bh)
 		_ok(rt < EPS, "%s: board coordinate round-trip err %.6f" % [tag, rt])
 	await _resize(Vector2i(1080, 2160))

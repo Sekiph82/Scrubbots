@@ -49,14 +49,14 @@ const RobotRoster = preload("res://scripts/progression/robot_roster.gd")
 var _portrait: TextureRect = null
 var _portrait_robot := ""
 ## Profile overlay layout inside the baked profile box (master px).
-const PROFILE_PORTRAIT := [54, 38, 162, 150]
-const PROFILE_NAME := [176, 40, 300, 92]
-const PROFILE_LEVEL := [290, 40, 398, 92]
-const PROFILE_BAR := [176, 102, 398, 140]
+const PROFILE_PORTRAIT := [38, 114, 144, 220]
+const PROFILE_NAME := [157, 116, 278, 166]
+const PROFILE_LEVEL := [269, 116, 374, 166]
+const PROFILE_BAR := [157, 175, 374, 212]
 ## Invisible anchors on the baked Scrubby / bubble / props (future FTUE text anchor, tests).
-const SPEECH_ANCHOR := [19, 1188, 204, 1356]
-const SCRUBBY_ANCHOR := [18, 1345, 245, 1590]
-const PROPS_ANCHOR := [705, 1265, 880, 1590]
+const SPEECH_ANCHOR := [14, 1150, 214, 1345]
+const SCRUBBY_ANCHOR := [14, 1325, 262, 1600]
+const PROPS_ANCHOR := [600, 1230, 845, 1625]
 
 const BOOSTERS := [
 	{"id": "plus_one_slot", "art": "res://assets/ui/final/boosters/extra_slot.png"},
@@ -66,8 +66,8 @@ const BOOSTERS := [
 ]
 ## Live bubble copy layout inside the masked text area (master px) + colours sampled to
 ## match the master's own navy lettering.
-const BUBBLE_HEADLINE_REF := [34, 1200, 191, 1252]
-const BUBBLE_INSTRUCTION_REF := [34, 1256, 191, 1320]
+const BUBBLE_HEADLINE_REF := [34, 1166, 200, 1218]
+const BUBBLE_INSTRUCTION_REF := [34, 1228, 200, 1302]
 const BUBBLE_HEADLINE_COLOR := Color8(22, 36, 128)
 const BUBBLE_TEXT_COLOR := Color8(28, 44, 110)
 const BUBBLE_HEADLINE_REF_PX := 21.0
@@ -623,7 +623,7 @@ func relayout() -> void:
 	if s.x <= 0.0 or s.y <= 0.0:
 		return
 	_layout_mode = ResponsiveLayout.get_layout_mode(get_viewport_rect().size)
-	# Safe-area-aware uniform aspect-fit of the 887×1774 master (never stretched).
+	# Safe-area-aware uniform aspect-fit of the 852×1846 master (never stretched).
 	_scale = minf(s.x / Shell.SIZE.x, s.y / Shell.SIZE.y)
 	_origin = ((s - Shell.SIZE * _scale) * 0.5).floor()
 	_place_rect(_shell, Rect2(Vector2.ZERO, Shell.SIZE))
@@ -668,7 +668,7 @@ func _place_child(c: Control, parent_ref: Array, ref: Array) -> void:
 	c.size = r.size * _scale
 
 func _layout_top() -> void:
-	var top := [0, 0, 887, 170]
+	var top := [0, 0, int(Shell.SIZE.x), 240]
 	_place_ref(_top_region, top)
 	_place_child(_profile, top, Shell.PROFILE)
 	for pair in [[_profile.get_node("Portrait"), PROFILE_PORTRAIT], [_profile_name, PROFILE_NAME],

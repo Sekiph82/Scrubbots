@@ -41,7 +41,7 @@ const HOME_FRAMES := {"bow": 15, "full_turn": 17, "turn": 17, "wave": 14}
 ## Gameplay: gameplay_screen (fallback shell, portrait, boosters + state art), scrub rail,
 ## Scrubbot body and clean FX.
 const GAMEPLAY := [
-	"gameplay/master/gameplay_v02_shell_5slot_5col.png", "gameplay/profile/scrubby_portrait.png",
+	"gameplay/master/gameplay_v03_plaza_shell_5slot_5col.png", "gameplay/profile/scrubby_portrait.png",
 	"boosters/extra_slot.png", "boosters/random.png", "boosters/selector.png", "boosters/tornado.png",
 	"boosters/states/booster_selected_ring.png", "boosters/states/booster_unavailable_overlay.png",
 	"boosters/states/booster_free_badge_frame.png", "boosters/states/booster_reward_glow.png",
@@ -50,7 +50,7 @@ const GAMEPLAY := [
 	"characters/scrubby/scrubby_gameplay.png", "gameplay/effects/fx_clean_puff.png",
 	"gameplay/effects/fx_clean_sparkle.png",
 	# step 2 measurement: the 3-column shells drawn at runtime
-	"gameplay/master/gameplay_v02_shell_5slot_3col.png", "gameplay/master/gameplay_v02_shell_6slot_3col.png",
+	"gameplay/master/gameplay_v03_plaza_shell_5slot_3col.png", "gameplay/master/gameplay_v03_plaza_shell_6slot_3col.png",
 ]
 ## Results: won + failed hero/emblem and the reward-row icons of results_screen.
 const RESULTS := [

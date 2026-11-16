@@ -19,9 +19,9 @@ const BoardDebugFixtures = preload("res://scripts/debug/board_debug_fixtures.gd"
 const BatchSupplyGenerator = preload("res://scripts/gameplay/supply/batch_supply_generator.gd")
 
 const SIZES := [Vector2i(720, 1520), Vector2i(1080, 2400), Vector2i(1170, 2532)]
-## Baked frame tube: centreline (Shell rail) to inner metal edge, measured on the 5slot_3col
-## master (x 76.5 -> 100, 811 -> 787; y 210 -> 234, 960.5 -> 936).
-const FRAME_HALF := 24.0
+## Baked frame tube: centreline (Shell rail) to inner metal edge, measured on the plaza masters
+## (x 80 -> 106 / 103, 769 -> 743 / 746; y 285 -> 311, 973 -> 947).
+const FRAME_HALF := 26.0
 
 var EXPECTED_CASES := ["bg01_is_palette_background", "levels_20_30_backdrop_and_frame", "envelope_59x59_backdrop_and_frame", "cleared_shows_backdrop"]
 
