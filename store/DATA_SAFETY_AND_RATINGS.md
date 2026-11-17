@@ -135,5 +135,5 @@ the ads match a 4+ / PEGI 3 game.
 It goes live once this branch is on `main` and GitHub Pages is enabled for the repo with
 source "Deploy from a branch", branch `main`, folder `/docs` (the repo is public, Pages is free).
 `docs/.nojekyll` makes Pages serve the files as they are, without a Jekyll build over `docs/`.
-Before submitting, replace `[CONTACT-EMAIL]` in `docs/privacy/index.html` with the support e-mail
+Before submitting, replace `sekiphayit1982@gmail.com` in `docs/privacy/index.html` with the support e-mail
 (owner item).

@@ -37,7 +37,7 @@ side), so 1080x2340 captures would be rejected.
 
 ## Before either console
 
-1. **[OWNER]** Pick the public support e-mail. Claude then replaces `[CONTACT-EMAIL]` in
+1. **[OWNER]** Pick the public support e-mail. Claude then replaces `sekiphayit1982@gmail.com` in
    `docs/privacy/index.html` (both languages).
 2. Merge this branch to `main`, then enable GitHub Pages: source "Deploy from a branch", `main`,
    `/docs`. Claude can do this with `gh api` (the repo is public and Pages is free). Then check that
