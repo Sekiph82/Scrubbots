@@ -281,7 +281,9 @@ jobs:
             xcodebuild -create-xcframework -library "$P/bin/libinappstore.arm64-ios.release.a" -output "ios/plugins/inappstore.$v.xcframework"
           done
           cp "$P/plugins/inappstore/inappstore.gdip" ios/plugins/
-          ruby -e "require 'xcodeproj'" 2>/dev/null || sudo gem install xcodeproj --no-document
+          # The AdMob export plugin runs `ruby` + the xcodeproj gem; under Godot that is the macOS system Ruby.
+          /usr/bin/ruby -e "require 'xcodeproj'" 2>/dev/null || sudo /usr/bin/gem install xcodeproj --no-document
+          /usr/bin/ruby -e "require 'xcodeproj'"
           "$GODOT" --headless --import > "$RUNNER_TEMP/billing_ads_import.log" 2>&1 || true
           sed -i '' 's#^enabled=PackedStringArray(#enabled=PackedStringArray("res://addons/AdmobPlugin/plugin.cfg", #' project.godot
           grep -q 'res://addons/AdmobPlugin/plugin.cfg' project.godot
@@ -378,6 +380,21 @@ jobs:
             "$PCK" "$PWD/.github/android/family_first10_export_exclusions.txt" \
             "$PWD/out/required_runtime_paths.txt" "$PWD/out/ipa_pck_scan_report.json" 2>&1 | tee out/ipa_pck_scan.log
           grep -q "verdict=PASS" out/ipa_pck_scan.log
+
+      # The Xcode step pipes into tail, so prove the app binary was linked with both plugins.
+      - name: StoreKit + AdMob linked into the app (input billing_ads)
+        if: ${{ inputs.billing_ads }}
+        run: |
+          APP=$(grep -E '^Payload/[^/]+\.app/Info\.plist$' out/ipa_entries.txt | head -1 | sed 's#/Info\.plist$##')
+          test -n "$APP"
+          unzip -q -o "${OUT_DIR}/${ARTIFACT}.ipa" "$APP/*" -d "$RUNNER_TEMP/app_x"
+          BIN="$RUNNER_TEMP/app_x/$APP/$(plutil -extract CFBundleExecutable raw "$RUNNER_TEMP/app_x/$APP/Info.plist")"
+          test -s "$BIN"
+          for s in InAppStore GADMobileAds UMPConsentInformation; do
+            strings "$BIN" | grep -q "$s" || { echo "::error::app binary lacks $s"; exit 1; }
+          done
+          plutil -extract GADApplicationIdentifier raw "$RUNNER_TEMP/app_x/$APP/Info.plist" | tee out/billing_ads_check.txt
+          plutil -extract NSUserTrackingUsageDescription raw "$RUNNER_TEMP/app_x/$APP/Info.plist" | tee -a out/billing_ads_check.txt
 
       - name: Headless boot of the IPA's pack (offline)
         run: |
