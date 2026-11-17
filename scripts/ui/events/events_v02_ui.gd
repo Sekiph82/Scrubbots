@@ -63,13 +63,9 @@ static func participants(v: Dictionary) -> String:
 		return UiText.t("EV2_RIVALS", [UiText.num(int(v["entrants"]) - 1)])
 	return UiText.t("EV2_SOLO")
 
-## Canonical palette name for a C-id ("C04" -> "Green"); text + swatch, never color alone.
+## Localized canonical palette name for a C-id ("C04" -> "Green" / "Yeşil"); text + swatch, never color alone.
 static func color_name(cid: String) -> String:
-	var d = JSON.parse_string(FileAccess.get_file_as_string(PALETTE))
-	for c in (d.get("colors", []) if typeof(d) == TYPE_DICTIONARY else []):
-		if c["id"] == cid:
-			return String(c["name"])
-	return cid
+	return UiText.t("EV2_COLOR_" + cid) if UiText.EN.has("EV2_COLOR_" + cid) else cid
 
 static func color_value(cid: String) -> Color:
 	var d = JSON.parse_string(FileAccess.get_file_as_string(PALETTE))
@@ -133,7 +129,7 @@ static func card(v: Dictionary, open: Callable) -> PanelContainer:
 		col.add_child(_label("Title", title(v["id"]), 30, HomeStyle.TEXT))
 		col.add_child(_label("When", when_text(v), 24, HomeStyle.TEXT))
 		return c
-	var t := _label("Title", title(v["id"]).to_upper(), 38, HomeStyle.SUBTITLE)
+	var t := _label("Title", UiText.caps(title(v["id"])), 38, HomeStyle.SUBTITLE)
 	t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(t)
 	var hero := _art("EventHero", HERO % v["id"], 260)
@@ -226,7 +222,7 @@ static func open_details(stack, app, iid: String) -> BasePopup:
 
 static func refresh_details(p: BasePopup, app) -> void:
 	var v: Dictionary = app.economy.events_v02.view(String(p.get_meta("iid")))
-	p.set_title(title(v["id"]).to_upper())
+	p.set_title(UiText.caps(title(v["id"])))
 	var list: VBoxContainer = p.find_child("DetailList", true, false)
 	var stash: Control = p.find_child("RewardStash", true, false)
 	if stash == null:

@@ -133,7 +133,7 @@ static func show_step(p: BasePopup, app, step: int) -> void:
 	var st := state(v, step, ev)
 	p.set_meta("step", step)
 	p.set_meta("state", st)
-	p.set_title(String(st["title"]).to_upper())   # English product names: no Turkish dotted-I casing
+	p.set_title(UiText.caps(st["title"]))
 	var body: VBoxContainer = p.find_child("Tutorial", true, false)
 	for c in body.get_children():
 		body.remove_child(c)

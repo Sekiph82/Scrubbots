@@ -47,6 +47,7 @@ func _run(size: Vector2i, lang: String) -> void:
 	var a = AppStateScript.new(path, MainScript.boot_clock_override, Callable())
 	for n in range(1, 30):
 		a.progression.record_win(n)
+	a.set_language(lang)   # saved choice: the whole app (HUD too) boots in this language
 	a.flush()
 	var sub := SubViewport.new()
 	sub.size = _logical(size)
