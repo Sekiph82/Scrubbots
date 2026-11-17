@@ -714,6 +714,8 @@ func _drive_economy_terminal(status) -> void:
 	# M43-C001A: authoritative pre-commit probe for the Results receipt (read-only).
 	var pre: Dictionary = TerminalRewardReceipt.capture(_progression, _economy)
 	var progression_attempt := is_progression_attempt()
+	# SB-EV02-004: the Events gate as it stood before this win advanced the frontier.
+	var ev_unlocked: bool = app_state != null and app_state.feature_unlocked("events")
 	var catchup: Array = []
 	if status == CompletionEvaluator.WON:
 		_economy_terminal_done = true
@@ -740,14 +742,14 @@ func _drive_economy_terminal(status) -> void:
 			for i in orders_done:   # SB-M56-020
 				var o: Dictionary = _economy.orders.orders()[i]
 				_track("daily_order_done", {"tier": o["tier"], "metric": o["metric"], "target": o["target"]})
-			catchup = _meta_terminal(true)
+			catchup = _meta_terminal(true, ev_unlocked)
 	elif status == CompletionEvaluator.LOST:
 		_economy_terminal_done = true
 		_economy.hearts.consume()
 		_economy.streak.on_progression_loss()
 		_economy.speed.on_level_completed(progression_level, false)
 		if progression_attempt:
-			_meta_terminal(false)
+			_meta_terminal(false, ev_unlocked)
 	# SB-M57-001: any finished level (win or loss) is one play for the interstitial cadence.
 	if _economy_terminal_done:
 		_economy.ads.on_play_finished()
@@ -914,8 +916,9 @@ func terminal_context() -> Dictionary:
 ## M43-C010R / C012R: a committed progression terminal feeds the self-only records, the
 ## configured events and the Catch-Up track (saved by the terminal boundary). Returns the
 ## Catch-Up steps this win granted (Results receipt).
-func _meta_terminal(won: bool) -> Array:
+func _meta_terminal(won: bool, events_unlocked: bool) -> Array:
 	var r: Dictionary = _economy.records.on_progression_terminal(progression_level, won, _attempt_boosters, _economy.streak.streak())
+	_economy.events_v02.on_receipt(_event_receipt(won, bool(r["first_try"])), events_unlocked)
 	var ev_before: Array = [_economy.events.list(), _economy.events.first_try()]
 	_economy.events.on_progression_terminal(won, bool(r["first_try"]))
 	_track_event_progress(ev_before, won, bool(r["first_try"]))
@@ -946,6 +949,23 @@ func _track_event_progress(before: Array, won: bool, first_try_attempt: bool) ->
 	var now_f: Dictionary = _economy.events.first_try()
 	_track("first_try", {"step": ("completed" if now_f["complete"] else "advanced") if won else "reset",
 		"run": int(now_f["run"]) if won else int(f["run"])})
+
+## SB-EV02-003: the V02 event receipt of this committed progression terminal. Pixels = the
+## artwork (non-VOID) cells this attempt left CLEARED, by canonical C-id (they reconcile to the
+## total); events add them only for a won first clear. Id = level + attempt ordinal
+## (PlayerRecords), so the same attempt can never count twice.
+func _event_receipt(won: bool, first_try: bool) -> Dictionary:
+	var by_color := {}
+	var total := 0
+	if _board != null and _level != null:
+		for i in range(_board.get_cell_count()):
+			if not _board.is_void(i) and _board.get_cell_state(i) == BoardState.CellState.CLEARED:
+				var cid := String(_level.palette[_board.get_color_id(i)])
+				by_color[cid] = int(by_color.get(cid, 0)) + 1
+				total += 1
+	return {"receipt_id": "L%d:a%d" % [progression_level, _economy.records.get_value("attempts_on_level")],
+		"level": progression_level, "won": won, "first_attempt": first_try, "boosters_used": _attempt_boosters,
+		"cleaned_active_pixels": total, "cleaned_pixels_by_color": by_color, "completed_at_utc": int(Time.get_unix_time_from_system())}
 
 ## M43-C009R: committed booster actions in the current attempt (reset per attempt / Retry).
 func get_attempt_boosters_used() -> int:

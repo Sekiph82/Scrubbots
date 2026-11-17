@@ -275,6 +275,24 @@ func claim_first_try() -> Dictionary:
 		return _locked("claim_first_try", "events")
 	return _finish("claim_first_try", _economy.events.claim_first_try(_economy.reward))
 
+## SB-EV02-004/007: V02 event join / reward claim / tutorial seen, all behind the Events
+## unlock. A claim is saved before it is acknowledged (a failed save rolls it back).
+func join_event(iid: String) -> Dictionary:
+	if not feature_unlocked("events"):
+		return _locked("join_event", "events")
+	return _finish("join_event", _economy.events_v02.join(iid, true))
+
+func claim_event_reward(iid: String, rid: String) -> Dictionary:
+	if not feature_unlocked("events"):
+		return _locked("claim_event_reward", "events")
+	return _finish_durable("claim_event_reward", func(): return _economy.events_v02.claim(iid, rid, _economy.reward, true))
+
+func mark_event_tutorial_seen(event_id: String) -> Dictionary:
+	if not feature_unlocked("events"):
+		return _locked("mark_event_tutorial_seen", "events")
+	_economy.events_v02.mark_tutorial_seen(event_id)
+	return _finish("mark_event_tutorial_seen", {"ok": true})
+
 ## M43-C012R: Comeback Catch-Up step claim (only when an owner reward sequence is configured).
 func claim_catchup(step: int) -> Dictionary:
 	return _finish("claim_catchup", _economy.returns.claim_catchup(step, _economy.reward))
