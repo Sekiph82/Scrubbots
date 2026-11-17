@@ -55,7 +55,7 @@ const OWNER_GATES := [
 	{"id": "OWNER-SIGNING", "title": "Store signing secrets (Android release keystore, Apple distribution certificate + profile)", "status": "BLOCKED", "blocked_by": "owner",
 		"evidence": "Android upload key in ANDROID_RELEASE_KEYSTORE_* since 2026-11-17 (mode aab_release, docs/RELEASE_BUILDS.md). iOS: IOS_DIST_CERT_* / IOS_PROVISIONING_PROFILE_BASE64 / IOS_TEAM_ID are still missing (need the owner's Apple Developer login); iOS release runs stop before export until they exist."},
 	{"id": "OWNER-STORE-SUBMISSION", "title": "Store submission / public production release", "status": "BLOCKED", "blocked_by": "owner",
-		"evidence": "CLAUDE.md 0D.5: a public production store release is owner-only. No workflow uploads to Google Play or the App Store; the owner uploads the signed AAB / IPA artifacts."},
+		"evidence": "CLAUDE.md 0D.5: a public production store release is owner-only. No workflow uploads to Google Play; the owner uploads the signed AAB. ios-ipa.yml testflight_upload (release only) uploads the signed IPA to App Store Connect / TestFlight for testing; it never submits for App Review or releases."},
 	{"id": "OWNER-VISUAL-SIGNOFF", "title": "Owner visual sign-off of the M43 player-facing surfaces", "status": "BLOCKED", "blocked_by": "owner",
 		"evidence": "No manifest surface is OWNER_ACCEPTED (see the SB-M43-170 lists below); most still need a visual master first (MASTER_REQUIRED, factory work). Masters approved by Claude under delegated authority are not owner visual review."},
 	{"id": "OWNER-DEVICE-TESTS", "title": "Real-device tests (Android Galaxy A10, iPhone)", "status": "BLOCKED", "blocked_by": "owner",

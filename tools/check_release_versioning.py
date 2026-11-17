@@ -17,7 +17,8 @@ Asserts:
     picks --export-release only for release; mode aab_release (signed Play AAB) refuses debug;
   - outputs go to build/<platform>/<build_type>/ with version+build in the artifact name; iOS
     exports and builds under the fixed basename Scrubbots and is renamed only afterwards;
-  - no store upload anywhere;
+  - no store upload anywhere except one TestFlight upload step in the iOS workflow guarded
+    `inputs.build_type == 'release' && inputs.testflight_upload` (SB-IOS-TESTFLIGHT-2026-11-18);
   - SB-M59-006/007/009 release gate: a release export (Android build_apk or apk_only, iOS) runs only
     after the full validate suites, the content validator (tools/validate_content.gd) and the
     clean-clone check (tools/clean_clone_check.py) succeeded; only debug apk_only skips them;
@@ -55,6 +56,7 @@ CONTENT_STEP ="res://tools/validate_content.gd"
 CONTENT_PASS = "grep -q '^CONTENT_VALIDATION PASS' content_validation.log"
 DEBUG_KEY = re.compile(r"ANDROID_DEBUG_KEYSTORE|GODOT_ANDROID_KEYSTORE_DEBUG|debug_keystore|keytool -genkeypair|androiddebugkey")
 UPLOAD = re.compile(r"upload-google-play|r0adkll|altool|notarytool|fastlane|xcrun\s+upload|<string>upload</string>|play.googleapis", re.I)
+TESTFLIGHT_IF = "inputs.build_type == 'release' && inputs.testflight_upload"
 LITERAL_VERSION = re.compile(r"(version/(code|name)|short_version|application/version)\s*=\s*\"?\d")
 
 
@@ -73,13 +75,20 @@ def steps(text):
     return out
 
 
-def check_signing(text, release_secret_prefix):
-    """Errors for the debug-vs-release signing rules of one workflow text."""
+def check_signing(text, release_secret_prefix, testflight=False):
+    """Errors for the debug-vs-release signing rules of one workflow text.
+
+    testflight: the workflow may hold one upload step guarded exactly by TESTFLIGHT_IF."""
     errs = []
     release_steps = 0
+    uploads = 0
     for name, body in steps(text):
         guard = re.search(r"^        if: \$\{\{(.*)\}\}", body, re.M)
         guard = guard.group(1) if guard else ""
+        if testflight and UPLOAD.search(body) and guard.strip() == TESTFLIGHT_IF:
+            uploads += 1
+            text = text.replace(body, "")
+            continue
         if DEBUG_KEY.search(body) and "build_type != 'release'" not in guard:
             errs.append("step %r uses the debug key without an `inputs.build_type != 'release'` guard" % name)
         if release_secret_prefix in body:
@@ -94,6 +103,8 @@ def check_signing(text, release_secret_prefix):
         errs.append("expected exactly one release signing step reading %s*, found %d" % (release_secret_prefix, release_steps))
     if UPLOAD.search(text):
         errs.append("store upload found: %r" % UPLOAD.search(text).group(0))
+    if uploads > 1:
+        errs.append("more than one TestFlight upload step (%d)" % uploads)
     return errs
 
 
@@ -225,7 +236,11 @@ def check_repo():
     if 'print("OUT_DIR=build/%s/%s" % (platform, channel))' not in stamp:
         errs.append("%s no longer emits OUT_DIR=build/<platform>/<channel>" % STAMP)
     errs += check_signing(android, "ANDROID_RELEASE_KEYSTORE_")
-    errs += check_signing(ios, "IOS_DIST_CERT_")
+    errs += check_signing(ios, "IOS_DIST_CERT_", testflight=True)
+    if "      testflight_upload:\n" not in ios or '[ "$TESTFLIGHT" != true ] || [ "$BUILD_TYPE" = release ]' not in ios:
+        errs.append("%s: input testflight_upload must exist and fail unless build_type is release" % IOS)
+    if "<key>ITSAppUsesNonExemptEncryption</key><false/>" not in ios:
+        errs.append("%s does not declare ITSAppUsesNonExemptEncryption = false" % IOS)
     errs += check_android_export(android)
     errs += check_gate(android, ios)
     errs += check_hygiene(android, ios, preset, read(EXCLUSIONS), read(PROJECT), read(CREDITS))
@@ -262,6 +277,19 @@ def selftest():
         print("FAIL selftest: versioned iOS export basename not caught"); fails += 1
     else:
         print("ok selftest: caught versioned iOS export basename")
+    ios = read(IOS)
+    if check_signing(ios, "IOS_DIST_CERT_", testflight=True):
+        print("FAIL selftest: the real iOS workflow does not pass"); fails += 1
+    tf = {
+        "TestFlight upload without the release guard": ios.replace("if: ${{ %s }}" % TESTFLIGHT_IF, "if: ${{ inputs.testflight_upload }}"),
+        "TestFlight upload in every release": ios.replace("if: ${{ %s }}" % TESTFLIGHT_IF, "if: ${{ inputs.build_type == 'release' }}"),
+        "iOS upload outside the TestFlight step": ios + "\n      - name: x\n        run: xcrun altool --upload-app\n",
+    }
+    for label, text in tf.items():
+        if text == ios or not check_signing(text, "IOS_DIST_CERT_", testflight=True):
+            print("FAIL selftest: not caught: " + label); fails += 1
+        else:
+            print("ok selftest: caught " + label)
     fails += selftest_gate_hygiene()
     return fails
 

@@ -16,7 +16,7 @@ name: iOS IPA
 #     res:// reference present, main scene) and boots headless; the inner IPA SHA-256 is logged.
 # SB-M59-001..005 (docs/RELEASE_BUILDS.md): input `build_type` debug (default; the unsigned IPA above) |
 #   release (App Store distribution signing from GitHub Secrets ONLY, fails fast when absent; the IPA is
-#   exported to the runner, NEVER uploaded). Version from data/config/app_version.json via
+#   exported to the runner, uploaded only with testflight_upload below). Version from data/config/app_version.json via
 #   .github/scripts/app_version.py: CFBundleShortVersionString = version, CFBundleVersion = build number
 #   (run_number + build_offset). Godot/Xcode build under the fixed name Scrubbots (pack/scheme/binary lookup), then
 #   the IPA is renamed to build/ios/<build_type>/ScrubBots-iOS-<build_type>-v<ver>-b<build>.ipa.
@@ -26,6 +26,9 @@ name: iOS IPA
 # SB-M59-006/007/009 (docs/RELEASE_BUILDS.md): a release IPA first needs the release_gate job green: the
 #   release/versioning check, the content validator, every Android validate suite with its exact guard
 #   (tools/run_suites.py reads the list from android-family-first10.yml) and the clean-clone check. Debug skips it.
+# SB-IOS-TESTFLIGHT-2026-11-18: input `testflight_upload` (default false, release only) uploads the signed IPA to
+#   App Store Connect / TestFlight with the App Store Connect API key secrets. Upload only: no App Review submission,
+#   no external testing, no release. Every IPA declares ITSAppUsesNonExemptEncryption = false (no custom crypto).
 
 on:
   workflow_dispatch:
@@ -44,6 +47,10 @@ on:
         default: false
       billing_ads:
         description: "SB-M57-014..016/022: include StoreKit (godot-ios-plugins inappstore) + AdMob (Google TEST ad ids) plugins."
+        type: boolean
+        default: false
+      testflight_upload:
+        description: "release only: upload the signed IPA to App Store Connect / TestFlight (no App Review submission)."
         type: boolean
         default: false
 
@@ -141,7 +148,9 @@ jobs:
       - name: Version + output paths (data/config/app_version.json, build = run_number + build_offset)
         env:
           BUILD_TYPE: ${{ inputs.build_type }}
+          TESTFLIGHT: ${{ inputs.testflight_upload }}
         run: |
+          [ "$TESTFLIGHT" != true ] || [ "$BUILD_TYPE" = release ] || { echo "::error::testflight_upload needs build_type release"; exit 1; }
           python3 -I .github/scripts/app_version.py ios "$BUILD_TYPE" "$GITHUB_RUN_NUMBER" | tee -a "$GITHUB_ENV"
           echo "BUILD_TYPE=$BUILD_TYPE" >> "$GITHUB_ENV"
           cat data/config/app_version.json
@@ -223,6 +232,7 @@ jobs:
           application/short_version="${APP_VERSION}"
           application/version="${APP_BUILD}"
           application/bundle_identifier="com.sekiph82.scrubbots"
+          application/additional_plist_content="<key>ITSAppUsesNonExemptEncryption</key><false/>"
           application/export_project_only=true
           icons/app_store_1024x1024="res://assets/ui/final/branding/app_icon_ios_1024.png"
           icons/icon_1024x1024="res://assets/ui/final/branding/app_icon_ios_1024.png"
@@ -425,6 +435,34 @@ jobs:
         with:
           name: ${{ env.ARTIFACT }}.ipa
           path: ${{ env.OUT_DIR }}/${{ env.ARTIFACT }}.ipa
+
+      # SB-IOS-TESTFLIGHT-2026-11-18: upload only (TestFlight processing); never submits for App Review or releases.
+      - name: TestFlight upload (input testflight_upload, release only)
+        if: ${{ inputs.build_type == 'release' && inputs.testflight_upload }}
+        env:
+          ASC_KEY_P8: ${{ secrets.APP_STORE_CONNECT_API_KEY_P8 }}
+          ASC_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+        run: |
+          if [ -z "$ASC_KEY_P8" ] || [ -z "$ASC_KEY_ID" ] || [ -z "$ASC_ISSUER_ID" ]; then
+            echo "::error::testflight_upload needs GitHub Secrets APP_STORE_CONNECT_API_KEY_P8, APP_STORE_CONNECT_KEY_ID and APP_STORE_CONNECT_ISSUER_ID"
+            exit 1
+          fi
+          IPA="${OUT_DIR}/${ARTIFACT}.ipa"
+          PLIST=$(grep -E '^Payload/[^/]+\.app/Info\.plist$' out/ipa_entries.txt | head -1)
+          unzip -p "$IPA" "$PLIST" > "$RUNNER_TEMP/upload_Info.plist"
+          test "$(plutil -extract ITSAppUsesNonExemptEncryption raw "$RUNNER_TEMP/upload_Info.plist")" = false \
+            || { echo "::error::Info.plist lacks ITSAppUsesNonExemptEncryption = false"; exit 1; }
+          echo "CFBundleVersion $(plutil -extract CFBundleVersion raw "$RUNNER_TEMP/upload_Info.plist"), short version $(plutil -extract CFBundleShortVersionString raw "$RUNNER_TEMP/upload_Info.plist")"
+          KEYS="$HOME/.appstoreconnect/private_keys"
+          mkdir -p "$KEYS" && printf '%s\n' "$ASC_KEY_P8" > "$KEYS/AuthKey_${ASC_KEY_ID}.p8" && chmod 600 "$KEYS/AuthKey_${ASC_KEY_ID}.p8"
+          set +e
+          xcrun altool --upload-app -f "$IPA" -t ios --apiKey "$ASC_KEY_ID" --apiIssuer "$ASC_ISSUER_ID" --output-format normal
+          ec=$?
+          set -e
+          rm -f "$KEYS/AuthKey_${ASC_KEY_ID}.p8"
+          [ $ec -eq 0 ] || { echo "::error::altool upload exited $ec"; exit 1; }
+          echo "- TestFlight upload: ${ARTIFACT}.ipa sent to App Store Connect (processing; no App Review submission)" >> "$GITHUB_STEP_SUMMARY"
 
       # The AdMob export plugin logs the app id it used; keep a real one out of the uploaded logs.
       - name: Scrub the real AdMob app id from uploaded logs (input billing_ads)

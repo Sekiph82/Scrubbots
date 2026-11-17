@@ -1,7 +1,8 @@
 # Release builds: debug vs release, versioning, build numbers
 
 SB-M59-001..005. Both build workflows are manual (`workflow_dispatch`) and run only while the
-repository is public. Neither workflow uploads anything to Google Play or the App Store.
+repository is public. Neither workflow uploads anything to Google Play. The iOS workflow uploads
+to App Store Connect / TestFlight only with `testflight_upload: true` (see below).
 
 ## Making a build
 
@@ -36,8 +37,8 @@ Release:
   certificate DN contains "debug".
 - iOS: `xcodebuild archive` with manual signing ("Apple Distribution" plus the provisioning
   profile from the secrets), then `-exportArchive` with `method app-store-connect`,
-  `destination export`. The IPA stays on the runner and becomes an artifact; nothing is
-  uploaded. Missing secrets stop the run before any build.
+  `destination export`. The IPA stays on the runner and becomes an artifact; it is uploaded
+  only with `testflight_upload: true`. Missing secrets stop the run before any build.
 - Google Play needs an AAB: `mode: aab_release` (with `build_type: release`; a debug build_type
   stops the run) runs `validate` + `clean_clone`, switches the preset to the Gradle build with
   `gradle_build/export_format=1`, installs the Android build template and exports
@@ -252,8 +253,15 @@ naming them when any is absent:
 | `IOS_PROVISIONING_PROFILE_BASE64` | App Store provisioning profile for `com.sekiph82.scrubbots`, base64 |
 | `IOS_TEAM_ID` | Apple Developer team id |
 
-An App Store Connect API key (`.p8`, key id, issuer id) is needed only to upload to TestFlight
-from CI; neither workflow uploads, so it is not read yet.
+TestFlight (SB-IOS-TESTFLIGHT-2026-11-18): input `testflight_upload: true` (only with
+`build_type: release`; a debug build_type stops the run) uploads the signed IPA to App Store Connect
+with `xcrun altool --upload-app` and the App Store Connect API key secrets
+`APP_STORE_CONNECT_API_KEY_P8` (the `.p8` text), `APP_STORE_CONNECT_KEY_ID` and
+`APP_STORE_CONNECT_ISSUER_ID`. The key file exists on the runner only during the upload. Every IPA
+declares `ITSAppUsesNonExemptEncryption = false` (no custom encryption), so TestFlight does not wait
+on export compliance; CFBundleVersion is the run number plus `build_offset`, so each run uploads a
+new build. The upload never submits for App Review, never enables external testing and never
+releases; that stays owner-only (CLAUDE.md §0D.5).
 
 The owner signs in to Apple Developer / App Store Connect / Play Console (credentials and store
 records need the owner's login). A public production store release stays owner-only

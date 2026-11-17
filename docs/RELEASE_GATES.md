@@ -31,7 +31,7 @@ Release ready: **NO**
 
 - PASS `manifest_bound`: 42 surfaces: 40 bound (script + live data + evidence suite exist), 2 explicitly not built: ["account_cloud_sync_conflict (no cloud provider yet: Play Games Saved Games / Game Center + iCloud plugins (SB-M43-153))", "friends_postlaunch (post-launch)"]; unbound / broken []
 - PASS `registry_covered`: every ui_surface_registry screen / popup has a manifest surface; missing []
-- PASS `no_placeholder_copy`: 587 English UiText strings, none contains placeholder / dummy / lorem / TODO / TBD / FIXME copy []
+- PASS `no_placeholder_copy`: 708 English UiText strings, none contains placeholder / dummy / lorem / TODO / TBD / FIXME copy []
 
 ## SB-M60-003: PASS
 
@@ -66,7 +66,7 @@ Release ready: **NO**
 
 ## OWNER-STORE-SUBMISSION: BLOCKED
 
-- BLOCKED `owner`: CLAUDE.md 0D.5: a public production store release is owner-only. No workflow uploads to Google Play or the App Store; the owner uploads the signed AAB / IPA artifacts.
+- BLOCKED `owner`: CLAUDE.md 0D.5: a public production store release is owner-only. No workflow uploads to Google Play; the owner uploads the signed AAB. ios-ipa.yml testflight_upload (release only) uploads the signed IPA to App Store Connect / TestFlight for testing; it never submits for App Review or releases.
 
 ## OWNER-VISUAL-SIGNOFF: BLOCKED
 
