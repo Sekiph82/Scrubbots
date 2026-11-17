@@ -15,7 +15,8 @@ extends RefCounted
 ##     `event:<instance_id>:<reward_id>:<reward_policy_version>` (once, save-safe). Claims are
 ##     enabled only when the config asks for it AND the worst-case cycle total (every event at
 ##     its best result, five concurrent) fits `cycle_reward_cap`; otherwise preview only.
-##   - Clock: a high-water mark; a clock moved backwards never reopens a window or rewinds rivals.
+##   - Clock: a high-water mark stamped by every state change (receipt, join, claim); a clock moved
+##     backwards never reopens a joined window or rewinds rivals. Reads never write it.
 ## The Level 30 gate is the caller's (`unlocked`, AppState.feature_unlocked("events")).
 ## Economy section `events_v02`: absent = fresh (older saves), present = strict.
 
@@ -52,9 +53,15 @@ func _init(clock: Callable = Callable(), path: String = PATH) -> void:
 	_clock = clock if clock.is_valid() else func(): return int(Time.get_unix_time_from_system())
 	load_config(path)
 
-## Service time: the wall clock, never below the highest time already seen.
+## Service time: the wall clock, never below the high-water mark. Read-only: views / lists never
+## write state (a save taken around a pure read stays byte-identical).
 func now() -> int:
-	_hw = maxi(_hw, int(_clock.call()))
+	return maxi(_hw, int(_clock.call()))
+
+## Records the current service time as the high-water mark; only state changes call this
+## (receipt applied, join, claim), so a clock moved back never rewinds committed progress.
+func _stamp() -> int:
+	_hw = now()
 	return _hw
 
 # ---------------------------------------------------------------- config ----
@@ -263,7 +270,7 @@ func on_receipt(r: Dictionary, unlocked: bool) -> Array:
 	_receipts.append(String(r["receipt_id"]))
 	while _receipts.size() > RECEIPT_MEMORY:
 		_receipts.pop_front()
-	var t := now()
+	var t := _stamp()
 	for iid in _inst:
 		var rec: Dictionary = _inst[iid]
 		if t < int(rec["start"]) or t >= int(rec["end"]):
@@ -657,7 +664,7 @@ func join(iid: String, unlocked: bool) -> Dictionary:
 	var t := now()
 	if t < int(rec["start"]) or t >= int(rec["end"]):
 		return {"ok": false, "reason": "not_active"}
-	rec["joined_at"] = t
+	rec["joined_at"] = _stamp()
 	_inst[iid] = rec
 	return {"ok": true}
 
@@ -677,6 +684,7 @@ func claim(iid: String, rid: String, reward_service, unlocked: bool) -> Dictiona
 		var tx := "event:%s:%s:%s" % [iid, rid, policy_version()]
 		if not reward_service.grant(tx, s["reward"]) and not reward_service.already_applied(tx):
 			return {"ok": false, "reason": "grant_failed"}
+		_stamp()
 		(_inst[iid]["claimed"] as Array).append(rid)
 		return {"ok": true, "reward": (s["reward"] as Dictionary).duplicate(), "tx": tx}
 	return {"ok": false, "reason": "not_found"}

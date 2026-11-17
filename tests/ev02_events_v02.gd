@@ -220,6 +220,16 @@ func _e05() -> void:
 			mono = mono and sc >= last
 			last = sc
 	_ok(mono, "every rival score is non-decreasing over the window (no impossible movement)")
+	# SB-EV02 CI fix (factory 175): reads never write; only a state change stamps the high-water.
+	var snap0: Dictionary = s.snapshot()
+	_now[0] += 3600
+	s.list()
+	s.view(x["iid"])
+	s.active_count()
+	s.claimable_count()
+	_ok(s.snapshot() == snap0, "list / view / counts at a later clock leave the save byte-identical")
+	s.on_receipt(_receipt(950, true), true)
+	_ok(int(s.snapshot()["hw"]) == _now[0], "an applied receipt stamps the high-water mark")
 	var end_past := _inst_of(s, "scrub_sprint")
 	_now[0] = int(end_past["end"]) + 10
 	_ok(s.view(end_past["iid"])["phase"] != "active" and not s.join(end_past["iid"], true)["ok"], "an ended instance cannot be joined late")
