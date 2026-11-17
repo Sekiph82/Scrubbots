@@ -1,0 +1,10 @@
+# 169-store-listings (SB-STORE-LISTING-2026-11-17)
+Owner 2026-11-17: "magaza sayfalarinin hepsini hazirla, hem google play hem de ios app store icin". Free only.
+Deliver under store/ in the repo (new folder; exclude it from APK/IPA export filters):
+1. Texts TR + EN: app name (<=30), Play short description (<=80), full description (<=4000), App Store subtitle (<=30), promotional text (<=170), description, keywords (<=100 chars), what's new. Honest to the actual game (200 levels, pixel-art cleaning robots, 5 slots, boosters, collection, daily rewards, gift meter); no claims about features not shipped (Events are not shipped yet; friends/cloud save not shipped).
+2. Privacy policy (TR + EN) matching what the app really does (local saves; Google Play Billing / StoreKit purchases; AdMob ads with advertising ID, consent via UMP; no own server, no account). Publish-ready HTML in docs/privacy/ (index.html) suitable for GitHub Pages on this public repo; write the Pages URL that will result. Ask nothing; if a contact e-mail is required use a placeholder and list it as an owner item.
+3. Google Play Data safety form answers and IARC content rating questionnaire answers, App Store privacy "nutrition label" answers and age rating answers — as a filled checklist (markdown) consistent with the privacy policy and with AdMob + billing being integrated (job 170 in progress).
+4. Graphics: Play icon 512x512, feature graphic 1024x500 (from existing approved art: Scrubby, plaza background, logo), phone screenshots for Play (1080x1920 or 1080x2340, 4-8) and App Store 6.9"/6.7" (1290x2796) and 6.5" (1242x2688), at least 4 each, TR and EN, taken from the REAL game with the GPU capture tools (Home, gameplay mid-level, collection, robots, win); optional short caption banners rendered natively. No new AI generation needed; reuse approved art.
+5. A STORE_SUBMISSION_CHECKLIST.md: every field of both consoles, where each answer/file is, and which steps need the owner (sign-in, agreements, tax/bank).
+## Must not
+Do not upload anything to the stores. No gameplay changes.
