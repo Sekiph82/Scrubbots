@@ -154,7 +154,10 @@ func _masters_locked() -> void:
 		var img := Image.load_from_file(ProjectSettings.globalize_path(Shell.texture_path(id)))
 		dims = dims and img != null and img.get_size() == Vector2i(Shell.SIZE)
 	_ok(dims, "all six are 852x1846")
-	_ok(FileAccess.file_exists("res://assets/ui/final/gameplay/master/scrubbots_gameplay_master.png"), "historical scrubbots_gameplay_master.png preserved")
+	var retired_gone := not FileAccess.file_exists("res://assets/ui/final/gameplay/master/scrubbots_gameplay_master.png")
+	for id in Shell.SHA256:
+		retired_gone = retired_gone and not FileAccess.file_exists(Shell.DIR + "gameplay_v02_shell_%s.png" % id)
+	_ok(retired_gone, "retired scrubbots_gameplay_master.png + six V02 shells deleted (SB-ASSET-PURGE-2026-11-17)")
 	_complete("masters_locked")
 
 ## columns (3/4/5, authoritative supply) x capacity (5/6, authoritative strip) -> shell.

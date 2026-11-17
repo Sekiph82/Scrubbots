@@ -531,6 +531,8 @@ jobs:
             !/assets/ui/candidates/
             !/assets/ui/generated/
             !/addons/godot_ai/
+            !/factory/
+            !/flow_videos/
 
       - name: Prove excluded trees are absent from the export workspace
         run: |

@@ -4,6 +4,8 @@ Status: CANONICAL VISUAL DISCOVERY INDEX
 Branch audited: `codex/visual-assets-production`
 Purpose: single lookup map for Claude/Godot UI integration.
 
+> SB-ASSET-PURGE-2026-11-17: 148 unused files listed in the tables below were git rm'd (rows removed; git history keeps them). The audit counts below predate that purge.
+
 ## How Claude should use this file
 
 1. Prefer assets under `assets/ui/final/**` for production UI.
@@ -29,7 +31,7 @@ Purpose: single lookup map for Claude/Godot UI integration.
 
 ## Canonical authorities
 
-- Gameplay master: `assets/ui/final/gameplay/master/scrubbots_gameplay_master.png`
+- Gameplay master: `assets/ui/final/gameplay/master/scrubbots_gameplay_master.png` (deleted SB-ASSET-PURGE-2026-11-17; the runtime uses `gameplay_v03_plaza_shell_*.png`)
 - Home reference: `assets/art/references/_owner_inbox/Game Screens/main screen.png`
 - Phase 1 master list: `coordination/codex_visual_assets/CODEX_VISUAL_ASSET_MASTER_LIST.md`
 - Phase 2 master list: `coordination/codex_visual_assets/CODEX_PROJECT_VISUALS_PHASE2_MASTER_LIST.md`
@@ -50,7 +52,6 @@ Purpose: single lookup map for Claude/Godot UI integration.
 | `assets/ui/final/boosters/states/booster_free_badge_frame.png` | Phase 2 P2-046 | 1,096,228 |
 | `assets/ui/final/boosters/states/booster_reward_glow.png` | Phase 2 P2-043 | 1,703,097 |
 | `assets/ui/final/boosters/states/booster_selected_ring.png` | Phase 2 P2-041 | 1,115,635 |
-| `assets/ui/final/boosters/states/booster_tutorial_pointer.png` | Phase 2 P2-045 (RETIRED from runtime requirements, owner 2026-10-23; PNG preserved, shared `gameplay/tutorial/tutorial_pointer.png` is used) | 1,264,198 |
 | `assets/ui/final/boosters/states/booster_unavailable_overlay.png` | Phase 2 P2-042 | 1,709,253 |
 | `assets/ui/final/boosters/tornado.png` | Phase 1 | 1,179,175 |
 
@@ -70,82 +71,52 @@ Purpose: single lookup map for Claude/Godot UI integration.
 
 | Path | Authority | Bytes |
 |---|---|---:|
-| `assets/ui/final/cards_exchange/card_exchange_arrow.png` | Phase 1 | 1,492,384 |
-| `assets/ui/final/cards_exchange/card_stack_placeholder.png` | Phase 1 | 1,433,570 |
 | `assets/ui/final/cards_exchange/cards_exchange_header_emblem.png` | Phase 1 | 1,163,027 |
-| `assets/ui/final/cards_exchange/exchange_all_button_frame.png` | Phase 1 | 1,834,063 |
-| `assets/ui/final/cards_exchange/exchange_button_frame.png` | Phase 1 | 1,455,680 |
-| `assets/ui/final/cards_exchange/scrub_bucks_receive_bundle.png` | Phase 1 | 1,201,225 |
 
 ### characters (65)
 
 | Path | Authority | Bytes |
 |---|---|---:|
-| `assets/ui/final/characters/helper_bots/helper_bot_alt_pose.png` | Phase 1 | 1,286,130 |
-| `assets/ui/final/characters/helper_bots/helper_bot_cart.png` | Phase 1 | 1,360,982 |
-| `assets/ui/final/characters/helper_bots/helper_bot_floor_cleaner.png` | Phase 1 | 956,334 |
-| `assets/ui/final/characters/helper_bots/rail_scrubbot.png` | Phase 1 | 862,650 |
-| `assets/ui/final/characters/robots/atlas/atlas_face_blink_layer.png` | Phase 2 P2-140 | 1,617,088 |
 | `assets/ui/final/characters/robots/atlas/atlas_gameplay.png` | Phase 2 P2-137 | 1,686,731 |
 | `assets/ui/final/characters/robots/atlas/atlas_home_pose.png` | Phase 2 P2-139 | 2,264,391 |
 | `assets/ui/final/characters/robots/atlas/atlas_master.png` | Phase 2 P2-136 | 1,934,835 |
 | `assets/ui/final/characters/robots/atlas/atlas_portrait.png` | Phase 2 P2-138 | 2,237,835 |
-| `assets/ui/final/characters/robots/atlas/atlas_tool_arm_layer.png` | Phase 2 P2-141 | 1,077,609 |
-| `assets/ui/final/characters/robots/bubbles/bubbles_face_blink_layer.png` | Phase 2 P2-077 | 1,319,776 |
 | `assets/ui/final/characters/robots/bubbles/bubbles_gameplay.png` | Phase 2 P2-074 | 1,555,816 |
 | `assets/ui/final/characters/robots/bubbles/bubbles_home_pose.png` | Phase 2 P2-076 | 2,123,120 |
 | `assets/ui/final/characters/robots/bubbles/bubbles_master.png` | Phase 2 P2-073 | 1,509,511 |
 | `assets/ui/final/characters/robots/bubbles/bubbles_portrait.png` | Phase 2 P2-075 | 1,503,030 |
-| `assets/ui/final/characters/robots/bubbles/bubbles_tool_arm_layer.png` | Phase 2 P2-078 | 1,174,562 |
-| `assets/ui/final/characters/robots/clippy/clippy_face_blink_layer.png` | Phase 2 P2-131 | 1,381,170 |
 | `assets/ui/final/characters/robots/clippy/clippy_gameplay.png` | Phase 2 P2-128 | 1,440,278 |
 | `assets/ui/final/characters/robots/clippy/clippy_home_pose.png` | Phase 2 P2-130 | 2,024,325 |
 | `assets/ui/final/characters/robots/clippy/clippy_master.png` | Phase 2 P2-127 | 1,557,624 |
 | `assets/ui/final/characters/robots/clippy/clippy_portrait.png` | Phase 2 P2-129 | 1,618,890 |
-| `assets/ui/final/characters/robots/clippy/clippy_tool_arm_layer.png` | Phase 2 P2-132 | 2,040,378 |
-| `assets/ui/final/characters/robots/dusty/dusty_face_blink_layer.png` | Phase 2 P2-104 | 1,887,897 |
 | `assets/ui/final/characters/robots/dusty/dusty_gameplay.png` | Phase 2 P2-101 | 1,495,212 |
 | `assets/ui/final/characters/robots/dusty/dusty_home_pose.png` | Phase 2 P2-103 | 2,058,202 |
 | `assets/ui/final/characters/robots/dusty/dusty_master.png` | Phase 2 P2-100 | 1,545,078 |
 | `assets/ui/final/characters/robots/dusty/dusty_portrait.png` | Phase 2 P2-102 | 1,620,173 |
-| `assets/ui/final/characters/robots/dusty/dusty_tool_arm_layer.png` | Phase 2 P2-105 | 1,986,177 |
-| `assets/ui/final/characters/robots/moppy/moppy_face_blink_layer.png` | Phase 2 P2-068 | 1,533,342 |
 | `assets/ui/final/characters/robots/moppy/moppy_gameplay.png` | Phase 2 P2-065 | 1,284,395 |
 | `assets/ui/final/characters/robots/moppy/moppy_home_pose.png` | Phase 2 P2-067 | 2,041,722 |
 | `assets/ui/final/characters/robots/moppy/moppy_master.png` | Phase 2 P2-064 | 1,460,771 |
 | `assets/ui/final/characters/robots/moppy/moppy_portrait.png` | Phase 2 P2-066 | 1,684,947 |
-| `assets/ui/final/characters/robots/moppy/moppy_tool_arm_layer.png` | Phase 2 P2-069 | 934,313 |
-| `assets/ui/final/characters/robots/polly/polly_face_blink_layer.png` | Phase 2 P2-122 | 1,633,171 |
 | `assets/ui/final/characters/robots/polly/polly_gameplay.png` | Phase 2 P2-119 | 1,413,837 |
 | `assets/ui/final/characters/robots/polly/polly_home_pose.png` | Phase 2 P2-121 | 1,318,982 |
 | `assets/ui/final/characters/robots/polly/polly_master.png` | Phase 2 P2-118 | 1,463,472 |
 | `assets/ui/final/characters/robots/polly/polly_portrait.png` | Phase 2 P2-120 | 1,540,128 |
-| `assets/ui/final/characters/robots/polly/polly_tool_arm_layer.png` | Phase 2 P2-123 | 1,088,135 |
-| `assets/ui/final/characters/robots/rinse/rinse_face_blink_layer.png` | Phase 2 P2-113 | 1,481,771 |
 | `assets/ui/final/characters/robots/rinse/rinse_gameplay.png` | Phase 2 P2-110 | 1,462,820 |
 | `assets/ui/final/characters/robots/rinse/rinse_home_pose.png` | Phase 2 P2-112 | 1,940,014 |
 | `assets/ui/final/characters/robots/rinse/rinse_master.png` | Phase 2 P2-109 | 1,386,814 |
 | `assets/ui/final/characters/robots/rinse/rinse_portrait.png` | Phase 2 P2-111 | 1,611,064 |
-| `assets/ui/final/characters/robots/rinse/rinse_tool_arm_layer.png` | Phase 2 P2-114 | 1,096,109 |
-| `assets/ui/final/characters/robots/spark/spark_face_blink_layer.png` | Phase 2 P2-086 | 1,519,529 |
 | `assets/ui/final/characters/robots/spark/spark_gameplay.png` | Phase 2 P2-083 | 1,627,019 |
 | `assets/ui/final/characters/robots/spark/spark_home_pose.png` | Phase 2 P2-085 | 1,967,402 |
 | `assets/ui/final/characters/robots/spark/spark_master.png` | Phase 2 P2-082 | 1,502,033 |
 | `assets/ui/final/characters/robots/spark/spark_portrait.png` | Phase 2 P2-084 | 1,461,468 |
-| `assets/ui/final/characters/robots/spark/spark_tool_arm_layer.png` | Phase 2 P2-087 | 964,618 |
-| `assets/ui/final/characters/robots/squeegee/squeegee_face_blink_layer.png` | Phase 2 P2-095 | 1,182,631 |
 | `assets/ui/final/characters/robots/squeegee/squeegee_gameplay.png` | Phase 2 P2-092 | 1,272,555 |
 | `assets/ui/final/characters/robots/squeegee/squeegee_home_pose.png` | Phase 2 P2-094 | 1,962,310 |
 | `assets/ui/final/characters/robots/squeegee/squeegee_master.png` | Phase 2 P2-091 | 1,438,622 |
 | `assets/ui/final/characters/robots/squeegee/squeegee_portrait.png` | Phase 2 P2-093 | 1,436,695 |
-| `assets/ui/final/characters/robots/squeegee/squeegee_tool_arm_layer.png` | Phase 2 P2-096 | 1,927,476 |
-| `assets/ui/final/characters/scrubby/scrubby_brush_arm_layer.png` | Phase 1 | 774,383 |
-| `assets/ui/final/characters/scrubby/scrubby_face_blink_layer.png` | Phase 1 | 1,456,169 |
 | `assets/ui/final/characters/scrubby/scrubby_gameplay.png` | Phase 1 | 1,157,666 |
 | `assets/ui/final/characters/scrubby/scrubby_home_pose.png` | Phase 1 | 1,407,303 |
 | `assets/ui/final/characters/scrubby/scrubby_master.png` | Phase 1 | 1,143,456 |
 | `assets/ui/final/characters/scrubby/scrubby_portrait.png` | Phase 1 | 741,149 |
-| `assets/ui/final/characters/robots/cleaning_crew_group.png` | Phase 2 P2-157 | 2,817,625 |
 
 ### collection (148)
 
@@ -294,60 +265,24 @@ Purpose: single lookup map for Claude/Godot UI integration.
 | `assets/ui/final/collection/cards/set_15/card_08.png` | Phase 1 | 200,193 |
 | `assets/ui/final/collection/cards/set_15/card_09.png` | Phase 1 | 184,652 |
 | `assets/ui/final/collection/collection_complete_emblem.png` | Phase 1 | 1,313,371 |
-| `assets/ui/final/collection/collection_panel_frame.png` | Phase 1 | 1,364,299 |
 | `assets/ui/final/collection/master_collection_emblem.png` | Phase 1 | 1,646,178 |
-| `assets/ui/final/collection/set_header_frame.png` | Phase 1 | 1,269,723 |
-| `assets/ui/final/collection/set_navigation_arrow_left.png` | Phase 1 | 968,318 |
-| `assets/ui/final/collection/set_navigation_arrow_right.png` | Phase 1 | 784,769 |
 
 ### common (49)
 
 | Path | Authority | Bytes |
 |---|---|---:|
-| `assets/ui/final/common/badges/badge_generic_frame.png` | Phase 2 P2-036 | 1,423,420 |
-| `assets/ui/final/common/badges/badge_notification_frame.png` | Phase 2 P2-037 | 1,015,502 |
-| `assets/ui/final/common/badges/badge_quantity_frame.png` | Phase 2 P2-038 | 1,608,674 |
 | `assets/ui/final/common/currencies/icon_currency_heart.png` | Phase 1 | 978,806 |
 | `assets/ui/final/common/currencies/icon_currency_scrub_bucks.png` | Phase 1 | 1,177,566 |
-| `assets/ui/final/common/frames/button_blue_frame.png` | Phase 2 P2-031 | 999,275 |
-| `assets/ui/final/common/frames/button_disabled_frame.png` | Phase 2 P2-035 | 1,147,105 |
-| `assets/ui/final/common/frames/button_green_frame.png` | Phase 2 P2-032 | 988,660 |
-| `assets/ui/final/common/frames/button_purple_frame.png` | Phase 2 P2-033 | 994,676 |
-| `assets/ui/final/common/frames/button_red_frame.png` | Phase 2 P2-034 | 1,355,866 |
-| `assets/ui/final/common/frames/popup_confirmation_frame.png` | Phase 2 P2-028 | 1,314,662 |
 | `assets/ui/final/common/frames/popup_large_frame.png` | Phase 2 P2-027 | 1,148,508 |
 | `assets/ui/final/common/frames/popup_medium_frame.png` | Phase 2 P2-026 | 1,220,083 |
 | `assets/ui/final/common/frames/popup_reward_frame.png` | Phase 2 P2-029 | 1,564,546 |
 | `assets/ui/final/common/frames/popup_small_frame.png` | Phase 2 P2-025 | 1,399,872 |
 | `assets/ui/final/common/frames/popup_warning_frame.png` | Phase 2 P2-030 | 1,328,148 |
-| `assets/ui/final/common/frames/progress_bar_fill.png` | Phase 2 P2-040 | 504,992 |
-| `assets/ui/final/common/frames/progress_bar_frame.png` | Phase 2 P2-039 | 474,996 |
-| `assets/ui/final/common/icons/icon_arrow_left.png` | Phase 1 | 685,980 |
-| `assets/ui/final/common/icons/icon_arrow_right.png` | Phase 1 | 665,089 |
 | `assets/ui/final/common/icons/icon_check.png` | Phase 1 | 1,062,406 |
 | `assets/ui/final/common/icons/icon_clock.png` | Phase 1 | 1,004,796 |
-| `assets/ui/final/common/icons/icon_close.png` | Phase 1 | 1,009,619 |
-| `assets/ui/final/common/icons/icon_cloud_save.png` | Phase 2 P2-059 | 1,098,404 |
-| `assets/ui/final/common/icons/icon_connection_lost.png` | Phase 2 P2-063 | 903,129 |
-| `assets/ui/final/common/icons/icon_download.png` | Phase 2 P2-023 | 1,234,098 |
-| `assets/ui/final/common/icons/icon_haptics.png` | Phase 1 | 875,521 |
 | `assets/ui/final/common/icons/icon_info.png` | Phase 1 | 976,772 |
-| `assets/ui/final/common/icons/icon_language.png` | Phase 2 P2-054 | 1,181,189 |
 | `assets/ui/final/common/icons/icon_lock.png` | Phase 1 | 868,905 |
-| `assets/ui/final/common/icons/icon_maintenance.png` | Phase 2 P2-061 | 1,277,402 |
-| `assets/ui/final/common/icons/icon_music.png` | Phase 1 | 690,769 |
-| `assets/ui/final/common/icons/icon_notification.png` | Phase 1 | 863,041 |
-| `assets/ui/final/common/icons/icon_notifications.png` | Phase 2 P2-055 | 1,191,952 |
-| `assets/ui/final/common/icons/icon_offline.png` | Phase 2 P2-021 | 1,341,812 |
-| `assets/ui/final/common/icons/icon_player_id.png` | Phase 2 P2-058 | 1,666,390 |
 | `assets/ui/final/common/icons/icon_plus.png` | Phase 1 | 949,878 |
-| `assets/ui/final/common/icons/icon_privacy.png` | Phase 2 P2-056 | 1,517,460 |
-| `assets/ui/final/common/icons/icon_refresh.png` | Phase 2 P2-022 | 1,153,880 |
-| `assets/ui/final/common/icons/icon_save_conflict.png` | Phase 2 P2-060 | 1,085,284 |
-| `assets/ui/final/common/icons/icon_sound.png` | Phase 1 | 745,752 |
-| `assets/ui/final/common/icons/icon_support.png` | Phase 2 P2-057 | 1,442,400 |
-| `assets/ui/final/common/icons/icon_update_required.png` | Phase 2 P2-062 | 1,542,946 |
-| `assets/ui/final/common/icons/icon_warning.png` | Phase 2 P2-024 | 1,179,858 |
 | `assets/ui/final/common/navigation/icon_nav_events.png` | Phase 1 | 1,206,416 |
 | `assets/ui/final/common/navigation/icon_nav_home.png` | Phase 1 | 878,485 |
 | `assets/ui/final/common/navigation/icon_nav_leaderboard.png` | Phase 1 | 1,031,817 |
@@ -360,7 +295,6 @@ Purpose: single lookup map for Claude/Godot UI integration.
 |---|---|---:|
 | `assets/ui/final/daily/daily_day_reward_frame.png` | Phase 1 | 1,378,753 |
 | `assets/ui/final/daily/daily_day5_reward_frame.png` | Phase 1 | 1,521,489 |
-| `assets/ui/final/daily/daily_header_emblem.png` | Phase 1 | 1,399,306 |
 | `assets/ui/final/daily/daily_login_calendar.png` | Phase 1 | 1,256,722 |
 | `assets/ui/final/daily/daily_streak_flame.png` | Phase 1 | 1,581,575 |
 | `assets/ui/final/daily/daily_task_check.png` | Phase 1 | 1,279,055 |
@@ -369,38 +303,13 @@ Purpose: single lookup map for Claude/Godot UI integration.
 
 | Path | Authority | Bytes |
 |---|---|---:|
-| `assets/ui/final/difficulty/hard_emblem.png` | Phase 1 | 1,466,122 |
-| `assets/ui/final/difficulty/very_hard_emblem.png` | Phase 1 | 1,594,534 |
 
 ### gameplay (51)
 
 | Path | Authority | Bytes |
 |---|---|---:|
-| `assets/ui/final/gameplay/batch/batch_panel.png` | Phase 1 | 1,616,743 |
-| `assets/ui/final/gameplay/batch/batch_tile_frame.png` | Phase 1 | 802,572 |
-| `assets/ui/final/gameplay/batch/batch_tile_front_highlight.png` | Phase 1 | 662,375 |
-| `assets/ui/final/gameplay/batch/batch_tile_locked_overlay.png` | Phase 1 | 838,142 |
-| `assets/ui/final/gameplay/board/board_inner_frame.png` | Phase 1 | 21,679 |
-| `assets/ui/final/gameplay/controls/button_pause.png` | Phase 1 | 915,660 |
-| `assets/ui/final/gameplay/controls/button_speed_2x_active.png` | Phase 1 | 943,779 |
-| `assets/ui/final/gameplay/controls/button_speed_2x_countdown_frame.png` | Phase 1 | 1,033,006 |
-| `assets/ui/final/gameplay/controls/button_speed_2x.png` | Phase 1 | 1,020,738 |
-| `assets/ui/final/gameplay/decorative/bubble_bucket.png` | Phase 1 | 1,221,375 |
-| `assets/ui/final/gameplay/decorative/caution_wet_floor_sign.png` | Phase 1 | 1,064,090 |
-| `assets/ui/final/gameplay/decorative/cleaning_equipment_cluster.png` | Phase 1 | 1,606,629 |
-| `assets/ui/final/gameplay/decorative/flexible_hose.png` | Phase 1 | 1,355,163 |
-| `assets/ui/final/gameplay/effects/fx_batch_commit.png` | Phase 1 | 1,310,757 |
 | `assets/ui/final/gameplay/effects/fx_clean_puff.png` | Phase 1 | 973,148 |
 | `assets/ui/final/gameplay/effects/fx_clean_sparkle.png` | Phase 1 | 704,176 |
-| `assets/ui/final/gameplay/effects/fx_rail_travel_glow.png` | Phase 1 | 1,512,800 |
-| `assets/ui/final/gameplay/effects/fx_slot_spawn_glow.png` | Phase 1 | 1,493,862 |
-| `assets/ui/final/gameplay/effects/fx_tornado_clean.png` | Phase 1 | 1,602,181 |
-| `assets/ui/final/gameplay/environment/gameplay_environment.png` | Phase 1 | 1,835,673 |
-| `assets/ui/final/gameplay/master/scrubbots_gameplay_master.png` | Phase 1 | 2,500,673 |
-| `assets/ui/final/gameplay/profile/bot_parts_bar_fill.png` | Phase 1 | 2,075 |
-| `assets/ui/final/gameplay/profile/bot_parts_bar_frame.png` | Phase 1 | 2,189 |
-| `assets/ui/final/gameplay/profile/level_badge_frame.png` | Phase 1 | 14,538 |
-| `assets/ui/final/gameplay/profile/profile_panel_frame.png` | Phase 1 | 17,763 |
 | `assets/ui/final/gameplay/profile/robots/atlas_portrait.png` | Phase 2 P2-142 | 2,067,810 |
 | `assets/ui/final/gameplay/profile/robots/bubbles_portrait.png` | Phase 2 P2-079 | 1,695,415 |
 | `assets/ui/final/gameplay/profile/robots/clippy_portrait.png` | Phase 2 P2-133 | 1,410,798 |
@@ -411,19 +320,9 @@ Purpose: single lookup map for Claude/Godot UI integration.
 | `assets/ui/final/gameplay/profile/robots/spark_portrait.png` | Phase 2 P2-088 | 1,487,295 |
 | `assets/ui/final/gameplay/profile/robots/squeegee_portrait.png` | Phase 2 P2-097 | 1,300,252 |
 | `assets/ui/final/gameplay/profile/scrubby_portrait.png` | Phase 1 | 107,412 |
-| `assets/ui/final/gameplay/railroad/rail_corner_90.png` | Phase 1 | 1,101,090 |
-| `assets/ui/final/gameplay/railroad/rail_end_cap.png` | Phase 1 | 1,365,039 |
 | `assets/ui/final/gameplay/railroad/rail_energy_node.png` | Phase 1 | 1,299,949 |
-| `assets/ui/final/gameplay/railroad/rail_ingress_marker.png` | Phase 1 | 1,017,973 |
-| `assets/ui/final/gameplay/railroad/rail_intersection.png` | Phase 1 | 1,047,467 |
 | `assets/ui/final/gameplay/railroad/rail_slot_connector.png` | Phase 1 | 977,573 |
 | `assets/ui/final/gameplay/railroad/rail_straight_horizontal.png` | Phase 1 | 863,340 |
-| `assets/ui/final/gameplay/railroad/rail_straight_vertical.png` | Phase 1 | 1,052,797 |
-| `assets/ui/final/gameplay/railway/rail_straight.png` | LEGACY / EXTRA | 7,938 |
-| `assets/ui/final/gameplay/slots/slot_active.png` | Phase 1 | 13,108 |
-| `assets/ui/final/gameplay/slots/slot_empty.png` | Phase 1 | 7,379 |
-| `assets/ui/final/gameplay/slots/slot_filled_base.png` | Phase 1 | 5,726 |
-| `assets/ui/final/gameplay/slots/slot_locked.png` | Phase 1 | 1,082,738 |
 | `assets/ui/final/gameplay/tutorial/speech_bubble.png` | Phase 1 | 1,244,746 |
 | `assets/ui/final/gameplay/tutorial/tutorial_highlight_ring.png` | Phase 1 | 1,104,058 |
 | `assets/ui/final/gameplay/tutorial/tutorial_pointer.png` | Phase 1 | 1,021,540 |
@@ -432,25 +331,8 @@ Purpose: single lookup map for Claude/Godot UI integration.
 
 | Path | Authority | Bytes |
 |---|---|---:|
-| `assets/ui/final/home/area_banner/home_arch_decor.png` | Phase 1 | 1,225,643 |
-| `assets/ui/final/home/area_banner/home_arch_whispering_park.png` | Phase 1 | 1,774,284 |
-| `assets/ui/final/home/background/home_bg_city_far.png` | Phase 1 | 1,333,722 |
-| `assets/ui/final/home/background/home_bg_city_mid.png` | Phase 1 | 2,525,140 |
-| `assets/ui/final/home/background/home_bg_sky.png` | Phase 1 | 1,389,273 |
-| `assets/ui/final/home/background/home_bg_street_foreground.png` | Phase 1 | 1,301,742 |
-| `assets/ui/final/home/environment/home_prop_cleaning_bucket.png` | Phase 1 | 1,466,978 |
-| `assets/ui/final/home/environment/home_prop_cleaning_equipment.png` | Phase 1 | 1,555,215 |
-| `assets/ui/final/home/environment/home_prop_foam_cluster.png` | Phase 1 | 1,305,053 |
-| `assets/ui/final/home/environment/home_prop_hose.png` | Phase 1 | 1,555,110 |
-| `assets/ui/final/home/environment/home_prop_keep_clean_sign.png` | Phase 1 | 1,020,218 |
-| `assets/ui/final/home/environment/home_prop_neon_details.png` | Phase 1 | 2,167,940 |
-| `assets/ui/final/home/environment/home_prop_puddles.png` | Phase 1 | 824,488 |
-| `assets/ui/final/home/environment/home_prop_wet_floor_sign.png` | Phase 1 | 1,219,232 |
 | `assets/ui/final/home/gift_meter/gift_meter_emblem.png` | Phase 1 | 1,283,008 |
 | `assets/ui/final/home/gift_meter/gift_meter_reward_crate.png` | Phase 1 | 1,373,783 |
-| `assets/ui/final/home/platform/home_platform_main.png` | Phase 1 | 2,112,595 |
-| `assets/ui/final/home/platform/home_platform_top.png` | Phase 1 | 1,801,797 |
-| `assets/ui/final/home/play_cta/play_button_frame.png` | Phase 1 | 1,224,010 |
 | `assets/ui/final/home/reward_track/reward_gift_1.png` | Phase 1 | 1,119,397 |
 | `assets/ui/final/home/reward_track/reward_gift_10.png` | Phase 1 | 1,522,054 |
 | `assets/ui/final/home/reward_track/reward_gift_100.png` | Phase 1 | 1,415,950 |
@@ -483,13 +365,8 @@ Purpose: single lookup map for Claude/Godot UI integration.
 | Path | Authority | Bytes |
 |---|---|---:|
 | `assets/ui/final/popups/failure/fail_header_emblem.png` | Phase 1 | 1,359,229 |
-| `assets/ui/final/popups/failure/heart_empty.png` | Phase 1 | 850,326 |
 | `assets/ui/final/popups/failure/heart_large.png` | Phase 1 | 1,135,656 |
-| `assets/ui/final/popups/failure/refill_button_frame.png` | Phase 1 | 1,482,866 |
 | `assets/ui/final/popups/failure/refill_heart_bundle.png` | Phase 1 | 1,281,644 |
-| `assets/ui/final/popups/failure/retry_button_frame.png` | Phase 1 | 1,278,132 |
-| `assets/ui/final/popups/help/help_button_frame.png` | Phase 1 | 1,309,135 |
-| `assets/ui/final/popups/help/help_panel_emblem.png` | Phase 1 | 1,395,594 |
 | `assets/ui/final/popups/help/help_scrubby_pose.png` | Phase 1 | 1,253,407 |
 | `assets/ui/final/popups/help/robots/atlas_help_pose.png` | Phase 2 P2-143 | 2,261,827 |
 | `assets/ui/final/popups/help/robots/bubbles_help_pose.png` | Phase 2 P2-080 | 1,363,183 |
@@ -500,11 +377,8 @@ Purpose: single lookup map for Claude/Godot UI integration.
 | `assets/ui/final/popups/help/robots/rinse_help_pose.png` | Phase 2 P2-116 | 1,887,479 |
 | `assets/ui/final/popups/help/robots/spark_help_pose.png` | Phase 2 P2-089 | 1,239,048 |
 | `assets/ui/final/popups/help/robots/squeegee_help_pose.png` | Phase 2 P2-098 | 1,262,635 |
-| `assets/ui/final/popups/level_intro/hard_level_emblem.png` | Phase 1 | 1,347,579 |
 | `assets/ui/final/popups/level_intro/level_intro_frame.png` | Phase 1 | 1,353,000 |
 | `assets/ui/final/popups/level_intro/normal_level_emblem.png` | Phase 1 | 1,254,752 |
-| `assets/ui/final/popups/level_intro/very_hard_level_emblem.png` | Phase 1 | 1,598,581 |
-| `assets/ui/final/popups/victory/continue_button_frame.png` | Phase 1 | 1,292,779 |
 | `assets/ui/final/popups/victory/reward_glow.png` | Phase 1 | 1,657,823 |
 | `assets/ui/final/popups/victory/robots/atlas_victory_pose.png` | Phase 2 P2-144 | 2,214,718 |
 | `assets/ui/final/popups/victory/robots/bubbles_victory_pose.png` | Phase 2 P2-081 | 1,616,191 |
@@ -522,14 +396,12 @@ Purpose: single lookup map for Claude/Godot UI integration.
 
 | Path | Authority | Bytes |
 |---|---|---:|
-| `assets/ui/final/rewards/bot_parts_bundle_large.png` | Phase 1 | 1,762,769 |
 | `assets/ui/final/rewards/bot_parts_bundle_small.png` | Phase 1 | 1,238,744 |
 | `assets/ui/final/rewards/booster_of_choice.png` | Owner-approved M43-C005-C004 (SB-M43-076) | 670,138 |
 | `assets/ui/final/rewards/card_pack_premium.png` | Phase 1 | 2,135,294 |
 | `assets/ui/final/rewards/card_pack_standard.png` | Phase 1 | 2,138,727 |
 | `assets/ui/final/rewards/chest_small.png` | Phase 1 | 1,210,295 |
 | `assets/ui/final/rewards/gift_box.png` | Phase 1 | 1,269,854 |
-| `assets/ui/final/rewards/scrub_bucks_bundle_large.png` | Phase 1 | 2,037,038 |
 | `assets/ui/final/rewards/scrub_bucks_bundle_small.png` | Phase 1 | 1,091,823 |
 
 ### rewards/pack_opening/standard (9)
@@ -569,7 +441,6 @@ Integration note (M43-C005-C007): shipping Premium opening frames 01..09, bound 
 | Path | Authority | Bytes |
 |---|---|---:|
 | `assets/ui/final/robots/bot_parts_icon.png` | Phase 1 | 1,075,502 |
-| `assets/ui/final/robots/bot_parts_progress_frame.png` | Phase 1 | 507,078 |
 | `assets/ui/final/robots/perks/perk_booster_discount.png` | Phase 2 P2-149 | 1,953,644 |
 | `assets/ui/final/robots/perks/perk_cards_exchange_bonus.png` | Phase 2 P2-148 | 1,824,144 |
 | `assets/ui/final/robots/perks/perk_daily_task_bonus.png` | Phase 2 P2-152 | 1,869,230 |
@@ -579,27 +450,16 @@ Integration note (M43-C005-C007): shipping Premium opening frames 01..09, bound 
 | `assets/ui/final/robots/perks/perk_master_cleaner.png` | Phase 2 P2-153 | 2,026,602 |
 | `assets/ui/final/robots/perks/perk_speed_2x_discount.png` | Phase 2 P2-147 | 1,827,088 |
 | `assets/ui/final/robots/perks/perk_win_streak_bonus.png` | Phase 2 P2-151 | 1,925,244 |
-| `assets/ui/final/robots/robot_card_frame_locked.png` | Phase 1 | 1,717,165 |
-| `assets/ui/final/robots/robot_card_frame_unlocked.png` | Phase 1 | 1,632,947 |
-| `assets/ui/final/robots/robot_detail_hero_frame.png` | Phase 2 P2-049 | 1,607,914 |
 | `assets/ui/final/robots/robot_lock_emblem.png` | Phase 2 P2-053 | 1,109,523 |
-| `assets/ui/final/robots/robot_locked_silhouette.png` | Phase 2 P2-047 | 1,361,708 |
 | `assets/ui/final/robots/robot_perk_emblem_frame.png` | Phase 2 P2-052 | 1,554,591 |
-| `assets/ui/final/robots/robot_portrait_frame.png` | Phase 2 P2-048 | 843,090 |
-| `assets/ui/final/robots/robot_selected_ring.png` | Phase 2 P2-050 | 929,259 |
-| `assets/ui/final/robots/robot_unlock_glow.png` | Phase 1 | 1,407,156 |
 | `assets/ui/final/robots/robot_unlocked_burst.png` | Phase 2 P2-051 | 1,674,543 |
 
 ### shop (8)
 
 | Path | Authority | Bytes |
 |---|---|---:|
-| `assets/ui/final/shop/shop_booster_bundle.png` | Phase 1 | 1,554,079 |
-| `assets/ui/final/shop/shop_featured_frame.png` | Phase 1 | 1,218,029 |
 | `assets/ui/final/shop/shop_header_emblem.png` | Phase 1 | 1,398,208 |
 | `assets/ui/final/shop/shop_heart_bundle.png` | Phase 1 | 1,088,754 |
-| `assets/ui/final/shop/shop_item_frame.png` | Phase 1 | 1,399,717 |
-| `assets/ui/final/shop/shop_purchase_button_frame.png` | Phase 1 | 1,360,218 |
 | `assets/ui/final/shop/shop_scrub_bucks_bundle.png` | Phase 1 | 1,757,393 |
 | `assets/ui/final/shop/shop_speed_2x_icon.png` | Phase 1 | 1,254,419 |
 
@@ -607,11 +467,6 @@ Integration note (M43-C005-C007): shipping Premium opening frames 01..09, bound 
 
 | Path | Authority | Bytes |
 |---|---|---:|
-| `assets/ui/final/system/loading/loading_glow.png` | Phase 2 P2-013 | 1,910,130 |
-| `assets/ui/final/system/loading/loading_scrubby.png` | Phase 2 P2-011 | 1,336,509 |
-| `assets/ui/final/system/loading/loading_spinner_ring.png` | Phase 2 P2-012 | 1,152,953 |
-| `assets/ui/final/system/placeholders/content_loading_placeholder.png` | Phase 2 P2-020 | 1,957,052 |
-| `assets/ui/final/system/placeholders/level_preview_placeholder.png` | Phase 2 P2-019 | 1,351,161 |
 | `assets/ui/final/system/splash/splash_background.png` | Phase 2 P2-008 | 2,096,251 |
 | `assets/ui/final/system/splash/boot_splash_portrait.png` | P2-010 derivative (resize/pad, boot splash) | 237,558 |
 | `assets/ui/final/system/splash/splash_logo.png` | Phase 2 P2-010 | 1,312,961 |
@@ -623,7 +478,6 @@ These files exist in `assets/ui/final/**` but are not canonical targets in the c
 
 | Existing extra path | Preferred canonical path / note |
 |---|---|
-| `assets/ui/final/gameplay/railway/rail_straight.png` | `Prefer horizontal/vertical canonical pieces under assets/ui/final/gameplay/railroad/` |
 
 ## Generated candidates / source visuals (0)
 

@@ -55,7 +55,8 @@
         "magnific"
       ],
       "reusable": false,
-      "status": "APPROVED",
+      "status": "RETIRED_DELETED",
+      "deleted_note": "SB-ASSET-PURGE-2026-11-17 (owner chat 2026-11-17): file git rm'd because nothing loads it at runtime; git history keeps it",
       "approved_sha256": "d0353c68c944a188b53256e028f483873b4abe23fb4cc76bdddcba8e2803779c",
       "notes": "Sky/atmosphere layer; no text."
     },
@@ -72,7 +73,8 @@
         "magnific"
       ],
       "reusable": false,
-      "status": "APPROVED",
+      "status": "RETIRED_DELETED",
+      "deleted_note": "SB-ASSET-PURGE-2026-11-17 (owner chat 2026-11-17): file git rm'd because nothing loads it at runtime; git history keeps it",
       "approved_sha256": "d1ff336dc6d076654c3ff3177b97d86c87b7b74b542403a1cd98f81886fbd1f9",
       "notes": "Distant city layer for responsive crop/parallax."
     },
@@ -89,7 +91,8 @@
         "magnific"
       ],
       "reusable": false,
-      "status": "APPROVED",
+      "status": "RETIRED_DELETED",
+      "deleted_note": "SB-ASSET-PURGE-2026-11-17 (owner chat 2026-11-17): file git rm'd because nothing loads it at runtime; git history keeps it",
       "approved_sha256": "cf8403d29e033594d24d9f1a7b8b1dd1e36804b15dcbb3f4affe8eda299cbd78",
       "notes": "Mid-city shops/buildings layer."
     },
@@ -106,7 +109,8 @@
         "magnific"
       ],
       "reusable": false,
-      "status": "APPROVED",
+      "status": "RETIRED_DELETED",
+      "deleted_note": "SB-ASSET-PURGE-2026-11-17 (owner chat 2026-11-17): file git rm'd because nothing loads it at runtime; git history keeps it",
       "approved_sha256": "3b3ef164d5a5945259eb53ef3720f3fb55fae0afcb8410f9d98d11a154bd772d",
       "notes": "Near wet-street/foreground layer."
     },
@@ -134,7 +138,8 @@
         "magnific"
       ],
       "reusable": false,
-      "status": "APPROVED",
+      "status": "RETIRED_DELETED",
+      "deleted_note": "SB-ASSET-PURGE-2026-11-17 (owner chat 2026-11-17): file git rm'd because nothing loads it at runtime; git history keeps it",
       "approved_sha256": "b6cea5f6f16974884c81cbaef0050fddd29ad3965f78ec57fefa096b4d528046",
       "notes": "Arch only; title/area remain live text."
     },
@@ -151,7 +156,8 @@
         "magnific"
       ],
       "reusable": false,
-      "status": "APPROVED",
+      "status": "RETIRED_DELETED",
+      "deleted_note": "SB-ASSET-PURGE-2026-11-17 (owner chat 2026-11-17): file git rm'd because nothing loads it at runtime; git history keeps it",
       "approved_sha256": "af4d834a07f926906056a9e0b3a1608d6af285b14a741da4ce53c3fdc85591b2",
       "notes": ""
     },
@@ -190,7 +196,8 @@
         "magnific"
       ],
       "reusable": false,
-      "status": "APPROVED",
+      "status": "RETIRED_DELETED",
+      "deleted_note": "SB-ASSET-PURGE-2026-11-17 (owner chat 2026-11-17): file git rm'd because nothing loads it at runtime; git history keeps it",
       "approved_sha256": "61f4b715da49f4bf08a8cf32bfef778168e33689c2f4bf4b5d0eecfc511d7999",
       "notes": ""
     },
@@ -207,7 +214,8 @@
         "magnific"
       ],
       "reusable": false,
-      "status": "APPROVED",
+      "status": "RETIRED_DELETED",
+      "deleted_note": "SB-ASSET-PURGE-2026-11-17 (owner chat 2026-11-17): file git rm'd because nothing loads it at runtime; git history keeps it",
       "approved_sha256": "3b0b1187c6d0c32465a67713b31b986730e09ce744e5c669f00bd3f7159f9e70",
       "notes": ""
     },
@@ -235,7 +243,8 @@
         "magnific"
       ],
       "reusable": false,
-      "status": "APPROVED",
+      "status": "RETIRED_DELETED",
+      "deleted_note": "SB-ASSET-PURGE-2026-11-17 (owner chat 2026-11-17): file git rm'd because nothing loads it at runtime; git history keeps it",
       "approved_sha256": "7681d0adaaa6506da968904bf1262c57301a01446d743a4e3aa69c94c30f7eea",
       "notes": ""
     },
@@ -252,7 +261,8 @@
         "magnific"
       ],
       "reusable": false,
-      "status": "APPROVED",
+      "status": "RETIRED_DELETED",
+      "deleted_note": "SB-ASSET-PURGE-2026-11-17 (owner chat 2026-11-17): file git rm'd because nothing loads it at runtime; git history keeps it",
       "approved_sha256": "38c214d93ff8222c0ba71f7a3f0e776dd46940e3873e44427acf32abd263df2a",
       "notes": ""
     },
@@ -269,7 +279,8 @@
         "magnific"
       ],
       "reusable": false,
-      "status": "APPROVED",
+      "status": "RETIRED_DELETED",
+      "deleted_note": "SB-ASSET-PURGE-2026-11-17 (owner chat 2026-11-17): file git rm'd because nothing loads it at runtime; git history keeps it",
       "approved_sha256": "ba69053c78c468326a91bff32abba51f742cd9d75616eb33086e548067bf2aa0",
       "notes": ""
     },
@@ -286,7 +297,8 @@
         "magnific"
       ],
       "reusable": false,
-      "status": "APPROVED",
+      "status": "RETIRED_DELETED",
+      "deleted_note": "SB-ASSET-PURGE-2026-11-17 (owner chat 2026-11-17): file git rm'd because nothing loads it at runtime; git history keeps it",
       "approved_sha256": "692271af12062350b412b6e919e4bc24849df2ce0c18023cdcca75cce8c5e124",
       "notes": ""
     },
@@ -314,7 +326,8 @@
         "magnific"
       ],
       "reusable": false,
-      "status": "APPROVED",
+      "status": "RETIRED_DELETED",
+      "deleted_note": "SB-ASSET-PURGE-2026-11-17 (owner chat 2026-11-17): file git rm'd because nothing loads it at runtime; git history keeps it",
       "approved_sha256": "d59eea2db0e7761500116308723448d5bc24c8bcb039fdc22652c205888803da",
       "notes": ""
     },
@@ -331,7 +344,8 @@
         "magnific"
       ],
       "reusable": false,
-      "status": "APPROVED",
+      "status": "RETIRED_DELETED",
+      "deleted_note": "SB-ASSET-PURGE-2026-11-17 (owner chat 2026-11-17): file git rm'd because nothing loads it at runtime; git history keeps it",
       "approved_sha256": "6d08b69f0aad74d0fdea9a696ab615a69e11f0796a5a23e0fa858032dcff9baa",
       "notes": "Avoid baked language-dependent copy."
     },
@@ -348,7 +362,8 @@
         "magnific"
       ],
       "reusable": false,
-      "status": "APPROVED",
+      "status": "RETIRED_DELETED",
+      "deleted_note": "SB-ASSET-PURGE-2026-11-17 (owner chat 2026-11-17): file git rm'd because nothing loads it at runtime; git history keeps it",
       "approved_sha256": "c83036875ad4f5d4d2ba65c2b3567d39d292f894629a5f64ba7e8f73ac19511d",
       "notes": ""
     },
@@ -365,7 +380,8 @@
         "magnific"
       ],
       "reusable": false,
-      "status": "APPROVED",
+      "status": "RETIRED_DELETED",
+      "deleted_note": "SB-ASSET-PURGE-2026-11-17 (owner chat 2026-11-17): file git rm'd because nothing loads it at runtime; git history keeps it",
       "approved_sha256": "dcb568463a3a560d950ac35196bcbd722b8d6fc248b767aab86466dafce0a2e5",
       "notes": ""
     },
@@ -382,7 +398,8 @@
         "magnific"
       ],
       "reusable": true,
-      "status": "APPROVED",
+      "status": "RETIRED_DELETED",
+      "deleted_note": "SB-ASSET-PURGE-2026-11-17 (owner chat 2026-11-17): file git rm'd because nothing loads it at runtime; git history keeps it",
       "approved_sha256": "d0cb14782d36a793c180904f0c61c59be938aa3c897afc342f19e721659a3119",
       "notes": ""
     },
@@ -399,7 +416,8 @@
         "magnific"
       ],
       "reusable": true,
-      "status": "APPROVED",
+      "status": "RETIRED_DELETED",
+      "deleted_note": "SB-ASSET-PURGE-2026-11-17 (owner chat 2026-11-17): file git rm'd because nothing loads it at runtime; git history keeps it",
       "approved_sha256": "1f85faf4c52ae20687a7e6667e7ce3162828dce8a4172380c1df0c540406242e",
       "notes": ""
     },
@@ -416,7 +434,8 @@
         "magnific"
       ],
       "reusable": true,
-      "status": "APPROVED",
+      "status": "RETIRED_DELETED",
+      "deleted_note": "SB-ASSET-PURGE-2026-11-17 (owner chat 2026-11-17): file git rm'd because nothing loads it at runtime; git history keeps it",
       "approved_sha256": "27eaa6a3da946991e08cc351bd0175daa4c56a0298dfec3fa85f3bce2c1e51b7",
       "notes": ""
     },
@@ -511,7 +530,8 @@
         "magnific"
       ],
       "reusable": true,
-      "status": "APPROVED",
+      "status": "RETIRED_DELETED",
+      "deleted_note": "SB-ASSET-PURGE-2026-11-17 (owner chat 2026-11-17): file git rm'd because nothing loads it at runtime; git history keeps it",
       "approved_sha256": "a6c6f9c6f4117284d28a4a64ce7665b1807a46c12ad2b78ddf5eb871fc407b92",
       "notes": "Optional idle animation layer."
     },
@@ -528,7 +548,8 @@
         "magnific"
       ],
       "reusable": true,
-      "status": "APPROVED",
+      "status": "RETIRED_DELETED",
+      "deleted_note": "SB-ASSET-PURGE-2026-11-17 (owner chat 2026-11-17): file git rm'd because nothing loads it at runtime; git history keeps it",
       "approved_sha256": "bf33c73a26c1368d773774d1ea8bc6e7d9bbeadef18afeb2ce5258c1c52c2521",
       "notes": "Optional idle animation layer."
     },
@@ -1124,7 +1145,8 @@
         "magnific"
       ],
       "reusable": false,
-      "status": "APPROVED",
+      "status": "RETIRED_DELETED",
+      "deleted_note": "SB-ASSET-PURGE-2026-11-17 (owner chat 2026-11-17): file git rm'd because nothing loads it at runtime; git history keeps it",
       "approved_sha256": "6a41ee7b2dd9f22736276b99134c85abc2fd27638125fe044592c0c6d5d46d77",
       "notes": "No-text, front-facing, 9-slice-capable glossy frame."
     },
@@ -1679,7 +1701,8 @@
         "magnific"
       ],
       "reusable": false,
-      "status": "APPROVED",
+      "status": "RETIRED_DELETED",
+      "deleted_note": "SB-ASSET-PURGE-2026-11-17 (owner chat 2026-11-17): file git rm'd because nothing loads it at runtime; git history keeps it",
       "approved_sha256": "9d5db29513d25ad5c0932840c08027be0198d0cd85dc758a69e09e800c7aabe2",
       "approval_authority": "coordination/sessions/M28-C002-C003-R01/CHATGPT_PROMPT_V02.md",
       "source_path": "assets/ui/final/home/background/home_background.png",
@@ -1714,7 +1737,8 @@
       "generation_required": false,
       "provider": "google_flow_veo_3_1_lite",
       "reusable": false,
-      "status": "APPROVED",
+      "status": "RETIRED_DELETED",
+      "deleted_note": "SB-ASSET-PURGE-2026-11-17 (owner chat 2026-11-17): file git rm'd because nothing loads it at runtime; git history keeps it",
       "approved_sha256": "7e89b2458622849ec59d20fc3c25c63c92badbb0c29b85d8eb04b9029b2f419b",
       "approval_authority": "SB-POLISH-009 owner design 2026-10-31 (owner-made Flow videos)",
       "source_path": "assets/ui/final/home/videos/home_scrubby_still.png",
@@ -1779,30 +1803,6 @@
         "sweep": {
           "path": "assets/ui/final/home/videos/home_scrubby_sweep_keyed.ogv",
           "sha256": "92619140b674e2d73ee4ae18e4e219a5b437c53946ef814889396f2125fe37dd"
-        }
-      }
-    },
-    "home_scrubby_videos_v1": {
-      "status": "APPROVED",
-      "authority": "SB-POLISH-009 owner design 2026-10-31",
-      "provenance": "owner Google Flow videos (Veo 3.1 Lite), trimmed at frame 184 (matches frame 0), re-encoded with ffmpeg libtheora -q:v 4, 720x1280, 24 fps, 185 frames, no audio; no art changes",
-      "still_slug": "home_scrubby_video_still",
-      "videos": {
-        "wave": {
-          "path": "assets/ui/final/home/videos/home_scrubby_wave.ogv",
-          "sha256": "e0a39ed79d42243714b1c9e829c4a1ae805d9972a8a5cee811e020e67e128526"
-        },
-        "bow": {
-          "path": "assets/ui/final/home/videos/home_scrubby_bow.ogv",
-          "sha256": "082b229e1bba3d03b33419aad2cc6ea74ae153264b85576d78474712ca783b74"
-        },
-        "turn": {
-          "path": "assets/ui/final/home/videos/home_scrubby_turn.ogv",
-          "sha256": "da7c0ba45a6c44f9a1799711d0f3a9ac18b163d6b20205a4823ffccf653683cb"
-        },
-        "full_turn": {
-          "path": "assets/ui/final/home/videos/home_scrubby_full_turn.ogv",
-          "sha256": "ac2d2d9b85a8e9b35c4ff9b4feb62789256dd8e2c835f962b813a625a2831ddb"
         }
       }
     }

@@ -28,7 +28,8 @@
   "canonical_references": {
     "gameplay": {
       "repository_path": "assets/ui/final/gameplay/master/scrubbots_gameplay_master.png",
-      "status": "OWNER_APPROVED_IN_REPO",
+      "status": "RETIRED_DELETED",
+      "deleted_note": "SB-ASSET-PURGE-2026-11-17: git rm'd (retired by the plaza gameplay shells gameplay_v03_plaza_shell_*.png, SB-GAMEPLAY-BG-2026-11-16); git history keeps it",
       "owner_decision": "coordination/OWNER_GAMEPLAY_MASTER_VISUAL_V01.md",
       "previous_reference": "assets/art/references/_owner_inbox/Game Screens/deneme 3 OK.png"
     },
@@ -108,7 +109,8 @@
         "assets/ui/final/home/videos/home_scrubby_full_turn.ogv",
         "assets/ui/final/home/videos/home_scrubby_still.png"
       ],
-      "status": "OWNER_SUPPLIED",
+      "status": "RETIRED_DELETED",
+      "deleted_note": "SB-ASSET-PURGE-2026-11-17: the five park-baked files were git rm'd (superseded by the keyed home_scrubby_videos_keyed_v2 set); git history keeps them",
       "provider": "google_flow_veo_3_1_lite",
       "date": "2026-10-31",
       "owner_decision": "owner made the four Home Scrubby gesture videos in Google Flow (Veo 3.1 Lite, frames-to-video with the Home start frame as first and last frame) and trimmed each at frame 184, the frame matching frame 0 (SB-POLISH-009)",
@@ -267,7 +269,8 @@
       "category": "difficulty",
       "provider": "chatgpt_image_generation",
       "required": false,
-      "status": "PLANNED",
+      "status": "RETIRED_DELETED",
+      "deleted_note": "SB-ASSET-PURGE-2026-11-17: unused file git rm'd; git history keeps it",
       "prompt": "Hard difficulty emblem for SCRUBBOTS, compact purple neon badge with a playful tough cleaning-tech motif, no text",
       "transparent": true,
       "target_path": "assets/ui/final/difficulty/hard_emblem.png",
@@ -281,7 +284,8 @@
       "category": "difficulty",
       "provider": "chatgpt_image_generation",
       "required": false,
-      "status": "PLANNED",
+      "status": "RETIRED_DELETED",
+      "deleted_note": "SB-ASSET-PURGE-2026-11-17: unused file git rm'd; git history keeps it",
       "prompt": "Very Hard difficulty emblem for SCRUBBOTS, stronger magenta-purple neon cleaning-tech badge, distinct from Hard, no text",
       "transparent": true,
       "target_path": "assets/ui/final/difficulty/very_hard_emblem.png",
@@ -425,7 +429,8 @@
   "gameplay_master_visual": {
     "id": "gameplay_master_visual_v01",
     "provider": "chatgpt_image_generation",
-    "status": "OWNER_APPROVED_IN_REPO",
+    "status": "RETIRED_DELETED",
+    "deleted_note": "SB-ASSET-PURGE-2026-11-17: master file git rm'd (retired by the plaza gameplay shells); git history keeps it",
     "target_path": "assets/ui/final/gameplay/master/scrubbots_gameplay_master.png",
     "regenerate": false,
     "composition_authority": "coordination/OWNER_GAMEPLAY_SCREEN_COMPOSITION_V02.md",
@@ -446,22 +451,26 @@
       {
         "id": "gameplay_pause_button",
         "path": "assets/ui/final/gameplay/controls/button_pause.png",
-        "status": "APPROVED"
+        "status": "RETIRED_DELETED",
+        "deleted_note": "SB-ASSET-PURGE-2026-11-17: unused file git rm'd; git history keeps it"
       },
       {
         "id": "gameplay_speed_2x_button",
         "path": "assets/ui/final/gameplay/controls/button_speed_2x.png",
-        "status": "APPROVED"
+        "status": "RETIRED_DELETED",
+        "deleted_note": "SB-ASSET-PURGE-2026-11-17: unused file git rm'd; git history keeps it"
       },
       {
         "id": "gameplay_speed_2x_active",
         "path": "assets/ui/final/gameplay/controls/button_speed_2x_active.png",
-        "status": "APPROVED"
+        "status": "RETIRED_DELETED",
+        "deleted_note": "SB-ASSET-PURGE-2026-11-17: unused file git rm'd; git history keeps it"
       },
       {
         "id": "gameplay_speed_2x_countdown_frame",
         "path": "assets/ui/final/gameplay/controls/button_speed_2x_countdown_frame.png",
-        "status": "APPROVED"
+        "status": "RETIRED_DELETED",
+        "deleted_note": "SB-ASSET-PURGE-2026-11-17: unused file git rm'd; git history keeps it"
       },
       {
         "id": "rail_straight_horizontal",
@@ -471,12 +480,14 @@
       {
         "id": "rail_straight_vertical",
         "path": "assets/ui/final/gameplay/railroad/rail_straight_vertical.png",
-        "status": "APPROVED"
+        "status": "RETIRED_DELETED",
+        "deleted_note": "SB-ASSET-PURGE-2026-11-17: unused file git rm'd; git history keeps it"
       },
       {
         "id": "rail_corner_90",
         "path": "assets/ui/final/gameplay/railroad/rail_corner_90.png",
-        "status": "APPROVED"
+        "status": "RETIRED_DELETED",
+        "deleted_note": "SB-ASSET-PURGE-2026-11-17: unused file git rm'd; git history keeps it"
       },
       {
         "id": "rail_slot_connector",

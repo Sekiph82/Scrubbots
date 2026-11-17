@@ -67,7 +67,7 @@ func _accounting(home) -> void:
 	var m = V.load_manifest()
 	var art_ids: Array = []
 	for a in m["assets"]:
-		if a["status"] == "APPROVED":
+		if a["status"] in ["APPROVED", "RETIRED_DELETED"]:
 			art_ids.append(a["id"])
 	var acc: Array = home.get_presentation_accounting()
 	var ids: Array = []
@@ -75,7 +75,7 @@ func _accounting(home) -> void:
 		ids.append(row["id"])
 	art_ids.sort()
 	ids.sort()
-	_ok(ids == art_ids, "every APPROVED manifest entry has exactly one presentation row (%d rows / %d approved)" % [ids.size(), art_ids.size()])
+	_ok(ids == art_ids, "every APPROVED / RETIRED_DELETED manifest entry has exactly one presentation row (%d rows / %d entries)" % [ids.size(), art_ids.size()])
 	var slug_ok := true
 	for a in m["assets"]:
 		if HomePresentationMap.ENTRIES.has(a["id"]):
@@ -114,10 +114,14 @@ func _inactive(home) -> void:
 	_ok(bad.is_empty(), "inactive rows have no presentation node and carry a reason %s" % str(bad))
 	var m = V.load_manifest()
 	var still_approved := 0
+	var deleted := 0
 	for a in m["assets"]:
-		if ids.has(a["id"]) and a["status"] == "APPROVED" and String(a.get("approved_sha256", "")).length() == 64:
-			still_approved += 1
-	_ok(still_approved == 30, "historical approval + sha pins of retired/disabled entries unchanged in the manifest")
+		if ids.has(a["id"]) and String(a.get("approved_sha256", "")).length() == 64:
+			if a["status"] == "APPROVED":
+				still_approved += 1
+			elif a["status"] == "RETIRED_DELETED" and not FileAccess.file_exists("res://" + String(a["path"])):
+				deleted += 1
+	_ok(still_approved == 6 and deleted == 24, "retired/disabled entries keep their historical sha pins: 6 still APPROVED on disk, 24 RETIRED_DELETED with the file gone (SB-ASSET-PURGE-2026-11-17) (%d / %d)" % [still_approved, deleted])
 	_complete("inactive_rows_present_nothing")
 
 func _labels(home) -> void:

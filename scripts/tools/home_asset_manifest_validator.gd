@@ -32,7 +32,8 @@ extends RefCounted
 ##     Meter, Cards Exchange shortcut, Win Streak reward track).
 
 const KINDS := ["ART", "LIVE", "FX", "NATIVE", "NATIVE_OR_9_SLICE", "FONT", "REUSE", "THEME"]
-const STATUSES := ["PLANNED", "AWAITING_FONT_SELECTION", "CANDIDATE", "OWNER_REVIEW", "APPROVED", "REJECTED"]
+## RETIRED_DELETED: the file was git rm'd (SB-ASSET-PURGE-2026-11-17); the entry stays as history and never binds.
+const STATUSES := ["PLANNED", "AWAITING_FONT_SELECTION", "CANDIDATE", "OWNER_REVIEW", "APPROVED", "REJECTED", "RETIRED_DELETED"]
 const IMPLEMENTATION_BY_KIND := {
 	"ART": ["generated_asset"],
 	"LIVE": ["live_godot_ui"],

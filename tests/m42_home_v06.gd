@@ -352,7 +352,7 @@ func _assets() -> void:
 			n += 1
 			if FileAccess.get_sha256("res://" + String(a["path"])) != String(a["approved_sha256"]):
 				bad.append(a["id"])
-	_ok(n == 56 and bad.is_empty(), "all 56 approved entries (R15-004 + HOME-122 + HOME-123 + HOME-124 + HOME-125) match their pins %s" % str(bad))
+	_ok(n == 32 and bad.is_empty(), "all 32 approved entries (56 minus the 24 SB-ASSET-PURGE-2026-11-17 deletions) match their pins %s" % str(bad))
 	_complete("asset_integrity")
 
 func _complete(c: String) -> void:

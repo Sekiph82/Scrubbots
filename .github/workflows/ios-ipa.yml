@@ -122,6 +122,8 @@ jobs:
             !/assets/ui/candidates/
             !/assets/ui/generated/
             !/addons/godot_ai/
+            !/factory/
+            !/flow_videos/
 
       - name: Import workspace has only runtime sources
         run: |
@@ -209,7 +211,7 @@ jobs:
           export_filter="all_resources"
           include_filter="addons/game_feel_flow/LICENSE, addons/saltmire_spark/LICENSE.txt"
           ; Gelistirme/denetim dosyalari oyuna girmesin (coordination 1.7 GB); workspace'te de yoklar
-          exclude_filter="coordination/*, docs/*, tests/*, tools/*, level_factory/*, content_pipeline/*, assets/art/references/*, assets/ui/generated/*, assets/ui/candidates/*, addons/godot_ai/*, .github/*"
+          exclude_filter="coordination/*, docs/*, tests/*, tools/*, level_factory/*, content_pipeline/*, assets/art/references/*, assets/ui/generated/*, assets/ui/candidates/*, addons/godot_ai/*, factory/*, flow_videos/*, .github/*"
           export_path="${OUT_DIR}/${APP_NAME}.ipa"
 
           [preset.0.options]

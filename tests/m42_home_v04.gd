@@ -22,14 +22,13 @@ const UiText = preload("res://scripts/ui/ui_text.gd")
 const V = preload("res://scripts/tools/home_asset_manifest_validator.gd")
 
 ## SB-HOME-BG-2026-11-16: the Home background is the owner plaza file below (941x1672,
-## HOME-124); the M28 HOME-121 file and the V04 1080x2160 HOME-120 file stay on disk,
-## retired and never loaded.
+## HOME-124); the V04 1080x2160 HOME-120 file stays on disk, retired and never loaded; the
+## M28 HOME-121 file was deleted (SB-ASSET-PURGE-2026-11-17).
 const WORLD_PATH := "res://assets/ui/final/home/background/home_background_plaza.png"
 const WORLD_SHA := "0aa7463b12cd156883aeb8d9b91f59632bbe6899ce4a61ad74a6f77026f9cde3"
 const WORLD_SLUG := "home_background_plaza"
 const OLD_WORLD_PATH := "res://assets/ui/final/home/worlds/world_01_whispering_park_1080x2160.png"
 const M28_WORLD_PATH := "res://assets/ui/final/home/background/home_background.png"
-const M28_WORLD_SHA := "9d5db29513d25ad5c0932840c08027be0198d0cd85dc758a69e09e800c7aabe2"
 const KEYED_STILL_PATH := "res://assets/ui/final/home/videos/home_scrubby_still_keyed.png"
 ## SB-HOME-VIDEO-MAGENTA-2026-11-17: + bow, full_turn, sweep from the owner's magenta Flow videos.
 const KEYED_GESTURES := ["wave", "turn", "bow", "full_turn", "sweep"]
@@ -122,7 +121,7 @@ func _world_identity() -> void:
 	_ok(img != null and img.get_size() == Vector2i(941, 1672), "Home background is exactly 941x1672 (%s)" % str(img.get_size() if img else null))
 	_ok(FileAccess.get_sha256(WORLD_PATH) == WORLD_SHA, "Home background SHA-256 is the owner plaza %s" % WORLD_SHA)
 	_ok(FileAccess.file_exists(OLD_WORLD_PATH), "retired HOME-120 file is kept on disk (never deleted or overwritten)")
-	_ok(FileAccess.get_sha256(M28_WORLD_PATH) == M28_WORLD_SHA, "retired HOME-121 file is kept byte-identical on disk")
+	_ok(not FileAccess.file_exists(M28_WORLD_PATH), "retired HOME-121 file was deleted (SB-ASSET-PURGE-2026-11-17)")
 	_complete("world_asset_identity")
 
 func _binds(home) -> void:
@@ -545,7 +544,7 @@ func _historical() -> void:
 			n += 1
 			if FileAccess.get_sha256("res://" + String(a["path"])) != String(a["approved_sha256"]):
 				bad.append(a["id"])
-	_ok(n == 56 and bad.is_empty(), "all 56 APPROVED entries (R15-004 + HOME-122 + HOME-123 + HOME-124 + HOME-125) (incl. retired history) match their pinned sha %s" % str(bad))
+	_ok(n == 32 and bad.is_empty(), "all 32 APPROVED entries (56 minus the 24 SB-ASSET-PURGE-2026-11-17 deletions) (incl. retired history) match their pinned sha %s" % str(bad))
 	_complete("historical_assets_intact")
 
 func _complete(c: String) -> void:

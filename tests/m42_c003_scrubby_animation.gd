@@ -29,8 +29,10 @@ const SOURCE_FAMILY := {"wave": "wave", "bow": "bow", "turn": "turn_look", "full
 const HARD := ["TopCurrencyHUD", "GiftMeter", "PlayButton", "BottomNav",
 	"Shortcut_shop", "Shortcut_collection", "Shortcut_tasks", "Shortcut_daily"]
 const DT := 1.0 / 60.0
-const VIDEO_SET_ID := "home_scrubby_videos_v1"
-const VIDEO_GESTURES := ["wave", "bow", "turn", "full_turn"]
+## SB-ASSET-PURGE-2026-11-17: the park-baked v1 set was deleted; the video seam runs on the keyed set.
+const VIDEO_SET_ID := "home_scrubby_videos_keyed_v2"
+const VIDEO_GESTURES := ["wave", "turn", "bow", "full_turn", "sweep"]
+const VIDEO_STILL_SLUG := "home_scrubby_video_still_keyed"
 
 var EXPECTED_CASES := [
 	"assets_manifest", "final_only_and_parity", "static_fallback", "base_geometry",
@@ -100,11 +102,11 @@ func _home(size: Vector2i, app = null, video := false) -> Array:
 	var hero = home.get_region("HomeScrubbyHero")
 	hero.set_process(false)
 	if video:
-		# SB-HOME-BG-2026-11-16: live Home binds no video set any more (its frames bake in the
-		# retired background); inject the pinned SB-POLISH-009 set to keep the seam covered.
+		# Bind the pinned keyed set explicitly (SB-HOME-VIDEO-2026-11-17) so the seam is covered
+		# whatever Home bound at construction.
 		var bnd = home.get_art_binder()
 		var still: TextureRect = home.get_region("WorldStill")
-		still.texture = bnd.texture("home_scrubby_video_still")
+		still.texture = bnd.texture(VIDEO_STILL_SLUG)
 		hero.set_video(still, home.get_region("WorldVideo"), bnd.video_set(VIDEO_SET_ID))
 		home.get_region("HeroFocusShade").visible = not hero.has_video()
 	else:
@@ -708,15 +710,15 @@ func _video_assets() -> void:
 		var v: Dictionary = vs["videos"][g]
 		parity = parity and FileAccess.get_sha256("res://" + String(v["path"])) == String(v["sha256"]) and String(v["path"]).begins_with("assets/ui/final/home/videos/")
 		sizes.append(FileAccess.get_file_as_bytes("res://" + String(v["path"])).size())
-	_ok(parity and (vs["videos"] as Dictionary).size() == 4, "4 pinned .ogv under final/home/videos, sha256 == bytes")
-	_ok(sizes.min() > 2500000 and sizes.max() < 4500000, "re-encoded clips ~3-4 MB each %s" % str(sizes))
+	_ok(parity and (vs["videos"] as Dictionary).size() == VIDEO_GESTURES.size(), "5 pinned .ogv under final/home/videos, sha256 == bytes")
+	_ok(sizes.min() > 2000000 and sizes.max() < 4500000, "re-encoded clips ~2-4 MB each %s" % str(sizes))
 	var b = HomeArtBinder.new()
 	var vset: Dictionary = b.video_set(VIDEO_SET_ID)
 	var theora := true
 	for g in VIDEO_GESTURES:
 		theora = theora and vset.get("streams", {}).get(g) is VideoStreamTheora
-	_ok(vset.get("still") != null and Vector2i(vset["still"].get_size()) == Vector2i(720, 1280) and theora, "binder serves the 720x1280 still + 4 Theora streams")
-	m["video_sets"][VIDEO_SET_ID]["videos"]["bow"]["sha256"] = "0".repeat(64)
+	_ok(vset.get("still") != null and Vector2i(vset["still"].get_size()) == Vector2i(720, 1280) and theora, "binder serves the 720x1280 still + 5 Theora streams")
+	m["video_sets"][VIDEO_SET_ID]["videos"]["turn"]["sha256"] = "0".repeat(64)
 	var bad = HomeArtBinder.new(m)
 	_ok(not bad.is_manifest_valid() and bad.video_set(VIDEO_SET_ID).is_empty(), "a changed video pin invalidates the manifest -> no video")
 	var m2 = V.load_manifest()
@@ -733,7 +735,7 @@ func _video_layout() -> void:
 		var still: TextureRect = home.get_region("WorldStill")
 		var video: VideoStreamPlayer = home.get_region("WorldVideo")
 		var wb := _local(home, "WorldBackground")
-		_ok(hero.has_video() and hero.get_streams().size() == 4 and still.visible and still.texture != null and still.texture.resource_path.ends_with("home_scrubby_still.png"), "%s video mode: still bound and shown" % str(vp))
+		_ok(hero.has_video() and hero.get_streams().size() == VIDEO_GESTURES.size() and still.visible and still.texture != null and still.texture.resource_path.ends_with("home_scrubby_still_keyed.png"), "%s video mode: still bound and shown" % str(vp))
 		_ok(_local(home, "WorldStill").is_equal_approx(wb) and _local(home, "WorldVideo").is_equal_approx(wb), "%s still + video share the background crop/scale rect %s" % [str(vp), str(wb)])
 		var bg: Control = home.get_region("Background")
 		_ok(still.get_parent() == bg and video.get_parent() == bg and still.get_index() > home.get_region("WorldBackground").get_index() and video.get_index() > still.get_index() and video.get_index() < home.get_region("Layer_characters").get_index(), "%s still then video above WorldBackground, below the character layer and UI" % str(vp))
@@ -782,16 +784,16 @@ func _video_scheduler() -> void:
 			repeats += int(seq[i] == seq[i - 1])
 	_ok(seq.size() > 200 and repeats == 0, "%d videos in 1 h, 0 immediate repeats" % seq.size())
 	_ok(holds.min() >= Hero.VIDEO_HOLD_MIN - DT and holds.max() <= Hero.VIDEO_HOLD_MAX + DT, "holds %.2f..%.2f s within 5..6" % [holds.min(), holds.max()])
-	var uniform := counts.size() == 4
+	var uniform := counts.size() == VIDEO_GESTURES.size()
 	for g in counts:
-		uniform = uniform and absf(float(counts[g]) / seq.size() - 0.25) < 0.07
-	_ok(uniform, "all 4 videos picked ~uniformly %s" % str(counts))
+		uniform = uniform and absf(float(counts[g]) / seq.size() - 1.0 / VIDEO_GESTURES.size()) < 0.07
+	_ok(uniform, "all %d videos picked ~uniformly %s" % [VIDEO_GESTURES.size(), str(counts)])
 	_ok(playing_ok, "every start: the picked stream on WorldVideo, playing, still underneath")
 	_ok(idle_ok, "every end: player hidden, stream released, still shown")
 	_ok(_players(home) == 1, "exactly one VideoStreamPlayer in Home (one decoder at most)")
 	if hero.get_state()["gesture"] == "":
-		hero.start_gesture("bow" if hero.get_state()["last"] != "bow" else "wave")
-	_ok(hero.get_state()["gesture"] != "" and not hero.start_gesture("turn") and not hero.start_gesture("full_turn"), "a second video is refused while one runs")
+		hero.start_gesture("turn" if hero.get_state()["last"] != "turn" else "wave")
+	_ok(hero.get_state()["gesture"] != "" and not hero.start_gesture("wave") and not hero.start_gesture("turn"), "a second video is refused while one runs")
 	r[0].free()
 	await process_frame
 	_complete("video_scheduler")
@@ -837,14 +839,14 @@ func _video_gates() -> void:
 	hero.step(DT)
 	_ok(_video_stopped(hero, home), "modal opens: video stopped, stream released, still")
 	_run(hero, 40.0)
-	_ok(hero.get_state()["counts"].size() == 1 and not hero.start_gesture("bow"), "40 s under modal: nothing starts")
+	_ok(hero.get_state()["counts"].size() == 1 and not hero.start_gesture("wave"), "40 s under modal: nothing starts")
 	home.set_modal_active("settings", false)
 	hero.step(DT)
 	_ok(hero.get_state()["wait"] >= Hero.VIDEO_HOLD_MIN - DT, "modal closed: fresh %.2f s hold" % hero.get_state()["wait"])
 	var p = home.open_popup("daily")
 	_ok(not hero.can_start_gesture(), "DAILY popup: no video")
 	p.close_popup()
-	_ok(hero.start_gesture("bow"), "bow playing")
+	_ok(hero.start_gesture("wave"), "wave playing")
 	home.visible = false
 	hero.step(DT)
 	_ok(_video_stopped(hero, home) and not hero.motion_allowed(), "Home hidden: video stopped")
@@ -853,7 +855,7 @@ func _video_gates() -> void:
 	home.visible = true
 	for pair in [[NOTIFICATION_APPLICATION_FOCUS_OUT, NOTIFICATION_APPLICATION_FOCUS_IN, "focus"], [NOTIFICATION_APPLICATION_PAUSED, NOTIFICATION_APPLICATION_RESUMED, "pause"]]:
 		hero.step(DT)
-		_ok(hero.start_gesture("full_turn" if pair[2] == "focus" else "wave"), "%s: video playing" % pair[2])
+		_ok(hero.start_gesture("turn" if pair[2] == "focus" else "wave"), "%s: video playing" % pair[2])
 		hero.notification(pair[0])
 		hero.step(DT)
 		_ok(_video_stopped(hero, home), "%s lost (backgrounded): video stopped, still" % pair[2])
@@ -886,7 +888,7 @@ func _video_reduced() -> void:
 	app.effects.set_reduced(true)
 	_ok(_video_stopped(hero, home) and home.get_region("Art_scrubby").self_modulate.a == 0.0, "ON live: video stopped, still only")
 	_run(hero, 60.0)
-	_ok(hero.get_state()["counts"].size() == 1 and not hero.start_gesture("bow") and _video_stopped(hero, home), "ON: no video in 60 s, start refused")
+	_ok(hero.get_state()["counts"].size() == 1 and not hero.start_gesture("turn") and _video_stopped(hero, home), "ON: no video in 60 s, start refused")
 	app.effects.set_reduced(false)
 	_run(hero, Hero.VIDEO_HOLD_MAX + 0.1)
 	_ok(hero.get_state()["gesture"] != "", "OFF: videos resume within one hold")

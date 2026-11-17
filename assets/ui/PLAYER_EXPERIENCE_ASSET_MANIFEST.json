@@ -4,7 +4,7 @@
   "authority": "coordination/OWNER_PLAYER_EXPERIENCE_SURFACE_PROGRAM_V01.md",
   "note": "Required visual masters/references and production surfaces. Dynamic text/prices/timers/progress remain native/live Godot UI. registry_ids lists the data/config/ui_surface_registry_v1.json ids a surface covers when they differ from its id.",
   "canonical_references": {
-    "gameplay_v02": "assets/ui/final/gameplay/master/scrubbots_gameplay_master.png",
+    "gameplay_v02": "assets/ui/final/gameplay/master/scrubbots_gameplay_master.png (RETIRED_DELETED SB-ASSET-PURGE-2026-11-17; git history keeps it)",
     "life": "assets/art/references/_owner_inbox/Additionals/life screens.png",
     "need_a_hand": "assets/art/references/_owner_inbox/Additionals/need a hand.png",
     "level_intro": "assets/art/references/_owner_inbox/Game Screens/level ekran acilisi.png",

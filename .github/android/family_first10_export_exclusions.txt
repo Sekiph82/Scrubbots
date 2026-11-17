@@ -15,3 +15,5 @@ assets/art/references
 assets/ui/candidates
 assets/ui/generated
 addons/godot_ai
+factory
+flow_videos

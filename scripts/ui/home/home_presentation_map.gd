@@ -14,6 +14,8 @@ extends RefCounted
 ##   WORLD_BAKED_RETIRED — V04 (coordination/OWNER_M42_HOME_REBUILD_V04_SINGLE_WORLD_
 ##                    BACKGROUND.md): component art now baked into the single World 01
 ##                    background HOME-120; file kept byte-identical, never loaded by Home.
+## SB-ASSET-PURGE-2026-11-17: the files of the inactive rows nothing else loads were deleted
+## (manifest status RETIRED_DELETED); the rows stay so every ART entry is still accounted.
 ## `nodes` are Home region names (HomeScreen.get_region). `slot` says how the texture is
 ## applied: "texture" (TextureRect), "button_icon" (Button.icon), "chip_icon"
 ## (UiValueChip.set_icon).
@@ -70,9 +72,9 @@ const ENTRIES := {
 	"HOME-104": {"slug": "icon_nav_leaderboard", "mode": "STATIC", "slot": "texture", "nodes": ["NavIcon_leaderboard"]},
 	"HOME-105": {"slug": "icon_nav_settings", "mode": "STATIC", "slot": "texture", "nodes": ["NavIcon_settings"]},
 	"HOME-120": {"slug": "world_01_whispering_park_background", "mode": "OWNER_RETIRED", "slot": "texture", "nodes": [], "reason": "M28-C002-C003-R01 V02: replaced as the Home background by the owner-selected HOME-121 (file kept byte-identical, never loaded by Home)"},
-	"HOME-121": {"slug": "home_background_whispering_park", "mode": "OWNER_RETIRED", "slot": "texture", "nodes": [], "reason": "SB-HOME-BG-2026-11-16: replaced as the Home background by the owner plaza HOME-124 (file kept byte-identical, never loaded by Home)"},
+	"HOME-121": {"slug": "home_background_whispering_park", "mode": "OWNER_RETIRED", "slot": "texture", "nodes": [], "reason": "SB-HOME-BG-2026-11-16: replaced as the Home background by the owner plaza HOME-124 (file deleted SB-ASSET-PURGE-2026-11-17)"},
 	"HOME-122": {"slug": "icon_shortcut_rewarded_ads", "mode": "STATIC", "slot": "texture", "nodes": ["ShortcutIcon_rewarded_ads"]},
-	"HOME-123": {"slug": "home_scrubby_video_still", "mode": "OWNER_RETIRED", "slot": "texture", "nodes": [], "reason": "SB-HOME-BG-2026-11-16: the old background is baked into the still and every video frame, so it would cover HOME-124 (files kept byte-identical, never loaded by Home)"},
+	"HOME-123": {"slug": "home_scrubby_video_still", "mode": "OWNER_RETIRED", "slot": "texture", "nodes": [], "reason": "SB-HOME-BG-2026-11-16: the old background is baked into the still and every video frame, so it would cover HOME-124 (files deleted SB-ASSET-PURGE-2026-11-17)"},
 	"HOME-124": {"slug": "home_background_plaza", "mode": "STATIC", "slot": "texture", "nodes": ["WorldBackground"]},
 	"HOME-125": {"slug": "home_scrubby_video_still_keyed", "mode": "STATIC", "slot": "texture", "nodes": ["WorldStill"]},
 }

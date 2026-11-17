@@ -82,9 +82,6 @@ assets/ui/final/boosters/states/booster_selected_ring.png,ACTIVE_RUNTIME,ui_fina
 assets/ui/final/boosters/states/booster_unavailable_overlay.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,512,512,512,1.00,,,,unmeasured,ok,yes,43,2.1,0.0,65.4,0.0,0.00,,PASS,
 assets/ui/final/boosters/tornado.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,512,512,512,1.00,185,185,2.77,ok,ok,yes,0,0.0,0.0,43.9,4.5,0.04,,PASS,
 assets/ui/final/cards_exchange/cards_exchange_header_emblem.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,512,512,512,1.00,163,163,3.14,ok,ok,yes,0,0.0,0.0,41.8,10.1,0.10,,PASS,
-assets/ui/final/characters/helper_bots/helper_bot_alt_pose.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,0,1254,1254,6.00,,,,unmeasured,ok,no,4,0.3,0.0,41.5,4.2,0.25,,PASS,.import untracked (Godot defaults)
-assets/ui/final/characters/helper_bots/helper_bot_cart.png,ACTIVE_RUNTIME,ui_final,1374,1145,yes,0,1374,1145,6.00,,,,unmeasured,ok,no,0,0.0,0.0,42.2,4.0,0.24,,PASS,.import untracked (Godot defaults)
-assets/ui/final/characters/helper_bots/helper_bot_floor_cleaner.png,ACTIVE_RUNTIME,ui_final,1293,1216,yes,0,1293,1216,6.00,,,,unmeasured,ok,no,0,0.0,0.0,33.1,15.7,0.94,,PASS,.import untracked (Godot defaults)
 assets/ui/final/characters/robots/atlas/atlas_gameplay.png,ACTIVE_RUNTIME,ui_final,1246,1263,yes,0,1246,1263,6.00,,,,unmeasured,ok,no,7,0.3,0.0,49.1,4.8,0.29,,PASS,.import untracked (Godot defaults)
 assets/ui/final/characters/robots/atlas/atlas_home_pose.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,0,1024,1536,6.00,,,,unmeasured,ok,no,0,0.0,0.0,59.0,4.1,0.25,,PASS,.import untracked (Godot defaults)
 assets/ui/final/characters/robots/atlas/atlas_master.png,ACTIVE_RUNTIME,ui_final,1145,1374,yes,1024,853,1024,3.33,358,430,2.38,ok,ok,yes,3,0.1,0.0,57.2,4.7,0.16,,PASS,
@@ -184,8 +181,6 @@ assets/ui/final/characters/scrubby/home_animation/wave/wave_11.png,ACTIVE_RUNTIM
 assets/ui/final/characters/scrubby/home_animation/wave/wave_12.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,36.2,33.5,0.30,,PASS,.import untracked (Godot defaults)
 assets/ui/final/characters/scrubby/home_animation/wave/wave_13.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,37.4,29.2,0.26,,PASS,.import untracked (Godot defaults)
 assets/ui/final/characters/scrubby/home_animation/wave/wave_14.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,36.9,30.9,0.28,,PASS,.import untracked (Godot defaults)
-assets/ui/final/characters/scrubby/scrubby_brush_arm_layer.png,ACTIVE_RUNTIME,ui_final,1395,1127,yes,0,1395,1127,6.00,,,,unmeasured,ok,no,0,0.0,0.0,28.1,5.5,0.33,,PASS,.import untracked (Godot defaults)
-assets/ui/final/characters/scrubby/scrubby_face_blink_layer.png,ACTIVE_RUNTIME,ui_final,1536,1024,yes,0,1536,1024,6.00,,,,unmeasured,ok,no,0,0.0,0.0,54.7,8.9,0.54,,PASS,.import untracked (Godot defaults)
 assets/ui/final/characters/scrubby/scrubby_gameplay.png,ACTIVE_RUNTIME,ui_final,1230,1278,yes,0,1230,1278,6.00,,,,unmeasured,ok,no,2,0.0,0.0,38.2,4.0,0.24,,PASS,.import untracked (Godot defaults)
 assets/ui/final/characters/scrubby/scrubby_home_pose.png,ACTIVE_RUNTIME,ui_final,1158,1358,yes,0,1158,1358,6.00,766,899,1.51,WARN,ok,no,0,0.0,0.0,48.0,0.0,0.00,,WARN,under 2x (1.51x: 1158x1358 drawn 766x899); .import untracked (Godot defaults)
 assets/ui/final/characters/scrubby/scrubby_master.png,ACTIVE_RUNTIME,ui_final,1147,1372,yes,1024,856,1024,3.34,358,430,2.39,ok,ok,yes,1,0.0,0.0,40.7,8.1,0.27,,PASS,
@@ -490,14 +485,6 @@ assets/ui/final/daily/daily_task_check.png,ACTIVE_RUNTIME,ui_final,1261,1247,yes
 assets/ui/final/events/event_weekly_hero.png,DYNAMIC_REF,ui_final,582,211,no,0,582,211,0.47,,,,unmeasured,ok,yes,,,,,,,,PASS,
 assets/ui/final/gameplay/effects/fx_clean_puff.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,0,1254,1254,6.00,,,,unmeasured,ok,no,0,0.0,0.0,40.5,2.3,0.14,,PASS,.import untracked (Godot defaults)
 assets/ui/final/gameplay/effects/fx_clean_sparkle.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,0,1254,1254,6.00,94,94,13.34,ok,ok,no,0,0.0,0.0,22.9,8.1,0.49,,PASS,.import untracked (Godot defaults)
-assets/ui/final/gameplay/master/gameplay_v02_shell_5slot_3col.png,DYNAMIC_REF,ui_final,887,1774,no,0,887,1774,6.00,1170,2340,0.76,FAIL,ok,no,,,,,,,,FAIL,under-res 0.76x (887x1774 drawn 1170x2340); .import untracked (Godot defaults)
-assets/ui/final/gameplay/master/gameplay_v02_shell_5slot_4col.png,DYNAMIC_REF,ui_final,887,1774,no,0,887,1774,6.00,,,,unmeasured,ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
-assets/ui/final/gameplay/master/gameplay_v02_shell_5slot_5col.png,DYNAMIC_REF,ui_final,887,1774,no,0,887,1774,6.00,,,,unmeasured,ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
-assets/ui/final/gameplay/master/gameplay_v02_shell_6slot_3col.png,DYNAMIC_REF,ui_final,887,1774,no,0,887,1774,6.00,1170,2340,0.76,FAIL,ok,no,,,,,,,,FAIL,under-res 0.76x (887x1774 drawn 1170x2340); .import untracked (Godot defaults)
-assets/ui/final/gameplay/master/gameplay_v02_shell_6slot_4col.png,DYNAMIC_REF,ui_final,887,1774,no,0,887,1774,6.00,,,,unmeasured,ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
-assets/ui/final/gameplay/master/gameplay_v02_shell_6slot_5col.png,DYNAMIC_REF,ui_final,887,1774,no,0,887,1774,6.00,,,,unmeasured,ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
-assets/ui/final/gameplay/master/scrubbots_gameplay_master.png,DYNAMIC_REF,ui_final,887,1774,no,0,887,1774,6.00,,,,unmeasured,ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
-assets/ui/final/gameplay/profile/bot_parts_bar_fill.png,DYNAMIC_REF,ui_final,320,38,no,0,320,38,0.05,,,,unmeasured,ok,no,,,,,,,,WARN,opaque white background corners; .import untracked (Godot defaults)
 assets/ui/final/gameplay/profile/robots/atlas_portrait.png,ACTIVE_RUNTIME,ui_final,1247,1261,yes,0,1247,1261,6.00,,,,unmeasured,ok,no,1,0.1,0.0,65.9,0.8,0.05,,PASS,.import untracked (Godot defaults)
 assets/ui/final/gameplay/profile/robots/bubbles_portrait.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,0,1254,1254,6.00,,,,unmeasured,ok,no,0,0.0,0.0,56.1,4.1,0.25,,PASS,.import untracked (Godot defaults)
 assets/ui/final/gameplay/profile/robots/clippy_portrait.png,ACTIVE_RUNTIME,ui_final,1223,1286,yes,0,1223,1286,6.00,,,,unmeasured,ok,no,1,0.0,0.0,48.3,8.3,0.50,,PASS,.import untracked (Godot defaults)
@@ -511,32 +498,12 @@ assets/ui/final/gameplay/profile/scrubby_portrait.png,ACTIVE_RUNTIME,ui_final,25
 assets/ui/final/gameplay/railroad/rail_energy_node.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,0,1254,1254,6.00,,,,unmeasured,ok,no,0,0.0,0.0,46.1,4.7,0.28,,PASS,.import untracked (Godot defaults)
 assets/ui/final/gameplay/railroad/rail_slot_connector.png,ACTIVE_RUNTIME,ui_final,887,1774,yes,0,887,1774,6.00,,,,unmeasured,ok,no,0,0.0,0.0,34.3,6.3,0.38,,PASS,.import untracked (Godot defaults)
 assets/ui/final/gameplay/railroad/rail_straight_horizontal.png,ACTIVE_RUNTIME,ui_final,2172,724,yes,0,2172,724,6.00,,,,unmeasured,ok,no,0,0.0,0.0,34.5,9.8,0.59,,PASS,.import untracked (Godot defaults)
-assets/ui/final/gameplay/railway/rail_straight.png,DYNAMIC_REF,ui_final,512,128,no,0,512,128,0.25,,,,unmeasured,ok,no,,,,,,,,WARN,opaque white background corners; .import untracked (Godot defaults)
-assets/ui/final/gameplay/slots/slot_active.png,DYNAMIC_REF,ui_final,220,220,no,0,220,220,0.18,,,,unmeasured,ok,no,,,,,,,,WARN,opaque white background corners; .import untracked (Godot defaults)
 assets/ui/final/gameplay/tutorial/speech_bubble.png,ACTIVE_RUNTIME,ui_final,1536,1024,yes,0,1536,1024,6.00,889,593,1.73,WARN,ok,no,0,0.0,0.0,46.1,35.8,2.15,,WARN,under 2x (1.73x: 1536x1024 drawn 889x593); transparent padding 36% = 2.15 MiB; .import untracked (Godot defaults)
 assets/ui/final/gameplay/tutorial/tutorial_highlight_ring.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,0,1254,1254,6.00,967,967,1.30,WARN,ok,no,0,0.0,0.0,41.0,0.0,0.00,,WARN,under 2x (1.30x: 1254x1254 drawn 967x967); .import untracked (Godot defaults)
 assets/ui/final/gameplay/tutorial/tutorial_pointer.png,ACTIVE_RUNTIME,ui_final,1230,1278,yes,512,493,512,0.96,122,122,4.20,ok,ok,yes,0,0.0,0.0,47.8,4.0,0.04,,PASS,
 assets/ui/final/gameplay/videos/level_start_scrubby_still.png,ACTIVE_RUNTIME,ui_final,624,640,yes,0,624,640,1.52,953,978,0.65,FAIL,ok,yes,0,0.0,0.0,32.2,35.3,0.54,,FAIL,under-res 0.65x (624x640 drawn 953x978)
-assets/ui/final/home/area_banner/home_arch_decor.png,ACTIVE_RUNTIME,ui_final,1774,887,yes,0,1774,887,6.00,,,,unmeasured,ok,no,0,0.0,0.0,33.4,6.4,0.38,,PASS,.import untracked (Godot defaults)
-assets/ui/final/home/area_banner/home_arch_whispering_park.png,ACTIVE_RUNTIME,ui_final,1225,1284,yes,0,1225,1284,6.00,,,,unmeasured,ok,no,0,0.0,0.0,46.0,0.5,0.03,,PASS,.import untracked (Godot defaults)
-assets/ui/final/home/background/home_background.png,ACTIVE_RUNTIME,ui_final,940,1672,no,0,940,1672,6.00,1321,2349,0.71,FAIL,ok,no,,,,,,,,FAIL,under-res 0.71x (940x1672 drawn 1321x2349); .import untracked (Godot defaults)
-assets/ui/final/home/background/home_bg_city_far.png,ACTIVE_RUNTIME,ui_final,2170,725,yes,0,2170,725,6.00,,,,unmeasured,ok,no,0,0.0,96.7,42.9,4.8,0.29,,WARN,opaque art on canvas edge (97%): cropped?; .import untracked (Godot defaults)
-assets/ui/final/home/background/home_bg_city_mid.png,ACTIVE_RUNTIME,ui_final,2024,777,yes,0,2024,777,6.00,,,,unmeasured,ok,no,0,0.0,84.6,70.6,0.0,0.00,,WARN,opaque art on canvas edge (85%): cropped?; .import untracked (Godot defaults)
-assets/ui/final/home/background/home_bg_sky.png,ACTIVE_RUNTIME,ui_final,887,1774,no,0,887,1774,6.00,,,,unmeasured,ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
-assets/ui/final/home/background/home_bg_street_foreground.png,ACTIVE_RUNTIME,ui_final,1211,1299,yes,0,1211,1299,6.00,,,,unmeasured,ok,no,0,0.0,56.4,33.6,1.6,0.10,,WARN,opaque art on canvas edge (56%): cropped?; .import untracked (Godot defaults)
-assets/ui/final/home/environment/home_prop_cleaning_bucket.png,ACTIVE_RUNTIME,ui_final,1227,1282,yes,0,1227,1282,6.00,,,,unmeasured,ok,no,1,0.0,0.0,59.2,5.0,0.30,,PASS,.import untracked (Godot defaults)
-assets/ui/final/home/environment/home_prop_cleaning_equipment.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,0,1254,1254,6.00,,,,unmeasured,ok,no,0,0.0,0.0,46.3,4.2,0.25,,PASS,.import untracked (Godot defaults)
-assets/ui/final/home/environment/home_prop_foam_cluster.png,ACTIVE_RUNTIME,ui_final,1402,1122,yes,0,1402,1122,6.00,,,,unmeasured,ok,no,2,0.3,0.0,50.5,2.6,0.16,,PASS,.import untracked (Godot defaults)
-assets/ui/final/home/environment/home_prop_hose.png,ACTIVE_RUNTIME,ui_final,1223,1286,yes,0,1223,1286,6.00,,,,unmeasured,ok,no,0,0.0,0.0,51.9,9.1,0.54,,PASS,.import untracked (Godot defaults)
-assets/ui/final/home/environment/home_prop_keep_clean_sign.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,0,1254,1254,6.00,,,,unmeasured,ok,no,0,0.0,0.0,47.0,25.8,1.55,,WARN,transparent padding 26% = 1.55 MiB; .import untracked (Godot defaults)
-assets/ui/final/home/environment/home_prop_neon_details.png,ACTIVE_RUNTIME,ui_final,1536,1024,yes,0,1536,1024,6.00,,,,unmeasured,ok,no,0,0.0,0.0,50.8,0.1,0.00,,PASS,.import untracked (Godot defaults)
-assets/ui/final/home/environment/home_prop_puddles.png,ACTIVE_RUNTIME,ui_final,1774,887,yes,0,1774,887,6.00,,,,unmeasured,ok,no,0,0.0,0.0,29.3,11.5,0.69,,PASS,.import untracked (Godot defaults)
-assets/ui/final/home/environment/home_prop_wet_floor_sign.png,ACTIVE_RUNTIME,ui_final,1145,1374,yes,0,1145,1374,6.00,,,,unmeasured,ok,no,0,0.0,0.0,55.3,4.7,0.28,,PASS,.import untracked (Godot defaults)
 assets/ui/final/home/gift_meter/gift_meter_emblem.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,512,512,512,1.00,143,143,3.58,ok,ok,yes,0,0.0,0.0,56.6,14.2,0.14,,PASS,
 assets/ui/final/home/gift_meter/gift_meter_reward_crate.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,1024,1024,1024,4.00,325,325,3.15,ok,ok,yes,60,2.2,0.0,61.4,15.0,0.60,,PASS,
-assets/ui/final/home/platform/home_platform_main.png,ACTIVE_RUNTIME,ui_final,1536,1024,yes,0,1536,1024,6.00,,,,unmeasured,ok,no,0,0.0,0.0,54.5,3.9,0.23,,PASS,.import untracked (Godot defaults)
-assets/ui/final/home/platform/home_platform_top.png,ACTIVE_RUNTIME,ui_final,1774,887,yes,0,1774,887,6.00,,,,unmeasured,ok,no,0,0.0,0.0,58.3,9.0,0.54,,PASS,.import untracked (Godot defaults)
-assets/ui/final/home/play_cta/play_button_frame.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,0,1254,1254,6.00,,,,unmeasured,ok,no,0,0.0,0.0,67.2,9.7,0.58,,PASS,.import untracked (Godot defaults)
 assets/ui/final/home/reward_track/reward_gift_1.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,1024,1024,1024,4.00,197,89,11.51,ok,ok,yes,0,0.0,0.0,50.0,13.9,0.56,,PASS,
 assets/ui/final/home/reward_track/reward_gift_10.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,1024,1024,1024,4.00,197,89,11.51,ok,ok,yes,1,0.0,0.0,68.1,6.2,0.25,,PASS,
 assets/ui/final/home/reward_track/reward_gift_100.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,1024,1024,1024,4.00,198,89,11.51,ok,ok,yes,0,0.0,0.0,55.9,12.6,0.50,,PASS,
@@ -554,7 +521,6 @@ assets/ui/final/home/shortcuts/icon_shortcut_tasks.png,ACTIVE_RUNTIME,ui_final,1
 assets/ui/final/home/shortcuts/icon_shortcut_win_streak.png,ACTIVE_RUNTIME,ui_final,1536,1024,yes,512,512,341,0.67,94,94,5.45,ok,ok,yes,0,0.0,0.0,25.0,10.2,0.07,,PASS,
 assets/ui/final/home/top_hud/profile_avatar_frame.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,512,512,512,1.00,185,185,2.77,ok,ok,yes,0,0.0,0.0,30.3,8.5,0.09,,PASS,
 assets/ui/final/home/top_hud/profile_rank_badge.png,ACTIVE_RUNTIME,ui_final,1317,1194,yes,512,512,464,0.91,104,106,4.92,ok,ok,yes,0,0.0,0.0,53.2,5.5,0.05,,PASS,
-assets/ui/final/home/videos/home_scrubby_still.png,ACTIVE_RUNTIME,ui_final,720,1280,no,0,720,1280,3.52,1321,2349,0.55,FAIL,ok,yes,,,,,,,,FAIL,under-res 0.55x (720x1280 drawn 1321x2349)
 assets/ui/final/home/worlds/world_01_whispering_park_1080x2160.png,ACTIVE_RUNTIME,ui_final,1080,2160,no,0,1080,2160,8.90,,,,unmeasured,ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
 assets/ui/final/popups/failure/fail_header_emblem.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,512,512,512,1.00,104,104,4.92,ok,ok,yes,0,0.0,0.0,62.1,13.6,0.14,,PASS,
 assets/ui/final/popups/failure/heart_large.png,ACTIVE_RUNTIME,ui_final,1320,1192,yes,1024,1024,925,3.61,228,206,4.49,ok,ok,yes,0,0.0,0.0,57.5,9.2,0.33,,PASS,
@@ -590,7 +556,6 @@ assets/ui/final/profile/achievement_crown_icon.png,DYNAMIC_REF,ui_final,128,128,
 assets/ui/final/profile/profile_no_booster_icon.png,DYNAMIC_REF,ui_final,128,128,yes,0,128,128,0.06,94,94,1.36,WARN,ok,yes,30,5.6,6.2,81.0,0.0,0.00,,WARN,under 2x (1.36x: 128x128 drawn 94x94)
 assets/ui/final/profile/profile_trophy_icon.png,DYNAMIC_REF,ui_final,128,128,yes,0,128,128,0.06,104,106,1.23,WARN,ok,yes,12,3.7,0.0,51.6,19.4,0.01,,WARN,under 2x (1.23x: 128x128 drawn 104x106)
 assets/ui/final/rewards/booster_of_choice.png,ACTIVE_RUNTIME,ui_final,1024,1024,yes,512,512,512,1.00,74,74,6.92,ok,ok,yes,0,0.0,0.0,75.7,0.0,0.00,,PASS,
-assets/ui/final/rewards/bot_parts_bundle_large.png,DYNAMIC_REF,ui_final,1230,1278,yes,0,1230,1278,6.00,,,,unmeasured,ok,no,0,0.0,0.0,57.2,6.9,0.42,,PASS,.import untracked (Godot defaults)
 assets/ui/final/rewards/bot_parts_bundle_small.png,DYNAMIC_REF,ui_final,1374,1145,yes,0,1374,1145,6.00,,,,unmeasured,ok,no,0,0.0,0.0,41.0,4.4,0.27,,PASS,.import untracked (Godot defaults)
 assets/ui/final/rewards/card_pack_premium.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,512,341,512,0.67,74,74,6.92,ok,ok,yes,0,0.0,0.0,71.7,9.9,0.07,,PASS,
 assets/ui/final/rewards/card_pack_standard.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,512,341,512,0.67,83,83,6.17,ok,ok,yes,0,0.0,0.0,70.4,6.3,0.04,,PASS,
@@ -620,7 +585,6 @@ assets/ui/final/rewards/pack_opening/videos/premium_pack_opening_first.png,DYNAM
 assets/ui/final/rewards/pack_opening/videos/premium_pack_opening_peak.png,DYNAMIC_REF,ui_final,720,1280,no,0,720,1280,3.52,1170,2532,0.62,FAIL,ok,yes,,,,,,,,FAIL,under-res 0.62x (720x1280 drawn 1170x2532)
 assets/ui/final/rewards/pack_opening/videos/standard_pack_opening_first.png,DYNAMIC_REF,ui_final,720,1280,no,0,720,1280,3.52,1170,2532,0.62,FAIL,ok,yes,,,,,,,,FAIL,under-res 0.62x (720x1280 drawn 1170x2532)
 assets/ui/final/rewards/pack_opening/videos/standard_pack_opening_peak.png,DYNAMIC_REF,ui_final,720,1280,no,0,720,1280,3.52,1170,2532,0.62,FAIL,ok,yes,,,,,,,,FAIL,under-res 0.62x (720x1280 drawn 1170x2532)
-assets/ui/final/rewards/scrub_bucks_bundle_large.png,DYNAMIC_REF,ui_final,1536,1024,yes,0,1536,1024,6.00,,,,unmeasured,ok,no,0,0.0,0.0,55.0,7.8,0.47,,PASS,.import untracked (Godot defaults)
 assets/ui/final/rewards/scrub_bucks_bundle_small.png,DYNAMIC_REF,ui_final,1448,1086,yes,0,1448,1086,6.00,,,,unmeasured,ok,no,0,0.0,0.0,43.6,9.5,0.57,,PASS,.import untracked (Godot defaults)
 assets/ui/final/rewards/set_complete_video/set_complete_badge_still.png,DYNAMIC_REF,ui_final,624,624,yes,0,624,624,1.49,364,364,1.71,WARN,ok,yes,0,0.0,0.0,45.5,9.3,0.14,br,WARN,under 2x (1.71x: 624x624 drawn 364x364); text/watermark CANDIDATE br
 assets/ui/final/robots/bot_parts_icon.png,ACTIVE_RUNTIME,ui_final,1222,1287,yes,512,486,512,0.95,96,96,5.33,ok,ok,yes,1,0.0,0.0,41.2,11.0,0.10,,PASS,

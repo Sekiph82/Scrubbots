@@ -120,7 +120,7 @@ func _packaged_binder() -> void:
 		n += 1
 		if b.state(slug) != "APPROVED_BOUND" or b.texture(slug) == null:
 			bad.append(slug)
-	_ok(bad.is_empty() and n == 56, "all %d approved ART entries APPROVED_BOUND with a texture (R15-004: + HOME-122; SB-POLISH-009: + HOME-123; SB-HOME-BG-2026-11-16: + HOME-124; SB-HOME-VIDEO-2026-11-17: + HOME-125) %s" % [n, str(bad)])
+	_ok(bad.is_empty() and n == 32, "all %d approved ART entries APPROVED_BOUND with a texture (SB-ASSET-PURGE-2026-11-17: 56 minus the 24 deleted retired entries) %s" % [n, str(bad)])
 	for slug in ["home_background_plaza", "scrubby_home_pose", "icon_shortcut_shop", "icon_currency_scrub_bucks"]:
 		if _idx(m, slug) >= 0:
 			_ok(b.texture(slug) != null, "%s binds without source bytes" % slug)
@@ -184,9 +184,9 @@ func _packaged_rejections() -> void:
 func _strict_tamper() -> void:
 	print("[strict: tamper / dynamic recheck]")
 	var m := _m()
-	m["assets"][0]["approved_sha256"] = "f".repeat(64)
+	m["assets"][_idx(m, "scrubby_home_pose")]["approved_sha256"] = "f".repeat(64)
 	var b = HomeArtBinder.new(m, STRICT)
-	_ok(not b.is_manifest_valid() and b.texture("home_bg_sky") == null, "silently changed approved file (pin != bytes) -> manifest invalid, nothing binds")
+	_ok(not b.is_manifest_valid() and b.texture("scrubby_home_pose") == null, "silently changed approved file (pin != bytes) -> manifest invalid, nothing binds")
 	# Dynamic: diverge source identity AFTER construction; state() re-hashes every call.
 	var live := _m()
 	var bl = HomeArtBinder.new(live, STRICT)
