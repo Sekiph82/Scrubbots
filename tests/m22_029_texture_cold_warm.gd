@@ -5,11 +5,12 @@ extends SceneTree
 ## (album, set, card) / Daily / Robots / Profile are open, and warm Home after closing them, twice.
 ## Fails if a second visit leaves more textures than the first (a leak), if catalog card art stays
 ## resident after the album closes, or if cold / peak exceed the 2 GB-device proxy budgets. Also:
-## every final/ import stays lossless (compress/mode=0) and without mipmaps.
+## every final/ import follows the SB-AAB-SIZE lossy/lossless split (ui_vis_006) and has no mipmaps.
 ## Run: godot --headless --path . -s res://tests/m22_029_texture_cold_warm.gd
 
 const MainScript = preload("res://scripts/app/main.gd")
 const MainScene = preload("res://scenes/app/main.tscn")
+const AssetQa = preload("res://tests/ui_vis_006_asset_qa.gd")
 const CollectionScreen = preload("res://scripts/ui/collection/collection_screen.gd")
 const DailyScreens = preload("res://scripts/ui/daily/daily_screens.gd")
 const RobotsScreen = preload("res://scripts/ui/robots/robots_screen.gd")
@@ -109,9 +110,9 @@ func _imports() -> void:
 	var bad: Array = []
 	for p in _pngs:
 		var c := ConfigFile.new()
-		if c.load(p + ".import") != OK or int(c.get_value("params", "compress/mode", -1)) != 0 or bool(c.get_value("params", "mipmaps/generate", true)):
+		if c.load(p + ".import") != OK or int(c.get_value("params", "compress/mode", -1)) != AssetQa.expected_compress_mode(p) or bool(c.get_value("params", "mipmaps/generate", true)):
 			bad.append(p)
-	_ok(bad.is_empty(), "%d final/ imports lossless (compress/mode=0) without mipmaps %s" % [_pngs.size(), str(bad.slice(0, 5))])
+	_ok(bad.is_empty(), "%d final/ imports follow the lossy/lossless split without mipmaps %s" % [_pngs.size(), str(bad.slice(0, 5))])
 
 func _list(dir: String) -> void:
 	for f in DirAccess.get_files_at(dir):

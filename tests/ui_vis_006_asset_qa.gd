@@ -1,7 +1,8 @@
 extends SceneTree
 ## SB-UI-VIS-006 / SB-UI-031 — cheap re-check of the pixel QA (`tools/ui_vis_006_asset_qa.py`,
-## `docs/ui_vis_006_asset_qa.csv`). For every PNG row of the CSV: the .import stays lossless
-## (compress/mode=0), without mipmaps, with fix_alpha_border on and premult_alpha off; and for
+## `docs/ui_vis_006_asset_qa.csv`). For every PNG row of the CSV: the .import follows the SB-AAB-SIZE
+## compression split (expected_compress_mode: big final/ art lossy WebP at LOSSY_QUALITY, the rest
+## lossless, pixel art always lossless; tools/sb_aab_size_lossy.py writes it), without mipmaps, with fix_alpha_border on and premult_alpha off; and for
 ## every UI texture with a measured drawn rect, the imported size (source PNG, process/size_limit
 ## applied) is not below the drawn rect on the fitting axis (max(imp_w / drawn_w, imp_h / drawn_h)
 ## >= 1, no upscaling on screen). The rows the report already records as under-res (res=FAIL:
@@ -12,9 +13,25 @@ extends SceneTree
 ## Run: godot --headless --path . -s res://tests/ui_vis_006_asset_qa.gd
 
 const CSV := "res://docs/ui_vis_006_asset_qa.csv"
-const REQUIRED := {"compress/mode": 0, "mipmaps/generate": false, "process/fix_alpha_border": true, "process/premult_alpha": false}
+const REQUIRED := {"mipmaps/generate": false, "process/fix_alpha_border": true, "process/premult_alpha": false}
+
+## SB-AAB-SIZE-2026-11-17 (same rule as tools/sb_aab_size_lossy.py): final/ PNGs >= 100 KiB import lossy
+## (Play 200 MB base module); booster states / effects (alpha gradients band) and branding stay lossless.
+const LOSSY_MIN_BYTES := 100 * 1024
+const LOSSY_QUALITY := 0.8
+const KEEP_LOSSLESS := ["boosters/", "gameplay/effects/", "branding/"]
+const FINAL := "res://assets/ui/final/"
 
 var _fail := 0
+
+static func expected_compress_mode(path: String) -> int:
+	if not path.begins_with(FINAL) or FileAccess.get_size(path) < LOSSY_MIN_BYTES:
+		return 0
+	var rel := path.trim_prefix(FINAL)
+	for k in KEEP_LOSSLESS:
+		if rel.begins_with(k):
+			return 0
+	return 1
 
 func _initialize() -> void:
 	var f := FileAccess.open(CSV, FileAccess.READ)
@@ -27,6 +44,7 @@ func _initialize() -> void:
 	var bad_import: Array = []
 	var under: Array = []
 	var known := 0
+	var lossy := 0
 	while not f.eof_reached():
 		var line := f.get_csv_line()
 		if line.size() != head.size():
@@ -45,6 +63,10 @@ func _initialize() -> void:
 		for k in REQUIRED:
 			if c.get_value("params", k, REQUIRED[k]) != REQUIRED[k]:
 				bad_import.append("%s %s=%s" % [path, k, str(c.get_value("params", k))])
+		var mode := expected_compress_mode(path)
+		lossy += mode
+		if int(c.get_value("params", "compress/mode", -1)) != mode or (mode == 1 and not is_equal_approx(float(c.get_value("params", "compress/lossy_quality", 0.0)), LOSSY_QUALITY)):
+			bad_import.append("%s compress/mode=%s (expected %d)" % [path, str(c.get_value("params", "compress/mode")), mode])
 		if String(row["drawn_w"]) == "":
 			continue
 		drawn += 1
@@ -59,7 +81,8 @@ func _initialize() -> void:
 			under.append("%s %.2fx of %sx%s drawn" % [path, ratio, row["drawn_w"], row["drawn_h"]])
 	_ok(pngs > 400, "CSV lists %d PNGs" % pngs)
 	_ok(drawn > 150, "%d PNGs have a measured drawn size" % drawn)
-	_ok(bad_import.is_empty(), "imports lossless, no mipmaps, fix_alpha_border, no premult %s" % str(bad_import.slice(0, 5)))
+	_ok(lossy > 500, "%d big final/ PNGs import lossy WebP" % lossy)
+	_ok(bad_import.is_empty(), "imports follow the lossy/lossless split, no mipmaps, fix_alpha_border, no premult %s" % str(bad_import.slice(0, 5)))
 	_ok(under.is_empty(), "no texture imported below its drawn rect %s" % str(under.slice(0, 5)))
 	print("  (%d known under-res rows recorded in the report)" % known)
 	_done()

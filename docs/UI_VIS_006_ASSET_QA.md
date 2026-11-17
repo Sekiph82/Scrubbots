@@ -114,7 +114,7 @@ mark. Top corners were only checked by the heuristic.
 
 ## Import settings, filtering, compression, memory
 
-- Every PNG imports lossless (`compress/mode=0`), without mipmaps, `fix_alpha_border=true` (Godot
+- Every PNG imports lossless (`compress/mode=0`; since SB-AAB-SIZE the big final/ art is lossy WebP, UI-ADR-009), without mipmaps, `fix_alpha_border=true` (Godot
   bleeds edge colour into transparent pixels, so linear filtering does not pull in a dark / white
   matte) and `premult_alpha=false`. Nothing to fix.
 - 243 runtime images have no tracked `.import` (88 under `characters/`, 27 `gameplay/`, 24 `rewards/`,

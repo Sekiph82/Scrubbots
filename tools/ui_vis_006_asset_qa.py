@@ -27,7 +27,7 @@ CSV row per image. Checks (UI art = PNGs under assets/ui/final/):
              least this much, a stretch / cover draw more. < 1 FAIL (upscaled on screen), < 2
              WARN, no visible measurement = "unmeasured". Nine-patch frames stretch only their
              middle, so for them it is a lower bound of the corner sharpness, not a defect.
-  import     compress/mode=0 (lossless), mipmaps/generate=false, process/fix_alpha_border=true,
+  import     compress/mode as tools/sb_aab_size_lossy.py (big final/ art lossy, rest lossless), mipmaps/generate=false, process/fix_alpha_border=true,
              process/premult_alpha=false; FAIL otherwise. Also notes when the .import is not
              tracked in git (Godot recreates it with the same defaults on import).
   memory     resident MiB at the imported size (RGBA8, 4 bytes/px, no mipmaps; as UI-ADR-008).
@@ -52,11 +52,13 @@ import numpy as np
 from PIL import Image
 from scipy import ndimage
 
+from sb_aab_size_lossy import lossy
+
 ROOT = Path(__file__).resolve().parent.parent
 MIB = 1024.0 * 1024.0
 FINAL = "assets/ui/final/"
 LEVEL_ART = "assets/art/levels/"
-REQUIRED_IMPORT = {"compress/mode": "0", "mipmaps/generate": "false",
+REQUIRED_IMPORT = {"mipmaps/generate": "false",
                    "process/fix_alpha_border": "true", "process/premult_alpha": "false"}
 FIELDS = ["path", "class", "kind", "src_w", "src_h", "alpha", "size_limit", "imp_w", "imp_h",
           "resident_mib", "drawn_w", "drawn_h", "res_ratio", "res", "import", "import_tracked",
@@ -167,7 +169,8 @@ def audit(path, cls, drawn, tracked):
         r["import"] = "missing"
         fails.append("no .import (run godot --import)")
     else:
-        bad = [k for k, v in REQUIRED_IMPORT.items() if k in imp and imp[k] != v]
+        req = dict(REQUIRED_IMPORT, **{"compress/mode": "1" if path.startswith(FINAL) and lossy(path[len(FINAL):], (ROOT / path).stat().st_size) else "0"})
+        bad = [k for k, v in req.items() if k in imp and imp[k] != v]
         if path.endswith(".svg"):
             bad = [k for k in bad if k.startswith("compress") or k.startswith("mipmaps")]
         r["import"] = "ok" if not bad else "bad:" + ";".join("%s=%s" % (k, imp[k]) for k in bad)

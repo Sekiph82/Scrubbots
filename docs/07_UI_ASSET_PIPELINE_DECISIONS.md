@@ -252,3 +252,9 @@ PNGs without alpha (opaque by design, left lossless and unchanged): the 7 from s
 On screen this would bring cold Home ~133.5 -> ~33 MiB and the heaviest scenario (packs, 235.11 MiB whole tree) to ~59 MiB. The trial needs raw before/after captures of the large art (robot masters, poses, card art, pack frames, backgrounds) for the owner (owner 2026-11-03). No atlas.
 
 **Status**: Factory job 109, 2026-11-06 (SB-M22-026 closed: lossless caps done; VRAM is an owner visual decision).
+
+### UI-ADR-009: lossy WebP for the big final/ art, Theora q5 for keyed videos (SB-AAB-SIZE-2026-11-17)
+
+**Decision**: Supersedes "lossless everywhere" above for download size only. Google Play rejects a base module over 200 MB; the signed release AAB was 396 MB (PCK 348 MB, 268 MB of it lossless textures). Every PNG under `assets/ui/final/` whose source is >= 100 KiB imports as Godot Lossy (WebP, `compress/lossy_quality=0.8`, alpha kept), except `boosters/`, `gameplay/effects/` (alpha gradients band) and `branding/`; everything smaller, and all pixel art (`assets/art/levels/`), stays lossless. `tools/sb_aab_size_lossy.py --write` sets the split after `godot --import`; `tests/ui_vis_006_asset_qa.gd` (CI) and `tests/m22_029_texture_cold_warm.gd` enforce it. Size limits, mipmaps and resident RGBA8 memory are unchanged (lossy only shrinks the file, not VRAM). The keyed Flow videos (`tools/build_result_scrubby_videos.py`, `THEORA_Q`) and the opening cinematic are re-encoded from their masters at Theora `-q:v 5` (was 8); the chroma key edge was re-checked frame by frame. Home videos (q4, pinned) and pack openings (q6, shown under-res) are unchanged. Local PCK 368.4 -> 123.4 MB. Source PNGs and masters are untouched.
+
+**Status**: Factory job 176, 2026-11-17.
