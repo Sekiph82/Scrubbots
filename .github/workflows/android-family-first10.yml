@@ -683,9 +683,17 @@ jobs:
         if: ${{ inputs.mode == 'aab_release' }}
         run: |
           [ "$BUILD_TYPE" = release ] || { echo "::error::mode aab_release needs build_type release"; exit 1; }
-          sed -i -e 's#^gradle_build/use_gradle_build=false#gradle_build/use_gradle_build=true#'             -e 's#^gradle_build/export_format=0#gradle_build/export_format=1#' export_presets.cfg
+          sed -i -e 's#^gradle_build/use_gradle_build=false#gradle_build/use_gradle_build=true#' \
+            -e 's#^gradle_build/export_format=0#gradle_build/export_format=1#' export_presets.cfg
           grep -qx 'gradle_build/use_gradle_build=true' export_presets.cfg && grep -qx 'gradle_build/export_format=1' export_presets.cfg
-          [ -f android/build/build.gradle ] || "$GODOT" --headless --path . --install-android-build-template
+          # Install the build template by hand (what the editor does): `--install-android-build-template`
+          # without an export command opens the headless editor and never exits.
+          if [ ! -f android/build/build.gradle ]; then
+            mkdir -p android/build
+            unzip -q "$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable/android_source.zip" -d android/build
+            printf '%s' "${GODOT_VERSION}.stable" > android/.build_version
+            touch android/build/.gdignore
+          fi
           test -f android/build/build.gradle
           echo "PKG_EXT=aab" >> "$GITHUB_ENV"
           echo "CHECK_APK=out/universal.apk" >> "$GITHUB_ENV"
@@ -711,7 +719,9 @@ jobs:
           keytool -printcert -jarfile "$AAB" | grep -E "Owner:|SHA256:" | tee out/aab_cert.txt
           curl -fsSL -o "$RUNNER_TEMP/bundletool.jar" https://github.com/google/bundletool/releases/download/1.18.1/bundletool-all-1.18.1.jar
           java -jar "$RUNNER_TEMP/bundletool.jar" dump manifest --bundle "$AAB" | grep -E "<manifest|uses-sdk|debuggable" | tee out/aab_manifest.txt
-          java -jar "$RUNNER_TEMP/bundletool.jar" build-apks --bundle "$AAB" --output "$RUNNER_TEMP/u.apks" --mode universal             --ks "$GODOT_ANDROID_KEYSTORE_RELEASE_PATH" --ks-key-alias "$GODOT_ANDROID_KEYSTORE_RELEASE_USER"             --ks-pass "pass:$GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD" --key-pass "pass:$GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD"
+          java -jar "$RUNNER_TEMP/bundletool.jar" build-apks --bundle "$AAB" --output "$RUNNER_TEMP/u.apks" --mode universal \
+            --ks "$GODOT_ANDROID_KEYSTORE_RELEASE_PATH" --ks-key-alias "$GODOT_ANDROID_KEYSTORE_RELEASE_USER" \
+            --ks-pass "pass:$GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD" --key-pass "pass:$GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD"
           unzip -p "$RUNNER_TEMP/u.apks" universal.apk > out/universal.apk
           test -s out/universal.apk
 
