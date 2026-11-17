@@ -26,6 +26,7 @@ const HomeBadges = preload("res://scripts/ui/home/home_badges.gd")
 const PersonalRank = preload("res://scripts/progression/personal_rank.gd")
 const UiProgressMeter = preload("res://scripts/ui/components/ui_progress_meter.gd")
 const UiEventCard = preload("res://scripts/ui/components/ui_event_card.gd")
+const EventsV02Ui = preload("res://scripts/ui/events/events_v02_ui.gd")
 const MetaCeremonies = preload("res://scripts/ui/ceremony/meta_ceremonies.gd")
 
 # ---------------------------------------------------------------- PROFILE ----
@@ -421,7 +422,11 @@ static func open_events(stack, app) -> BasePopup:
 	TouchScroll.enable(scroll)   # M47-TOUCH-R01: finger swipe scrolls over cards / claim buttons
 	p.add_action("close", UiText.t("SHOP_CLOSE"), "secondary", true)
 	p.action_selected.connect(func(id, _c):
-		if id.begins_with("ev:"):
+		if id.begins_with("ev2:"):   # SB-EV02-008: V02 event details (refreshes this list on close)
+			var d = EventsV02Ui.open_details(stack, app, id.substr(4))
+			if d != null:
+				d.closed.connect(func(_r): refresh_events(p, app))
+		elif id.begins_with("ev:"):
 			var parts: PackedStringArray = id.split(":")
 			app.actions.claim_event_milestone(parts[1], int(parts[2]))
 		elif id == "ft_join":
@@ -459,6 +464,14 @@ static func refresh_events(p: BasePopup, app) -> void:
 		p.set_action_blocked(aid, app.is_blocked)
 		return b
 	var any := false
+	# SB-EV02-008: the 3..5 active V02 events (+ claimable ended ones), then the upcoming previews.
+	var head := false
+	for v in app.economy.events_v02.list():
+		any = true
+		if v["phase"] == "upcoming" and not head:
+			head = true
+			list.add_child(_label("UpcomingHead", UiText.t("EV2_UPCOMING"), 30, BasePopup.ROYAL_EDGE))
+		list.add_child(EventsV02Ui.card(v, claim))
 	for v in ev.list():
 		any = true
 		list.add_child(UiEventCard.build(v, claim))
@@ -483,7 +496,7 @@ static func refresh_events(p: BasePopup, app) -> void:
 		list.add_child(card)
 	if not any:
 		var empty := _card("EmptyCard")
-		empty.get_child(0).add_child(_label("Empty", UiText.t("EVENTS_EMPTY") if ev.config_ok else UiText.t("EVENTS_UNAVAILABLE"), 30, BasePopup.INK))
+		empty.get_child(0).add_child(_label("Empty", UiText.t("EVENTS_EMPTY") if ev.config_ok and app.economy.events_v02.config_ok else UiText.t("EVENTS_UNAVAILABLE"), 30, BasePopup.INK))
 		list.add_child(empty)
 	list.alignment = BoxContainer.ALIGNMENT_BEGIN if any else BoxContainer.ALIGNMENT_CENTER   # empty card centred
 	(list.get_parent() as Control).custom_minimum_size.y = 1180 if any else 160

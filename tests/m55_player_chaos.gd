@@ -987,6 +987,7 @@ func _timer_expiry() -> void:
 	# Weekly event expiring with the Events screen open (fixture config, forfeit policy).
 	var ev_path := _write_event_fixture(_now[0] - 7 * 86400 + 30)
 	e.events.load_config(ev_path)
+	e.events_v02.load_config("user://__no_events_v02.json")   # SB-EV02: isolate the V1 fixture
 	e.events.import_snapshot({"version": 1, "weekly": {"chaos_week": {"progress": 5, "claimed": []}}, "first_try": {}})
 	_open("events")
 	var evp = _top()
@@ -1001,6 +1002,7 @@ func _timer_expiry() -> void:
 	_ok(evp.find_child("EmptyCard", true, false) != null, "Events screen refreshed to the empty state")
 	_stack().clear("test")
 	e.events.load_config("res://data/config/events_v1.json")
+	e.events_v02.load_config("res://data/config/events_v02_runtime.json")
 	await _frames(2)
 	# Comeback window: 49 h absence while the Shop is open -> summary once, after the Shop closes.
 	_open("shop")

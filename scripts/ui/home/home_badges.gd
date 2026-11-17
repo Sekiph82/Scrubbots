@@ -64,7 +64,7 @@ static func compute(app) -> Dictionary:
 	for cid in e.collection.all_card_ids():
 		if e.collection.owned(cid) > 0 and not e.meta_ui.is_seen("card:" + String(cid)):
 			out["collection"] += 1
-	out["events"] = e.events.claimable_count()
+	out["events"] = e.events.claimable_count() + e.events_v02.claimable_count()
 	out["achievements"] = Achievements.claimable_count(app)
 	if e.rewarded_daily != null:
 		var rd = e.rewarded_daily

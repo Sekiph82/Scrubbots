@@ -232,10 +232,12 @@ func _m05() -> void:
 	await _boot("m05")
 	var p = ProfileScreens.open_events(_root.get_modal_stack(), _root.get_app_state())
 	await _frames(2)
-	_ok(_eco().events.config_ok and _eco().events.list().is_empty() and _txt(p, "Empty") == UiText.t("EVENTS_EMPTY"), "no event, no fake card")
+	# SB-EV02-008: the V1 weekly config still schedules nothing; the V02 rotation is what lists.
+	_ok(_eco().events.config_ok and _eco().events.list().is_empty() and p.find_child("Event_*", true, false) == null and p.find_child("EventV2_*", true, false) != null, "no V1 event, no fake V1 card; the V02 rotation is listed")
 	var cfg: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(EventService.PATH))
 	_ok(not JSON.stringify(cfg).to_lower().contains("point") and not JSON.stringify(cfg).contains("currency\":"), "no event points / event currency")
 	_eco().events.load_config("user://__missing_events.json")
+	_eco().events_v02.load_config("user://__missing_events_v02.json")
 	ProfileScreens.refresh_events(p, _root.get_app_state())
 	_ok(_txt(p, "Empty") == UiText.t("EVENTS_UNAVAILABLE"), "unreadable config -> unavailable state")
 	_ok(p.find_child("EmptyCard", true, false) != null and p.find_child("Event_*", true, false) == null, "SB-M43-130: empty / unavailable shown as the Empty card, no Event_* card")
