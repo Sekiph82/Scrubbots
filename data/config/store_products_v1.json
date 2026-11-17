@@ -5,10 +5,10 @@
   "policy": "Displayed prices are ONLY the store's localized price strings (StoreService.price_text). reference_usd is store-console setup metadata and is never shown.",
   "products": [
     {"id": "scrubbucks_100", "kind": "consumable", "scrub_bucks": 100, "reference_usd": 0.99},
-    {"id": "scrubbucks_550", "kind": "consumable", "scrub_bucks": 550, "reference_usd": 4.99},
-    {"id": "scrubbucks_1200", "kind": "consumable", "scrub_bucks": 1200, "reference_usd": 9.99},
-    {"id": "scrubbucks_2600", "kind": "consumable", "scrub_bucks": 2600, "reference_usd": 19.99},
-    {"id": "scrubbucks_7000", "kind": "consumable", "scrub_bucks": 7000, "reference_usd": 49.99},
+    {"id": "scrubbucks_550", "kind": "consumable", "scrub_bucks": 550, "reference_usd": 1.99},
+    {"id": "scrubbucks_1200", "kind": "consumable", "scrub_bucks": 1200, "reference_usd": 2.99},
+    {"id": "scrubbucks_2600", "kind": "consumable", "scrub_bucks": 2600, "reference_usd": 4.99},
+    {"id": "scrubbucks_7000", "kind": "consumable", "scrub_bucks": 7000, "reference_usd": 9.99},
     {"id": "no_ads", "kind": "non_consumable", "entitlement": "no_ads", "reference_usd": 4.99}
   ]
 }
