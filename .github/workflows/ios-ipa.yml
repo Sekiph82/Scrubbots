@@ -244,6 +244,11 @@ jobs:
       # the Godot 4.7.2-stable headers. The AdMob export plugin adds GoogleMobileAds by Swift Package Manager.
       - name: AdMob + InAppStore iOS plugins (input billing_ads)
         if: ${{ inputs.billing_ads }}
+        env:
+          ADMOB_APP_ID: ${{ secrets.ADMOB_IOS_APP_ID }}
+          ADMOB_BANNER_ID: ${{ secrets.ADMOB_IOS_BANNER_ID }}
+          ADMOB_INTERSTITIAL_ID: ${{ secrets.ADMOB_IOS_INTERSTITIAL_ID }}
+          ADMOB_REWARDED_ID: ${{ secrets.ADMOB_IOS_REWARDED_ID }}
         run: |
           set -e
           curl -fsSL -o "$RUNNER_TEMP/admob.zip" https://github.com/godot-sdk-integrations/godot-admob/releases/download/v7.0/AdmobPlugin-Multi-v7.0.zip
@@ -251,21 +256,20 @@ jobs:
           unzip -q "$RUNNER_TEMP/admob.zip" -d "$RUNNER_TEMP/admob"
           cp -R "$RUNNER_TEMP/admob/res/addons/." addons/
           mkdir -p ios/plugins && cp -R "$RUNNER_TEMP/admob/res/ios/plugins/." ios/plugins/
-          # Google's sample AdMob app id (test ads only); the owner's real app id replaces it later.
-          cat > addons/AdmobPlugin/ios_export.cfg <<'CFG'
-          [General]
-          is_real=false
-
-          [Debug]
-          app_id="ca-app-pub-3940256099942544~1458002511"
-
-          [Release]
-          app_id="ca-app-pub-3940256099942544~1458002511"
-
-          [ATT]
-          att_enabled=true
-          att_text="ScrubBots uses this to show you more relevant ads."
-          CFG
+          # Debug / test builds: Google's sample app id + TEST units (AdMob invalid-traffic policy).
+          # Release: the real ids from GitHub Secrets, written only into this workspace, never echoed.
+          REAL=false; APP_ID="ca-app-pub-3940256099942544~1458002511"
+          if [ "$BUILD_TYPE" = release ]; then
+            for v in ADMOB_APP_ID ADMOB_BANNER_ID ADMOB_INTERSTITIAL_ID ADMOB_REWARDED_ID; do
+              [ -n "${!v}" ] || { echo "::error::release billing_ads build needs GitHub Secret ${v/ADMOB_/ADMOB_IOS_}"; exit 1; }
+            done
+            REAL=true; APP_ID="$ADMOB_APP_ID"
+            printf 'const IDS := {"banner": "%s", "interstitial": "%s", "rewarded": "%s"}\n' \
+              "$ADMOB_BANNER_ID" "$ADMOB_INTERSTITIAL_ID" "$ADMOB_REWARDED_ID" > addons/AdmobPlugin/scrubbots_real_ids.gd
+          fi
+          printf '[General]\nis_real=%s\n\n[Debug]\napp_id="ca-app-pub-3940256099942544~1458002511"\n\n[Release]\napp_id="%s"\n\n[ATT]\natt_enabled=true\natt_text="ScrubBots uses this to show you more relevant ads."\n' \
+            "$REAL" "$APP_ID" > addons/AdmobPlugin/ios_export.cfg
+          echo "AdMob ids: $([ "$REAL" = true ] && echo 'REAL (secrets)' || echo 'Google TEST')"
           P="$RUNNER_TEMP/ios-plugins"
           git init -q "$P"
           git -C "$P" fetch -q --depth 1 https://github.com/godot-sdk-integrations/godot-ios-plugins.git caafb2c7fbfb5c72a64f163c76449274fa49abaa
@@ -393,8 +397,14 @@ jobs:
           for s in InAppStore GADMobileAds UMPConsentInformation; do
             strings "$BIN" | grep -q "$s" || { echo "::error::app binary lacks $s"; exit 1; }
           done
-          plutil -extract GADApplicationIdentifier raw "$RUNNER_TEMP/app_x/$APP/Info.plist" | tee out/billing_ads_check.txt
-          plutil -extract NSUserTrackingUsageDescription raw "$RUNNER_TEMP/app_x/$APP/Info.plist" | tee -a out/billing_ads_check.txt
+          # Google's sample app id in every debug build, never in a release build (the real id is not printed).
+          GAD=$(plutil -extract GADApplicationIdentifier raw "$RUNNER_TEMP/app_x/$APP/Info.plist")
+          test -n "$GAD"
+          if [ "$GAD" = "ca-app-pub-3940256099942544~1458002511" ]; then TEST_ID=yes; else TEST_ID=no; fi
+          if [ "$BUILD_TYPE" = release ]; then [ "$TEST_ID" = no ]; else [ "$TEST_ID" = yes ]; fi \
+            || { echo "::error::AdMob app id: build_type=$BUILD_TYPE but Google test id present=$TEST_ID"; exit 1; }
+          plutil -extract NSUserTrackingUsageDescription raw "$RUNNER_TEMP/app_x/$APP/Info.plist" > /dev/null
+          echo "billing_ads app check PASS (build_type=$BUILD_TYPE, Google test app id=$TEST_ID)" | tee out/billing_ads_check.txt
 
       - name: Headless boot of the IPA's pack (offline)
         run: |
@@ -415,6 +425,16 @@ jobs:
         with:
           name: ${{ env.ARTIFACT }}.ipa
           path: ${{ env.OUT_DIR }}/${{ env.ARTIFACT }}.ipa
+
+      # The AdMob export plugin logs the app id it used; keep a real one out of the uploaded logs.
+      - name: Scrub the real AdMob app id from uploaded logs (input billing_ads)
+        if: ${{ always() && inputs.billing_ads }}
+        env:
+          ADMOB_APP_ID: ${{ secrets.ADMOB_IOS_APP_ID }}
+        run: |
+          if [ -n "$ADMOB_APP_ID" ] && [ -d out ]; then
+            grep -rlF --include="*.log" --include="*.txt" --include="*.json" "$ADMOB_APP_ID" out | while read -r f; do sed -i '' "s#${ADMOB_APP_ID}#ADMOB_IOS_APP_ID#g" "$f"; done
+          fi
 
       - name: Upload import log + IPA scan reports
         if: always()

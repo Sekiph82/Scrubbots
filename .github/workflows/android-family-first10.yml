@@ -76,7 +76,7 @@ name: Android Family First10 APK
 # SB-M57-012/013 + SB-M43-081/084 real-money store seam (null provider default, MockProvider grants once per token, No Ads, restore): + m57_store_products (exact 9/9 guard).
 # SB-M44-027 Robots 5-stage assembly visual (50/100/150/200/250 Bot Parts, shader reveal of the next robot's portrait): + m44_robot_assembly_stages (exact 4/4 guard).
 # SB-M57-001..011 ad seam (null provider default, interstitial every 5 finished plays between levels, No Ads keeps rewarded, rewarded grants only on completion, saved play counter): + m57_ads_cadence (exact 6/6 guard).
-# SB-M57-014..016 / 022 real Play Billing / StoreKit / AdMob providers (fake native backends; input billing_ads adds the plugins, also to aab_release): + m57_native_providers (exact 8/8 guard).
+# SB-M57-014..016 / 022 real Play Billing / StoreKit / AdMob providers (fake native backends; input billing_ads adds the plugins, also to aab_release; release builds take the real AdMob ids from secrets): + m57_native_providers (exact 9/9 guard).
 # SB-M43-152..157 / SB-M49-030 / SB-M54-031 cloud save seam (null provider default, mock provider: header round trip, conflict choice, no double grant, failures never touch the local save, conflict screen fit): + m54_cloud_save_seam (exact 7/7 guard).
 # SB-M49-029 (mock part) ad / store return transitions (TEST-ONLY overlay providers: focus out/in, pause/resume, resize + safe-area change while up; completed / cancelled / failed; Shop buy + restore, Need a Hand, Continue interstitial, Rewarded Ads, Life): + m49_ad_store_return_layout (exact 6/6 guard).
 # SB-PHONE-2026-11-12-D board background BG01 under the board rect, no board cell under the baked frame (L20/L30/59x59 at 720x1520, 1080x2400, 1170x2532): + board_bg01_backdrop (exact 4/4 guard).
@@ -477,10 +477,10 @@ jobs:
           else
             echo "M57-ADS verdict=FAIL (exact 6/6 summary missing)" | tee -a "$S"; fail=1
           fi
-          if grep -qxF 'M57 native providers evidence: PASS (8/8 cases, 0 fail)' validate_logs/m57_native_providers.log 2>/dev/null; then
-            echo "M57-NATIVE verdict=PASS (8/8)" | tee -a "$S"
+          if grep -qxF 'M57 native providers evidence: PASS (9/9 cases, 0 fail)' validate_logs/m57_native_providers.log 2>/dev/null; then
+            echo "M57-NATIVE verdict=PASS (9/9)" | tee -a "$S"
           else
-            echo "M57-NATIVE verdict=FAIL (exact 8/8 summary missing)" | tee -a "$S"; fail=1
+            echo "M57-NATIVE verdict=FAIL (exact 9/9 summary missing)" | tee -a "$S"; fail=1
           fi
           if grep -qxF 'M54 cloud save seam: PASS (7/7 cases, 0 fail)' validate_logs/m54_cloud_save_seam.log 2>/dev/null; then
             echo "M54-CLOUD verdict=PASS (7/7)" | tee -a "$S"
@@ -711,6 +711,11 @@ jobs:
       # SB-M57-014..016 / 022: official MIT plugin releases, sha256-pinned; Android plugins need the Gradle build.
       - name: Play Billing + AdMob plugins + Gradle build (input billing_ads)
         if: ${{ inputs.billing_ads }}
+        env:
+          ADMOB_APP_ID: ${{ secrets.ADMOB_ANDROID_APP_ID }}
+          ADMOB_BANNER_ID: ${{ secrets.ADMOB_ANDROID_BANNER_ID }}
+          ADMOB_INTERSTITIAL_ID: ${{ secrets.ADMOB_ANDROID_INTERSTITIAL_ID }}
+          ADMOB_REWARDED_ID: ${{ secrets.ADMOB_ANDROID_REWARDED_ID }}
         run: |
           curl -fsSL -o "$RUNNER_TEMP/billing.zip" https://github.com/godot-sdk-integrations/godot-google-play-billing/releases/download/3.3.0/godot-google-play-billing.zip
           curl -fsSL -o "$RUNNER_TEMP/admob.zip" https://github.com/godot-sdk-integrations/godot-admob/releases/download/v7.0/AdmobPlugin-Multi-v7.0.zip
@@ -718,17 +723,20 @@ jobs:
           echo "d96e1734b889434c0a77f0bafe2f09f4cdb9e5b518b9d6809757b251a17cf8a2  $RUNNER_TEMP/admob.zip" | sha256sum -c -
           unzip -q "$RUNNER_TEMP/billing.zip" -d addons
           unzip -q "$RUNNER_TEMP/admob.zip" -d "$RUNNER_TEMP/admob" && cp -R "$RUNNER_TEMP/admob/res/addons/." addons/
-          # Google's sample AdMob app id (test ads only); the owner's real app id replaces it later.
-          cat > addons/AdmobPlugin/android_export.cfg <<'CFG'
-          [General]
-          is_real=false
-
-          [Debug]
-          app_id="ca-app-pub-3940256099942544~3347511713"
-
-          [Release]
-          app_id="ca-app-pub-3940256099942544~3347511713"
-          CFG
+          # Debug / test builds: Google's sample app id + TEST units (AdMob invalid-traffic policy).
+          # Release: the real ids from GitHub Secrets, written only into this workspace, never echoed.
+          REAL=false; APP_ID="ca-app-pub-3940256099942544~3347511713"
+          if [ "$BUILD_TYPE" = release ]; then
+            for v in ADMOB_APP_ID ADMOB_BANNER_ID ADMOB_INTERSTITIAL_ID ADMOB_REWARDED_ID; do
+              [ -n "${!v}" ] || { echo "::error::release billing_ads build needs GitHub Secret ${v/ADMOB_/ADMOB_ANDROID_}"; exit 1; }
+            done
+            REAL=true; APP_ID="$ADMOB_APP_ID"
+            printf 'const IDS := {"banner": "%s", "interstitial": "%s", "rewarded": "%s"}\n' \
+              "$ADMOB_BANNER_ID" "$ADMOB_INTERSTITIAL_ID" "$ADMOB_REWARDED_ID" > addons/AdmobPlugin/scrubbots_real_ids.gd
+          fi
+          printf '[General]\nis_real=%s\n\n[Debug]\napp_id="ca-app-pub-3940256099942544~3347511713"\n\n[Release]\napp_id="%s"\n' \
+            "$REAL" "$APP_ID" > addons/AdmobPlugin/android_export.cfg
+          echo "AdMob ids: $([ "$REAL" = true ] && echo 'REAL (secrets)' || echo 'Google TEST')"
           "$GODOT" --headless --path . --import > "$RUNNER_TEMP/billing_ads_import.log" 2>&1 || true
           sed -i 's#^gradle_build/use_gradle_build=false#gradle_build/use_gradle_build=true#' export_presets.cfg
           grep -qx 'gradle_build/use_gradle_build=true' export_presets.cfg
@@ -814,11 +822,17 @@ jobs:
         if: ${{ inputs.billing_ads }}
         run: |
           grep -q 'addons/AdmobPlugin/plugin.cfg' project.godot
-          "$BUILD_TOOLS/aapt2" dump xmltree --file AndroidManifest.xml "$CHECK_APK" > out/billing_ads_manifest.txt
-          grep -E 'GodotGooglePlayBilling|AdmobPlugin|com.android.vending.BILLING|gms.ads.APPLICATION_ID|3940256099942544' out/billing_ads_manifest.txt | tee out/billing_ads_check.txt
-          for k in GodotGooglePlayBilling AdmobPlugin com.android.vending.BILLING com.google.android.gms.ads.APPLICATION_ID ca-app-pub-3940256099942544~3347511713; do
-            grep -qF "$k" out/billing_ads_manifest.txt || { echo "::error::APK manifest lacks $k"; exit 1; }
+          # Kept out of out/ (uploaded): a release manifest holds the real app id.
+          M="$RUNNER_TEMP/billing_ads_manifest.txt"
+          "$BUILD_TOOLS/aapt2" dump xmltree --file AndroidManifest.xml "$CHECK_APK" > "$M"
+          for k in GodotGooglePlayBilling AdmobPlugin com.android.vending.BILLING com.google.android.gms.ads.APPLICATION_ID; do
+            grep -qF "$k" "$M" || { echo "::error::APK manifest lacks $k"; exit 1; }
           done
+          # Google's sample app id in every debug build, never in a release build.
+          if grep -qF 'ca-app-pub-3940256099942544~3347511713' "$M"; then TEST_ID=yes; else TEST_ID=no; fi
+          if [ "$BUILD_TYPE" = release ]; then [ "$TEST_ID" = no ]; else [ "$TEST_ID" = yes ]; fi \
+            || { echo "::error::AdMob app id: build_type=$BUILD_TYPE but Google test id present=$TEST_ID"; exit 1; }
+          echo "billing_ads manifest check PASS (build_type=$BUILD_TYPE, Google test app id=$TEST_ID)" | tee out/billing_ads_check.txt
 
       - name: APK signature / metadata / hash
         run: |
@@ -849,6 +863,16 @@ jobs:
           path: ${{ env.OUT_DIR }}/${{ env.ARTIFACT }}.${{ env.PKG_EXT }}
           retention-days: 30
           if-no-files-found: error
+
+      # The AdMob export plugin logs the app id it used; keep a real one out of the uploaded logs.
+      - name: Scrub the real AdMob app id from uploaded logs (input billing_ads)
+        if: ${{ always() && inputs.billing_ads }}
+        env:
+          ADMOB_APP_ID: ${{ secrets.ADMOB_ANDROID_APP_ID }}
+        run: |
+          if [ -n "$ADMOB_APP_ID" ] && [ -d out ]; then
+            grep -rlF --include="*.log" --include="*.txt" --include="*.json" "$ADMOB_APP_ID" out | while read -r f; do sed -i "s#${ADMOB_APP_ID}#ADMOB_ANDROID_APP_ID#g" "$f"; done
+          fi
 
       - name: Upload inspection pack + scan reports
         if: always()

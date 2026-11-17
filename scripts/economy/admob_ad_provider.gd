@@ -10,8 +10,9 @@ extends "res://scripts/economy/ad_provider.gd"
 ## Order (Google UMP first, then iOS ATT, then the SDK): update_consent_info -> the consent
 ## form only when the status is REQUIRED -> request_tracking_authorization on iOS -> initialize
 ## -> load one interstitial + one rewarded (+ the banner when wanted). Nothing loads before.
-## The node keeps is_real = false, so it requests Google's TEST ad units; real app / unit ids
-## are an owner step (build.md of factory job 170).
+## Debug / test builds keep is_real = false (Google's TEST ad units, AdMob invalid-traffic
+## policy). Only a release build with billing_ads gets REAL_IDS, written by the CI workflow from
+## the ADMOB_* GitHub secrets (never committed); when it exists the node turns is_real on.
 ##
 ##   set_banner(visible)        bottom banner (AdService passes No Ads); shown once loaded
 ##   show_interstitial(p)       true only when a loaded interstitial is shown; otherwise it
@@ -22,6 +23,8 @@ extends "res://scripts/economy/ad_provider.gd"
 
 const NATIVE := "AdmobPlugin"
 const NODE_SCRIPT := "res://addons/AdmobPlugin/Admob.gd"
+## CI-generated in release billing_ads builds only: const IDS = {banner, interstitial, rewarded}.
+const REAL_IDS := "res://addons/AdmobPlugin/scrubbots_real_ids.gd"
 ## LoadAdRequest.AdPosition.BOTTOM of the plugin.
 const POSITION_BOTTOM := 1
 
@@ -35,9 +38,14 @@ var _rewarded := "none"       ## none | loading | ready
 var _rw := {}                 ## the open rewarded view: {token, deliver, earned}
 
 ## node: an Admob node (not yet in the tree); ios: request ATT after consent.
-func _init(node, ios: bool = OS.has_feature("ios")) -> void:
+func _init(node, ios: bool = OS.has_feature("ios"), real_ids: String = REAL_IDS) -> void:
 	_n = node
 	_ios = ios
+	if ResourceLoader.exists(real_ids):
+		var ids: Dictionary = load(real_ids).IDS
+		_n.set("is_real", true)
+		for kind in ["banner", "interstitial", "rewarded"]:
+			_n.set("%s_real_%s_id" % ["ios" if ios else "android", kind], ids[kind])
 	_n.set("banner_position", POSITION_BOTTOM)
 	_n.set("banner_anchor_to_safe_area", true)
 	_n.set("remove_interstitial_ads_after_displayed", true)

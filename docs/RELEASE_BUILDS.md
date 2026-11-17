@@ -108,8 +108,16 @@ gh workflow run android-family-first10.yml -f mode=apk_only -f build_type=debug 
 gh workflow run ios-ipa.yml -f build_type=debug -f billing_ads=true
 ```
 
-Owner steps before real money / real ads: the AdMob account with an app and unit ids per platform
-(then `is_real`, the real app id in the two cfg files and the real unit ids on the Admob node), the
+Real AdMob ids: a `billing_ads` build with `build_type=release` (`aab_release`, release APK, iOS
+release) reads the GitHub Secrets `ADMOB_{ANDROID,IOS}_{APP,BANNER,INTERSTITIAL,REWARDED}_ID` and
+fails when any of its platform's four is missing. It writes them only into the CI workspace
+(`android_export.cfg` / `ios_export.cfg` with `is_real=true`, and
+`addons/AdmobPlugin/scrubbots_real_ids.gd`, which `AdmobAdProvider` loads to switch the node to the
+real units). Nothing is printed; the post-build check only asserts that the Google sample app id is
+absent, and a scrub step replaces the real app id in the uploaded logs. Every debug / test build keeps
+Google's TEST ids (AdMob invalid-traffic policy) and the check fails if a debug build lacks them.
+
+Owner steps before real money: the
 Play merchant profile, the App Store Paid Apps agreement, and the six products of
 `data/config/store_products_v1.json` in both consoles. Real purchases also need a Play test track
 build (the Play Billing plugin works only for an app installed from Play) and a StoreKit sandbox

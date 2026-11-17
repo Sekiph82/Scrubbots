@@ -21,7 +21,7 @@ const AdmobAdProvider = preload("res://scripts/economy/admob_ad_provider.gd")
 var EXPECTED_CASES := [
 	"n01_headless_null_providers", "n02_play_purchase_grants_once", "n03_play_cancel_fail_pending",
 	"n04_play_launch_and_restore", "n05_appstore_purchase_finish_restore", "n06_admob_consent_before_ads",
-	"n07_admob_rewarded_grants_once", "n08_admob_interstitial_banner",
+	"n07_admob_rewarded_grants_once", "n08_admob_interstitial_banner", "n09_admob_real_ids_release_only",
 ]
 
 ## GodotGooglePlayBilling singleton double (method names + signals of plugin 3.3.0).
@@ -108,6 +108,13 @@ class FakeAdmob extends RefCounted:
 		func to_status_string() -> String:
 			return s
 	var banner_position := 0
+	var is_real := false
+	var android_real_banner_id := ""
+	var android_real_interstitial_id := ""
+	var android_real_rewarded_id := ""
+	var ios_real_banner_id := ""
+	var ios_real_interstitial_id := ""
+	var ios_real_rewarded_id := ""
 	var banner_anchor_to_safe_area := false
 	var remove_interstitial_ads_after_displayed := false
 	var consent := "REQUIRED"
@@ -160,6 +167,7 @@ func _initialize() -> void:
 	_n06()
 	_n07()
 	_n08()
+	_n09()
 	_cleanup()
 	_done()
 
@@ -413,6 +421,24 @@ func _n08() -> void:
 	n.interstitial_ad_loaded.emit(null, null)
 	_ok(not e.ads.try_interstitial() and n.calls.count("show_interstitial") == 1, "No Ads -> no interstitial even when one is loaded")
 	_complete("n08_admob_interstitial_banner")
+
+func _n09() -> void:
+	print("[n09 real AdMob ids only from the CI-generated release file; otherwise TEST ids]")
+	var n := FakeAdmob.new()
+	AdmobAdProvider.new(n, false)
+	_ok(not ResourceLoader.exists(AdmobAdProvider.REAL_IDS) and not n.is_real and n.android_real_banner_id == "", "no generated file (every debug / test build) -> is_real false, Google TEST units")
+	var path := "user://m57_native_real_ids_%d.gd" % Time.get_ticks_usec()
+	_tmp.append(path)
+	var f := FileAccess.open(path, FileAccess.WRITE)
+	f.store_string('const IDS := {"banner": "B", "interstitial": "I", "rewarded": "R"}')
+	f.close()
+	var a := FakeAdmob.new()
+	AdmobAdProvider.new(a, false, path)
+	_ok(a.is_real and [a.android_real_banner_id, a.android_real_interstitial_id, a.android_real_rewarded_id] == ["B", "I", "R"] and a.ios_real_banner_id == "", "release file on Android -> is_real + android real unit ids")
+	var i := FakeAdmob.new()
+	AdmobAdProvider.new(i, true, path)
+	_ok(i.is_real and [i.ios_real_banner_id, i.ios_real_interstitial_id, i.ios_real_rewarded_id] == ["B", "I", "R"] and i.android_real_banner_id == "", "release file on iOS -> is_real + ios real unit ids")
+	_complete("n09_admob_real_ids_release_only")
 
 # ------------------------------------------------------------------ helpers ----
 
