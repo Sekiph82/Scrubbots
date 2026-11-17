@@ -16,8 +16,9 @@ gains a permission or privacy key that this file does not list. Update this file
 commit.
 
 State: current = `main` as of 2026-11-06 (app version from `data/config/app_version.json`).
-Planned = the owner decisions of 2026-10-22 that are not integrated yet (AdMob, Play
-Billing/StoreKit, Play Games/Game Center/iCloud).
+Planned = the owner decisions of 2026-10-22 that are not integrated yet (Play Games/Game
+Center/iCloud). AdMob, Play Billing and StoreKit are integrated (SB-M57-014..016 / 022) but
+ride only on the workflow input `billing_ads` (default off), so a default build still has none.
 
 ## 1. Third-party components (SB-M58-001)
 
@@ -28,6 +29,9 @@ Billing/StoreKit, Play Games/Game Center/iCloud).
 | Godot Engine | engine + export templates | 4.7.2 stable | MIT (plus its bundled third-party libraries, e.g. FreeType, mbedTLS, libogg/Vorbis/Theora, zlib, all permissive; full list in `Engine.get_copyright_info()`) | runtime | Collects nothing by itself. No engine telemetry. |
 | Game Feel Flow | `addons/game_feel_flow` | 1.0.0 | MIT (`addons/game_feel_flow/LICENSE`) | presentation effects (autoload `GameFeelFlow`) | none, no I/O beyond its own resources |
 | Saltmire Spark | `addons/saltmire_spark` | 1.0.0 | MIT (`addons/saltmire_spark/LICENSE.txt`) | particle/spark effects (autoload `Spark`) | none |
+| GodotGooglePlayBilling (SB-M57-014..016) | `addons/GodotGooglePlayBilling` (installed by CI, Android) | 3.3.0 (Play Billing Library `billing-ktx` 9.1.0) | MIT | Google Play purchases, acknowledge / consume, restore (`scripts/economy/play_billing_store_provider.gd`). Only in builds with the workflow input `billing_ads`. | Google processes the purchase (product id, order id, purchase token, time); the game keeps only the token as `store:<token>` |
+| godot-ios-plugins `inappstore` (SB-M57-014..016) | `ios/plugins/inappstore*` (built by CI from source, iOS) | commit `caafb2c7` | MIT | StoreKit purchases, finish, restore (`scripts/economy/app_store_provider.gd`). Only with `billing_ads`. | Apple processes the transaction; the game keeps only the transaction id as `store:<id>` |
+| Godot AdMob plugin + Google Mobile Ads SDK + UMP (SB-M57-022) | `addons/AdmobPlugin`, `addons/GMPShared`, `ios/plugins/AdmobPlugin*` (installed by CI), SDK by Gradle / Swift Package Manager | plugin 7.0, `play-services-ads` 24.9.0, iOS GoogleMobileAds 12.14.0 | plugin MIT; SDKs Google terms | banner / interstitial / rewarded ads after the UMP consent form and (iOS) the ATT prompt (`scripts/economy/admob_ad_provider.gd`). Only with `billing_ads`; Google TEST ad units until the owner's ids are set. | see "Planned" below: identifiers, IP, ad interactions, diagnostics, shared with Google |
 | ScrubbotsNotify (own code, SB-M43-171/172) | `addons/scrubbots_notify` (Android export plugin) + `native/` (Android plugin Java, iOS GDExtension Objective-C) | 1.0.0 | own code | schedules / cancels ONE local reminder (Android AlarmManager + notification, iOS UNUserNotificationCenter) and asks the iOS notification permission. Only in builds made with the workflow input `local_notifications` (default off, `docs/RELEASE_BUILDS.md`). | none: no network, no identifiers; the reminder text and time stay on the device |
 
 Content assets (not code): canonical SFX generated with ElevenLabs (`assets/audio/sfx/README.md`),
@@ -78,6 +82,7 @@ no ads, no purchases, no analytics provider, no crash reporter. The only network
 | Code | Purpose |
 |---|---|
 | `scripts/economy/notification_permission.gd` | `OS.request_permission("android.permission.POST_NOTIFICATIONS")`, only after the player turns reminders ON and taps Allow in the explainer (SB-M43-146). Never on boot. iOS: the same explainer calls the native `ScrubbotsNotify.request_authorization()` (UNUserNotificationCenter alert + sound, SB-M43-171). |
+| `scripts/app/main.gd` | `Engine.get_singleton("GodotGooglePlayBilling" / "InAppStore" / "AdmobPlugin")`: installs the real store / ad providers only when the plugin is in the build (input `billing_ads`, SB-M57-014..016 / 022); otherwise the null providers stay. |
 | `scripts/economy/local_notifications.gd` | `Engine.get_singleton("ScrubbotsNotify")` (Android plugin) / `ClassDB.instantiate("ScrubbotsNotify")` (iOS GDExtension): schedules one local reminder when the app goes to the background (reminders ON + permission granted only), cancels it on every open (SB-M43-172). No push server, nothing sent. |
 
 ### Files on the device (`user://`, app-private storage)
@@ -141,8 +146,10 @@ drops the reminder; the next app close schedules it again). Its manifest declare
 merger adds no implied legacy permissions, and its receiver is not exported.
 
 No `INTERNET`, location, camera, microphone, contacts, storage, phone-state or account
-permission. Godot's export adds no other dangerous permission. Advertising ID permission
-(`com.google.android.gms.permission.AD_ID`) arrives with AdMob (planned).
+permission. Godot's export adds no other dangerous permission. Builds with the input
+`billing_ads` merge the plugin manifests: `com.android.vending.BILLING` (Play Billing),
+`INTERNET`, `ACCESS_NETWORK_STATE` and `com.google.android.gms.permission.AD_ID` (Google Mobile
+Ads); a default build has none of them.
 
 ### iOS (`.github/workflows/ios-ipa.yml` preset)
 
@@ -154,8 +161,10 @@ engine's required-reason APIs (file timestamps, system boot time, disk space, Us
 **unverified**: confirm it is present in the exported Xcode project before App Store
 submission (SB-M58 follow-up for the release build).
 
-Planned iOS additions: `NSUserTrackingUsageDescription` + ATT prompt only if personalised ads
-use IDFA (SB-M58-009), SKAdNetwork ids from AdMob, Game Center / iCloud entitlements.
+Builds with the input `billing_ads`: the AdMob export plugin adds `GADApplicationIdentifier`,
+`NSUserTrackingUsageDescription` (ATT prompt after the UMP consent form), and
+`NSAppTransportSecurity` to Info.plist (`addons/AdmobPlugin/ios_export.cfg`, written by the iOS
+workflow). Planned: SKAdNetwork ids for the real AdMob account, Game Center / iCloud entitlements.
 
 ## 4. Collection hygiene review (SB-M58-003)
 

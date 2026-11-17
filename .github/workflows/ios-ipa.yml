@@ -42,6 +42,10 @@ on:
         description: "SB-M43-171/172: include the ScrubbotsNotify GDExtension (local reminders + permission)."
         type: boolean
         default: false
+      billing_ads:
+        description: "SB-M57-014..016/022: include StoreKit (godot-ios-plugins inappstore) + AdMob (Google TEST ad ids) plugins."
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -234,6 +238,55 @@ jobs:
           icons/notification_40x40="res://assets/ui/final/branding/app_icon_ios_1024.png"
           icons/notification_60x60="res://assets/ui/final/branding/app_icon_ios_1024.png"
           CFG
+
+      # SB-M57-014..016 / 022: AdMob = official MIT release zip (sha256-pinned); StoreKit = the official
+      # godot-ios-plugins inappstore (MIT, no 4.x binary release) built here from a pinned commit against
+      # the Godot 4.7.2-stable headers. The AdMob export plugin adds GoogleMobileAds by Swift Package Manager.
+      - name: AdMob + InAppStore iOS plugins (input billing_ads)
+        if: ${{ inputs.billing_ads }}
+        run: |
+          set -e
+          curl -fsSL -o "$RUNNER_TEMP/admob.zip" https://github.com/godot-sdk-integrations/godot-admob/releases/download/v7.0/AdmobPlugin-Multi-v7.0.zip
+          echo "d96e1734b889434c0a77f0bafe2f09f4cdb9e5b518b9d6809757b251a17cf8a2  $RUNNER_TEMP/admob.zip" | shasum -a 256 -c -
+          unzip -q "$RUNNER_TEMP/admob.zip" -d "$RUNNER_TEMP/admob"
+          cp -R "$RUNNER_TEMP/admob/res/addons/." addons/
+          mkdir -p ios/plugins && cp -R "$RUNNER_TEMP/admob/res/ios/plugins/." ios/plugins/
+          # Google's sample AdMob app id (test ads only); the owner's real app id replaces it later.
+          printf '[General]
+is_real=false
+
+[Debug]
+app_id="ca-app-pub-3940256099942544~1458002511"
+
+[Release]
+app_id="ca-app-pub-3940256099942544~1458002511"
+
+[ATT]
+att_enabled=true
+att_text="ScrubBots uses this to show you more relevant ads."
+' > addons/AdmobPlugin/ios_export.cfg
+          P="$RUNNER_TEMP/ios-plugins"
+          git init -q "$P"
+          git -C "$P" fetch -q --depth 1 https://github.com/godot-sdk-integrations/godot-ios-plugins.git caafb2c7fbfb5c72a64f163c76449274fa49abaa
+          git -C "$P" checkout -q FETCH_HEAD
+          git clone -q --depth 1 --branch 4.7.2-stable https://github.com/godotengine/godot.git "$P/godot"
+          test "$(git -C "$P/godot" rev-parse HEAD)" = ed1daf0bf001b61586d9930840f2f1394092c079
+          python3 -m venv "$RUNNER_TEMP/scons" && "$RUNNER_TEMP/scons/bin/pip" install -q scons==4.9.1
+          export PATH="$RUNNER_TEMP/scons/bin:$PATH"
+          (cd "$P/godot" && scons platform=ios target=template_release vulkan=no             core/disabled_classes.gen.h core/version_generated.gen.h core/object/gdvirtual.gen.h)
+          (cd "$P" && scons target=release arch=arm64 plugin=inappstore version=4.0)
+          for v in release debug; do
+            xcodebuild -create-xcframework -library "$P/bin/libinappstore.arm64-ios.release.a" -output "ios/plugins/inappstore.$v.xcframework"
+          done
+          cp "$P/plugins/inappstore/inappstore.gdip" ios/plugins/
+          ruby -e "require 'xcodeproj'" 2>/dev/null || sudo gem install xcodeproj --no-document
+          "$GODOT" --headless --import > "$RUNNER_TEMP/billing_ads_import.log" 2>&1 || true
+          sed -i '' 's#^enabled=PackedStringArray(#enabled=PackedStringArray("res://addons/AdmobPlugin/plugin.cfg", #' project.godot
+          grep -q 'res://addons/AdmobPlugin/plugin.cfg' project.godot
+          printf 'plugins/AdmobPlugin=true
+plugins/InAppStore=true
+' >> export_presets.cfg
+          ls ios/plugins
 
       - name: Godot import (fail-closed)
         run: |

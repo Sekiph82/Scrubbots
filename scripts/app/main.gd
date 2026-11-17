@@ -49,6 +49,9 @@ const CloudConflictScreen = preload("res://scripts/ui/cloud_conflict_screen.gd")
 const MetaCeremonies = preload("res://scripts/ui/ceremony/meta_ceremonies.gd")
 const LevelIntroOverlay = preload("res://scripts/ui/level_intro_overlay.gd")
 const WinOverlay = preload("res://scripts/ui/win_overlay.gd")
+const PlayBillingStoreProvider = preload("res://scripts/economy/play_billing_store_provider.gd")
+const AppStoreProvider = preload("res://scripts/economy/app_store_provider.gd")
+const AdmobAdProvider = preload("res://scripts/economy/admob_ad_provider.gd")
 ## M44: coachmark refresh cadence (presentation poll; not per frame).
 const COACH_TICK_S := 0.2
 ## M44 peer-review D1: step copy (L2 booster lines run the host's solver-backed legality
@@ -196,6 +199,10 @@ func _ready() -> void:
 	_home.nav_requested.connect(_on_home_nav)
 	_home.set_app_shortcuts(APP_SHORTCUTS)
 	_home.set_app_nav(APP_NAV)
+	# SB-M57-014..016 / 022: the real store / AdMob providers, only when their native plugin is in
+	# the build (CI input billing_ads); editor / desktop / headless keep the null providers.
+	if app_state != null and app_state.economy != null:
+		_install_native_providers(app_state.economy)
 	# SB-M57-013: the No Ads entitlement collapses the Home bottom banner slot (live after a buy / restore).
 	# SB-M57-001: the same check shows / hides the ad provider's bottom banner.
 	if app_state != null and app_state.economy != null:
@@ -1082,6 +1089,26 @@ func _track(event: String, params: Dictionary) -> void:
 func _schedule_reminder() -> void:
 	if app_state != null and app_state.economy != null:
 		app_state.economy.local_notify.on_background(app_state.economy, app_state.is_blocked, func(k): return UiText.t(k))
+
+func _install_native_providers(economy) -> void:
+	var deliver := Callable(economy.store, "deliver")
+	if Engine.has_singleton(PlayBillingStoreProvider.NATIVE):
+		economy.store.set_provider(PlayBillingStoreProvider.new(Engine.get_singleton(PlayBillingStoreProvider.NATIVE), deliver))
+	elif Engine.has_singleton(AppStoreProvider.NATIVE):
+		var store = AppStoreProvider.new(Engine.get_singleton(AppStoreProvider.NATIVE), deliver)
+		economy.store.set_provider(store)
+		var poll := Timer.new()
+		poll.wait_time = 0.25
+		poll.autostart = true
+		poll.process_mode = Node.PROCESS_MODE_ALWAYS
+		poll.timeout.connect(store.poll)
+		add_child(poll)
+	if Engine.has_singleton(AdmobAdProvider.NATIVE) and ResourceLoader.exists(AdmobAdProvider.NODE_SCRIPT):
+		var node: Node = load(AdmobAdProvider.NODE_SCRIPT).new()
+		var ads = AdmobAdProvider.new(node)
+		add_child(node)
+		economy.ads.set_provider(ads)
+		ads.start()
 
 func _notification(what: int) -> void:
 	match what:

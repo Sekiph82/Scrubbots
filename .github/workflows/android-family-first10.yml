@@ -114,6 +114,10 @@ on:
         description: "SB-M43-172: include the ScrubbotsNotify plugin (Gradle build). Off = the prebuilt-template APK as before."
         type: boolean
         default: false
+      billing_ads:
+        description: "SB-M57-014..016/022: include Google Play Billing + AdMob (Google TEST ad ids) plugins (Gradle build). Off = the APK as before."
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -697,6 +701,33 @@ jobs:
           test -f android/build/build.gradle
           echo "PKG_EXT=aab" >> "$GITHUB_ENV"
           echo "CHECK_APK=out/universal.apk" >> "$GITHUB_ENV"
+      # SB-M57-014..016 / 022: official MIT plugin releases, sha256-pinned; Android plugins need the Gradle build.
+      - name: Play Billing + AdMob plugins + Gradle build (input billing_ads)
+        if: ${{ inputs.billing_ads }}
+        run: |
+          curl -fsSL -o "$RUNNER_TEMP/billing.zip" https://github.com/godot-sdk-integrations/godot-google-play-billing/releases/download/3.3.0/godot-google-play-billing.zip
+          curl -fsSL -o "$RUNNER_TEMP/admob.zip" https://github.com/godot-sdk-integrations/godot-admob/releases/download/v7.0/AdmobPlugin-Multi-v7.0.zip
+          printf '%s
+' "20d75623d6f337f08d8283c83098b73678d5f575e39247af5a8eb80588b18568  $RUNNER_TEMP/billing.zip"             "d96e1734b889434c0a77f0bafe2f09f4cdb9e5b518b9d6809757b251a17cf8a2  $RUNNER_TEMP/admob.zip" | sha256sum -c -
+          unzip -q "$RUNNER_TEMP/billing.zip" -d addons
+          unzip -q "$RUNNER_TEMP/admob.zip" -d "$RUNNER_TEMP/admob" && cp -R "$RUNNER_TEMP/admob/res/addons/." addons/
+          # Google's sample AdMob app id (test ads only); the owner's real app id replaces it later.
+          printf '[General]
+is_real=false
+
+[Debug]
+app_id="ca-app-pub-3940256099942544~3347511713"
+
+[Release]
+app_id="ca-app-pub-3940256099942544~3347511713"
+' > addons/AdmobPlugin/android_export.cfg
+          "$GODOT" --headless --path . --import > "$RUNNER_TEMP/billing_ads_import.log" 2>&1 || true
+          sed -i 's#^gradle_build/use_gradle_build=false#gradle_build/use_gradle_build=true#' export_presets.cfg
+          grep -qx 'gradle_build/use_gradle_build=true' export_presets.cfg
+          sed -i 's#^enabled=PackedStringArray(#enabled=PackedStringArray("res://addons/GodotGooglePlayBilling/plugin.cfg", "res://addons/AdmobPlugin/plugin.cfg", #' project.godot
+          grep -q 'addons/GodotGooglePlayBilling/plugin.cfg", "res://addons/AdmobPlugin/plugin.cfg' project.godot
+          [ -f android/build/build.gradle ] || "$GODOT" --headless --path . --install-android-build-template
+          test -f android/build/build.gradle
 
       - name: Import + export APK and same-preset inspection PCK
         run: |
@@ -764,6 +795,16 @@ jobs:
           if grep -E "SCRIPT ERROR|Parse Error|Failed loading resource|Cannot open file|Resource file not found|Failed to load script" out/boot.log; then
             echo "::error::exported pack boot reported missing / broken resources"; exit 1
           fi
+
+      - name: Play Billing + AdMob inside the APK (input billing_ads)
+        if: ${{ inputs.billing_ads }}
+        run: |
+          grep -q 'addons/AdmobPlugin/plugin.cfg' project.godot
+          "$BUILD_TOOLS/aapt2" dump xmltree --file AndroidManifest.xml "${OUT_DIR}/${ARTIFACT}.apk" > out/billing_ads_manifest.txt
+          grep -E 'GodotGooglePlayBilling|AdmobPlugin|com.android.vending.BILLING|gms.ads.APPLICATION_ID|3940256099942544' out/billing_ads_manifest.txt | tee out/billing_ads_check.txt
+          for k in GodotGooglePlayBilling AdmobPlugin com.android.vending.BILLING com.google.android.gms.ads.APPLICATION_ID ca-app-pub-3940256099942544~3347511713; do
+            grep -qF "$k" out/billing_ads_manifest.txt || { echo "::error::APK manifest lacks $k"; exit 1; }
+          done
 
       - name: APK signature / metadata / hash
         run: |
