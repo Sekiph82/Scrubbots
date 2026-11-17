@@ -75,6 +75,45 @@ Not verified yet: neither path has run in CI or on a device (the Gradle build, t
 compile and load, the OS prompt and the delivered reminder). The game side
 (`scripts/economy/local_notifications.gd`) is a no-op whenever the native class is absent.
 
+## Purchases and ads (SB-M57-014..016 / 022, input `billing_ads`)
+
+Both workflows take a boolean input `billing_ads` (default `false`). Off, every build is exactly
+the earlier one (null store / ad providers: Shop UNAVAILABLE, no ads). On, the run adds free MIT
+plugins, each pinned:
+
+| Plugin | Source | Pin |
+|---|---|---|
+| GodotGooglePlayBilling 3.3.0 (Android) | https://github.com/godot-sdk-integrations/godot-google-play-billing/releases/download/3.3.0/godot-google-play-billing.zip | sha256 `20d75623d6f337f08d8283c83098b73678d5f575e39247af5a8eb80588b18568` |
+| Godot AdMob plugin v7.0 (Android + iOS) | https://github.com/godot-sdk-integrations/godot-admob/releases/download/v7.0/AdmobPlugin-Multi-v7.0.zip | sha256 `d96e1734b889434c0a77f0bafe2f09f4cdb9e5b518b9d6809757b251a17cf8a2` |
+| godot-ios-plugins `inappstore` (iOS StoreKit) | https://github.com/godot-sdk-integrations/godot-ios-plugins (no 4.x binary release; built in the run against the Godot 4.7.2-stable headers) | commit `caafb2c7fbfb5c72a64f163c76449274fa49abaa`, Godot tag commit `ed1daf0bf001b61586d9930840f2f1394092c079` |
+
+- Android: the zips are verified, unpacked into `addons/`, `addons/AdmobPlugin/android_export.cfg`
+  gets Google's sample AdMob app id, the preset switches to the Gradle build, the export templates'
+  `android_source.zip` is unpacked into `android/build` (what `--install-android-build-template`
+  does; that flag alone starts the editor and never exits) and `project.godot` enables both editor
+  plugins (they add the AARs, `billing-ktx` and `play-services-ads` by Gradle).
+  A check step reads the APK manifest for both plugins, the BILLING permission and the AdMob app id.
+- iOS: the AdMob zip adds `addons/` + `ios/plugins/AdmobPlugin*`; `inappstore` is compiled with
+  scons into `ios/plugins/inappstore.{release,debug}.xcframework` + `inappstore.gdip`;
+  `ios_export.cfg` gets Google's sample iOS app id and the ATT text; the preset enables
+  `plugins/AdmobPlugin` and `plugins/InAppStore`. The AdMob export plugin adds GoogleMobileAds by
+  Swift Package Manager (Ruby `xcodeproj` gem).
+- Game side: `scripts/app/main.gd` installs `PlayBillingStoreProvider` / `AppStoreProvider` /
+  `AdmobAdProvider` only when the native singleton exists. The Admob node keeps `is_real = false`,
+  so only Google TEST ad units are requested.
+
+```
+gh workflow run android-family-first10.yml -f mode=apk_only -f build_type=debug -f billing_ads=true
+gh workflow run ios-ipa.yml -f build_type=debug -f billing_ads=true
+```
+
+Owner steps before real money / real ads: the AdMob account with an app and unit ids per platform
+(then `is_real`, the real app id in the two cfg files and the real unit ids on the Admob node), the
+Play merchant profile, the App Store Paid Apps agreement, and the six products of
+`data/config/store_products_v1.json` in both consoles. Real purchases also need a Play test track
+build (the Play Billing plugin works only for an app installed from Play) and a StoreKit sandbox
+tester.
+
 ## Versioning (single source)
 
 `data/config/app_version.json` is the only place a version lives:
