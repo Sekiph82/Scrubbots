@@ -1,0 +1,56 @@
+{
+	"artworkCellCount": 1069,
+	"builderVersion": "SB-CAMPAIGN-L31-L200/release-pool-import/v1",
+	"cellCount": 3136,
+	"cellReferenceCounts": {
+		"C01": 481,
+		"C02": 448,
+		"C11": 69,
+		"C12": 6,
+		"C14": 14,
+		"C16": 51
+	},
+	"difficulty": "EASY",
+	"firstSeenColorOrder": [
+		"C01",
+		"C11",
+		"C02",
+		"C12",
+		"C16",
+		"C14"
+	],
+	"height": 56,
+	"normalizedColorOrder": [
+		"C01",
+		"C02",
+		"C11",
+		"C12",
+		"C14",
+		"C16"
+	],
+	"outputPath": "res://data/levels/level_116_phoenix.json",
+	"paletteAuthority": "res://data/palettes/scrubbots_palette_v3.json",
+	"previewPath": "res://assets/art/levels/previews/level_116_phoenix.png",
+	"releasePool": {
+		"artworkSha256": "c1d6ab63ae031f42cb5894a585322f2b5ededcc163b39b98facb669ee8a21dcf",
+		"candidateId": "candidate-owner-7deb1d370838ee7739b2c6b90dc4c88ef0e57279e805da91",
+		"cellsSha256": "52aad2d7b5e51adb8b18a49a47ad6a4b1a11629a9bb8e7702994b0ffd0b1bf91",
+		"challengeScore": 40.982849883129,
+		"derivation": "EXACT_LOGICAL_OWNER_UPLOAD_TO_CANONICAL_CANDIDATE",
+		"entryDigest": "004bbad457027fbce118a7fa3ccc056745bfa2ef74ca997423d765f9bf197eb1",
+		"entryFile": "data/Release Pool/Ready/candidate-owner-7deb1d370838ee7739b2c6b90dc4c88ef0e57279e805da91-pipeline-5bfaacb4fce3fda84bb46b42-ready.json",
+		"levelSha256": "35db74fcc96f1c39cd37a98deb246df14f9c630e8bb24f31f6ec3373319c3bf7",
+		"ownerSourceSha256": "7deb1d370838ee7739b2c6b90dc4c88ef0e57279e805da91330f5c39f8bca45c",
+		"pipelineRunId": "pipeline-5bfaacb4fce3fda84bb46b42",
+		"poolDifficultyClass": "MEDIUM",
+		"sessionLoad": 33.5790251127986,
+		"studioReplay": "WON_CANONICAL",
+		"studioSolverStatus": "WON_CANONICAL",
+		"supplyPlanSha256": "33f12b324880af925a13ac4e1b5150dc96e3d814371a393cac44c24cf4b263c4"
+	},
+	"sourcePath": "data/Level Factory/Workspace/Candidates/candidate-owner-7deb1d370838ee7739b2c6b90dc4c88ef0e57279e805da91/artwork.png",
+	"sourceSha256": "c1d6ab63ae031f42cb5894a585322f2b5ededcc163b39b98facb669ee8a21dcf",
+	"usedColorCount": 6,
+	"voidCellCount": 2067,
+	"width": 56
+}

@@ -15,6 +15,7 @@ const TR := {
 	"HOME_RATIO": "%s/%s",
 	"HOME_PLAYER_NAME_DEFAULT": "Scrubby",
 	"HOME_AREA_TITLE": "FISILTILI PARK",
+	"HOME_AREA_WORLD": "%s",
 	"HOME_AREA_NUMBER": "BÖLGE %d",
 	"HOME_LEVEL_COMING_SOON": "Bölüm %d çok yakında.",
 	"HOME_LEVELS_UNAVAILABLE": "Bölümler şu an açılamıyor (%s).",

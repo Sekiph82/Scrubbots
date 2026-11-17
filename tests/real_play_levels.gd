@@ -2,8 +2,9 @@ extends SceneTree
 ## SB-CAMPAIGN-RUNTIME-KERNEL-DIVERGENCE — shippability gate: every production catalog level
 ## is played through the REAL ProductionGameplayHost under the human policy
 ## (scripts/gameplay/solver/real_play_driver.gd, model real_play_v1) and must reach WON.
-##   - levels: every catalog entry's clicks at the canonical simulation step 1/60 -> WON, ACTIVE 0, supply
-##     exhausted, slots empty, no rejected click;
+##   - levels: the clicks of every catalog entry up to PLAYED_MAX_ORDER at the canonical simulation step
+##     1/60 -> WON, ACTIVE 0, supply exhausted, slots empty, no rejected click (L31..L200 are release-pool
+##     levels: owner rule, no per-level re-play in CI; their import gate is tools/real_play_gate_l31_l200.json);
 ##   - provenance: every catalog entry has a real_play_provenance_v1 record, status WON, its
 ##     planSha256 == the current plan file, regenerated exactly when the plan differs from
 ##     originalPlanSha256 (a level added without running tools/real_play_verify.gd fails here);
@@ -20,6 +21,7 @@ const LevelCatalog = preload("res://scripts/data/level_catalog.gd")
 ## L22 intendedColumnClicks as imported from the Studio (ProofKernel-legal, LOST under real play).
 const OLD_L22 := [1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 4, 4, 4, 4, 4, 4, 5, 5, 3, 3, 5, 5, 3, 3, 3, 3, 3, 5, 5, 5, 5, 5, 5, 5, 5]
 const L22 := "level_022_crab"
+const PLAYED_MAX_ORDER := 30
 
 var EXPECTED_CASES := ["levels", "provenance", "determinism", "search_negative"]
 
@@ -42,8 +44,8 @@ func _initialize() -> void:
 	_done()
 
 func _levels() -> void:
-	print("[levels: %d catalog levels, human policy, dt 1/60]" % _entries.size())
-	for e in _entries:
+	print("[levels: catalog levels 1..%d of %d, human policy, dt 1/60]" % [PLAYED_MAX_ORDER, _entries.size()])
+	for e in _entries.filter(func(x): return x.order <= PLAYED_MAX_ORDER):
 		var clicks := RealPlayDriver.clicks_for(e.id, e.supply_plan_path, _prov)
 		var r: Dictionary = await RealPlayDriver.play_level(get_root(), e.id, clicks)
 		var f: Dictionary = r.get("final", {})

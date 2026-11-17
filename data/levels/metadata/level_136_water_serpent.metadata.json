@@ -1,0 +1,53 @@
+{
+	"artworkCellCount": 1103,
+	"builderVersion": "SB-CAMPAIGN-L31-L200/release-pool-import/v1",
+	"cellCount": 3136,
+	"cellReferenceCounts": {
+		"C05": 290,
+		"C07": 26,
+		"C08": 339,
+		"C14": 131,
+		"C16": 317
+	},
+	"difficulty": "EASY",
+	"firstSeenColorOrder": [
+		"C16",
+		"C14",
+		"C05",
+		"C08",
+		"C07"
+	],
+	"height": 56,
+	"normalizedColorOrder": [
+		"C05",
+		"C07",
+		"C08",
+		"C14",
+		"C16"
+	],
+	"outputPath": "res://data/levels/level_136_water_serpent.json",
+	"paletteAuthority": "res://data/palettes/scrubbots_palette_v3.json",
+	"previewPath": "res://assets/art/levels/previews/level_136_water_serpent.png",
+	"releasePool": {
+		"artworkSha256": "c1afe8871380d81c3b58cbae65159912f0f79304f7349d081e0d1c5da8cc6ad6",
+		"candidateId": "candidate-owner-80894cc3fa9ff31279ef1d48c7f04cb0189155615b9cf2bd",
+		"cellsSha256": "8f382673fcf187fbfe2b9d63095ff289ddd69dd488c038b51f63a604a7bc0b23",
+		"challengeScore": 41.3875068896296,
+		"derivation": "EXACT_LOGICAL_OWNER_UPLOAD_TO_CANONICAL_CANDIDATE",
+		"entryDigest": "cdd115334a7207bf8cb5baae524fd0c16200e0ce38101ff5c8d490b394a49f50",
+		"entryFile": "data/Release Pool/Ready/candidate-owner-80894cc3fa9ff31279ef1d48c7f04cb0189155615b9cf2bd-pipeline-58fbb5c8d8a008ca80735dd2-ready.json",
+		"levelSha256": "b0940148377d1efe67fefa5642041c2aeb0ab8f134bb777eb871f4c8c7e149c7",
+		"ownerSourceSha256": "80894cc3fa9ff31279ef1d48c7f04cb0189155615b9cf2bdfce7c6dc7474326e",
+		"pipelineRunId": "pipeline-58fbb5c8d8a008ca80735dd2",
+		"poolDifficultyClass": "MEDIUM",
+		"sessionLoad": 34.7077629267107,
+		"studioReplay": "WON_CANONICAL",
+		"studioSolverStatus": "WON_CANONICAL",
+		"supplyPlanSha256": "57efd51eff0c06b3ff1f9f765069fda6c638e4ddb7d0e2f391f6dff5c0557d7b"
+	},
+	"sourcePath": "data/Level Factory/Workspace/Candidates/candidate-owner-80894cc3fa9ff31279ef1d48c7f04cb0189155615b9cf2bd/artwork.png",
+	"sourceSha256": "c1afe8871380d81c3b58cbae65159912f0f79304f7349d081e0d1c5da8cc6ad6",
+	"usedColorCount": 5,
+	"voidCellCount": 2033,
+	"width": 56
+}

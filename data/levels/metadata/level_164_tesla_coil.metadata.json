@@ -1,0 +1,53 @@
+{
+	"artworkCellCount": 932,
+	"builderVersion": "SB-CAMPAIGN-L31-L200/release-pool-import/v1",
+	"cellCount": 3136,
+	"cellReferenceCounts": {
+		"C06": 89,
+		"C10": 126,
+		"C13": 152,
+		"C14": 360,
+		"C16": 205
+	},
+	"difficulty": "EASY",
+	"firstSeenColorOrder": [
+		"C16",
+		"C10",
+		"C14",
+		"C13",
+		"C06"
+	],
+	"height": 56,
+	"normalizedColorOrder": [
+		"C06",
+		"C10",
+		"C13",
+		"C14",
+		"C16"
+	],
+	"outputPath": "res://data/levels/level_164_tesla_coil.json",
+	"paletteAuthority": "res://data/palettes/scrubbots_palette_v3.json",
+	"previewPath": "res://assets/art/levels/previews/level_164_tesla_coil.png",
+	"releasePool": {
+		"artworkSha256": "80d66fa58fd0beb979dcacc58acabff8ed56f281d57fa4b482312b1f667ac234",
+		"candidateId": "candidate-owner-0ab772688e820dc45e77fbcb013c1e98cfa80cf6e932d05d",
+		"cellsSha256": "73808778b4391f7912f66a699cfeb5c45e7f258678224aebea8f496b70663bc7",
+		"challengeScore": 42.1886085582456,
+		"derivation": "EXACT_LOGICAL_OWNER_UPLOAD_TO_CANONICAL_CANDIDATE",
+		"entryDigest": "c36c42918205e54052e46056169c06817ec9d30eaf293397407aac8dd5aba97d",
+		"entryFile": "data/Release Pool/Ready/candidate-owner-0ab772688e820dc45e77fbcb013c1e98cfa80cf6e932d05d-pipeline-32bbbac9f938a0d7dcdd3069-ready.json",
+		"levelSha256": "6b9a197be2b53d69887b1c8bcc393af8af0c9f7a5a52f67bd2c8cee204856382",
+		"ownerSourceSha256": "0ab772688e820dc45e77fbcb013c1e98cfa80cf6e932d05de9cc88d1f77b0505",
+		"pipelineRunId": "pipeline-32bbbac9f938a0d7dcdd3069",
+		"poolDifficultyClass": "MEDIUM",
+		"sessionLoad": 29.092603960414,
+		"studioReplay": "WON_CANONICAL",
+		"studioSolverStatus": "WON_CANONICAL",
+		"supplyPlanSha256": "d9a288a78def6dbaf3405be959ba91eff9f16adb55384307de00ba0797a75409"
+	},
+	"sourcePath": "data/Level Factory/Workspace/Candidates/candidate-owner-0ab772688e820dc45e77fbcb013c1e98cfa80cf6e932d05d/artwork.png",
+	"sourceSha256": "80d66fa58fd0beb979dcacc58acabff8ed56f281d57fa4b482312b1f667ac234",
+	"usedColorCount": 5,
+	"voidCellCount": 2204,
+	"width": 56
+}

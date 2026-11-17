@@ -257,101 +257,101 @@ func _p05() -> void:
 	_case("p05_registry_v1_v2")
 
 # ------------------------------------------------------ integration cases --
-## SB-CAMPAIGN-L11-L30: builtin levels are 1..30, so the remote fixture levels fam_l011..13 sit at 31..33.
+## SB-CAMPAIGN-L31-L200: builtin levels are 1..200, so the remote fixture levels fam_l011..13 sit at 201..203.
 
 func _i01() -> void:
-	print("[i01 SB-CP06-010: remote 32 disabled at frontier 32 -> 33, identity stable, zero rewards]")
-	var x := _app("i01", 32)
+	print("[i01 SB-CP06-010: remote 202 disabled at frontier 202 -> 203, identity stable, zero rewards]")
+	var x := _app("i01", 202)
 	var app = x[0]
 	var t = x[1]
 	var r1: Dictionary = await _publish(app, t, 1, [])
-	_ok(r1["ok"] and app.progression.current_level() == 32, "v1 activated, frontier 32 untouched")
+	_ok(r1["ok"] and app.progression.current_level() == 202, "v1 activated, frontier 202 untouched")
 	var orders_before := _orders(app)
 	var econ_before: Dictionary = app.economy.snapshot()
 	var sb: int = app.economy.wallet.scrub_bucks()
 	var r2: Dictionary = await _publish(app, t, 2, ["fam_l012"])
 	var sha := String(app.content.active_registry()["manifest_sha256"])
 	_ok(r2["ok"] and app.content.disabled_level_ids() == ["fam_l012"], "v2 disabling fam_l012 activated (pack bytes unchanged)")
-	_ok(app.progression.current_level() == 33 and app.progression.skipped_records() == [_rec(32, "fam_l012", 2, sha)], "frontier 33; ledger {32, fam_l012, v2, manifest sha}")
-	_ok(app.progression.completed_count() == 31 and not app.progression.is_completed(32), "no fake first-clear (completed_count 31)")
+	_ok(app.progression.current_level() == 203 and app.progression.skipped_records() == [_rec(202, "fam_l012", 2, sha)], "frontier 203; ledger {202, fam_l012, v2, manifest sha}")
+	_ok(app.progression.completed_count() == 201 and not app.progression.is_completed(202), "no fake first-clear (completed_count 201)")
 	_ok(app.economy.snapshot() == econ_before and app.economy.wallet.scrub_bucks() == sb, "economy snapshot (wallet, hearts, streak, Daily, gifts, cards, robots) unchanged")
-	_ok(_orders(app) == orders_before and orders_before[31] == "fam_l011" and orders_before[32] == "fam_l012" and orders_before[33] == "fam_l013", "catalog orders/IDs 31/32/33 unchanged (no compaction)")
+	_ok(_orders(app) == orders_before and orders_before[201] == "fam_l011" and orders_before[202] == "fam_l012" and orders_before[203] == "fam_l013", "catalog orders/IDs 201/202/203 unchanged (no compaction)")
 	var l := GameplayLaunchResolver.resolve(app)
-	_ok(l["ok"] and l["level"] == 33 and l["entry_id"] == "fam_l013", "launch resolves Level 33 -> fam_l013 (labelled 33)")
-	_ok(app.skip_notice == [32], "session notice names the real skipped number")
+	_ok(l["ok"] and l["level"] == 203 and l["entry_id"] == "fam_l013", "launch resolves Level 203 -> fam_l013 (labelled 203)")
+	_ok(app.skip_notice == [202], "session notice names the real skipped number")
 	var saved = JSON.parse_string(FileAccess.get_file_as_string(x[2]))
-	_ok(saved["version"] == 2 and saved["progression"]["current_level"] == 33 and saved["progression"]["skipped"].size() == 1, "skip durably saved as save v2")
-	_ok(app.reconcile_disabled_frontier()["skipped"] == [] and app.progression.current_level() == 33, "second reconcile is a no-op")
+	_ok(saved["version"] == 2 and saved["progression"]["current_level"] == 203 and saved["progression"]["skipped"].size() == 1, "skip durably saved as save v2")
+	_ok(app.reconcile_disabled_frontier()["skipped"] == [] and app.progression.current_level() == 203, "second reconcile is a no-op")
 	_case("i01_frontier12_skips_to13_no_rewards")
 
 func _i02() -> void:
 	print("[i02 disabled level ahead: no early skip; a real WON into it then skips]")
-	var x := _app("i02", 31)
+	var x := _app("i02", 201)
 	var app = x[0]
 	await _publish(app, x[1], 1, ["fam_l012"])
-	_ok(app.progression.current_level() == 31 and app.progression.skipped_records().is_empty(), "frontier 31 not disabled -> nothing skipped")
-	_ok(app.orders_context()["playable_ahead"] == 2, "Daily eligibility counts 31 and 33, not disabled 32")
-	_ok(app.progression.record_win(31), "real win on 31 (the host's first-clear path)")
+	_ok(app.progression.current_level() == 201 and app.progression.skipped_records().is_empty(), "frontier 201 not disabled -> nothing skipped")
+	_ok(app.orders_context()["playable_ahead"] == 2, "Daily eligibility counts 201 and 203, not disabled 202")
+	_ok(app.progression.record_win(201), "real win on 201 (the host's first-clear path)")
 	var blocked := GameplayLaunchResolver.resolve(app)
-	_ok(not blocked["ok"] and blocked["reason"] == GameplayLaunchResolver.LEVEL_DISABLED and blocked["level"] == 32, "before reconcile Level 32 resolves LEVEL_DISABLED, never launches")
+	_ok(not blocked["ok"] and blocked["reason"] == GameplayLaunchResolver.LEVEL_DISABLED and blocked["level"] == 202, "before reconcile Level 202 resolves LEVEL_DISABLED, never launches")
 	var r: Dictionary = app.reconcile_disabled_frontier()
-	_ok(r["ok"] and r["skipped"] == [32] and app.progression.current_level() == 33 and app.progression.completed_count() == 31, "terminal reconcile skips 32 -> 33 (only 31 counted as a win)")
+	_ok(r["ok"] and r["skipped"] == [202] and app.progression.current_level() == 203 and app.progression.completed_count() == 201, "terminal reconcile skips 202 -> 203 (only 201 counted as a win)")
 	_case("i02_win_into_disabled_then_skip")
 
 func _i03() -> void:
 	print("[i03 two consecutive disabled remote levels: bounded one-at-a-time]")
-	var x := _app("i03", 31)
+	var x := _app("i03", 201)
 	var app = x[0]
 	var r: Dictionary = await _publish(app, x[1], 1, ["fam_l012", "fam_l013"])
-	_ok(r["ok"] and app.progression.current_level() == 31, "frontier 31 enabled: no skip")
-	app.progression.record_win(31)
+	_ok(r["ok"] and app.progression.current_level() == 201, "frontier 201 enabled: no skip")
+	app.progression.record_win(201)
 	var rr: Dictionary = app.reconcile_disabled_frontier()
 	var recs: Array = app.progression.skipped_records()
-	_ok(rr["skipped"] == [32, 33] and app.progression.current_level() == 34 and recs.size() == 2 and recs[0]["level_id"] == "fam_l012" and recs[1]["level_id"] == "fam_l013",
-		"32 then 33 skipped one number at a time -> frontier 34")
+	_ok(rr["skipped"] == [202, 203] and app.progression.current_level() == 204 and recs.size() == 2 and recs[0]["level_id"] == "fam_l012" and recs[1]["level_id"] == "fam_l013",
+		"202 then 203 skipped one number at a time -> frontier 204")
 	var l := GameplayLaunchResolver.resolve(app)
-	_ok(not l["ok"] and l["reason"] == GameplayLaunchResolver.CONTENT_MISSING and l["level"] == 34, "stops at the real next frontier 34 (CONTENT_MISSING), no jump")
+	_ok(not l["ok"] and l["reason"] == GameplayLaunchResolver.CONTENT_MISSING and l["level"] == 204, "stops at the real next frontier 204 (CONTENT_MISSING), no jump")
 	_case("i03_two_consecutive_disabled")
 
 func _i04() -> void:
 	print("[i04 last remote level disabled: skip lands on CONTENT_MISSING, never fabricated]")
-	var x := _app("i04", 33)
+	var x := _app("i04", 203)
 	var app = x[0]
 	await _publish(app, x[1], 1, ["fam_l013"])
-	_ok(app.progression.current_level() == 34 and app.progression.skipped_records().size() == 1, "33 skipped -> 34")
+	_ok(app.progression.current_level() == 204 and app.progression.skipped_records().size() == 1, "203 skipped -> 204")
 	var l := GameplayLaunchResolver.resolve(app)
-	_ok(not l["ok"] and l["reason"] == GameplayLaunchResolver.CONTENT_MISSING, "Level 34 honestly CONTENT_MISSING")
+	_ok(not l["ok"] and l["reason"] == GameplayLaunchResolver.CONTENT_MISSING, "Level 204 honestly CONTENT_MISSING")
 	_case("i04_last_level_disabled_content_missing")
 
 func _i05() -> void:
 	print("[i05 re-enable: skipped history kept, no rewind/payout; fresh player can play it]")
-	var x := _app("i05", 32)
+	var x := _app("i05", 202)
 	var app = x[0]
 	await _publish(app, x[1], 1, [])
 	await _publish(app, x[1], 2, ["fam_l012"])
 	var econ: Dictionary = app.economy.snapshot()
 	var r: Dictionary = await _publish(app, x[1], 3, [])
 	_ok(r["ok"] and app.content.disabled_level_ids().is_empty(), "v3 re-enable activated (registry back to v1 shape)")
-	_ok(app.progression.current_level() == 33 and app.progression.is_skipped(32) and not app.progression.is_completed(32) and app.economy.snapshot() == econ, "skipped player: frontier 33, 32 stays skipped, no payout")
-	var y := _app("i05b", 32)
+	_ok(app.progression.current_level() == 203 and app.progression.is_skipped(202) and not app.progression.is_completed(202) and app.economy.snapshot() == econ, "skipped player: frontier 203, 202 stays skipped, no payout")
+	var y := _app("i05b", 202)
 	var fresh = y[0]
 	await _publish(fresh, y[1], 1, [])
 	await _publish(fresh, y[1], 2, ["fam_l012"])
-	_ok(fresh.progression.current_level() == 33, "second player at 32 also skipped under v2")
-	var z := _app("i05c", 31)
+	_ok(fresh.progression.current_level() == 203, "second player at 202 also skipped under v2")
+	var z := _app("i05c", 201)
 	var early = z[0]
 	await _publish(early, z[1], 1, [])
 	await _publish(early, z[1], 2, ["fam_l012"])
 	await _publish(early, z[1], 3, [])
-	early.progression.record_win(31)
+	early.progression.record_win(201)
 	early.reconcile_disabled_frontier()
 	var l := GameplayLaunchResolver.resolve(early)
-	_ok(l["ok"] and l["level"] == 32 and l["entry_id"] == "fam_l012" and early.progression.skipped_records().is_empty(), "player who had not reached 32 plays re-enabled fam_l012")
+	_ok(l["ok"] and l["level"] == 202 and l["entry_id"] == "fam_l012" and early.progression.skipped_records().is_empty(), "player who had not reached 202 plays re-enabled fam_l012")
 	_case("i05_reenable_history_and_fresh_player")
 
 func _i06() -> void:
 	print("[i06 cold offline boot: cached v2 disabled set applied, idempotent across relaunch]")
-	var x := _app("i06", 32)
+	var x := _app("i06", 202)
 	var app = x[0]
 	var save: String = x[2]
 	var root: String = app.content.root
@@ -364,16 +364,16 @@ func _i06() -> void:
 	m.boot()
 	t.set_manifest(F.manifest(2, [_pack3], L3, "0.0.0", {"disabled_levels": ["fam_l012"]}), [_pack3])
 	var r: Dictionary = await m.refresh()
-	_ok(r["ok"] and JSON.parse_string(FileAccess.get_file_as_string(save))["progression"]["current_level"] == 32, "registry v2 active on disk; save still at 32")
+	_ok(r["ok"] and JSON.parse_string(FileAccess.get_file_as_string(save))["progression"]["current_level"] == 202, "registry v2 active on disk; save still at 202")
 	var boot2 = AppState.new(save, func(): return CP06_FIXED_NOW)   # no transport: offline cold boot
-	_ok(boot2.progression.current_level() == 33 and boot2.progression.skipped_records().size() == 1, "offline boot applies cached disabled set -> 33")
+	_ok(boot2.progression.current_level() == 203 and boot2.progression.skipped_records().size() == 1, "offline boot applies cached disabled set -> 203")
 	var boot3 = AppState.new(save, func(): return CP06_FIXED_NOW)
-	_ok(boot3.progression.current_level() == 33 and boot3.progression.skipped_records().size() == 1, "relaunch: no further skip (idempotent)")
+	_ok(boot3.progression.current_level() == 203 and boot3.progression.skipped_records().size() == 1, "relaunch: no further skip (idempotent)")
 	_case("i06_cold_offline_boot_idempotent")
 
 func _i07() -> void:
 	print("[i07 skip save failure: exact rollback, LEVEL_DISABLED, retry later succeeds]")
-	var x := _app("i07", 32)
+	var x := _app("i07", 202)
 	var app = x[0]
 	await _publish(app, x[1], 1, [])
 	var pre: Dictionary = app.progression.snapshot()
@@ -381,58 +381,58 @@ func _i07() -> void:
 	app.save.set_fault_injector(func(stage): return stage == "temp_write")
 	await _publish(app, x[1], 2, ["fam_l012"])
 	_ok(app.progression.snapshot() == pre and FileAccess.get_file_as_bytes(x[2]) == bytes and app.skip_notice.is_empty(), "failed save: progression + save bytes exactly as before, no notice")
-	_ok(GameplayLaunchResolver.resolve(app)["reason"] == GameplayLaunchResolver.LEVEL_DISABLED, "disabled 32 still never launches")
+	_ok(GameplayLaunchResolver.resolve(app)["reason"] == GameplayLaunchResolver.LEVEL_DISABLED, "disabled 202 still never launches")
 	app.save.set_fault_injector(Callable())
 	var r: Dictionary = app.reconcile_disabled_frontier()
-	_ok(r["ok"] and r["skipped"] == [32] and app.progression.current_level() == 33, "retry after fault cleared: one skip")
+	_ok(r["ok"] and r["skipped"] == [202] and app.progression.current_level() == 203, "retry after fault cleared: one skip")
 	_case("i07_save_failure_rollback")
 
 func _i08() -> void:
 	print("[i08 builtin / unknown / case-variant disabled IDs: whole manifest refused, LKG kept]")
-	var x := _app("i08", 32)
+	var x := _app("i08", 202)
 	var app = x[0]
 	await _publish(app, x[1], 1, [])
 	for ids in [[String(_builtin_ids[0])], ["fam_l099"], ["FAM_L012"]]:
 		var r: Dictionary = await _publish(app, x[1], 2, ids)
-		_ok(not r["ok"] and r["reason"] == "MANIFEST_DISABLED_LEVEL_NOT_DECLARED" and app.content.status()["content_version"] == 1 and app.progression.current_level() == 32,
-			"%s -> refused, v1 + frontier 32 kept" % str(ids))
+		_ok(not r["ok"] and r["reason"] == "MANIFEST_DISABLED_LEVEL_NOT_DECLARED" and app.content.status()["content_version"] == 1 and app.progression.current_level() == 202,
+			"%s -> refused, v1 + frontier 202 kept" % str(ids))
 	_case("i08_builtin_and_unknown_ids_rejected")
 
 func _i09() -> void:
 	print("[i09 missing / unverifiable content and offline never justify a skip]")
-	var x := _app("i09", 32)
+	var x := _app("i09", 202)
 	var app = x[0]
 	var t = x[1]
 	t.offline = true
 	await _publish(app, t, 1, ["fam_l012"])
-	_ok(app.progression.current_level() == 32, "offline: no manifest -> no skip")
+	_ok(app.progression.current_level() == 202, "offline: no manifest -> no skip")
 	t.offline = false
 	t.corrupt_objects[F.manifest(1, [_pack3], L3)["packs"][0]["object_key"]] = PackedByteArray([1, 2, 3])
 	var r: Dictionary = await _publish(app, t, 1, ["fam_l012"])
-	_ok(not r["ok"] and app.progression.current_level() == 32, "tampered pack: refused, no skip (%s)" % r["reason"])
+	_ok(not r["ok"] and app.progression.current_level() == 202, "tampered pack: refused, no skip (%s)" % r["reason"])
 	t.corrupt_objects.clear()
-	var z := _app("i09z", 31)
+	var z := _app("i09z", 201)
 	var app2 = z[0]
 	await _publish(app2, z[1], 1, ["fam_l012"])
-	# Frontier reaches 32 and is saved WITHOUT a reconcile (crash window), then the verified
+	# Frontier reaches 202 and is saved WITHOUT a reconcile (crash window), then the verified
 	# cache is damaged before the next cold boot: an unusable set exposes no disabled membership.
-	app2.progression.record_win(31)
-	_ok(bool(app2.request_save().get("ok", false)), "frontier 32 saved")
+	app2.progression.record_win(201)
+	_ok(bool(app2.request_save().get("ok", false)), "frontier 202 saved")
 	var reg: Dictionary = app2.content.active_registry()
 	var lvl: String = app2.content.level_dir(reg["packs"][0], "fam_l013") + "level.json"
 	var f := FileAccess.open(lvl, FileAccess.WRITE)
 	f.store_string("{}")
 	f.close()
 	var y := _app("i09b", 0, z[2])
-	_ok(not y[0].content.is_active_usable() and y[0].content.disabled_level_ids().is_empty() and y[0].progression.current_level() == 32 and y[0].progression.skipped_records().is_empty(),
-		"corrupt cache: set unusable, frontier stays 32, no skip")
+	_ok(not y[0].content.is_active_usable() and y[0].content.disabled_level_ids().is_empty() and y[0].progression.current_level() == 202 and y[0].progression.skipped_records().is_empty(),
+		"corrupt cache: set unusable, frontier stays 202, no skip")
 	var l := GameplayLaunchResolver.resolve(y[0])
 	_ok(not l["ok"] and l["reason"] == GameplayLaunchResolver.CONTENT_MISSING, "unusable content -> CONTENT_MISSING, never a skip")
 	_case("i09_unusable_content_never_skips")
 
 func _i10() -> void:
 	print("[i10 stale / mutated successor manifests keep the active disabled state]")
-	var x := _app("i10", 31)
+	var x := _app("i10", 201)
 	var app = x[0]
 	await _publish(app, x[1], 2, ["fam_l012"])
 	var r1: Dictionary = await _publish(app, x[1], 1, [])
@@ -448,11 +448,11 @@ func _i10() -> void:
 
 func _i11() -> void:
 	print("[i11 v2 save reload; future-version guard protects it from older readers]")
-	var x := _app("i11", 32)
+	var x := _app("i11", 202)
 	var app = x[0]
 	await _publish(app, x[1], 1, ["fam_l012"])
 	var y := _app("i11b", 0, x[2])
-	_ok(y[0].progression.current_level() == 33 and y[0].progression.skipped_records() == app.progression.skipped_records(), "v2 save reloads exactly")
+	_ok(y[0].progression.current_level() == 203 and y[0].progression.skipped_records() == app.progression.skipped_records(), "v2 save reloads exactly")
 	var saved = JSON.parse_string(FileAccess.get_file_as_string(x[2]))
 	_ok(int(saved["version"]) > SaveService.LEGACY_VERSION, "file version 2 > 1: a pre-CP06 build (VERSION 1) treats it as future_schema and never overwrites it")
 	_case("i11_v2_save_roundtrip_and_old_reader_guard")

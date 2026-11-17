@@ -1,0 +1,56 @@
+{
+	"artworkCellCount": 992,
+	"builderVersion": "SB-CAMPAIGN-L31-L200/release-pool-import/v1",
+	"cellCount": 3136,
+	"cellReferenceCounts": {
+		"C08": 354,
+		"C10": 190,
+		"C12": 5,
+		"C13": 14,
+		"C14": 100,
+		"C16": 329
+	},
+	"difficulty": "MEDIUM",
+	"firstSeenColorOrder": [
+		"C16",
+		"C08",
+		"C14",
+		"C10",
+		"C13",
+		"C12"
+	],
+	"height": 56,
+	"normalizedColorOrder": [
+		"C08",
+		"C10",
+		"C12",
+		"C13",
+		"C14",
+		"C16"
+	],
+	"outputPath": "res://data/levels/level_138_scrub_racer.json",
+	"paletteAuthority": "res://data/palettes/scrubbots_palette_v3.json",
+	"previewPath": "res://assets/art/levels/previews/level_138_scrub_racer.png",
+	"releasePool": {
+		"artworkSha256": "9347c1b59014ea03355a63d8ca04152dbe202aa4d58d54ce655405436d6e5285",
+		"candidateId": "candidate-owner-970972bd4b8d56af9e7ee000f77422c9a9002dc46caa3eb6",
+		"cellsSha256": "5d47b3f9e479d0da8756f0ae8d80b4d0278aa5aed56476718c06934ca451d7af",
+		"challengeScore": 47.1512928580721,
+		"derivation": "EXACT_LOGICAL_OWNER_UPLOAD_TO_CANONICAL_CANDIDATE",
+		"entryDigest": "88c523580dd2fae91f4be0ae61dbec5b5083ac0b6101f98c9a73f61312e83852",
+		"entryFile": "data/Release Pool/Ready/candidate-owner-970972bd4b8d56af9e7ee000f77422c9a9002dc46caa3eb6-pipeline-4153c422ef3bb2017d9f8a67-ready.json",
+		"levelSha256": "69953a5b1656b4a3aecc9f69bb559a52b34ad0548c9f1ad5182810ea4511cada",
+		"ownerSourceSha256": "970972bd4b8d56af9e7ee000f77422c9a9002dc46caa3eb6d8b02a690e4823f8",
+		"pipelineRunId": "pipeline-4153c422ef3bb2017d9f8a67",
+		"poolDifficultyClass": "MEDIUM",
+		"sessionLoad": 30.9318638249029,
+		"studioReplay": "WON_CANONICAL",
+		"studioSolverStatus": "WON_CANONICAL",
+		"supplyPlanSha256": "ca0f7c3969d9dc560eac19ad68afdffc2f4b642a3e06fb209d202b7925f616cb"
+	},
+	"sourcePath": "data/Level Factory/Workspace/Candidates/candidate-owner-970972bd4b8d56af9e7ee000f77422c9a9002dc46caa3eb6/artwork.png",
+	"sourceSha256": "9347c1b59014ea03355a63d8ca04152dbe202aa4d58d54ce655405436d6e5285",
+	"usedColorCount": 6,
+	"voidCellCount": 2144,
+	"width": 56
+}

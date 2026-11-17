@@ -1,0 +1,59 @@
+{
+	"artworkCellCount": 998,
+	"builderVersion": "SB-CAMPAIGN-L31-L200/release-pool-import/v1",
+	"cellCount": 3136,
+	"cellReferenceCounts": {
+		"C04": 20,
+		"C05": 326,
+		"C06": 30,
+		"C07": 7,
+		"C13": 5,
+		"C14": 243,
+		"C16": 367
+	},
+	"difficulty": "MEDIUM",
+	"firstSeenColorOrder": [
+		"C16",
+		"C05",
+		"C06",
+		"C14",
+		"C07",
+		"C04",
+		"C13"
+	],
+	"height": 56,
+	"normalizedColorOrder": [
+		"C04",
+		"C05",
+		"C06",
+		"C07",
+		"C13",
+		"C14",
+		"C16"
+	],
+	"outputPath": "res://data/levels/level_053_rhino_beetle.json",
+	"paletteAuthority": "res://data/palettes/scrubbots_palette_v3.json",
+	"previewPath": "res://assets/art/levels/previews/level_053_rhino_beetle.png",
+	"releasePool": {
+		"artworkSha256": "5e1537fd3509bbc45f5a6d05b479d3ed59a635de53fa2a39712f0b662524f1be",
+		"candidateId": "candidate-owner-f979758a755b5cf8e8f8bb1abee58e681313aeff07d4f5c4",
+		"cellsSha256": "8df92ea872fda174ab1741a28643f2ab4beb5a1a7faeb706bb4b0572de26adf4",
+		"challengeScore": 44.5858337493838,
+		"derivation": "EXACT_LOGICAL_OWNER_UPLOAD_TO_CANONICAL_CANDIDATE",
+		"entryDigest": "e5534af8a3168edefa51a8e366225899f487a47bb717711d1fd8ced156525309",
+		"entryFile": "data/Release Pool/Ready/candidate-owner-f979758a755b5cf8e8f8bb1abee58e681313aeff07d4f5c4-pipeline-55629e4c2016272def8a3e86-ready.json",
+		"levelSha256": "9a55e5a51716c46af05aef64871c09d6c63d049489464783dd2e7078c135ce10",
+		"ownerSourceSha256": "f979758a755b5cf8e8f8bb1abee58e681313aeff07d4f5c4542db7ed00114c9f",
+		"pipelineRunId": "pipeline-55629e4c2016272def8a3e86",
+		"poolDifficultyClass": "MEDIUM",
+		"sessionLoad": 31.5660420125874,
+		"studioReplay": "WON_CANONICAL",
+		"studioSolverStatus": "WON_CANONICAL",
+		"supplyPlanSha256": "47d26372f2ed7771dff8e11332dea7342cc264ad399d0f4d17c8a8fe4d9fea65"
+	},
+	"sourcePath": "data/Level Factory/Workspace/Candidates/candidate-owner-f979758a755b5cf8e8f8bb1abee58e681313aeff07d4f5c4/artwork.png",
+	"sourceSha256": "5e1537fd3509bbc45f5a6d05b479d3ed59a635de53fa2a39712f0b662524f1be",
+	"usedColorCount": 7,
+	"voidCellCount": 2138,
+	"width": 56
+}

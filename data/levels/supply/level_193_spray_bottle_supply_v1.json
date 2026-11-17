@@ -1,0 +1,290 @@
+{
+	"schema": "scrubbots.level_supply_plan.v1",
+	"version": 1,
+	"levelId": "level_193_spray_bottle",
+	"ownerInput": "PixelArtStudio supply pipeline (solver-proven)",
+	"ownerInputSha256": "e7b3472c8f795387c939574d209be4d9e365f71482b3f52b279e1b66a1769003",
+	"columnCount": 3,
+	"visiblePreviewDepth": 3,
+	"maxRobotsPerBatch": 38,
+	"intendedColumnClicks": [
+		1,
+		1,
+		1,
+		1,
+		1,
+		1,
+		1,
+		1,
+		1,
+		1,
+		1,
+		1,
+		1,
+		1,
+		1,
+		1,
+		1,
+		2,
+		2,
+		2,
+		3,
+		3,
+		3,
+		3,
+		3,
+		3,
+		3,
+		3,
+		3,
+		2,
+		2,
+		2,
+		2,
+		2,
+		2,
+		2,
+		2,
+		2,
+		2,
+		3,
+		3,
+		3,
+		3,
+		3,
+		3
+	],
+	"columns": [
+		[
+			{
+				"batchId": "L193-K1-01",
+				"cid": "C16",
+				"robots": 8
+			},
+			{
+				"batchId": "L193-K1-02",
+				"cid": "C10",
+				"robots": 10
+			},
+			{
+				"batchId": "L193-K1-03",
+				"cid": "C16",
+				"robots": 8
+			},
+			{
+				"batchId": "L193-K1-04",
+				"cid": "C10",
+				"robots": 13
+			},
+			{
+				"batchId": "L193-K1-05",
+				"cid": "C07",
+				"robots": 11
+			},
+			{
+				"batchId": "L193-K1-06",
+				"cid": "C10",
+				"robots": 12
+			},
+			{
+				"batchId": "L193-K1-07",
+				"cid": "C10",
+				"robots": 33
+			},
+			{
+				"batchId": "L193-K1-08",
+				"cid": "C10",
+				"robots": 13
+			},
+			{
+				"batchId": "L193-K1-09",
+				"cid": "C07",
+				"robots": 27
+			},
+			{
+				"batchId": "L193-K1-10",
+				"cid": "C16",
+				"robots": 8
+			},
+			{
+				"batchId": "L193-K1-11",
+				"cid": "C10",
+				"robots": 31
+			},
+			{
+				"batchId": "L193-K1-12",
+				"cid": "C10",
+				"robots": 33
+			},
+			{
+				"batchId": "L193-K1-13",
+				"cid": "C10",
+				"robots": 14
+			},
+			{
+				"batchId": "L193-K1-14",
+				"cid": "C07",
+				"robots": 16
+			},
+			{
+				"batchId": "L193-K1-15",
+				"cid": "C10",
+				"robots": 25
+			},
+			{
+				"batchId": "L193-K1-16",
+				"cid": "C10",
+				"robots": 25
+			},
+			{
+				"batchId": "L193-K1-17",
+				"cid": "C10",
+				"robots": 19
+			}
+		],
+		[
+			{
+				"batchId": "L193-K2-01",
+				"cid": "C07",
+				"robots": 31
+			},
+			{
+				"batchId": "L193-K2-02",
+				"cid": "C16",
+				"robots": 19
+			},
+			{
+				"batchId": "L193-K2-03",
+				"cid": "C10",
+				"robots": 12
+			},
+			{
+				"batchId": "L193-K2-04",
+				"cid": "C07",
+				"robots": 11
+			},
+			{
+				"batchId": "L193-K2-05",
+				"cid": "C16",
+				"robots": 9
+			},
+			{
+				"batchId": "L193-K2-06",
+				"cid": "C10",
+				"robots": 16
+			},
+			{
+				"batchId": "L193-K2-07",
+				"cid": "C16",
+				"robots": 9
+			},
+			{
+				"batchId": "L193-K2-08",
+				"cid": "C07",
+				"robots": 12
+			},
+			{
+				"batchId": "L193-K2-09",
+				"cid": "C10",
+				"robots": 20
+			},
+			{
+				"batchId": "L193-K2-10",
+				"cid": "C10",
+				"robots": 23
+			},
+			{
+				"batchId": "L193-K2-11",
+				"cid": "C10",
+				"robots": 20
+			},
+			{
+				"batchId": "L193-K2-12",
+				"cid": "C16",
+				"robots": 12
+			},
+			{
+				"batchId": "L193-K2-13",
+				"cid": "C10",
+				"robots": 23
+			}
+		],
+		[
+			{
+				"batchId": "L193-K3-01",
+				"cid": "C10",
+				"robots": 38
+			},
+			{
+				"batchId": "L193-K3-02",
+				"cid": "C16",
+				"robots": 21
+			},
+			{
+				"batchId": "L193-K3-03",
+				"cid": "C10",
+				"robots": 34
+			},
+			{
+				"batchId": "L193-K3-04",
+				"cid": "C16",
+				"robots": 19
+			},
+			{
+				"batchId": "L193-K3-05",
+				"cid": "C10",
+				"robots": 14
+			},
+			{
+				"batchId": "L193-K3-06",
+				"cid": "C10",
+				"robots": 27
+			},
+			{
+				"batchId": "L193-K3-07",
+				"cid": "C16",
+				"robots": 15
+			},
+			{
+				"batchId": "L193-K3-08",
+				"cid": "C10",
+				"robots": 18
+			},
+			{
+				"batchId": "L193-K3-09",
+				"cid": "C16",
+				"robots": 14
+			},
+			{
+				"batchId": "L193-K3-10",
+				"cid": "C10",
+				"robots": 25
+			},
+			{
+				"batchId": "L193-K3-11",
+				"cid": "C16",
+				"robots": 14
+			},
+			{
+				"batchId": "L193-K3-12",
+				"cid": "C10",
+				"robots": 20
+			},
+			{
+				"batchId": "L193-K3-13",
+				"cid": "C16",
+				"robots": 10
+			},
+			{
+				"batchId": "L193-K3-14",
+				"cid": "C10",
+				"robots": 23
+			},
+			{
+				"batchId": "L193-K3-15",
+				"cid": "C07",
+				"robots": 16
+			}
+		]
+	]
+}

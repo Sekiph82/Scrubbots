@@ -1,0 +1,53 @@
+{
+	"artworkCellCount": 853,
+	"builderVersion": "SB-CAMPAIGN-L31-L200/release-pool-import/v1",
+	"cellCount": 3136,
+	"cellReferenceCounts": {
+		"C05": 441,
+		"C06": 168,
+		"C14": 37,
+		"C15": 37,
+		"C16": 170
+	},
+	"difficulty": "EASY",
+	"firstSeenColorOrder": [
+		"C05",
+		"C15",
+		"C06",
+		"C14",
+		"C16"
+	],
+	"height": 56,
+	"normalizedColorOrder": [
+		"C05",
+		"C06",
+		"C14",
+		"C15",
+		"C16"
+	],
+	"outputPath": "res://data/levels/level_076_spirit_bird.json",
+	"paletteAuthority": "res://data/palettes/scrubbots_palette_v3.json",
+	"previewPath": "res://assets/art/levels/previews/level_076_spirit_bird.png",
+	"releasePool": {
+		"artworkSha256": "ba1db0df2bc4546a2cbee59e3546ad600aac098474b0de96cc06d07c3ac7e4ac",
+		"candidateId": "candidate-owner-8db796861fe1ace354e49daa4e35fb975e33e66a418b105b",
+		"cellsSha256": "5bc02215e15297291b912b1d2d0242c9e9093f1369de43744b32e2d7181ab2b8",
+		"challengeScore": 39.4102277919232,
+		"derivation": "EXACT_LOGICAL_OWNER_UPLOAD_TO_CANONICAL_CANDIDATE",
+		"entryDigest": "2cfc0875f9adb3289eacd5d2a6344c503e7db3bbe4a34248b183715d5d8ad40d",
+		"entryFile": "data/Release Pool/Ready/candidate-owner-8db796861fe1ace354e49daa4e35fb975e33e66a418b105b-pipeline-08f8f5cba7cae56b156b2732-ready.json",
+		"levelSha256": "e04926e672c262397aca9c27a32e64c2dd3f5deff6188e0e47a3f98569b909a7",
+		"ownerSourceSha256": "8db796861fe1ace354e49daa4e35fb975e33e66a418b105b537c13b569ea9fe0",
+		"pipelineRunId": "pipeline-08f8f5cba7cae56b156b2732",
+		"poolDifficultyClass": "MEDIUM",
+		"sessionLoad": 26.4089052781974,
+		"studioReplay": "WON_CANONICAL",
+		"studioSolverStatus": "WON_CANONICAL",
+		"supplyPlanSha256": "2b76bdf3dcc2dfc812904c8002f600ff12171a82ef7499adde19fcc057361c52"
+	},
+	"sourcePath": "data/Level Factory/Workspace/Candidates/candidate-owner-8db796861fe1ace354e49daa4e35fb975e33e66a418b105b/artwork.png",
+	"sourceSha256": "ba1db0df2bc4546a2cbee59e3546ad600aac098474b0de96cc06d07c3ac7e4ac",
+	"usedColorCount": 5,
+	"voidCellCount": 2283,
+	"width": 56
+}

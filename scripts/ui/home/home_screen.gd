@@ -357,7 +357,7 @@ func _build() -> void:
 	hero.set_home_rect(sc)
 	chars.add_child(_reg(hero))
 	_nodes["Art_scrubby_gesture"] = hero.get_gesture_rect()
-	# SB-HOME-BG-2026-11-16: native area name in the sky band (HOME_AREA_TITLE / HOME_AREA_NUMBER).
+	# SB-HOME-BG-2026-11-16: native area name in the sky band (world name / HOME_AREA_NUMBER).
 	var area := Control.new()
 	area.name = "HomeAreaLabel"
 	area.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -1395,7 +1395,8 @@ func _render_values() -> void:
 		pr.texture = pr.get_meta("binder_tex")
 	(_nodes["ProfileLevel"] as Label).text = UiText.num(_vm["level"])
 	var w := WorldService.world_for_level(int(_vm["level"]))
-	_set_area_text("HomeAreaTitle", UiText.t("HOME_AREA_TITLE"))
+	# Owner 2026-11-17: the title is the current world's name (same source as the world ceremony).
+	_set_area_text("HomeAreaTitle", UiText.t("HOME_AREA_WORLD", [UiText.caps(UiText.data("WORLD_NAME_%d" % int(w["number"]), String(w["name"])))]) if not w.is_empty() else "")
 	_set_area_text("HomeAreaNumber", UiText.t("HOME_AREA_NUMBER", [int(w["number"])]) if not w.is_empty() else "")
 	# Bot Parts toward the next 250-part robot (canonical wallet / RobotUnlockService),
 	# never XP — only the live ratio, centred in the bar; gold bar when unlockable.

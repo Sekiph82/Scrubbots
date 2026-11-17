@@ -1,0 +1,53 @@
+{
+	"artworkCellCount": 866,
+	"builderVersion": "SB-CAMPAIGN-L31-L200/release-pool-import/v1",
+	"cellCount": 3136,
+	"cellReferenceCounts": {
+		"C07": 82,
+		"C08": 94,
+		"C09": 110,
+		"C13": 487,
+		"C14": 93
+	},
+	"difficulty": "EASY",
+	"firstSeenColorOrder": [
+		"C08",
+		"C13",
+		"C09",
+		"C14",
+		"C07"
+	],
+	"height": 56,
+	"normalizedColorOrder": [
+		"C07",
+		"C08",
+		"C09",
+		"C13",
+		"C14"
+	],
+	"outputPath": "res://data/levels/level_056_moon_jellyfish.json",
+	"paletteAuthority": "res://data/palettes/scrubbots_palette_v3.json",
+	"previewPath": "res://assets/art/levels/previews/level_056_moon_jellyfish.png",
+	"releasePool": {
+		"artworkSha256": "1ae212ad13ff8c8afddd979251b3592c3f16c3b300b406b99eaf25ac05a4af7c",
+		"candidateId": "candidate-owner-3b755f245dfd8828be2cb4f96154d5253f3aed4918f0929d",
+		"cellsSha256": "438ac2550be90943b094151ea5e5c8aba2019e93f2324fea9509dafde598b186",
+		"challengeScore": 38.603298479785,
+		"derivation": "EXACT_LOGICAL_OWNER_UPLOAD_TO_CANONICAL_CANDIDATE",
+		"entryDigest": "97277728398d46c4cfb744684ac17bb75a7148ec30231019a06259a110f5998c",
+		"entryFile": "data/Release Pool/Ready/candidate-owner-3b755f245dfd8828be2cb4f96154d5253f3aed4918f0929d-pipeline-952d9f055ee10d47cd77635c-ready.json",
+		"levelSha256": "a83c72d898bba3d1bf0f97ed5ff4591847493631f80d71f2746e20fd86b4f127",
+		"ownerSourceSha256": "3b755f245dfd8828be2cb4f96154d5253f3aed4918f0929d4b20a3ddfe9198a0",
+		"pipelineRunId": "pipeline-952d9f055ee10d47cd77635c",
+		"poolDifficultyClass": "MEDIUM",
+		"sessionLoad": 27.100343841283,
+		"studioReplay": "WON_CANONICAL",
+		"studioSolverStatus": "WON_CANONICAL",
+		"supplyPlanSha256": "f7771a9fb08fd2177ca9e876e4d0e9b1373353bdefc3d12b4f3cac02835c9a98"
+	},
+	"sourcePath": "data/Level Factory/Workspace/Candidates/candidate-owner-3b755f245dfd8828be2cb4f96154d5253f3aed4918f0929d/artwork.png",
+	"sourceSha256": "1ae212ad13ff8c8afddd979251b3592c3f16c3b300b406b99eaf25ac05a4af7c",
+	"usedColorCount": 5,
+	"voidCellCount": 2270,
+	"width": 56
+}

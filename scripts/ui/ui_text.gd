@@ -23,6 +23,7 @@ const EN := {
 	"HOME_RATIO": "%s/%s",
 	"HOME_PLAYER_NAME_DEFAULT": "Scrubby",
 	"HOME_AREA_TITLE": "WHISPERING PARK",
+	"HOME_AREA_WORLD": "%s",
 	"HOME_AREA_NUMBER": "AREA %d",
 	"HOME_LEVEL_COMING_SOON": "Level %d is coming soon.",
 	"HOME_LEVELS_UNAVAILABLE": "Levels unavailable (%s).",
@@ -657,6 +658,10 @@ static func tn(key: String, n: int, args: Array = []) -> String:
 ## Turkish is active, else the data file's own English `fallback`.
 static func data(key: String, fallback: String) -> String:
 	return String(UiTextTr.DATA[key]) if locale == "tr" and UiTextTr.DATA.has(key) else fallback
+
+## Upper case for the active language: Turkish dotted i -> İ (to_upper alone gives I).
+static func caps(s: String) -> String:
+	return (s.replace("i", "İ") if locale == "tr" else s).to_upper()
 
 ## The language to show: a supported saved `choice`, else a supported `device` language, else "en".
 static func resolve_language(choice: String, device: String) -> String:

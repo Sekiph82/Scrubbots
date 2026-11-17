@@ -1,0 +1,56 @@
+{
+	"artworkCellCount": 1098,
+	"builderVersion": "SB-CAMPAIGN-L31-L200/release-pool-import/v1",
+	"cellCount": 3136,
+	"cellReferenceCounts": {
+		"C08": 603,
+		"C11": 10,
+		"C12": 39,
+		"C14": 8,
+		"C15": 36,
+		"C16": 402
+	},
+	"difficulty": "EASY",
+	"firstSeenColorOrder": [
+		"C16",
+		"C08",
+		"C11",
+		"C14",
+		"C12",
+		"C15"
+	],
+	"height": 56,
+	"normalizedColorOrder": [
+		"C08",
+		"C11",
+		"C12",
+		"C14",
+		"C15",
+		"C16"
+	],
+	"outputPath": "res://data/levels/level_082_anglerfish.json",
+	"paletteAuthority": "res://data/palettes/scrubbots_palette_v3.json",
+	"previewPath": "res://assets/art/levels/previews/level_082_anglerfish.png",
+	"releasePool": {
+		"artworkSha256": "2b96f3852021eff3ab744a2e4bd3ac072db1a2cb46c3ebd1e69b3efb1b9dc931",
+		"candidateId": "candidate-owner-8eabaa5458973cc0c697afdf7b944b69ab37720f2c68a879",
+		"cellsSha256": "89b6ee286c678330d111c93ee60acc2f1f4083dbd8f7f122e29680b344b90da0",
+		"challengeScore": 39.8633766022613,
+		"derivation": "EXACT_LOGICAL_OWNER_UPLOAD_TO_CANONICAL_CANDIDATE",
+		"entryDigest": "223e3485acab8e60f7ed3596480c81840e0396f1758bfa3f072c0e696499990c",
+		"entryFile": "data/Release Pool/Ready/candidate-owner-8eabaa5458973cc0c697afdf7b944b69ab37720f2c68a879-pipeline-68d9df14dcd0e257289c7ce4-ready.json",
+		"levelSha256": "eaeec690f0cfa5ee18cb021a837c97defb6d2c716dcf5ff44dd968b35d81493e",
+		"ownerSourceSha256": "8eabaa5458973cc0c697afdf7b944b69ab37720f2c68a87956d8c01b930bb7f9",
+		"pipelineRunId": "pipeline-68d9df14dcd0e257289c7ce4",
+		"poolDifficultyClass": "MEDIUM",
+		"sessionLoad": 34.3798906365282,
+		"studioReplay": "WON_CANONICAL",
+		"studioSolverStatus": "WON_CANONICAL",
+		"supplyPlanSha256": "ea384ccd905fd4f8279bb2dd37f07592cb35b3e90e9b2a6fbaf6b965e10debb7"
+	},
+	"sourcePath": "data/Level Factory/Workspace/Candidates/candidate-owner-8eabaa5458973cc0c697afdf7b944b69ab37720f2c68a879/artwork.png",
+	"sourceSha256": "2b96f3852021eff3ab744a2e4bd3ac072db1a2cb46c3ebd1e69b3efb1b9dc931",
+	"usedColorCount": 6,
+	"voidCellCount": 2038,
+	"width": 56
+}

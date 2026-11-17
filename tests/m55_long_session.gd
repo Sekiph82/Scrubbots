@@ -39,7 +39,8 @@ const WARMUP_CYCLES := 5
 ## (engine-internal caches), and static memory by at most this many bytes.
 const MAX_OBJECT_DRIFT := 64
 const MAX_STATIC_MEM_DRIFT := 4 * 1024 * 1024
-## Every builtin production level (SB-CAMPAIGN-L11-L30: 30 since 2026-10-30); frontier LEVELS+1 has no content.
+## The first 30 builtin production levels (SB-CAMPAIGN-L31-L200: the catalog holds 200 since 2026-11-17;
+## playing all of them twice is too slow for CI). The lap stops on Home after Level LEVELS without pressing PLAY.
 const LEVELS := 30
 const DT := RealPlayDriver.CANONICAL_DT
 ## Feel-quiescence sampling (QUIESCENCE-QA-R01): one monotonic deadline for the whole wait.
@@ -359,15 +360,13 @@ func _long_session(root, base: Dictionary, lap: int) -> Dictionary:
 		var home_ok: bool = nav.current() == NavigationController.Route.HOME and _routes.size() == rt0 and root.get_gameplay_host() == null
 		if not home_ok:
 			dup_bad.append([n, "home", _routes.size() - rt0])
-		var cont_ok := 1 if root.play_current_frontier().get("ok", false) else 0
+		var cont_ok := 1 if n < LEVELS and root.play_current_frontier().get("ok", false) else 0
 		await _settle()
 		var s := _sample(root)
 		per_level.append([n, cells, d["frames"], d["clicks"], got_sb, s["nodes"], s["orphans"], s["objects"], s["static_mem"]])
 		if n < LEVELS:
 			if cont_ok != 1 or s["hosts"] != 1 or nav.current() != NavigationController.Route.GAMEPLAY:
 				dup_bad.append([n, "play", cont_ok, s["hosts"]])
-		elif cont_ok != 0:
-			dup_bad.append([n, "play past content", cont_ok])
 	var ms := Time.get_ticks_msec() - t0
 	print("    per level [n, cells, frames, clicks, SB, nodes, orphans, objects, static_mem]:")
 	for row in per_level:
@@ -379,9 +378,13 @@ func _long_session(root, base: Dictionary, lap: int) -> Dictionary:
 	_ok(signal_bad.is_empty(), "each level: exactly one HOME transition (no Results) and one clear event per cell %s" % str(signal_bad))
 	_ok(reward_bad.is_empty(), "each WON: SB == first_clear_sb(class) + win_streak_sb(position), reward tx grew, Bot Parts grew, streak +1 %s" % str(reward_bad))
 	_ok(dup_bad.is_empty(), "re-emitted terminal / re-run handler / re-committed FirstClear / 10 Back presses: zero extra SB, tx, routes; Home PLAY -> exactly one next host %s" % str(dup_bad))
-	# After frontier LEVELS + 1 (no content) return HOME and compare with the transition baseline.
-	_ok(nav.current() == NavigationController.Route.HOME, "WON -> HOME after Level %d (no content past it)" % LEVELS)
+	# After Level LEVELS stay on HOME (PLAY not pressed) and compare with the transition baseline.
+	_ok(nav.current() == NavigationController.Route.HOME, "WON -> HOME after Level %d" % LEVELS)
 	await _settle()
+	# The last win's Home reward flight (SB-HOME-FLIGHT-LOCK, ~5 s of staggered REWARD pickups) now
+	# plays out on Home; wait for its own completion (bounded by its safety timer) before the quiet rule.
+	if root.get_home().is_reward_flight_running():
+		await root.get_home().reward_flight_finished
 	# Sample at feel quiescence: presentation-feel bursts (the win's Home reward pickups, the Home
 	# ceremony's REWARD burst) are transient Nodes the adapter frees within its per-tier ceiling
 	# (<= 1.3 s). Counting one mid-flight is timing noise, not a leak; a leaked burst would

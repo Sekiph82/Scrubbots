@@ -1,0 +1,53 @@
+{
+	"artworkCellCount": 1073,
+	"builderVersion": "SB-CAMPAIGN-L31-L200/release-pool-import/v1",
+	"cellCount": 3136,
+	"cellReferenceCounts": {
+		"C04": 59,
+		"C11": 79,
+		"C12": 21,
+		"C14": 449,
+		"C16": 465
+	},
+	"difficulty": "MEDIUM",
+	"firstSeenColorOrder": [
+		"C16",
+		"C14",
+		"C11",
+		"C04",
+		"C12"
+	],
+	"height": 56,
+	"normalizedColorOrder": [
+		"C04",
+		"C11",
+		"C12",
+		"C14",
+		"C16"
+	],
+	"outputPath": "res://data/levels/level_048_robo_hound.json",
+	"paletteAuthority": "res://data/palettes/scrubbots_palette_v3.json",
+	"previewPath": "res://assets/art/levels/previews/level_048_robo_hound.png",
+	"releasePool": {
+		"artworkSha256": "23980889b7ede35f8502a0c8344c00440b5739e8178c67f19969a962a08cc5ef",
+		"candidateId": "candidate-owner-5ff86b87f2d8ad12c044afc00e33639e2e122d524c5c4b30",
+		"cellsSha256": "5345c155eff041d7d74de9a0a0673162e1db11eea91b521ed8c74926d4c8be4c",
+		"challengeScore": 44.4300246214608,
+		"derivation": "EXACT_LOGICAL_OWNER_UPLOAD_TO_CANONICAL_CANDIDATE",
+		"entryDigest": "378df34fea18a6315c3434d5a56bd19f6e77616482c5f94d4e0c1ebf1f953eba",
+		"entryFile": "data/Release Pool/Ready/candidate-owner-5ff86b87f2d8ad12c044afc00e33639e2e122d524c5c4b30-pipeline-937c34cb19f417704ad3743a-ready.json",
+		"levelSha256": "3179c11d1014590d155a4a89a63fbeda2a3afa9cd035156eb3010a74460b1fc2",
+		"ownerSourceSha256": "5ff86b87f2d8ad12c044afc00e33639e2e122d524c5c4b30aa5ddc384016a531",
+		"pipelineRunId": "pipeline-937c34cb19f417704ad3743a",
+		"poolDifficultyClass": "MEDIUM",
+		"sessionLoad": 33.4208085777451,
+		"studioReplay": "WON_CANONICAL",
+		"studioSolverStatus": "WON_CANONICAL",
+		"supplyPlanSha256": "8523f66f12fe1c5075103fe2ac02d1c351b93f551874c071326769e58a94b1cf"
+	},
+	"sourcePath": "data/Level Factory/Workspace/Candidates/candidate-owner-5ff86b87f2d8ad12c044afc00e33639e2e122d524c5c4b30/artwork.png",
+	"sourceSha256": "23980889b7ede35f8502a0c8344c00440b5739e8178c67f19969a962a08cc5ef",
+	"usedColorCount": 5,
+	"voidCellCount": 2063,
+	"width": 56
+}

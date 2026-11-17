@@ -270,7 +270,7 @@ func _catalog_and_resolver() -> void:
 	var cat = LevelCatalog.new()
 	var lr = cat.load_manifest()
 	_ok(lr.ok, "production catalog validates (plans loaded fail-closed) %s" % lr.summary())
-	# SB-CAMPAIGN-L11-L30: L11..L30 follow (tests/campaign_l11_l30.gd); this suite owns L1..L10.
+	# SB-CAMPAIGN-L11-L30 / L31-L200: L11..L200 follow (tests/campaign_l11_l30.gd, campaign_l31_l200.gd); this suite owns L1..L10.
 	var got: Array = cat.get_entries_ordered().slice(0, 10)
 	var expect_ids: Array = ["m21_level_001_hazard_bot"] + PLAN_LEVELS
 	var ids: Array = []
@@ -278,7 +278,7 @@ func _catalog_and_resolver() -> void:
 	for e in got:
 		ids.append(e.id)
 		orders.append(e.order)
-	_ok(cat.size() == 30 and ids == expect_ids and orders == [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "production catalog orders 1..10 -> %s (30 total)" % str(ids))
+	_ok(cat.size() == 200 and ids == expect_ids and orders == [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "production catalog orders 1..10 -> %s (200 total)" % str(ids))
 	for e in got:
 		var want := "" if e.order == 1 else plan_path(e.id)
 		_ok(e.supply_plan_path == want, "order %d plan path '%s'" % [e.order, e.supply_plan_path])
@@ -288,7 +288,7 @@ func _catalog_and_resolver() -> void:
 		_ok(r["ok"] and int(r["level"]) == n and r["entry_id"] == expect_ids[n - 1], "frontier %d -> %s" % [n, r.get("entry_id", r.get("reason"))])
 		app.progression.record_win(n)
 	var r11: Dictionary = GameplayLaunchResolver.resolve(app)
-	_ok(r11["ok"] and r11["entry_id"] == "level_011_duckling", "frontier 11 -> level_011_duckling (end of catalog moved to 31)")
+	_ok(r11["ok"] and r11["entry_id"] == "level_011_duckling", "frontier 11 -> level_011_duckling (end of catalog moved to 201)")
 	var entries: Array = JSON.parse_string(FileAccess.get_file_as_string(LevelCatalog.DEFAULT_MANIFEST_PATH))["entries"]
 	# fail-closed catalog entries
 	var bad := entries.duplicate(true)

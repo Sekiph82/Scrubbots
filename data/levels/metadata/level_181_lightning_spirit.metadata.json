@@ -1,0 +1,62 @@
+{
+	"artworkCellCount": 993,
+	"builderVersion": "SB-CAMPAIGN-L31-L200/release-pool-import/v1",
+	"cellCount": 3136,
+	"cellReferenceCounts": {
+		"C02": 177,
+		"C03": 84,
+		"C08": 42,
+		"C09": 469,
+		"C11": 11,
+		"C12": 172,
+		"C13": 8,
+		"C14": 30
+	},
+	"difficulty": "EASY",
+	"firstSeenColorOrder": [
+		"C02",
+		"C12",
+		"C08",
+		"C03",
+		"C09",
+		"C13",
+		"C14",
+		"C11"
+	],
+	"height": 56,
+	"normalizedColorOrder": [
+		"C02",
+		"C03",
+		"C08",
+		"C09",
+		"C11",
+		"C12",
+		"C13",
+		"C14"
+	],
+	"outputPath": "res://data/levels/level_181_lightning_spirit.json",
+	"paletteAuthority": "res://data/palettes/scrubbots_palette_v3.json",
+	"previewPath": "res://assets/art/levels/previews/level_181_lightning_spirit.png",
+	"releasePool": {
+		"artworkSha256": "d1e8f764cf2ec67f81bfe63666b00440c8bc235b7259203064ea3d55e2392dd4",
+		"candidateId": "candidate-owner-48cf492b4cd935dc33ef4cdd2340c176375c6c10fbf1e8ac",
+		"cellsSha256": "8d250d899222ddca4efe2cb4e3cf085e52185bfd1cc978b924d67a7da57e503a",
+		"challengeScore": 42.6145276795788,
+		"derivation": "EXACT_LOGICAL_OWNER_UPLOAD_TO_CANONICAL_CANDIDATE",
+		"entryDigest": "839a271fc8984622f842b1524f6023749c7601435a25264af4c1a7b9b1b881a9",
+		"entryFile": "data/Release Pool/Ready/candidate-owner-48cf492b4cd935dc33ef4cdd2340c176375c6c10fbf1e8ac-pipeline-dd15c69cbe0d40f0e7234a42-ready.json",
+		"levelSha256": "b5b6eb11cc61b13f4a17c09271d560b84847b3478960b4a8549829c9701ab580",
+		"ownerSourceSha256": "48cf492b4cd935dc33ef4cdd2340c176375c6c10fbf1e8acb2f392d6b11a1045",
+		"pipelineRunId": "pipeline-dd15c69cbe0d40f0e7234a42",
+		"poolDifficultyClass": "MEDIUM",
+		"sessionLoad": 31.733552211879,
+		"studioReplay": "WON_CANONICAL",
+		"studioSolverStatus": "WON_CANONICAL",
+		"supplyPlanSha256": "56a41e0eef05793748b875ad4227442a89d514a0f08e805415a2b51f960c8f91"
+	},
+	"sourcePath": "data/Level Factory/Workspace/Candidates/candidate-owner-48cf492b4cd935dc33ef4cdd2340c176375c6c10fbf1e8ac/artwork.png",
+	"sourceSha256": "d1e8f764cf2ec67f81bfe63666b00440c8bc235b7259203064ea3d55e2392dd4",
+	"usedColorCount": 8,
+	"voidCellCount": 2143,
+	"width": 56
+}

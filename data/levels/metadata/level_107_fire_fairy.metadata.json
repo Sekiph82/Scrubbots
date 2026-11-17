@@ -1,0 +1,56 @@
+{
+	"artworkCellCount": 942,
+	"builderVersion": "SB-CAMPAIGN-L31-L200/release-pool-import/v1",
+	"cellCount": 3136,
+	"cellReferenceCounts": {
+		"C01": 139,
+		"C02": 176,
+		"C03": 79,
+		"C11": 177,
+		"C14": 194,
+		"C16": 177
+	},
+	"difficulty": "EASY",
+	"firstSeenColorOrder": [
+		"C11",
+		"C01",
+		"C02",
+		"C16",
+		"C03",
+		"C14"
+	],
+	"height": 56,
+	"normalizedColorOrder": [
+		"C01",
+		"C02",
+		"C03",
+		"C11",
+		"C14",
+		"C16"
+	],
+	"outputPath": "res://data/levels/level_107_fire_fairy.json",
+	"paletteAuthority": "res://data/palettes/scrubbots_palette_v3.json",
+	"previewPath": "res://assets/art/levels/previews/level_107_fire_fairy.png",
+	"releasePool": {
+		"artworkSha256": "7aeeab55f27c934eb334052cbe620a8d3152e257861350b951d592acf5d4842a",
+		"candidateId": "candidate-owner-8f8fd69d23ef5707a54218b46aa5a688bd26eb4ff88ee260",
+		"cellsSha256": "dbf23012e0636dbf5f65dc9d61634ae0a4e6084a1ed0c0322f5d1162a454d996",
+		"challengeScore": 40.7145540626704,
+		"derivation": "EXACT_LOGICAL_OWNER_UPLOAD_TO_CANONICAL_CANDIDATE",
+		"entryDigest": "063be61c26a5656cbb5fbbbeeffbce17755122a0dad3b0eeab54429cbcb7981e",
+		"entryFile": "data/Release Pool/Ready/candidate-owner-8f8fd69d23ef5707a54218b46aa5a688bd26eb4ff88ee260-pipeline-1a7074a265619dfa1bb40082-ready.json",
+		"levelSha256": "f1c0e82c3564e59a4bf1279524f8b39dc07bab987771bd6a99f632a08f80bb52",
+		"ownerSourceSha256": "8f8fd69d23ef5707a54218b46aa5a688bd26eb4ff88ee260a7a266070595c70b",
+		"pipelineRunId": "pipeline-1a7074a265619dfa1bb40082",
+		"poolDifficultyClass": "MEDIUM",
+		"sessionLoad": 30.552387900914,
+		"studioReplay": "WON_CANONICAL",
+		"studioSolverStatus": "WON_CANONICAL",
+		"supplyPlanSha256": "a49bb7ff8fa426eabfccaa76545a78afb015515e935c319a76c2620b33e8d8d7"
+	},
+	"sourcePath": "data/Level Factory/Workspace/Candidates/candidate-owner-8f8fd69d23ef5707a54218b46aa5a688bd26eb4ff88ee260/artwork.png",
+	"sourceSha256": "7aeeab55f27c934eb334052cbe620a8d3152e257861350b951d592acf5d4842a",
+	"usedColorCount": 6,
+	"voidCellCount": 2194,
+	"width": 56
+}

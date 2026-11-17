@@ -1,0 +1,56 @@
+{
+	"artworkCellCount": 1726,
+	"builderVersion": "SB-CAMPAIGN-L31-L200/release-pool-import/v1",
+	"cellCount": 3136,
+	"cellReferenceCounts": {
+		"C05": 249,
+		"C08": 459,
+		"C11": 5,
+		"C13": 16,
+		"C14": 525,
+		"C16": 472
+	},
+	"difficulty": "VERY_HARD",
+	"firstSeenColorOrder": [
+		"C16",
+		"C14",
+		"C05",
+		"C13",
+		"C08",
+		"C11"
+	],
+	"height": 56,
+	"normalizedColorOrder": [
+		"C05",
+		"C08",
+		"C11",
+		"C13",
+		"C14",
+		"C16"
+	],
+	"outputPath": "res://data/levels/level_200_sea_wyrm.json",
+	"paletteAuthority": "res://data/palettes/scrubbots_palette_v3.json",
+	"previewPath": "res://assets/art/levels/previews/level_200_sea_wyrm.png",
+	"releasePool": {
+		"artworkSha256": "ed995537d8cbfc11aaf8b856093c5a6ff110caf0effaec50d3f65a0d9bdc4089",
+		"candidateId": "candidate-owner-f8b09bed55b75dcb07e68f182c1175d642c06f32b161e661",
+		"cellsSha256": "d707c0ff31dc4047e50632119241060457a1f83f2ae8091cbeee71cf6fbf0860",
+		"challengeScore": 59.6523277290646,
+		"derivation": "EXACT_LOGICAL_OWNER_UPLOAD_TO_CANONICAL_CANDIDATE",
+		"entryDigest": "3ec6549555394e886bf5946a8dae4f0a9a06908405e6b35102f78eec2dfa6ce3",
+		"entryFile": "data/Release Pool/Ready/candidate-owner-f8b09bed55b75dcb07e68f182c1175d642c06f32b161e661-pipeline-338a891908e6f34fb1fe20cd-ready.json",
+		"levelSha256": "1c18e3215f6dcaee8508c42854ea027a8a4c447356e794fc716372870ec2a189",
+		"ownerSourceSha256": "f8b09bed55b75dcb07e68f182c1175d642c06f32b161e66191ea1ee6d40de5aa",
+		"pipelineRunId": "pipeline-338a891908e6f34fb1fe20cd",
+		"poolDifficultyClass": "HARD",
+		"sessionLoad": 53.2430489084515,
+		"studioReplay": "WON_CANONICAL",
+		"studioSolverStatus": "WON_CANONICAL",
+		"supplyPlanSha256": "b56192c6c85ba0fd04316776892749565e89561efd42b8b8aa5770e541448049"
+	},
+	"sourcePath": "data/Level Factory/Workspace/Candidates/candidate-owner-f8b09bed55b75dcb07e68f182c1175d642c06f32b161e661/artwork.png",
+	"sourceSha256": "ed995537d8cbfc11aaf8b856093c5a6ff110caf0effaec50d3f65a0d9bdc4089",
+	"usedColorCount": 6,
+	"voidCellCount": 1410,
+	"width": 56
+}

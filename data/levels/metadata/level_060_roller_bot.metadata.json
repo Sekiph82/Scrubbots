@@ -1,0 +1,56 @@
+{
+	"artworkCellCount": 1332,
+	"builderVersion": "SB-CAMPAIGN-L31-L200/release-pool-import/v1",
+	"cellCount": 3136,
+	"cellReferenceCounts": {
+		"C04": 409,
+		"C07": 238,
+		"C08": 122,
+		"C14": 295,
+		"C15": 6,
+		"C16": 262
+	},
+	"difficulty": "VERY_HARD",
+	"firstSeenColorOrder": [
+		"C16",
+		"C08",
+		"C07",
+		"C14",
+		"C15",
+		"C04"
+	],
+	"height": 56,
+	"normalizedColorOrder": [
+		"C04",
+		"C07",
+		"C08",
+		"C14",
+		"C15",
+		"C16"
+	],
+	"outputPath": "res://data/levels/level_060_roller_bot.json",
+	"paletteAuthority": "res://data/palettes/scrubbots_palette_v3.json",
+	"previewPath": "res://assets/art/levels/previews/level_060_roller_bot.png",
+	"releasePool": {
+		"artworkSha256": "aa9f91557ae3b9f412931c1f90cb881e874b979f4b5889a99c954cb87db95e09",
+		"candidateId": "candidate-owner-0be1bb8688a96b51bf1c66fcca1416fe0763704630d79dc1",
+		"cellsSha256": "c751bca32b96122f548679c102eaf5aefd1eee7aefc7b7e48a8d078a22276b35",
+		"challengeScore": 55.3424530563844,
+		"derivation": "EXACT_LOGICAL_OWNER_UPLOAD_TO_CANONICAL_CANDIDATE",
+		"entryDigest": "9408ba108ad955a2167d5f5a2d155a47553973c21b62df67da214528fbee61fb",
+		"entryFile": "data/Release Pool/Ready/candidate-owner-0be1bb8688a96b51bf1c66fcca1416fe0763704630d79dc1-pipeline-b5c8eb1ba76c08cefe51e094-ready.json",
+		"levelSha256": "1379645a7df7d1cb307ffe6dade3cee4d52def2a540180cc3b91d9bc74fe5ca3",
+		"ownerSourceSha256": "0be1bb8688a96b51bf1c66fcca1416fe0763704630d79dc18b3043798109187c",
+		"pipelineRunId": "pipeline-b5c8eb1ba76c08cefe51e094",
+		"poolDifficultyClass": "HARD",
+		"sessionLoad": 42.2790219547939,
+		"studioReplay": "WON_CANONICAL",
+		"studioSolverStatus": "WON_CANONICAL",
+		"supplyPlanSha256": "ad7fa82257c3777bbbb60d067f3d5715564ffe182f343137c19779e465cc49ab"
+	},
+	"sourcePath": "data/Level Factory/Workspace/Candidates/candidate-owner-0be1bb8688a96b51bf1c66fcca1416fe0763704630d79dc1/artwork.png",
+	"sourceSha256": "aa9f91557ae3b9f412931c1f90cb881e874b979f4b5889a99c954cb87db95e09",
+	"usedColorCount": 6,
+	"voidCellCount": 1804,
+	"width": 56
+}

@@ -1,0 +1,53 @@
+{
+	"artworkCellCount": 890,
+	"builderVersion": "SB-CAMPAIGN-L31-L200/release-pool-import/v1",
+	"cellCount": 3136,
+	"cellReferenceCounts": {
+		"C06": 241,
+		"C07": 97,
+		"C08": 276,
+		"C13": 96,
+		"C15": 180
+	},
+	"difficulty": "EASY",
+	"firstSeenColorOrder": [
+		"C08",
+		"C06",
+		"C15",
+		"C13",
+		"C07"
+	],
+	"height": 56,
+	"normalizedColorOrder": [
+		"C06",
+		"C07",
+		"C08",
+		"C13",
+		"C15"
+	],
+	"outputPath": "res://data/levels/level_167_ice_dragonfly.json",
+	"paletteAuthority": "res://data/palettes/scrubbots_palette_v3.json",
+	"previewPath": "res://assets/art/levels/previews/level_167_ice_dragonfly.png",
+	"releasePool": {
+		"artworkSha256": "af20d36784ee6412da1ad680d1d95d50fa3342a6becb9684ebbd0d1e19af7bdc",
+		"candidateId": "candidate-owner-7063efbbe4f33ccf6c0d15aface404276cf01cbd0e8e4ccd",
+		"cellsSha256": "72e906eb7bc4f0aef7c71ef315fa77afe972dcbf9fba094b5fea843f10af7790",
+		"challengeScore": 42.3340413767468,
+		"derivation": "EXACT_LOGICAL_OWNER_UPLOAD_TO_CANONICAL_CANDIDATE",
+		"entryDigest": "ece080fc38549b1818634b1fbb5c59a32dd8bbcb62d024e2abfa3d32e76f7db0",
+		"entryFile": "data/Release Pool/Ready/candidate-owner-7063efbbe4f33ccf6c0d15aface404276cf01cbd0e8e4ccd-pipeline-5c17df8054045fb636545a66-ready.json",
+		"levelSha256": "c9ca24dc1f46303d0edf2f7acede15fcab41730e1fcc020ba392f81af8db5bcb",
+		"ownerSourceSha256": "7063efbbe4f33ccf6c0d15aface404276cf01cbd0e8e4ccd0652dd4188d42f3a",
+		"pipelineRunId": "pipeline-5c17df8054045fb636545a66",
+		"poolDifficultyClass": "MEDIUM",
+		"sessionLoad": 28.2489052380201,
+		"studioReplay": "WON_CANONICAL",
+		"studioSolverStatus": "WON_CANONICAL",
+		"supplyPlanSha256": "e68a2c6d69e50e25076e491bda3874ed21db6a6f0b6cd065cef51121b598decb"
+	},
+	"sourcePath": "data/Level Factory/Workspace/Candidates/candidate-owner-7063efbbe4f33ccf6c0d15aface404276cf01cbd0e8e4ccd/artwork.png",
+	"sourceSha256": "af20d36784ee6412da1ad680d1d95d50fa3342a6becb9684ebbd0d1e19af7bdc",
+	"usedColorCount": 5,
+	"voidCellCount": 2246,
+	"width": 56
+}

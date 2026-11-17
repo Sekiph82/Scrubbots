@@ -1,0 +1,56 @@
+{
+	"artworkCellCount": 957,
+	"builderVersion": "SB-CAMPAIGN-L31-L200/release-pool-import/v1",
+	"cellCount": 3136,
+	"cellReferenceCounts": {
+		"C06": 21,
+		"C08": 97,
+		"C11": 3,
+		"C13": 20,
+		"C14": 502,
+		"C16": 314
+	},
+	"difficulty": "EASY",
+	"firstSeenColorOrder": [
+		"C16",
+		"C14",
+		"C13",
+		"C08",
+		"C06",
+		"C11"
+	],
+	"height": 56,
+	"normalizedColorOrder": [
+		"C06",
+		"C08",
+		"C11",
+		"C13",
+		"C14",
+		"C16"
+	],
+	"outputPath": "res://data/levels/level_161_radio_bot.json",
+	"paletteAuthority": "res://data/palettes/scrubbots_palette_v3.json",
+	"previewPath": "res://assets/art/levels/previews/level_161_radio_bot.png",
+	"releasePool": {
+		"artworkSha256": "f391eed69675b848d21c2d4a67fc8517e67acfd33e2574c4fc924356c7912618",
+		"candidateId": "candidate-owner-64c28231dedffc5a56ac1188042f39b674d4a427163482cb",
+		"cellsSha256": "4264d42ffc54b28684ee3070a0e943ba4194ac7b3ec658ce8bb49797765f4d9c",
+		"challengeScore": 42.1612329466173,
+		"derivation": "EXACT_LOGICAL_OWNER_UPLOAD_TO_CANONICAL_CANDIDATE",
+		"entryDigest": "f018295695bb2e98f286714732b1af93757d5e32e4658752d1b2999dec61a6f6",
+		"entryFile": "data/Release Pool/Ready/candidate-owner-64c28231dedffc5a56ac1188042f39b674d4a427163482cb-pipeline-e17e54c47cbb60b750f715da-ready.json",
+		"levelSha256": "d14017a7f04cc199eb1028c9dbe16d9f8e13179fc4aee763a5e75a601ba20562",
+		"ownerSourceSha256": "64c28231dedffc5a56ac1188042f39b674d4a427163482cb00b076131cf84409",
+		"pipelineRunId": "pipeline-e17e54c47cbb60b750f715da",
+		"poolDifficultyClass": "MEDIUM",
+		"sessionLoad": 29.4041654586131,
+		"studioReplay": "WON_CANONICAL",
+		"studioSolverStatus": "WON_CANONICAL",
+		"supplyPlanSha256": "5a3a188efbb04b80405c1ac6d6a9e5e31bd39d562ff25866b740c0437620a7d9"
+	},
+	"sourcePath": "data/Level Factory/Workspace/Candidates/candidate-owner-64c28231dedffc5a56ac1188042f39b674d4a427163482cb/artwork.png",
+	"sourceSha256": "f391eed69675b848d21c2d4a67fc8517e67acfd33e2574c4fc924356c7912618",
+	"usedColorCount": 6,
+	"voidCellCount": 2179,
+	"width": 56
+}

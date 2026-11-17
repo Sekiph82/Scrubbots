@@ -1,0 +1,56 @@
+{
+	"artworkCellCount": 1258,
+	"builderVersion": "SB-CAMPAIGN-L31-L200/release-pool-import/v1",
+	"cellCount": 3136,
+	"cellReferenceCounts": {
+		"C06": 328,
+		"C07": 769,
+		"C08": 52,
+		"C14": 34,
+		"C15": 3,
+		"C16": 72
+	},
+	"difficulty": "HARD",
+	"firstSeenColorOrder": [
+		"C08",
+		"C06",
+		"C07",
+		"C16",
+		"C15",
+		"C14"
+	],
+	"height": 56,
+	"normalizedColorOrder": [
+		"C06",
+		"C07",
+		"C08",
+		"C14",
+		"C15",
+		"C16"
+	],
+	"outputPath": "res://data/levels/level_125_blue_slime.json",
+	"paletteAuthority": "res://data/palettes/scrubbots_palette_v3.json",
+	"previewPath": "res://assets/art/levels/previews/level_125_blue_slime.png",
+	"releasePool": {
+		"artworkSha256": "ba0768796408aa968c417a478c4b797e738f439ec2a9cca9ebe7da69c3155844",
+		"candidateId": "candidate-owner-1ec76425bc4438b7a2f79b505d79e02c58c63712a7b90f50",
+		"cellsSha256": "abdf9079b840e5792e183f0b75914241f5921084e045c14ad9b66fe1242a564e",
+		"challengeScore": 52.0891456968388,
+		"derivation": "EXACT_LOGICAL_OWNER_UPLOAD_TO_CANONICAL_CANDIDATE",
+		"entryDigest": "28ca3d0777a215b8307dfef0b7752af0b96934de197d0bbb8a49b4e929021634",
+		"entryFile": "data/Release Pool/Ready/candidate-owner-1ec76425bc4438b7a2f79b505d79e02c58c63712a7b90f50-pipeline-9e9408b35679bc4f43d54692-ready.json",
+		"levelSha256": "1eb198623a327822f7b1b3fe4542f44342a903d58a0b07355ea6ebf7dbc2ccf9",
+		"ownerSourceSha256": "1ec76425bc4438b7a2f79b505d79e02c58c63712a7b90f501f6b51bb51829ae5",
+		"pipelineRunId": "pipeline-9e9408b35679bc4f43d54692",
+		"poolDifficultyClass": "HARD",
+		"sessionLoad": 36.7793617289309,
+		"studioReplay": "WON_CANONICAL",
+		"studioSolverStatus": "WON_CANONICAL",
+		"supplyPlanSha256": "7f66a2a3f2b31e1b15c39b1dd4e249c21d4c0d03333b102d87027a06d26a9d76"
+	},
+	"sourcePath": "data/Level Factory/Workspace/Candidates/candidate-owner-1ec76425bc4438b7a2f79b505d79e02c58c63712a7b90f50/artwork.png",
+	"sourceSha256": "ba0768796408aa968c417a478c4b797e738f439ec2a9cca9ebe7da69c3155844",
+	"usedColorCount": 6,
+	"voidCellCount": 1878,
+	"width": 56
+}

@@ -44,6 +44,7 @@ name: Android Family First10 APK
 # SB-COL-NAV-001 Collection set NEW-count badge + set detail prev/next: k18/k19 in m43_master_c007_collection (59 total, C007 guard now exact 19/19).
 # SB-M43-R07-001..006 earned-pack pity + First Collection Sprint tuning: + m43_master_c007r_pity (60 total, exact 11/11 guard).
 # SB-CAMPAIGN-L11-L30 20 release-pool levels as campaign L11..L30: + campaign_l11_l30 (61 total, exact 5/5 guard).
+# SB-CAMPAIGN-L31-L200 170 release-pool levels as campaign L31..L200: + campaign_l31_l200 (exact 5/5 guard; data checks only, the real-play gate ran at import).
 # SB-M43-122 RANKS personal rank ladder: + m43_personal_ranks (62 total, exact 8/8 guard).
 # SB-M43-131/132 RANKS two tables (all-time + weekly, Monday 00:00 UTC reset): + m43_ranks_weekly (exact 7/7 guard).
 # SB-CAMPAIGN-RUNTIME-KERNEL-DIVERGENCE real-play shippability gate: + real_play_levels (63 total, exact 5/5 guard).
@@ -188,7 +189,7 @@ jobs:
                    m43_c005_c072_feature_unlock_ceremony m43_c005_c074_c077_celebrations \
                    m43_master_c005r_gift_micro_progress sb_polish_002_gift_meter sb_gift_meter_48h sb_polish_004_006_ui_batch sb_phone_2026_11_12_c_copy_state sb_polish_003_booster_vfx sb_m22_008_polish_013_slot_fx m43_master_c005_meta_ceremonies m43_c005f_phase6_unlock_feel \
                    m43_master_c006_shop m43_master_c007_collection m54_collection_set_master_exactly_once m43_master_c008_robots m54_regression_pack_022_027 \
-                   m43_master_c010_meta m43_master_c011_c014 m44_pending_packs_gate m44_meta_l1_unlock_ftue m44_meta_verify_achievements_gift m43_master_c007r_pity campaign_l11_l30 m43_personal_ranks real_play_levels real_play_file_cli ui_vis_006_asset_qa m59_app_version m56_analytics_taxonomy m58_privacy_inventory m58_privacy_consent m54_regression_pack_028_036 m43_172_local_notifications m54_world_regression m60_release_gates m43_ranks_weekly m44_featured_card_onboarding m57_store_products m44_robot_assembly_stages m54_regression_pack_037_038 m57_ads_cadence m54_cloud_save_seam m49_ad_store_return_layout board_bg01_backdrop sb_phone_2026_11_12_e_win_home sb_phone_2026_11_12_f_slot_pop_hold difficulty_v1_identical_output; do
+                   m43_master_c010_meta m43_master_c011_c014 m44_pending_packs_gate m44_meta_l1_unlock_ftue m44_meta_verify_achievements_gift m43_master_c007r_pity campaign_l11_l30 campaign_l31_l200 m43_personal_ranks real_play_levels real_play_file_cli ui_vis_006_asset_qa m59_app_version m56_analytics_taxonomy m58_privacy_inventory m58_privacy_consent m54_regression_pack_028_036 m43_172_local_notifications m54_world_regression m60_release_gates m43_ranks_weekly m44_featured_card_onboarding m57_store_products m44_robot_assembly_stages m54_regression_pack_037_038 m57_ads_cadence m54_cloud_save_seam m49_ad_store_return_layout board_bg01_backdrop sb_phone_2026_11_12_e_win_home sb_phone_2026_11_12_f_slot_pop_hold difficulty_v1_identical_output; do
             L="validate_logs/$s.log"
             if [ ! -f "tests/$s.gd" ]; then echo "$s MISSING tests/$s.gd status=FAIL" | tee -a "$S"; fail=1; continue; fi
             if timeout 1500 "$GODOT" --headless --path . -s "res://tests/$s.gd" > "$L" 2>&1; then ec=0; else ec=$?; fi
@@ -386,6 +387,11 @@ jobs:
             echo "CAMPAIGN-L11-L30 verdict=PASS (5/5)" | tee -a "$S"
           else
             echo "CAMPAIGN-L11-L30 verdict=FAIL (exact 5/5 summary missing)" | tee -a "$S"; fail=1
+          fi
+          if grep -qxF 'CAMPAIGN L31-L200 evidence: PASS (5/5 cases, 0 fail)' validate_logs/campaign_l31_l200.log 2>/dev/null; then
+            echo "CAMPAIGN-L31-L200 verdict=PASS (5/5)" | tee -a "$S"
+          else
+            echo "CAMPAIGN-L31-L200 verdict=FAIL (exact 5/5 summary missing)" | tee -a "$S"; fail=1
           fi
           if grep -qxF 'M54 COLLECTION SET/MASTER EXACTLY-ONCE: PASS' validate_logs/m54_collection_set_master_exactly_once.log 2>/dev/null; then
             echo "M54-COLLECTION verdict=PASS" | tee -a "$S"

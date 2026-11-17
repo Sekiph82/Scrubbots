@@ -193,20 +193,38 @@ func _no_duplicates(home) -> void:
 	# SB-HOME-BG-2026-11-16: the area name is native text (no longer baked into the art).
 	var title: Label = home.get_region("HomeAreaTitle")
 	var number: Label = home.get_region("HomeAreaNumber")
-	_ok(title.text == UiText.t("HOME_AREA_TITLE") and number.text == UiText.t("HOME_AREA_NUMBER", [1]) and title.is_visible_in_tree() and number.is_visible_in_tree(), "native area label: %s / %s" % [title.text, number.text])
+	_ok(title.text == "WHISPERING PARK" and number.text == UiText.t("HOME_AREA_NUMBER", [1]) and title.is_visible_in_tree() and number.is_visible_in_tree(), "native area label: %s / %s" % [title.text, number.text])
 	_ok(title.get_theme_constant("outline_size") >= 9 and home.get_region("HomeAreaLabel").get_parent() == home.get_region("Layer_characters"), "area label outlined, in the world character layer (below all live UI)")
 	var prev_locale := UiText.locale
 	UiText.locale = "tr"
 	home.refresh()
-	_ok(title.text == "FISILTILI PARK" and number.text == "BÖLGE 1", "TR area label: %s / %s" % [title.text, number.text])
+	_ok(title.text == "FISILTILI PARK" and number.text == "BÖLGE 1" and _area_fits(home), "TR area label: %s / %s" % [title.text, number.text])
+	# Owner 2026-11-17: the title follows the current world's name (worlds_v1: L151 = world 2).
+	var app = home.get_app_state()
+	var lvl: int = app.progression.current_level()
+	app.progression.debug_set_current_level(151)
+	home.refresh()
+	_ok(title.text == "KÖPÜK MAHALLESİ" and number.text == "BÖLGE 2" and _area_fits(home), "TR world 2 area label: %s / %s" % [title.text, number.text])
 	UiText.locale = prev_locale
 	home.refresh()
+	_ok(title.text == "BUBBLE DISTRICT" and number.text == "AREA 2" and _area_fits(home), "world 2 area label: %s / %s" % [title.text, number.text])
+	app.progression.debug_set_current_level(lvl)
+	home.refresh()
+	_ok(title.text == "WHISPERING PARK" and number.text == "AREA 1" and _area_fits(home), "back on world 1: %s / %s" % [title.text, number.text])
 	var tex_count := 0
 	for n in home.find_children("*", "TextureRect", true, false):
 		if (n as TextureRect).texture != null and (n as TextureRect).texture.resource_path == WORLD_PATH and n.is_visible_in_tree():
 			tex_count += 1
 	_ok(tex_count == 1, "at 1:2 the world image is drawn exactly once (%d)" % tex_count)
 	_complete("no_duplicate_world_art")
+
+## Both area label lines are one line and their text fits the label width.
+func _area_fits(home) -> bool:
+	for n in ["HomeAreaTitle", "HomeAreaNumber"]:
+		var l: Label = home.get_region(n)
+		if l.get_line_count() != 1 or l.get_theme_font("font").get_string_size(l.text, HORIZONTAL_ALIGNMENT_LEFT, -1, l.get_theme_font_size("font_size")).x > l.size.x + 0.5:
+			return false
+	return true
 
 func _anchor(home) -> void:
 	print("[scrubby anchor contract]")

@@ -1,0 +1,59 @@
+{
+	"artworkCellCount": 820,
+	"builderVersion": "SB-CAMPAIGN-L31-L200/release-pool-import/v1",
+	"cellCount": 3136,
+	"cellReferenceCounts": {
+		"C02": 53,
+		"C03": 18,
+		"C04": 333,
+		"C05": 138,
+		"C14": 51,
+		"C15": 3,
+		"C16": 224
+	},
+	"difficulty": "EASY",
+	"firstSeenColorOrder": [
+		"C16",
+		"C14",
+		"C04",
+		"C05",
+		"C02",
+		"C03",
+		"C15"
+	],
+	"height": 56,
+	"normalizedColorOrder": [
+		"C02",
+		"C03",
+		"C04",
+		"C05",
+		"C14",
+		"C15",
+		"C16"
+	],
+	"outputPath": "res://data/levels/level_126_sprout.json",
+	"paletteAuthority": "res://data/palettes/scrubbots_palette_v3.json",
+	"previewPath": "res://assets/art/levels/previews/level_126_sprout.png",
+	"releasePool": {
+		"artworkSha256": "b4f2825634a32c8a37d18d54421874250fab5e8ba474facd7103c54470bcadbb",
+		"candidateId": "candidate-owner-f09066badc48b7df987ebb11d50cb6c963b43d3727cc8b95",
+		"cellsSha256": "e9dc2efd81cb3e6b12f036915a66b385ba9257fb7e4f0aab020cc4958e34a21c",
+		"challengeScore": 41.1907675904835,
+		"derivation": "EXACT_LOGICAL_OWNER_UPLOAD_TO_CANONICAL_CANDIDATE",
+		"entryDigest": "0b3c248ea0d839f62733558925a27b4f472f51b056695a573de62b78e2373286",
+		"entryFile": "data/Release Pool/Ready/candidate-owner-f09066badc48b7df987ebb11d50cb6c963b43d3727cc8b95-pipeline-1b43980e8cb7a715ad00df43-ready.json",
+		"levelSha256": "a39fcd18b39a16042b2645f72d43a11b1bd679e2efae039f956a5386d1688cd5",
+		"ownerSourceSha256": "f09066badc48b7df987ebb11d50cb6c963b43d3727cc8b95c894d7fb1bd4897f",
+		"pipelineRunId": "pipeline-1b43980e8cb7a715ad00df43",
+		"poolDifficultyClass": "MEDIUM",
+		"sessionLoad": 25.7665665556058,
+		"studioReplay": "WON_CANONICAL",
+		"studioSolverStatus": "WON_CANONICAL",
+		"supplyPlanSha256": "aa8c1fcfd608ca1b34f2bf4ac7f100c54843fbc090df4c692ae3b7e8537dd17a"
+	},
+	"sourcePath": "data/Level Factory/Workspace/Candidates/candidate-owner-f09066badc48b7df987ebb11d50cb6c963b43d3727cc8b95/artwork.png",
+	"sourceSha256": "b4f2825634a32c8a37d18d54421874250fab5e8ba474facd7103c54470bcadbb",
+	"usedColorCount": 7,
+	"voidCellCount": 2316,
+	"width": 56
+}

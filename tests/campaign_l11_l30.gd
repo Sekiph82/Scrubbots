@@ -1,7 +1,8 @@
 extends SceneTree
 ## SB-CAMPAIGN-L11-L30 — 20 Level Factory Studio release-pool levels as campaign L11..L30
 ## (owner 2026-10-30; imported by tools/import_release_pool_levels.py):
-##   - catalog: exactly 30 entries, orders 1..30, L1..L10 unchanged, L11..L30 in the locked order;
+##   - catalog: orders 1..30 are L1..L10 unchanged then L11..L30 in the locked order (L31..L200 follow,
+##     tests/campaign_l31_l200.gd);
 ##   - levels: load + LevelValidator + ProductionLevelValidator, square 20..59, palette V3
 ##     C01..C16 ascending, 3..12 colours, VOID only in version 2, cadence class per slot;
 ##   - provenance: metadata binds the release-pool entry (digest, owner candidate, sha256s) and
@@ -10,8 +11,8 @@ extends SceneTree
 ##     click pops a front batch, every batch is clicked) and the Studio SOLVED + replay WIN
 ##     evidence is in metadata. WON under real play is asserted by tests/real_play_levels.gd
 ##     (SB-CAMPAIGN-RUNTIME-KERNEL-DIVERGENCE): a regenerated plan need not be ProofKernel-legal;
-##   - frontier: fresh profile resolves L1..L30 in order, L31 is CONTENT_MISSING, and feature
-##     unlocks follow the owner table up to L30.
+##   - frontier: fresh profile resolves L1..L30 in order, then L31 (end of content is checked by
+##     campaign_l31_l200), and feature unlocks follow the owner table up to L30.
 ## Never boots main.tscn: AppState on temp user:// paths.
 ##
 ## Run: godot --headless --path . -s res://tests/campaign_l11_l30.gd
@@ -53,7 +54,7 @@ func _initialize() -> void:
 	_done()
 
 func _new_entries() -> Array:
-	return _cat.get_entries_ordered().slice(10)
+	return _cat.get_entries_ordered().slice(10, 30)
 
 func _level(e):
 	return LevelLoader.load_from_path(e.level_path).level_data
@@ -65,10 +66,10 @@ func _catalog() -> void:
 	_ok(r.ok, "production catalog validates %s" % r.summary())
 	var ids: Array = []
 	var orders: Array = []
-	for e in _cat.get_entries_ordered():
+	for e in _cat.get_entries_ordered().slice(0, 30):
 		ids.append(e.id)
 		orders.append(e.order)
-	_ok(_cat.size() == 30 and ids == FIRST_TEN + NEW_LEVELS and orders == range(1, 31), "30 entries, orders 1..30, ids in order")
+	_ok(_cat.size() >= 30 and ids == FIRST_TEN + NEW_LEVELS and orders == range(1, 31), "orders 1..30, ids in order")
 	for e in _new_entries():
 		_ok(e.supply_plan_path == "res://data/levels/supply/%s_supply_v1.json" % e.id and e.preview_exists
 			and e.metadata_path == "res://data/levels/metadata/%s.metadata.json" % e.id, "%s: plan, preview and metadata paths" % e.id)
@@ -176,7 +177,8 @@ func _frontier() -> void:
 			"frontier %d: collection/card_packs/robots/events unlock per owner table" % n)
 		app.progression.record_win(n)
 	_ok(order_ok, "fresh profile resolves L1..L30 to the catalog entries in order")
-	_ok(GameplayLaunchResolver.resolve(app)["reason"] == GameplayLaunchResolver.CONTENT_MISSING, "frontier 31 -> CONTENT_MISSING (end of builtin catalog)")
+	var r31: Dictionary = GameplayLaunchResolver.resolve(app)
+	_ok(r31["ok"] and int(r31["level"]) == 31 and r31["entry_id"] == _cat.get_entries_ordered()[30].id, "frontier 31 -> the L31 catalog entry (SB-CAMPAIGN-L31-L200)")
 	_ok(app.feature_unlocked("achievements") and app.feature_unlock_level("achievements") == 1 and not app.feature_unlocked("ranks") and app.feature_unlock_level("ranks") == 40, "achievements open (L1); RANKS (L40) still locked at frontier 31")
 	_completed["frontier"] = true
 	_remove_tree(ProjectSettings.globalize_path(root))

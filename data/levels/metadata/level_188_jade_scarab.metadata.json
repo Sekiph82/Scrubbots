@@ -1,0 +1,59 @@
+{
+	"artworkCellCount": 970,
+	"builderVersion": "SB-CAMPAIGN-L31-L200/release-pool-import/v1",
+	"cellCount": 3136,
+	"cellReferenceCounts": {
+		"C02": 167,
+		"C03": 50,
+		"C05": 275,
+		"C11": 24,
+		"C12": 2,
+		"C14": 159,
+		"C16": 293
+	},
+	"difficulty": "MEDIUM",
+	"firstSeenColorOrder": [
+		"C16",
+		"C05",
+		"C02",
+		"C03",
+		"C11",
+		"C12",
+		"C14"
+	],
+	"height": 56,
+	"normalizedColorOrder": [
+		"C02",
+		"C03",
+		"C05",
+		"C11",
+		"C12",
+		"C14",
+		"C16"
+	],
+	"outputPath": "res://data/levels/level_188_jade_scarab.json",
+	"paletteAuthority": "res://data/palettes/scrubbots_palette_v3.json",
+	"previewPath": "res://assets/art/levels/previews/level_188_jade_scarab.png",
+	"releasePool": {
+		"artworkSha256": "576600c218b4e9120bde2c83d1dcb4ca4e972b5ad0ceef9d03959dd3a2fceee2",
+		"candidateId": "candidate-owner-265c09ef2fcb3a6fba3989e32f986cd64832aa8c35d9057e",
+		"cellsSha256": "04816d14f6f93efcab05464425123dcad9d84d877e7c0ecb3fb23bcafdb8b7da",
+		"challengeScore": 48.7314830120868,
+		"derivation": "EXACT_LOGICAL_OWNER_UPLOAD_TO_CANONICAL_CANDIDATE",
+		"entryDigest": "f9a97749b8b0246f9b4972c289252eb529a57314a838c608942099162ddac76e",
+		"entryFile": "data/Release Pool/Ready/candidate-owner-265c09ef2fcb3a6fba3989e32f986cd64832aa8c35d9057e-pipeline-a378f2211570d09cf3d0c541-ready.json",
+		"levelSha256": "ddd8f97064a3091c0ef3619f04da628f95ac0402cc77c418ae1dbb963248d0fc",
+		"ownerSourceSha256": "265c09ef2fcb3a6fba3989e32f986cd64832aa8c35d9057eb14e56e4ed58f8b4",
+		"pipelineRunId": "pipeline-a378f2211570d09cf3d0c541",
+		"poolDifficultyClass": "MEDIUM",
+		"sessionLoad": 30.4751498010821,
+		"studioReplay": "WON_CANONICAL",
+		"studioSolverStatus": "WON_CANONICAL",
+		"supplyPlanSha256": "fa971ba56b0dad1efe339db9cf704aa69bfc9b7a309ed9ab51b4867995851a10"
+	},
+	"sourcePath": "data/Level Factory/Workspace/Candidates/candidate-owner-265c09ef2fcb3a6fba3989e32f986cd64832aa8c35d9057e/artwork.png",
+	"sourceSha256": "576600c218b4e9120bde2c83d1dcb4ca4e972b5ad0ceef9d03959dd3a2fceee2",
+	"usedColorCount": 7,
+	"voidCellCount": 2166,
+	"width": 56
+}
