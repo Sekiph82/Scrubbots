@@ -274,7 +274,8 @@ jobs:
           test "$(git -C "$P/godot" rev-parse HEAD)" = ed1daf0bf001b61586d9930840f2f1394092c079
           python3 -m venv "$RUNNER_TEMP/scons" && "$RUNNER_TEMP/scons/bin/pip" install -q scons==4.9.1
           export PATH="$RUNNER_TEMP/scons/bin:$PATH"
-          (cd "$P/godot" && scons platform=ios target=template_release vulkan=no core/disabled_classes.gen.h core/version_generated.gen.h core/object/gdvirtual.gen.h)
+          (cd "$P/godot" && scons platform=ios target=template_release vulkan=no core/disabled_classes.gen.h core/version_generated.gen.h \
+            core/object/gdvirtual.gen.h core/extension/gdextension_interface.gen.h core/extension/ext_wrappers.gen.h core/profiling/profiling.gen.h)
           (cd "$P" && scons target=release arch=arm64 plugin=inappstore version=4.0)
           for v in release debug; do
             xcodebuild -create-xcframework -library "$P/bin/libinappstore.arm64-ios.release.a" -output "ios/plugins/inappstore.$v.xcframework"
