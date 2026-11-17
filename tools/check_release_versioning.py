@@ -14,7 +14,7 @@ Asserts:
   - release paths never use a debug key: every step touching the debug keystore is guarded
     `build_type != 'release'`, release keystore/signing steps are guarded `== 'release'`,
     name no debug key and fail fast when a secret is absent; the Android export command
-    picks --export-release only for release;
+    picks --export-release only for release; mode aab_release (signed Play AAB) refuses debug;
   - outputs go to build/<platform>/<build_type>/ with version+build in the artifact name; iOS
     exports and builds under the fixed basename Scrubbots and is renamed only afterwards;
   - no store upload anywhere;
@@ -46,11 +46,12 @@ CREDITS = "scripts/ui/credits_screen.gd"
 ADDONS = {"GameFeelFlow": "addons/game_feel_flow/LICENSE", "Spark": "addons/saltmire_spark/LICENSE.txt"}
 GATE_IF = "!github.event.repository.private && (inputs.mode != 'apk_only' || inputs.build_type == 'release')"
 EXPORT_IF = ("always() && !github.event.repository.private && ((inputs.mode == 'apk_only' && inputs.build_type != 'release') || "
-             "((inputs.mode == 'build_apk' || inputs.mode == 'apk_only') && needs.validate.result == 'success' && "
+             "((inputs.mode == 'build_apk' || inputs.mode == 'apk_only' || inputs.mode == 'aab_release') && needs.validate.result == 'success' && "
              "(inputs.build_type != 'release' || needs.clean_clone.result == 'success')))")
 IOS_GATE_IF = "!github.event.repository.private && inputs.build_type == 'release'"
 IOS_IPA_IF = "always() && !github.event.repository.private && (inputs.build_type != 'release' || needs.release_gate.result == 'success')"
-CONTENT_STEP = "res://tools/validate_content.gd"
+AAB_RELEASE_ONLY = '[ "$BUILD_TYPE" = release ] || { echo "::error::mode aab_release needs build_type release"; exit 1; }'
+CONTENT_STEP ="res://tools/validate_content.gd"
 CONTENT_PASS = "grep -q '^CONTENT_VALIDATION PASS' content_validation.log"
 DEBUG_KEY = re.compile(r"ANDROID_DEBUG_KEYSTORE|GODOT_ANDROID_KEYSTORE_DEBUG|debug_keystore|keytool -genkeypair|androiddebugkey")
 UPLOAD = re.compile(r"upload-google-play|r0adkll|altool|notarytool|fastlane|xcrun\s+upload|<string>upload</string>|play.googleapis", re.I)
@@ -101,6 +102,9 @@ def check_android_export(text):
     if text.count("--export-release") != 1 or text.count("--export-debug") != 1 \
             or 'if [ "$BUILD_TYPE" = release ]; then EXPORT=--export-release; else EXPORT=--export-debug; fi' not in text:
         errs.append("Android export must choose --export-release only when BUILD_TYPE = release")
+    aab = [b for n, b in steps(text) if "gradle_build/export_format=1" in b]
+    if len(aab) != 1 or "        if: ${{ inputs.mode == 'aab_release' }}\n" not in aab[0] or AAB_RELEASE_ONLY not in aab[0]:
+        errs.append("Android AAB export must be one step guarded by mode aab_release that fails unless BUILD_TYPE = release")
     return errs
 
 
@@ -249,6 +253,10 @@ def selftest():
         print("FAIL selftest: swapped export not caught"); fails += 1
     else:
         print("ok selftest: caught swapped export")
+    if not check_android_export(android.replace(AAB_RELEASE_ONLY, "true")):
+        print("FAIL selftest: debug AAB not caught"); fails += 1
+    else:
+        print("ok selftest: caught debug AAB")
     ios = read(IOS).replace('export_path="${OUT_DIR}/${APP_NAME}.ipa"', 'export_path="${OUT_DIR}/${ARTIFACT}.ipa"')
     if "fixed basename Scrubbots" not in " ".join(check_ios_basename(ios)):
         print("FAIL selftest: versioned iOS export basename not caught"); fails += 1

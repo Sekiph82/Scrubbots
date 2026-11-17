@@ -31,7 +31,7 @@ Release ready: **NO**
 
 - PASS `manifest_bound`: 42 surfaces: 40 bound (script + live data + evidence suite exist), 2 explicitly not built: ["account_cloud_sync_conflict (no cloud provider yet: Play Games Saved Games / Game Center + iCloud plugins (SB-M43-153))", "friends_postlaunch (post-launch)"]; unbound / broken []
 - PASS `registry_covered`: every ui_surface_registry screen / popup has a manifest surface; missing []
-- PASS `no_placeholder_copy`: 584 English UiText strings, none contains placeholder / dummy / lorem / TODO / TBD / FIXME copy []
+- PASS `no_placeholder_copy`: 587 English UiText strings, none contains placeholder / dummy / lorem / TODO / TBD / FIXME copy []
 
 ## SB-M60-003: PASS
 
@@ -62,11 +62,11 @@ Release ready: **NO**
 
 ## OWNER-SIGNING: BLOCKED
 
-- BLOCKED `owner`: `gh secret list` 2026-11-09 shows only ANDROID_DEBUG_KEYSTORE_*; ANDROID_RELEASE_KEYSTORE_* and IOS_DIST_CERT_* / IOS_PROVISIONING_PROFILE_BASE64 / IOS_TEAM_ID are missing (docs/RELEASE_BUILDS.md Owner-only steps). Release runs stop before export until the owner adds them.
+- BLOCKED `owner`: Android upload key in ANDROID_RELEASE_KEYSTORE_* since 2026-11-17 (mode aab_release, docs/RELEASE_BUILDS.md). iOS: IOS_DIST_CERT_* / IOS_PROVISIONING_PROFILE_BASE64 / IOS_TEAM_ID are still missing (need the owner's Apple Developer login); iOS release runs stop before export until they exist.
 
 ## OWNER-STORE-SUBMISSION: BLOCKED
 
-- BLOCKED `owner`: CLAUDE.md 0D.5: a public production store release is owner-only. No workflow uploads to Google Play or the App Store; the release APK is not an AAB (store-release work stays with the owner).
+- BLOCKED `owner`: CLAUDE.md 0D.5: a public production store release is owner-only. No workflow uploads to Google Play or the App Store; the owner uploads the signed AAB / IPA artifacts.
 
 ## OWNER-VISUAL-SIGNOFF: BLOCKED
 

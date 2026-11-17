@@ -9,6 +9,7 @@ repository is public. Neither workflow uploads anything to Google Play or the Ap
 |---|---|---|
 | Android debug APK (family testing) | `Android Family First10 APK` | `mode: build_apk` (or `apk_only`), `build_type: debug` |
 | Android release APK | same | `mode: build_apk` (or `apk_only`), `build_type: release` |
+| Android Google Play AAB (upload-key signed) | same | `mode: aab_release`, `build_type: release` |
 | iOS unsigned IPA (owner signs with xtool) | `iOS IPA` | `build_type: debug` |
 | iOS distribution-signed IPA | same | `build_type: release` |
 
@@ -37,8 +38,14 @@ Release:
   profile from the secrets), then `-exportArchive` with `method app-store-connect`,
   `destination export`. The IPA stays on the runner and becomes an artifact; nothing is
   uploaded. Missing secrets stop the run before any build.
-- The release APK is an APK, not an AAB. Google Play needs an AAB (Gradle build template);
-  that belongs to the store-release work, which stays with the owner.
+- Google Play needs an AAB: `mode: aab_release` (with `build_type: release`; a debug build_type
+  stops the run) runs `validate` + `clean_clone`, switches the preset to the Gradle build with
+  `gradle_build/export_format=1`, installs the Android build template and exports
+  `${ARTIFACT}.aab`, signed with the same release (upload) key. The run checks the AAB with
+  `jarsigner -verify` and prints its signer certificate SHA-256, then bundletool builds a
+  universal APK from it (same key) only for the APK scan, `apksigner` and `aapt2` checks
+  (`targetSdkVersion` comes from the Godot 4.7.2 Gradle template: compile/target SDK 36, min 24).
+  Artifact: `<ARTIFACT>.aab`. Nothing is uploaded; the owner uploads it in Play Console.
 
 ## Local reminders (SB-M43-171/172, input `local_notifications`)
 
@@ -177,23 +184,29 @@ uncommitted work is not in the clone.
 
 The first CI run of the new gate jobs is still pending (no workflow was dispatched for this change).
 
-## Owner-only steps
+## Signing secrets and owner-only steps
 
-Add these as GitHub repository secrets before the first release build. Release runs fail
-until they exist; this is expected.
+Android (set 2026-11-17, SB-RELEASE-SIGNING-2026-11-17): a Google Play **upload** key was
+generated outside the repository (PKCS12, RSA 4096, 30 years, alias `scrubbots-upload`) and stored
+as `ANDROID_RELEASE_KEYSTORE_BASE64` / `_PASSWORD` / `_ALIAS` / `_KEY_PASSWORD` (PKCS12 has one
+password, so `_KEY_PASSWORD` equals `_PASSWORD`; the workflow reads `_PASSWORD`). The owner keeps
+the offline backup; Play App Signing holds the app signing key. When the app is created in Play
+Console, choose "Use Google-generated key" and upload the first AAB; the upload key is then the
+one in the secrets.
+
+iOS: `build_type: release` is the App Store mode. It needs these secrets and stops with an error
+naming them when any is absent:
 
 | Secret | Content |
 |---|---|
-| `ANDROID_RELEASE_KEYSTORE_BASE64` | `base64 -w0 release.keystore` (upload key; keep the original offline) |
-| `ANDROID_RELEASE_KEYSTORE_PASSWORD` | keystore and key password |
-| `ANDROID_RELEASE_KEYSTORE_ALIAS` | key alias |
 | `IOS_DIST_CERT_P12_BASE64` | Apple Distribution certificate + private key, `.p12`, base64 |
 | `IOS_DIST_CERT_PASSWORD` | `.p12` password |
 | `IOS_PROVISIONING_PROFILE_BASE64` | App Store provisioning profile for `com.sekiph82.scrubbots`, base64 |
 | `IOS_TEAM_ID` | Apple Developer team id |
 
-The owner also has to create the release keystore and the Apple distribution certificate
-(credentials), and do any store sign-in. A public production store release stays owner-only
-(CLAUDE.md §0D.5). Internal testing and TestFlight uploads are allowed autonomously but are not
-part of these workflows yet. Keys and passwords go only into GitHub Secrets, never into the
-repository.
+An App Store Connect API key (`.p8`, key id, issuer id) is needed only to upload to TestFlight
+from CI; neither workflow uploads, so it is not read yet.
+
+The owner signs in to Apple Developer / App Store Connect / Play Console (credentials and store
+records need the owner's login). A public production store release stays owner-only
+(CLAUDE.md §0D.5). Keys and passwords go only into GitHub Secrets, never into the repository.

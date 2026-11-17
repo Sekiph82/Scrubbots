@@ -85,12 +85,15 @@ name: Android Family First10 APK
 # SB-PERF-DIFF-2026-11-13 faster Difficulty V1 analysis / ProofKernel with byte-identical output (fast CI subset +
 #   verdict-only == full route probe): + difficulty_v1_identical_output (exact 8/8 guard).
 # SB-PERF-ROUTE-2026-11-13 canonical-access railroad Dijkstra fast path (fast == generic route points case): difficulty_v1_identical_output guard now exact 9/9.
+# SB-RELEASE-SIGNING-2026-11-17: mode aab_release (needs build_type release) = validate + clean_clone, then the
+#   Gradle build exports a Google Play .aab signed with the upload key (release keystore secrets); bundletool turns it
+#   into a universal APK (same key) only for the scans / apksigner / aapt2 checks. No store upload.
 
 on:
   workflow_dispatch:
     inputs:
       mode:
-        description: "validation_only = tests + logs only, NO APK. build_apk = tests then APK export."
+        description: "validation_only = tests + logs only, NO APK. build_apk = tests then APK export. aab_release = tests then signed Play AAB (build_type release)."
         type: choice
         required: true
         default: validation_only
@@ -98,6 +101,7 @@ on:
           - validation_only
           - build_apk
           - apk_only   # owner 2026-10-30: APK without the test suites (Level Factory already proved the levels)
+          - aab_release
       build_type:
         description: "debug = debug keystore (family dev package). release = release keystore secrets only (fails if absent)."
         type: choice
@@ -526,7 +530,7 @@ jobs:
     needs: [validate, clean_clone]
     # Job-level guard: build_apk exports after validate; release (build_apk or apk_only) also needs clean_clone;
     # debug apk_only is the owner's untested quick path. validation_only / unset / unknown skip.
-    if: ${{ always() && !github.event.repository.private && ((inputs.mode == 'apk_only' && inputs.build_type != 'release') || ((inputs.mode == 'build_apk' || inputs.mode == 'apk_only') && needs.validate.result == 'success' && (inputs.build_type != 'release' || needs.clean_clone.result == 'success'))) }}
+    if: ${{ always() && !github.event.repository.private && ((inputs.mode == 'apk_only' && inputs.build_type != 'release') || ((inputs.mode == 'build_apk' || inputs.mode == 'apk_only' || inputs.mode == 'aab_release') && needs.validate.result == 'success' && (inputs.build_type != 'release' || needs.clean_clone.result == 'success'))) }}
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
@@ -656,6 +660,8 @@ jobs:
             -e "s/@PACKAGE@/${PKG}/" -e "s/@APP_LABEL@/${LABEL}/" \
             .github/android/export_presets_family_first10.cfg > export_presets.cfg
           cat export_presets.cfg
+          echo "PKG_EXT=apk" >> "$GITHUB_ENV"
+          echo "CHECK_APK=${OUT_DIR}/${ARTIFACT}.apk" >> "$GITHUB_ENV"
 
       # SB-M43-172: Android plugins need the Gradle build, so the plugin rides only on this input.
       - name: ScrubbotsNotify plugin + Gradle build (input local_notifications)
@@ -672,17 +678,42 @@ jobs:
           "$GODOT" --headless --path . --install-android-build-template
           test -f android/build/build.gradle
 
+      # SB-RELEASE-SIGNING-2026-11-17: Google Play takes an AAB, which only the Gradle build exports.
+      - name: Gradle AAB export (mode aab_release)
+        if: ${{ inputs.mode == 'aab_release' }}
+        run: |
+          [ "$BUILD_TYPE" = release ] || { echo "::error::mode aab_release needs build_type release"; exit 1; }
+          sed -i -e 's#^gradle_build/use_gradle_build=false#gradle_build/use_gradle_build=true#'             -e 's#^gradle_build/export_format=0#gradle_build/export_format=1#' export_presets.cfg
+          grep -qx 'gradle_build/use_gradle_build=true' export_presets.cfg && grep -qx 'gradle_build/export_format=1' export_presets.cfg
+          [ -f android/build/build.gradle ] || "$GODOT" --headless --path . --install-android-build-template
+          test -f android/build/build.gradle
+          echo "PKG_EXT=aab" >> "$GITHUB_ENV"
+          echo "CHECK_APK=out/universal.apk" >> "$GITHUB_ENV"
+
       - name: Import + export APK and same-preset inspection PCK
         run: |
           mkdir -p "$OUT_DIR" out
           "$GODOT" --headless --path . --import > out/import.log 2>&1 || true
           if [ "$BUILD_TYPE" = release ]; then EXPORT=--export-release; else EXPORT=--export-debug; fi
-          "$GODOT" --headless --path . "$EXPORT" "$PRESET" "${OUT_DIR}/${ARTIFACT}.apk" > out/export_apk.log 2>&1 \
+          "$GODOT" --headless --path . "$EXPORT" "$PRESET" "${OUT_DIR}/${ARTIFACT}.${PKG_EXT}" > out/export_apk.log 2>&1 \
             || { tail -40 out/export_apk.log; exit 1; }
           "$GODOT" --headless --path . --export-pack "$PRESET" "${OUT_DIR}/${ARTIFACT}.pck" > out/export_pck.log 2>&1 \
             || { tail -40 out/export_pck.log; exit 1; }
           ls -la "$OUT_DIR"
-          test -s "${OUT_DIR}/${ARTIFACT}.apk" && test -s "${OUT_DIR}/${ARTIFACT}.pck"
+          test -s "${OUT_DIR}/${ARTIFACT}.${PKG_EXT}" && test -s "${OUT_DIR}/${ARTIFACT}.pck"
+
+      - name: AAB signature + universal APK for the checks (bundletool, upload key; mode aab_release)
+        if: ${{ inputs.mode == 'aab_release' }}
+        run: |
+          AAB="${OUT_DIR}/${ARTIFACT}.aab"
+          jarsigner -verify -verbose -certs "$AAB" > out/aab_jarsigner.txt 2>&1 || { tail -20 out/aab_jarsigner.txt; exit 1; }
+          grep -x 'jar verified.' out/aab_jarsigner.txt
+          keytool -printcert -jarfile "$AAB" | grep -E "Owner:|SHA256:" | tee out/aab_cert.txt
+          curl -fsSL -o "$RUNNER_TEMP/bundletool.jar" https://github.com/google/bundletool/releases/download/1.18.1/bundletool-all-1.18.1.jar
+          java -jar "$RUNNER_TEMP/bundletool.jar" dump manifest --bundle "$AAB" | grep -E "<manifest|uses-sdk|debuggable" | tee out/aab_manifest.txt
+          java -jar "$RUNNER_TEMP/bundletool.jar" build-apks --bundle "$AAB" --output "$RUNNER_TEMP/u.apks" --mode universal             --ks "$GODOT_ANDROID_KEYSTORE_RELEASE_PATH" --ks-key-alias "$GODOT_ANDROID_KEYSTORE_RELEASE_USER"             --ks-pass "pass:$GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD" --key-pass "pass:$GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD"
+          unzip -p "$RUNNER_TEMP/u.apks" universal.apk > out/universal.apk
+          test -s out/universal.apk
 
       - name: Packaged-path scan of the exported PCK (zero excluded paths, every runtime reference present)
         run: |
@@ -700,7 +731,7 @@ jobs:
 
       - name: Packaged-path scan of the APK itself
         run: |
-          unzip -Z1 "${OUT_DIR}/${ARTIFACT}.apk" > out/apk_entries.txt
+          unzip -Z1 "$CHECK_APK" > out/apk_entries.txt
           wc -l out/apk_entries.txt
           echo "apk assets/ entries: $(grep -c '^assets/' out/apk_entries.txt || true); embedded .pck: $(grep -E '\.pck$' out/apk_entries.txt | tr '\n' ' ')" | tee out/apk_scan.txt
           hits=0
@@ -726,7 +757,7 @@ jobs:
 
       - name: APK signature / metadata / hash
         run: |
-          APK="${OUT_DIR}/${ARTIFACT}.apk"
+          APK="$CHECK_APK"
           file "$APK" | tee out/apk_metadata.txt
           unzip -tq "$APK" | tee -a out/apk_metadata.txt
           "$BUILD_TOOLS/apksigner" verify --verbose --print-certs "$APK" | tee -a out/apk_metadata.txt
@@ -736,20 +767,21 @@ jobs:
           if [ "$BUILD_TYPE" = release ] && grep -iE "debuggable|certificate DN:.*debug" out/apk_metadata.txt; then
             echo "::error::release APK is debuggable or signed with a debug certificate"; exit 1
           fi
-          sha256sum "$APK" "${OUT_DIR}/${ARTIFACT}.pck" | tee out/sha256.txt
-          stat -c '%n %s bytes' "$APK" "${OUT_DIR}/${ARTIFACT}.pck" | tee out/sizes.txt
+          PKG="${OUT_DIR}/${ARTIFACT}.${PKG_EXT}"
+          sha256sum "$PKG" "${OUT_DIR}/${ARTIFACT}.pck" | tee out/sha256.txt
+          stat -c '%n %s bytes' "$PKG" "${OUT_DIR}/${ARTIFACT}.pck" | tee out/sizes.txt
           {
             echo "## ${ARTIFACT}"
             echo "- source SHA: \`${GITHUB_SHA}\`"
             echo "- run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
-            echo '```'; cat out/sizes.txt out/sha256.txt out/apk_scan.txt; grep PCK_SCAN out/pck_scan.log; cat out/apk_metadata.txt; echo '```'
+            echo '```'; cat out/sizes.txt out/sha256.txt out/apk_scan.txt; grep PCK_SCAN out/pck_scan.log; cat out/apk_metadata.txt; cat out/aab_cert.txt out/aab_manifest.txt 2>/dev/null; echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Upload APK
+      - name: Upload APK / AAB
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: ${{ env.ARTIFACT }}.apk
-          path: ${{ env.OUT_DIR }}/${{ env.ARTIFACT }}.apk
+          name: ${{ env.ARTIFACT }}.${{ env.PKG_EXT }}
+          path: ${{ env.OUT_DIR }}/${{ env.ARTIFACT }}.${{ env.PKG_EXT }}
           retention-days: 30
           if-no-files-found: error
 
