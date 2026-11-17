@@ -32,6 +32,8 @@ const M28_WORLD_PATH := "res://assets/ui/final/home/background/home_background.p
 const KEYED_STILL_PATH := "res://assets/ui/final/home/videos/home_scrubby_still_keyed.png"
 ## SB-HOME-VIDEO-MAGENTA-2026-11-17: + bow, full_turn, sweep from the owner's magenta Flow videos.
 const KEYED_GESTURES := ["wave", "turn", "bow", "full_turn", "sweep"]
+## SB-HOME-VIDEO-MAGENTA-2-2026-11-17: wave/turn re-made from the magenta Flow videos; the job-160 difference mattes are gone.
+const OLD_MATTE_SHAS := ["a8b14736c3dc2cb3854ea605165ca630db6b3450769271915020a44bf30187f0", "679d7eaf83460fa5279bd0663357123b15b495137c759df85f911a524f3b6467"]
 const FEET := Vector2(470, 1240)
 const SAFE_BOX := Rect2(305, 620, 330, 620)
 const WORLD_ASPECT := 941.0 / 1672.0
@@ -158,6 +160,8 @@ func _binds(home) -> void:
 		var v: Dictionary = m["video_sets"]["home_scrubby_videos_keyed_v2"]["videos"][g]
 		pins_ok = pins_ok and FileAccess.get_sha256("res://" + String(v["path"])) == String(v["sha256"]) and String(v["path"]).ends_with("_keyed.ogv") and hero.get_streams()[g] is VideoStreamTheora
 	_ok(pins_ok, "all %d keyed videos pinned (sha256 == bytes) and bound as Theora streams" % KEYED_GESTURES.size())
+	var vids: Dictionary = m["video_sets"]["home_scrubby_videos_keyed_v2"]["videos"]
+	_ok(not OLD_MATTE_SHAS.has(String(vids["wave"]["sha256"])) and not OLD_MATTE_SHAS.has(String(vids["turn"]["sha256"])), "wave/turn are the magenta Flow re-encodes, not the job-160 difference mattes")
 	_complete("world_binds_through_lifecycle")
 
 func _no_duplicates(home) -> void:
