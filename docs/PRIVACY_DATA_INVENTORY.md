@@ -155,8 +155,10 @@ Ads / Play services); a default build has none of them.
 
 ### iOS (`.github/workflows/ios-ipa.yml` preset)
 
-No `privacy/*` usage descriptions, no `capabilities/*`, no extra Info.plist content: the
-build asks for no protected resource. Local notifications (ScrubbotsNotify, input
+No `privacy/*` usage descriptions, no `capabilities/*`: the build asks for no protected
+resource. The only extra Info.plist content (`application/additional_plist_content`,
+SB-IOS-TESTFLIGHT-2026-11-18) is `ITSAppUsesNonExemptEncryption = false`: the app uses no custom
+encryption (only the OS's HTTPS), so TestFlight needs no export-compliance answer; it collects nothing. Local notifications (ScrubbotsNotify, input
 `local_notifications`) need no usage description and no push capability; the OS prompt comes
 only after the in-game explainer. Godot 4.3+ writes a `PrivacyInfo.xcprivacy` for the
 engine's required-reason APIs (file timestamps, system boot time, disk space, UserDefaults);
