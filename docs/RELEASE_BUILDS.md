@@ -93,6 +93,7 @@ plugins, each pinned:
   does; that flag alone starts the editor and never exits) and `project.godot` enables both editor
   plugins (they add the AARs, `billing-ktx` and `play-services-ads` by Gradle).
   A check step reads the APK manifest for both plugins, the BILLING permission and the AdMob app id.
+  The same input works with `mode=aab_release` (the Play AAB; the check reads bundletool's universal APK).
 - iOS: the AdMob zip adds `addons/` + `ios/plugins/AdmobPlugin*`; `inappstore` is compiled with
   scons into `ios/plugins/inappstore.{release,debug}.xcframework` + `inappstore.gdip`;
   `ios_export.cfg` gets Google's sample iOS app id and the ATT text; the preset enables
