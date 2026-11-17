@@ -252,19 +252,20 @@ jobs:
           cp -R "$RUNNER_TEMP/admob/res/addons/." addons/
           mkdir -p ios/plugins && cp -R "$RUNNER_TEMP/admob/res/ios/plugins/." ios/plugins/
           # Google's sample AdMob app id (test ads only); the owner's real app id replaces it later.
-          printf '[General]
-is_real=false
+          cat > addons/AdmobPlugin/ios_export.cfg <<'CFG'
+          [General]
+          is_real=false
 
-[Debug]
-app_id="ca-app-pub-3940256099942544~1458002511"
+          [Debug]
+          app_id="ca-app-pub-3940256099942544~1458002511"
 
-[Release]
-app_id="ca-app-pub-3940256099942544~1458002511"
+          [Release]
+          app_id="ca-app-pub-3940256099942544~1458002511"
 
-[ATT]
-att_enabled=true
-att_text="ScrubBots uses this to show you more relevant ads."
-' > addons/AdmobPlugin/ios_export.cfg
+          [ATT]
+          att_enabled=true
+          att_text="ScrubBots uses this to show you more relevant ads."
+          CFG
           P="$RUNNER_TEMP/ios-plugins"
           git init -q "$P"
           git -C "$P" fetch -q --depth 1 https://github.com/godot-sdk-integrations/godot-ios-plugins.git caafb2c7fbfb5c72a64f163c76449274fa49abaa
@@ -273,7 +274,7 @@ att_text="ScrubBots uses this to show you more relevant ads."
           test "$(git -C "$P/godot" rev-parse HEAD)" = ed1daf0bf001b61586d9930840f2f1394092c079
           python3 -m venv "$RUNNER_TEMP/scons" && "$RUNNER_TEMP/scons/bin/pip" install -q scons==4.9.1
           export PATH="$RUNNER_TEMP/scons/bin:$PATH"
-          (cd "$P/godot" && scons platform=ios target=template_release vulkan=no             core/disabled_classes.gen.h core/version_generated.gen.h core/object/gdvirtual.gen.h)
+          (cd "$P/godot" && scons platform=ios target=template_release vulkan=no core/disabled_classes.gen.h core/version_generated.gen.h core/object/gdvirtual.gen.h)
           (cd "$P" && scons target=release arch=arm64 plugin=inappstore version=4.0)
           for v in release debug; do
             xcodebuild -create-xcframework -library "$P/bin/libinappstore.arm64-ios.release.a" -output "ios/plugins/inappstore.$v.xcframework"
@@ -283,9 +284,8 @@ att_text="ScrubBots uses this to show you more relevant ads."
           "$GODOT" --headless --import > "$RUNNER_TEMP/billing_ads_import.log" 2>&1 || true
           sed -i '' 's#^enabled=PackedStringArray(#enabled=PackedStringArray("res://addons/AdmobPlugin/plugin.cfg", #' project.godot
           grep -q 'res://addons/AdmobPlugin/plugin.cfg' project.godot
-          printf 'plugins/AdmobPlugin=true
-plugins/InAppStore=true
-' >> export_presets.cfg
+          echo 'plugins/AdmobPlugin=true' >> export_presets.cfg
+          echo 'plugins/InAppStore=true' >> export_presets.cfg
           ls ios/plugins
 
       - name: Godot import (fail-closed)

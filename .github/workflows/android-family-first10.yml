@@ -707,20 +707,21 @@ jobs:
         run: |
           curl -fsSL -o "$RUNNER_TEMP/billing.zip" https://github.com/godot-sdk-integrations/godot-google-play-billing/releases/download/3.3.0/godot-google-play-billing.zip
           curl -fsSL -o "$RUNNER_TEMP/admob.zip" https://github.com/godot-sdk-integrations/godot-admob/releases/download/v7.0/AdmobPlugin-Multi-v7.0.zip
-          printf '%s
-' "20d75623d6f337f08d8283c83098b73678d5f575e39247af5a8eb80588b18568  $RUNNER_TEMP/billing.zip"             "d96e1734b889434c0a77f0bafe2f09f4cdb9e5b518b9d6809757b251a17cf8a2  $RUNNER_TEMP/admob.zip" | sha256sum -c -
+          echo "20d75623d6f337f08d8283c83098b73678d5f575e39247af5a8eb80588b18568  $RUNNER_TEMP/billing.zip" | sha256sum -c -
+          echo "d96e1734b889434c0a77f0bafe2f09f4cdb9e5b518b9d6809757b251a17cf8a2  $RUNNER_TEMP/admob.zip" | sha256sum -c -
           unzip -q "$RUNNER_TEMP/billing.zip" -d addons
           unzip -q "$RUNNER_TEMP/admob.zip" -d "$RUNNER_TEMP/admob" && cp -R "$RUNNER_TEMP/admob/res/addons/." addons/
           # Google's sample AdMob app id (test ads only); the owner's real app id replaces it later.
-          printf '[General]
-is_real=false
+          cat > addons/AdmobPlugin/android_export.cfg <<'CFG'
+          [General]
+          is_real=false
 
-[Debug]
-app_id="ca-app-pub-3940256099942544~3347511713"
+          [Debug]
+          app_id="ca-app-pub-3940256099942544~3347511713"
 
-[Release]
-app_id="ca-app-pub-3940256099942544~3347511713"
-' > addons/AdmobPlugin/android_export.cfg
+          [Release]
+          app_id="ca-app-pub-3940256099942544~3347511713"
+          CFG
           "$GODOT" --headless --path . --import > "$RUNNER_TEMP/billing_ads_import.log" 2>&1 || true
           sed -i 's#^gradle_build/use_gradle_build=false#gradle_build/use_gradle_build=true#' export_presets.cfg
           grep -qx 'gradle_build/use_gradle_build=true' export_presets.cfg
