@@ -727,7 +727,13 @@ jobs:
           grep -qx 'gradle_build/use_gradle_build=true' export_presets.cfg
           sed -i 's#^enabled=PackedStringArray(#enabled=PackedStringArray("res://addons/GodotGooglePlayBilling/plugin.cfg", "res://addons/AdmobPlugin/plugin.cfg", #' project.godot
           grep -q 'addons/GodotGooglePlayBilling/plugin.cfg", "res://addons/AdmobPlugin/plugin.cfg' project.godot
-          [ -f android/build/build.gradle ] || "$GODOT" --headless --path . --install-android-build-template
+          # What --install-android-build-template does (that flag alone starts the editor and never exits).
+          if [ ! -f android/build/build.gradle ]; then
+            mkdir -p android/build
+            unzip -q "$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable/android_source.zip" -d android/build
+            touch android/build/.gdignore
+            echo "${GODOT_VERSION}.stable" > android/.build_version
+          fi
           test -f android/build/build.gradle
 
       - name: Import + export APK and same-preset inspection PCK
