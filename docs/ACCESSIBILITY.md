@@ -98,6 +98,7 @@ a ceremony. Each row's REDUCED arm is tested by the suite in `REDUCED_LEDGER`
 | home_screen.gd, gift_tick_overlay.gd | Gift Meter tick pulse | static ticks |
 | coachmark_layer.gd | pointer motion | static pointer |
 | level_intro_overlay.gd | intro video, then fade | keyed still for 0.8 s, then the same fade |
+| event_tutorial.gd | Events tutorial step 2 meter fills by one win (0.8 s tween) | meter shows the value at once |
 | acquisition_flow.gd | Need a Hand helper video / slide + wave | static helper |
 | profile_screens.gd | Welcome Back video | still frame |
 | daily_screens.gd | no motion | identical |

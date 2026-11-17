@@ -70,6 +70,7 @@ const ICON_FAMILIES := {
 }
 ## Reduced Effects consumer -> the suite whose REDUCED arm proves its calm path.
 const REDUCED_LEDGER := {
+	"scripts/ui/events/event_tutorial.gd": "ev02_events_ui",
 	"scripts/gameplay/presentation/cleaning_effects_controller.gd": "m31_cleaning_effects_evidence",
 	"scripts/ui/gameplay_screen.gd": "sb_polish_003_booster_vfx",
 	"scripts/ui/feel/booster_vfx.gd": "sb_polish_003_booster_vfx",
