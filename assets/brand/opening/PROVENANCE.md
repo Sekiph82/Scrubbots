@@ -23,8 +23,8 @@ derivative (SB-M42-027), never H.264/MP4.
 | Field | Value |
 |---|---|
 | Path | `assets/brand/opening/scrubbots_opening_720p30.ogv` |
-| SHA-256 | `3ec6e1347bbb1d8ced2709f3383b06ae6dbfba017e0a6d23a0fb991ec78ee89a` |
-| Size | 16,038,188 bytes |
+| SHA-256 | `3261bd3214328eea643dccbe13bfbebc0158c6953f9b045877b0164300c8ebfd` |
+| Size | 7,277,103 bytes (SB-AAB-SIZE 2026-11-17: re-encoded at `-q:v 5`, was 16,038,188 bytes at q8) |
 | Container | Ogg, duration 15.022993 s |
 | Video | Theora, 1280x720, yuv420p, 30/1 fps, 15.000000 s; 450 packets = 441 coded frames + 9 zero-length duplicate-frame packets (static frames), last pts 14.966667 s |
 | Audio | Vorbis, 44,100 Hz, stereo, 15.022993 s |
@@ -33,7 +33,7 @@ derivative (SB-M42-027), never H.264/MP4.
 Exact command (run in `assets/brand/opening/`):
 
 ```bash
-ffmpeg -hide_banner -loglevel error -y -i final_15_seconds_opening_video.mp4 -map 0:v:0 -map 0:a:0 -vf "scale=1280:720:flags=lanczos,fps=30" -c:v libtheora -q:v 8 -pix_fmt yuv420p -c:a libvorbis -q:a 5 -ar 44100 -ac 2 -map_metadata -1 scrubbots_opening_720p30.ogv
+ffmpeg -hide_banner -loglevel error -y -i final_15_seconds_opening_video.mp4 -map 0:v:0 -map 0:a:0 -vf "scale=1280:720:flags=lanczos,fps=30" -c:v libtheora -q:v 5 -pix_fmt yuv420p -c:a libvorbis -q:a 5 -ar 44100 -ac 2 -map_metadata -1 scrubbots_opening_720p30.ogv
 ```
 
 The MP4 master is read-only input (SHA-256 unchanged after conversion).

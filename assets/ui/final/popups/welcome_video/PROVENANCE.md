@@ -15,6 +15,6 @@ transparent with the same key at build time.
 
 - master `welcome_back_master.mp4` sha256 `f93b53f020f87c6af596e01cb98467b1c7ff5e32a955901fe9bcd3c4f376057c` (190 frames)
 - crop x=95 y=359 w=576 h=672
-- `welcome_back_scrubby.ogv` sha256 `a06897d8e59e58403ed15d95ab56c982408b0fc2d8b360453c5bfa32cb311634` (2641207 bytes)
+- `welcome_back_scrubby.ogv` sha256 `dfbef9d79795beed2e81323cc389a4a5f1fa8b6db0f40d4670778e2377534fa0` (1063560 bytes)
 - `welcome_back_scrubby_still.png` sha256 `25517312cc971cdcae3b3df571d89068c4dd234ee286abe94c0efbe39eb135c6` (241861 bytes)
-- encode: `ffmpeg -hide_banner -loglevel error -y -i welcome_back_master.mp4 -map 0:v:0 -an -vf crop=576:672:95:359 -c:v libtheora -q:v 8 -pix_fmt yuv420p -map_metadata -1 welcome_back_scrubby.ogv`
+- encode: `ffmpeg -hide_banner -loglevel error -y -i welcome_back_master.mp4 -map 0:v:0 -an -vf crop=576:672:95:359 -c:v libtheora -q:v 5 -pix_fmt yuv420p -map_metadata -1 welcome_back_scrubby.ogv`

@@ -16,6 +16,6 @@ transparent with the same key at build time.
 
 - master `new_region_master.mp4` sha256 `e236a0639c82e106816b0eac32983d99dc2b5854a818dcd913a9e84f6a0b0590` (190 frames)
 - crop x=0 y=295 w=720 h=848
-- `new_region_scrubby.ogv` sha256 `7c5e1cfb04471cca261230bfe68db5fbf653049b1c39e80742b0b486ff303a1f` (2493437 bytes)
+- `new_region_scrubby.ogv` sha256 `65012274349baed87338eb21125f619571224238fa8b12c4d9478d214bb2b63f` (1080361 bytes)
 - `new_region_scrubby_still.png` sha256 `d8d28e9dfa968423511d016cc4db7b983f8c8a683bda333836360ca287570e75` (292322 bytes)
-- encode: `ffmpeg -hide_banner -loglevel error -y -i new_region_master.mp4 -map 0:v:0 -an -vf crop=720:848:0:295 -c:v libtheora -q:v 8 -pix_fmt yuv420p -map_metadata -1 new_region_scrubby.ogv`
+- encode: `ffmpeg -hide_banner -loglevel error -y -i new_region_master.mp4 -map 0:v:0 -an -vf crop=720:848:0:295 -c:v libtheora -q:v 5 -pix_fmt yuv420p -map_metadata -1 new_region_scrubby.ogv`

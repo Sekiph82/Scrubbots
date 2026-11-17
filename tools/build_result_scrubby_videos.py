@@ -143,6 +143,7 @@ TRIM = {"set_complete": 182,  # frames kept: the master's last 8 frames dissolve
 ROBOT_OUT = (480, 576)        # robots: every crop is scaled to this (>= the 400x480 hero box, keeps the APK small)
 BLUE_LO, BLUE_HI = 0.30, 0.45 # keep in sync with chroma_key_blue.gdshader (purple armour stays below B - max(R, G) 0.3)
 EDGE = 0.06                   # gift / set_complete edge fade (UV fraction per side), keep in sync with the shaders
+THEORA_Q = "5"                # SB-AAB-SIZE: q8 -> q5, ~60 % smaller (Play 200 MB base module); key edge re-checked
 
 
 def frames(path: Path) -> np.ndarray:
@@ -247,7 +248,7 @@ def main(src: Path, which: str) -> None:
         ogv = out / f"{stem}.ogv"
         still = out / f"{stem}_still.png"
         cmd = ["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-i", str(master), "-map", "0:v:0", "-an",
-               *(["-frames:v", str(TRIM[name])] if name in TRIM else []), "-vf", f"crop={w}:{h}:{x}:{y}" + (f",scale={ROBOT_OUT[0]}:{ROBOT_OUT[1]}:flags=lanczos" if robots else ""), "-c:v", "libtheora", "-q:v", "8", "-pix_fmt", "yuv420p",
+               *(["-frames:v", str(TRIM[name])] if name in TRIM else []), "-vf", f"crop={w}:{h}:{x}:{y}" + (f",scale={ROBOT_OUT[0]}:{ROBOT_OUT[1]}:flags=lanczos" if robots else ""), "-c:v", "libtheora", "-q:v", THEORA_Q, "-pix_fmt", "yuv420p",
                "-map_metadata", "-1", str(ogv)]
         subprocess.run(cmd, check=True)
         hold = f[-1 if last else 0, y:y + h, x:x + w]

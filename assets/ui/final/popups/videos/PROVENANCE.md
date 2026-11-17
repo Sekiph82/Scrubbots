@@ -15,14 +15,14 @@ transparent with the same key at build time.
 
 - master `result_scrubby_win_master.mp4` sha256 `a3f80015edeb8da3c79545a202eb407782941d8c227be305dcf415fcb5b7e996` (185 frames)
 - crop x=87 y=278 w=560 h=864
-- `result_scrubby_win.ogv` sha256 `eeacf4ee41f5933ac91cf36e936449fcd06f7c08d4fffd20669af697cb9f8d46` (3363281 bytes)
+- `result_scrubby_win.ogv` sha256 `773431bd3e264c35073697d3d4a70997f9355432b09b476f916232b561e23236` (1364486 bytes)
 - `result_scrubby_win_still.png` sha256 `3a849f03c1dd5ff26f3675426801429d59d93b87f3c2094b8f9266b27a4ff097` (224420 bytes)
-- encode: `ffmpeg -hide_banner -loglevel error -y -i result_scrubby_win_master.mp4 -map 0:v:0 -an -vf crop=560:864:87:278 -c:v libtheora -q:v 8 -pix_fmt yuv420p -map_metadata -1 result_scrubby_win.ogv`
+- encode: `ffmpeg -hide_banner -loglevel error -y -i result_scrubby_win_master.mp4 -map 0:v:0 -an -vf crop=560:864:87:278 -c:v libtheora -q:v 5 -pix_fmt yuv420p -map_metadata -1 result_scrubby_win.ogv`
 
 ## LOSE
 
 - master `result_scrubby_lose_master.mp4` sha256 `936c8e3f08cc44c9cc1de45b14b91c944f17c521298e6e6cb58e72077397780a` (185 frames)
 - crop x=126 y=304 w=512 h=624
-- `result_scrubby_lose.ogv` sha256 `695181897c64cba1b2fd37a87c3b5fa747a5bcb327624de977de4a6b8778fe72` (2060313 bytes)
+- `result_scrubby_lose.ogv` sha256 `646340c0a888e6a8cba1649c266ee5407384b8383d3e5e6e611b7a953b3911e1` (850937 bytes)
 - `result_scrubby_lose_still.png` sha256 `5ec8e2cd5b383c66bea48ffad0a3c4de8b319fdb5fb060598fa6cf28a7648610` (224011 bytes)
-- encode: `ffmpeg -hide_banner -loglevel error -y -i result_scrubby_lose_master.mp4 -map 0:v:0 -an -vf crop=512:624:126:304 -c:v libtheora -q:v 8 -pix_fmt yuv420p -map_metadata -1 result_scrubby_lose.ogv`
+- encode: `ffmpeg -hide_banner -loglevel error -y -i result_scrubby_lose_master.mp4 -map 0:v:0 -an -vf crop=512:624:126:304 -c:v libtheora -q:v 5 -pix_fmt yuv420p -map_metadata -1 result_scrubby_lose.ogv`

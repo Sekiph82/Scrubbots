@@ -7,7 +7,7 @@ extends SceneTree
 const MP4 := "res://assets/brand/opening/final_15_seconds_opening_video.mp4"
 const MP4_SHA256 := "c044841d4aad1bc97c3d2bd144468c44f514bc2e288a970ae0a6aa14191f4388"
 const OGV := "res://assets/brand/opening/scrubbots_opening_720p30.ogv"
-const OGV_SHA256 := "3ec6e1347bbb1d8ced2709f3383b06ae6dbfba017e0a6d23a0fb991ec78ee89a"
+const OGV_SHA256 := "3261bd3214328eea643dccbe13bfbebc0158c6953f9b045877b0164300c8ebfd"
 
 var EXPECTED_CASES := ["mp4_preserved", "ogv_runtime_asset", "opening_player_aspect", "opening_lifecycle",
 	"boot_opening_to_home_once", "once_per_cold_launch", "device_instrumentation", "ios_static_readiness", "boot_splash_logo", "akilta_logo"]
@@ -64,7 +64,7 @@ func _ogv_runtime_asset() -> void:
 	_ok(s is VideoStreamTheora, "Godot imports it as VideoStreamTheora (%s)" % (s.get_class() if s else "null"))
 	_ok(FileAccess.get_sha256(MP4) == MP4_SHA256, "MP4 master unchanged after conversion")
 	var prov := FileAccess.get_file_as_string("res://assets/brand/opening/PROVENANCE.md")
-	_ok(prov.find("-c:v libtheora -q:v 8") != -1 and prov.find("ffmpeg 9.0.1") != -1 and prov.find(OGV_SHA256) != -1, "exact command, tool version and hash recorded")
+	_ok(prov.find("-c:v libtheora -q:v 5") != -1 and prov.find("ffmpeg 9.0.1") != -1 and prov.find(OGV_SHA256) != -1, "exact command, tool version and hash recorded")
 	_complete("ogv_runtime_asset")
 
 const OpeningScreen = preload("res://scripts/app/opening_screen.gd")

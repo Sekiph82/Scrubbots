@@ -16,6 +16,6 @@ transparent with the same key at build time.
 
 - master `need_a_hand_master.mp4` sha256 `dc3f1c1fc135f7ee110ea55a4d37a9bc6a52e02be8ede7b7a5f9e6f892c409ba` (182 frames used)
 - crop x=78 y=487 w=576 h=512
-- `need_a_hand_scrubby.ogv` sha256 `e65e5f110ed5358ba8e536df7dffea37c5894007b435220feb789bcff9c6f616` (1553099 bytes)
+- `need_a_hand_scrubby.ogv` sha256 `f43862030248ba86ad8975194316b231746446ace13f79c37468c88ae632d7d3` (638110 bytes)
 - `need_a_hand_scrubby_still.png` sha256 `ae1ade689b144ad67ac8f0157d18b27ea67ebd8d1f13dac19acbab4029a993af` (218439 bytes)
-- encode: `ffmpeg -hide_banner -loglevel error -y -i need_a_hand_master.mp4 -map 0:v:0 -an -frames:v 182 -vf crop=576:512:78:487 -c:v libtheora -q:v 8 -pix_fmt yuv420p -map_metadata -1 need_a_hand_scrubby.ogv`
+- encode: `ffmpeg -hide_banner -loglevel error -y -i need_a_hand_master.mp4 -map 0:v:0 -an -frames:v 182 -vf crop=576:512:78:487 -c:v libtheora -q:v 5 -pix_fmt yuv420p -map_metadata -1 need_a_hand_scrubby.ogv`

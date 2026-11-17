@@ -18,6 +18,6 @@ frame keyed to transparent with the same key at build time (the hold pose after 
 
 - master `set_complete_master.mp4` sha256 `bc0ccc2025ebdfc17232913ef62a00587d424f1613374ff1944ea06e78bda7d9` (182 frames used)
 - crop x=48 y=402 w=624 h=624
-- `set_complete_badge.ogv` sha256 `23c1f5247268eed122e74bb6287aa3606dc678f8c07e5b2f3a2ba73f92996ebb` (3565048 bytes)
+- `set_complete_badge.ogv` sha256 `e9ac55d9ffc74e13f130fd585fa2e1c2b4fb90bcc556f327cd4b996073427373` (1628240 bytes)
 - `set_complete_badge_still.png` sha256 `6807a3c705f8bfe26720f02471b15d44e93a82fb9e54503be97700f453251023` (385029 bytes)
-- encode: `ffmpeg -hide_banner -loglevel error -y -i set_complete_master.mp4 -map 0:v:0 -an -frames:v 182 -vf crop=624:624:48:402 -c:v libtheora -q:v 8 -pix_fmt yuv420p -map_metadata -1 set_complete_badge.ogv`
+- encode: `ffmpeg -hide_banner -loglevel error -y -i set_complete_master.mp4 -map 0:v:0 -an -frames:v 182 -vf crop=624:624:48:402 -c:v libtheora -q:v 5 -pix_fmt yuv420p -map_metadata -1 set_complete_badge.ogv`
