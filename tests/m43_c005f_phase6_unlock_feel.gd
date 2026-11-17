@@ -141,6 +141,7 @@ func _truth() -> Dictionary:
 	var s: Dictionary = _e().snapshot()
 	s["hearts"].erase("anchor")              # wall-clock anchors, not authority truth
 	s["speed"].erase("clock_high_water")
+	s["events_v02"].erase("hw")
 	for k in s:
 		out["economy." + String(k)] = JSON.stringify(s[k])
 	for id in _app().unlocks.cfg["unlocks"]:
