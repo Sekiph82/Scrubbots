@@ -1,0 +1,1771 @@
+{
+ "schema": "scrubbots.events_v02.asset_manifest",
+ "version": 1,
+ "source_root": "C:/Users/sekip/Desktop/ScrubBots Events PNG (Codex local delivery, read only)",
+ "approval": "CLAUDE.md 0D.1 (owner 2026-10-22): owner visual approvals given",
+ "optimization": "heroes/backgrounds 1024->768, icons 512->256 (Lanczos), decorations unchanged; lossless import",
+ "assets": [
+  {
+   "kind": "heroes",
+   "event_id": "clean_team_treasure",
+   "path": "res://assets/ui/final/events/heroes/clean_team_treasure.png",
+   "source": "heroes/clean_team_treasure.png",
+   "source_sha256": "c2518e2f7e4845ffba2e2ab723eabbbedb6cda2510ba7e72653f59a99af1f930",
+   "source_size": [
+    1024,
+    1024
+   ],
+   "size": [
+    768,
+    768
+   ],
+   "sha256": "200ac1e41da84e9455840324ae458baeee6ef9419b7a2d638d2622357929639f"
+  },
+  {
+   "kind": "heroes",
+   "event_id": "color_scrub_rush",
+   "path": "res://assets/ui/final/events/heroes/color_scrub_rush.png",
+   "source": "heroes/color_scrub_rush.png",
+   "source_sha256": "3911b67d08f16a1069cf4cebb5f6d9ee9f086c66f54d41e50cb6365a540bc505",
+   "source_size": [
+    1024,
+    1024
+   ],
+   "size": [
+    768,
+    768
+   ],
+   "sha256": "13c2417c0890060ff2b4897dcd12cb76369a82cf3e8272c6dc51c32a6dd3d578"
+  },
+  {
+   "kind": "heroes",
+   "event_id": "first_brush_race",
+   "path": "res://assets/ui/final/events/heroes/first_brush_race.png",
+   "source": "heroes/first_brush_race.png",
+   "source_sha256": "6cf7a5dda65ecba30453d2f972f04deb62cfcfb6d7a27024eeba93b095f34ec0",
+   "source_size": [
+    1024,
+    1024
+   ],
+   "size": [
+    768,
+    768
+   ],
+   "sha256": "e2a1d0b94e7f28dfd4ddf8b60ac903b273f864f1fcba053cbecd888da1905b4c"
+  },
+  {
+   "kind": "heroes",
+   "event_id": "golden_brush_championship",
+   "path": "res://assets/ui/final/events/heroes/golden_brush_championship.png",
+   "source": "heroes/golden_brush_championship.png",
+   "source_sha256": "d83a8151d5018437dc0d0735f9a9ae345bbd1ec7be2dfc631147ef6b7d98962c",
+   "source_size": [
+    1024,
+    1024
+   ],
+   "size": [
+    768,
+    768
+   ],
+   "sha256": "9e845785424aba1b057aadbd45c1e95bdff8115c158989f81e0aaa18d505c837"
+  },
+  {
+   "kind": "heroes",
+   "event_id": "lost_card_rescue",
+   "path": "res://assets/ui/final/events/heroes/lost_card_rescue.png",
+   "source": "heroes/lost_card_rescue.png",
+   "source_sha256": "64202c4334a2c3ca3b9aa28674e606ea886c55e5faef790a1fd47e1d085938dc",
+   "source_size": [
+    1024,
+    1024
+   ],
+   "size": [
+    768,
+    768
+   ],
+   "sha256": "4386a8bc2c9d9469d5ecc9113a8c993965c744d297e827f9b8c9f340e72423b5"
+  },
+  {
+   "kind": "heroes",
+   "event_id": "master_cleaner_quest",
+   "path": "res://assets/ui/final/events/heroes/master_cleaner_quest.png",
+   "source": "heroes/master_cleaner_quest.png",
+   "source_sha256": "1db40eaba307f5f5fd939816438206503c9a2d1835282571fb2062ab90a2483f",
+   "source_size": [
+    1024,
+    1024
+   ],
+   "size": [
+    768,
+    768
+   ],
+   "sha256": "69cb394b8e27205e461739acb89ce28042cd13f4b92b151a987b9bb6f9e144aa"
+  },
+  {
+   "kind": "heroes",
+   "event_id": "mega_stain_cleanup",
+   "path": "res://assets/ui/final/events/heroes/mega_stain_cleanup.png",
+   "source": "heroes/mega_stain_cleanup.png",
+   "source_sha256": "f2f7b11f71fedf8ae9f92fa76261e275e5e32b1181b25d2beb700a2c6a1bcf7f",
+   "source_size": [
+    1024,
+    1024
+   ],
+   "size": [
+    768,
+    768
+   ],
+   "sha256": "9bf0a231f343bc0e3ea639abaa901621177a70054fc9c214fb2af7ab92295a44"
+  },
+  {
+   "kind": "heroes",
+   "event_id": "mystery_scrubbox_hunt",
+   "path": "res://assets/ui/final/events/heroes/mystery_scrubbox_hunt.png",
+   "source": "heroes/mystery_scrubbox_hunt.png",
+   "source_sha256": "47ddde9ccc486c3266c569018eedf70f76d22a989f37b1c31ca8e8f89958f461",
+   "source_size": [
+    1024,
+    1024
+   ],
+   "size": [
+    768,
+    768
+   ],
+   "sha256": "7f7558e170828c57317fb6150dab4c50d3a8837429ad1f2ecf01729d3c92ac27"
+  },
+  {
+   "kind": "heroes",
+   "event_id": "perfect_first_clean",
+   "path": "res://assets/ui/final/events/heroes/perfect_first_clean.png",
+   "source": "heroes/perfect_first_clean.png",
+   "source_sha256": "22e2662e23019b19a7f3bb9c24b29bc76a5bc52fcd562ab1aefb68f495b0e377",
+   "source_size": [
+    1024,
+    1024
+   ],
+   "size": [
+    768,
+    768
+   ],
+   "sha256": "e00059d7c0a231a21e80e473527eb123894e18538ca7f01edd3ec351bd580a89"
+  },
+  {
+   "kind": "heroes",
+   "event_id": "pure_scrub_challenge",
+   "path": "res://assets/ui/final/events/heroes/pure_scrub_challenge.png",
+   "source": "heroes/pure_scrub_challenge.png",
+   "source_sha256": "02b50330c7ea615e0b06f07b9383c98b3097ff6daea240562c37e1e1be2b5a82",
+   "source_size": [
+    1024,
+    1024
+   ],
+   "size": [
+    768,
+    768
+   ],
+   "sha256": "45105c696517cf06277f9aecd12a401a4c1b2adaa4c47a69d2033e7648ad859e"
+  },
+  {
+   "kind": "heroes",
+   "event_id": "robot_parts_recovery",
+   "path": "res://assets/ui/final/events/heroes/robot_parts_recovery.png",
+   "source": "heroes/robot_parts_recovery.png",
+   "source_sha256": "5ff49116b3141ec5e7ff523e345ac01a4013be4da07ee0dba32452509c8d6617",
+   "source_size": [
+    1024,
+    1024
+   ],
+   "size": [
+    768,
+    768
+   ],
+   "sha256": "eb76f3e82e27de58ecaa6ba612fc427550f140efbed32f12c0204cebde63850d"
+  },
+  {
+   "kind": "heroes",
+   "event_id": "scrub_relay",
+   "path": "res://assets/ui/final/events/heroes/scrub_relay.png",
+   "source": "heroes/scrub_relay.png",
+   "source_sha256": "02612fb59cab7d7d7f01078393fdf4aa1d7bfd0f43200ca544d0961ac30e5965",
+   "source_size": [
+    1024,
+    1024
+   ],
+   "size": [
+    768,
+    768
+   ],
+   "sha256": "79efd75e849aafeaafb4a7ffdfe9e9701483eb681187425f86dbf7d8c459ca6d"
+  },
+  {
+   "kind": "heroes",
+   "event_id": "scrub_season_pass",
+   "path": "res://assets/ui/final/events/heroes/scrub_season_pass.png",
+   "source": "heroes/scrub_season_pass.png",
+   "source_sha256": "4c7c3015ac49ea4f5ad28edfa6f72f9ddc1c62f1eef83eb5e2d137568f8aa8a8",
+   "source_size": [
+    1024,
+    1024
+   ],
+   "size": [
+    768,
+    768
+   ],
+   "sha256": "0f48650b76d3e72989e45de764351d3eec6f19b26845689d02eaebeb4c94b76c"
+  },
+  {
+   "kind": "heroes",
+   "event_id": "scrub_sprint",
+   "path": "res://assets/ui/final/events/heroes/scrub_sprint.png",
+   "source": "heroes/scrub_sprint.png",
+   "source_sha256": "1fa429febc9fae68857a4be68b794fbf4a62ea2cbc73df3f904218ef41b9ced6",
+   "source_size": [
+    1024,
+    1024
+   ],
+   "size": [
+    768,
+    768
+   ],
+   "sha256": "ded553f0289701f85176d0e947bfc523041625c9dc904a48f0530fd2594f11b8"
+  },
+  {
+   "kind": "heroes",
+   "event_id": "scrub_squad_tournament",
+   "path": "res://assets/ui/final/events/heroes/scrub_squad_tournament.png",
+   "source": "heroes/scrub_squad_tournament.png",
+   "source_sha256": "541267eea9c92b30cacbbc2d837f944037ef1759c76a168589a1844f259ec81c",
+   "source_size": [
+    1024,
+    1024
+   ],
+   "size": [
+    768,
+    768
+   ],
+   "sha256": "2c3a185ee3fc4a402c828986ecc42f1314d028914e928511d6dc4946c98ace4a"
+  },
+  {
+   "kind": "heroes",
+   "event_id": "scrubbots_royale",
+   "path": "res://assets/ui/final/events/heroes/scrubbots_royale.png",
+   "source": "heroes/scrubbots_royale.png",
+   "source_sha256": "3b3ebf08cdd5a6f4231e014efed481ad666e5a1b794b93c1acc5d2037d4c4940",
+   "source_size": [
+    1024,
+    1024
+   ],
+   "size": [
+    768,
+    768
+   ],
+   "sha256": "a02968dc8a3f4e7d996e900558c8559287ab61ee319f05058946f47a9c592f75"
+  },
+  {
+   "kind": "heroes",
+   "event_id": "scrubbys_cleanup_workshop",
+   "path": "res://assets/ui/final/events/heroes/scrubbys_cleanup_workshop.png",
+   "source": "heroes/scrubbys_cleanup_workshop.png",
+   "source_sha256": "a0f85824b29fc55e8887e1f5bed01937f6243aaab602f076e84c793d289725f6",
+   "source_size": [
+    1024,
+    1024
+   ],
+   "size": [
+    768,
+    768
+   ],
+   "sha256": "635dd34b42621216c98d7ef892461d75e6d52d070271721597f19b133ec0e6d8"
+  },
+  {
+   "kind": "heroes",
+   "event_id": "scrubbys_rescue_mission",
+   "path": "res://assets/ui/final/events/heroes/scrubbys_rescue_mission.png",
+   "source": "heroes/scrubbys_rescue_mission.png",
+   "source_sha256": "21b10199797ff4244d3d6d44e934a73781f93a82c328d3739eae3225cc0ea709",
+   "source_size": [
+    1024,
+    1024
+   ],
+   "size": [
+    768,
+    768
+   ],
+   "sha256": "84865e24c2cd305c889c19c04249681feca7e2ced307dfd11d5cee50b631e2e9"
+  },
+  {
+   "kind": "heroes",
+   "event_id": "seasonal_scrub_festival",
+   "path": "res://assets/ui/final/events/heroes/seasonal_scrub_festival.png",
+   "source": "heroes/seasonal_scrub_festival.png",
+   "source_sha256": "dcc1df1ccbbe191346dba283b7d5c2e0af0ad31875ed052a77ff092a645f9861",
+   "source_size": [
+    1024,
+    1024
+   ],
+   "size": [
+    768,
+    768
+   ],
+   "sha256": "d0443fc57e56e29d09254ee21992ece7cfa1914921503c409f7e313a29140a4a"
+  },
+  {
+   "kind": "heroes",
+   "event_id": "sparkling_streak",
+   "path": "res://assets/ui/final/events/heroes/sparkling_streak.png",
+   "source": "heroes/sparkling_streak.png",
+   "source_sha256": "8e34f345fd98cc573343318fbd9d45a1c9f1bdfa7ce9757ea7150f4882d7ea24",
+   "source_size": [
+    1024,
+    1024
+   ],
+   "size": [
+    768,
+    768
+   ],
+   "sha256": "ab150879034037753f328c19c3595e05796f5bc6ccdda5207f03249b6bafff02"
+  },
+  {
+   "kind": "heroes",
+   "event_id": "stain_busters",
+   "path": "res://assets/ui/final/events/heroes/stain_busters.png",
+   "source": "heroes/stain_busters.png",
+   "source_sha256": "ba36b8e8598fea1843a38214f37b6094cf69c2a8488efae830ee32c710ed3542",
+   "source_size": [
+    1024,
+    1024
+   ],
+   "size": [
+    768,
+    768
+   ],
+   "sha256": "1c26409f2cc799f60fb2e114cbd5fd7947a8e65ad099af12d9dec66b48ffbd6d"
+  },
+  {
+   "kind": "heroes",
+   "event_id": "weekly_cleanup_challenge",
+   "path": "res://assets/ui/final/events/heroes/weekly_cleanup_challenge.png",
+   "source": "heroes/weekly_cleanup_challenge.png",
+   "source_sha256": "9838ba1c8b5d033eae7983df0896e5ec77d70fcc609c1515b5101d78b3774ddd",
+   "source_size": [
+    1024,
+    1024
+   ],
+   "size": [
+    768,
+    768
+   ],
+   "sha256": "9630932f3a07452973a8fd722bba9b1012828d14861e8a5a84e3b52169d14332"
+  },
+  {
+   "kind": "heroes",
+   "event_id": "weekly_scrub_league",
+   "path": "res://assets/ui/final/events/heroes/weekly_scrub_league.png",
+   "source": "heroes/weekly_scrub_league.png",
+   "source_sha256": "0934a9ba31f26b15994ce2b4cf80f89ca54de8fea2a0fc21f79620c26d072095",
+   "source_size": [
+    1024,
+    1024
+   ],
+   "size": [
+    768,
+    768
+   ],
+   "sha256": "09b0c25255f9079e8942d8cef23f4190ba3bb37e191bd032775fceeae22df0f1"
+  },
+  {
+   "kind": "heroes",
+   "event_id": "world_cleanup_cup",
+   "path": "res://assets/ui/final/events/heroes/world_cleanup_cup.png",
+   "source": "heroes/world_cleanup_cup.png",
+   "source_sha256": "be6e9c14146105f07ccf38906ef5adf14e2bbd13fdf4773cf1f7f3809a5be6e0",
+   "source_size": [
+    1024,
+    1024
+   ],
+   "size": [
+    768,
+    768
+   ],
+   "sha256": "77aa4f6c01b59602cdbb15c652ef31d3491c2522c0db9bbf59757fc01ddfcffe"
+  },
+  {
+   "kind": "icons",
+   "event_id": "clean_team_treasure",
+   "path": "res://assets/ui/final/events/icons/clean_team_treasure.png",
+   "source": "icons/clean_team_treasure.png",
+   "source_sha256": "27bea5c3647544127159f7cca3db9c9dd1b5a887e41ff368a50fd58b7e9a3a34",
+   "source_size": [
+    512,
+    512
+   ],
+   "size": [
+    256,
+    256
+   ],
+   "sha256": "f257c4362e59ae380a739a0c203a97c7edc38a59222decb86aa075aa889ea118"
+  },
+  {
+   "kind": "icons",
+   "event_id": "color_scrub_rush",
+   "path": "res://assets/ui/final/events/icons/color_scrub_rush.png",
+   "source": "icons/color_scrub_rush.png",
+   "source_sha256": "dd3b0bad0249a6df2eb72a904537a73c4e6a2d93a31d6669d6d63579bdc6f95d",
+   "source_size": [
+    512,
+    512
+   ],
+   "size": [
+    256,
+    256
+   ],
+   "sha256": "8577911e6ab28113d68188c47b902d28767fb9de2213c3115e7779da41f33d1a"
+  },
+  {
+   "kind": "icons",
+   "event_id": "first_brush_race",
+   "path": "res://assets/ui/final/events/icons/first_brush_race.png",
+   "source": "icons/first_brush_race.png",
+   "source_sha256": "3c380ac3cee282abadc32821f0ce3f363d507422b5ae7aed4477397ed680ed7f",
+   "source_size": [
+    512,
+    512
+   ],
+   "size": [
+    256,
+    256
+   ],
+   "sha256": "64b801f7ebbff36a0cdc458f986a92a1539c6bf9912c45cfabc1304b1bb33e35"
+  },
+  {
+   "kind": "icons",
+   "event_id": "golden_brush_championship",
+   "path": "res://assets/ui/final/events/icons/golden_brush_championship.png",
+   "source": "icons/golden_brush_championship.png",
+   "source_sha256": "2b0f9b1b731fb463e18e8f59a70c25d52dda45713e4bf4481680f26f33b31ac8",
+   "source_size": [
+    512,
+    512
+   ],
+   "size": [
+    256,
+    256
+   ],
+   "sha256": "7cfaf1ce00d5dd4001fa7205062ceedf4bc344069497c05900bde9d14925c60d"
+  },
+  {
+   "kind": "icons",
+   "event_id": "lost_card_rescue",
+   "path": "res://assets/ui/final/events/icons/lost_card_rescue.png",
+   "source": "icons/lost_card_rescue.png",
+   "source_sha256": "eef3b03aa2286b1628ecb77b877b5ff0daef66c4d51727970e12b250363d86fe",
+   "source_size": [
+    512,
+    512
+   ],
+   "size": [
+    256,
+    256
+   ],
+   "sha256": "04553ddf86aeab6bf73d738bd97199f4676987e844de30fcf012fb47ba722f97"
+  },
+  {
+   "kind": "icons",
+   "event_id": "master_cleaner_quest",
+   "path": "res://assets/ui/final/events/icons/master_cleaner_quest.png",
+   "source": "icons/master_cleaner_quest.png",
+   "source_sha256": "51b33d8ed77f61b945987a0628497225939f93389a79d7d7522fd14738a1517c",
+   "source_size": [
+    512,
+    512
+   ],
+   "size": [
+    256,
+    256
+   ],
+   "sha256": "163ad3d20a337871bbf9de12e582ceb55de8016761de99c92ca56fbcb88c924f"
+  },
+  {
+   "kind": "icons",
+   "event_id": "mega_stain_cleanup",
+   "path": "res://assets/ui/final/events/icons/mega_stain_cleanup.png",
+   "source": "icons/mega_stain_cleanup.png",
+   "source_sha256": "a9e2a36f47f75780d1a9b3192fb7b791262e05939521201d26db42f7b14abd6b",
+   "source_size": [
+    512,
+    512
+   ],
+   "size": [
+    256,
+    256
+   ],
+   "sha256": "0e48135633fe5f3f206ba93504b58311bbb6dee683362d99bf5050661ace0577"
+  },
+  {
+   "kind": "icons",
+   "event_id": "mystery_scrubbox_hunt",
+   "path": "res://assets/ui/final/events/icons/mystery_scrubbox_hunt.png",
+   "source": "icons/mystery_scrubbox_hunt.png",
+   "source_sha256": "b1d9d8669f78465d3751bf86a1bd82ef0b75db079c36f0235d21548efd40c092",
+   "source_size": [
+    512,
+    512
+   ],
+   "size": [
+    256,
+    256
+   ],
+   "sha256": "5246c0abd6e7e4532586229df738b5665eef90860c0f9e805f66c12a00968547"
+  },
+  {
+   "kind": "icons",
+   "event_id": "perfect_first_clean",
+   "path": "res://assets/ui/final/events/icons/perfect_first_clean.png",
+   "source": "icons/perfect_first_clean.png",
+   "source_sha256": "5bd9cf325fc9fc25f892048fa9c7d40eb0ff3328f574b20f6dac8ebffbe32eae",
+   "source_size": [
+    512,
+    512
+   ],
+   "size": [
+    256,
+    256
+   ],
+   "sha256": "74f97edf8a25371bfd72acb95893d68effde621fbc9992f3ec11cb1cf8dcd657"
+  },
+  {
+   "kind": "icons",
+   "event_id": "pure_scrub_challenge",
+   "path": "res://assets/ui/final/events/icons/pure_scrub_challenge.png",
+   "source": "icons/pure_scrub_challenge.png",
+   "source_sha256": "ae6928684da3faa9cafa55e36b3b3c38e11d56fa2fc24dbb1dbf2020dfffb2d5",
+   "source_size": [
+    512,
+    512
+   ],
+   "size": [
+    256,
+    256
+   ],
+   "sha256": "6fdc6b48a439bbd1c2e6be073338a4053380d695c08613fd56a369d940f52d2b"
+  },
+  {
+   "kind": "icons",
+   "event_id": "robot_parts_recovery",
+   "path": "res://assets/ui/final/events/icons/robot_parts_recovery.png",
+   "source": "icons/robot_parts_recovery.png",
+   "source_sha256": "b00031cc0a7bac1f2fde25e50aff81fc2959eec69d71e8a5305d2e544ffa7e2a",
+   "source_size": [
+    512,
+    512
+   ],
+   "size": [
+    256,
+    256
+   ],
+   "sha256": "d51a68c8cf5df726409e9be05d9ca524ab43bd1b19a13eb69b989b9da299423a"
+  },
+  {
+   "kind": "icons",
+   "event_id": "scrub_relay",
+   "path": "res://assets/ui/final/events/icons/scrub_relay.png",
+   "source": "icons/scrub_relay.png",
+   "source_sha256": "725a1889533f3bbbcead833e2acb6794c4332bcb4d049cbe59d8a8b3b8d4a052",
+   "source_size": [
+    512,
+    512
+   ],
+   "size": [
+    256,
+    256
+   ],
+   "sha256": "53e402c670c292a8638c6a5b57d9c384e6892723888f164de47361ccc9fe1415"
+  },
+  {
+   "kind": "icons",
+   "event_id": "scrub_season_pass",
+   "path": "res://assets/ui/final/events/icons/scrub_season_pass.png",
+   "source": "icons/scrub_season_pass.png",
+   "source_sha256": "dfe250b564f864fe00dfdd1c2a1b743a46721ad457952753fa3e72cfa1ae6f17",
+   "source_size": [
+    512,
+    512
+   ],
+   "size": [
+    256,
+    256
+   ],
+   "sha256": "b39f480524fb67a28cf31b1c6df03e1e11d7fc8d4b0ebbd0532d2aef2598ecc9"
+  },
+  {
+   "kind": "icons",
+   "event_id": "scrub_sprint",
+   "path": "res://assets/ui/final/events/icons/scrub_sprint.png",
+   "source": "icons/scrub_sprint.png",
+   "source_sha256": "c2b7f19196f45346603e8b7eca54331b781a4747b2798059a5da3d5114a76750",
+   "source_size": [
+    512,
+    512
+   ],
+   "size": [
+    256,
+    256
+   ],
+   "sha256": "6411cdff518915c50a4c322a90f3d0a5e775d1b18db388a6259c76db223d3b2e"
+  },
+  {
+   "kind": "icons",
+   "event_id": "scrub_squad_tournament",
+   "path": "res://assets/ui/final/events/icons/scrub_squad_tournament.png",
+   "source": "icons/scrub_squad_tournament.png",
+   "source_sha256": "d0da36b71863220897d85cd12471bf318d4af48f505a0c9f9532c79d2926455a",
+   "source_size": [
+    512,
+    512
+   ],
+   "size": [
+    256,
+    256
+   ],
+   "sha256": "6868557d7db530c475fdf855d431d6feea4d7d2cf80a0671f4b29f358453702d"
+  },
+  {
+   "kind": "icons",
+   "event_id": "scrubbots_royale",
+   "path": "res://assets/ui/final/events/icons/scrubbots_royale.png",
+   "source": "icons/scrubbots_royale.png",
+   "source_sha256": "6c5bc773814423daa0ea5d618589966c03b7ad4961ffa150c88ccfe516660a7a",
+   "source_size": [
+    512,
+    512
+   ],
+   "size": [
+    256,
+    256
+   ],
+   "sha256": "76cade53a622a0bf9ca9cde1ddd76b155da988aaaa19b6fe7c1267ddda63de5c"
+  },
+  {
+   "kind": "icons",
+   "event_id": "scrubbys_cleanup_workshop",
+   "path": "res://assets/ui/final/events/icons/scrubbys_cleanup_workshop.png",
+   "source": "icons/scrubbys_cleanup_workshop.png",
+   "source_sha256": "3211923b63444bfa3a52e5e7b838837aead98e034fb3003e3c8d2553966c361c",
+   "source_size": [
+    512,
+    512
+   ],
+   "size": [
+    256,
+    256
+   ],
+   "sha256": "7808ac06b95090b950723913cd31bb4176ce006b823831096af23225b4d67939"
+  },
+  {
+   "kind": "icons",
+   "event_id": "scrubbys_rescue_mission",
+   "path": "res://assets/ui/final/events/icons/scrubbys_rescue_mission.png",
+   "source": "icons/scrubbys_rescue_mission.png",
+   "source_sha256": "c3744f093e6737dc6b2e2efe28e061bb4c6d1bcbf466c0dadee77a197bd11c95",
+   "source_size": [
+    512,
+    512
+   ],
+   "size": [
+    256,
+    256
+   ],
+   "sha256": "d2690b5d7d378203c5789c1f59f6447edf623c20db4b9bc8f7ca2da11e2cc608"
+  },
+  {
+   "kind": "icons",
+   "event_id": "seasonal_scrub_festival",
+   "path": "res://assets/ui/final/events/icons/seasonal_scrub_festival.png",
+   "source": "icons/seasonal_scrub_festival.png",
+   "source_sha256": "1b84a16d303e1b74623a3d176bce3a596c0c5f56a1be4960d22b345dd3306727",
+   "source_size": [
+    512,
+    512
+   ],
+   "size": [
+    256,
+    256
+   ],
+   "sha256": "46802920b5334fd7010a116aeecb4a20817ef9532659201cdafb4e18cd55fc33"
+  },
+  {
+   "kind": "icons",
+   "event_id": "sparkling_streak",
+   "path": "res://assets/ui/final/events/icons/sparkling_streak.png",
+   "source": "icons/sparkling_streak.png",
+   "source_sha256": "988058b8b5d57d0e0d3d0711928f586a2991b4bfd8a260b63624a3d0a14ebe8e",
+   "source_size": [
+    512,
+    512
+   ],
+   "size": [
+    256,
+    256
+   ],
+   "sha256": "9427d3556743614e9d9cd1b2f94e1a7b0abcba6fd1e31aa7a8122bbc90827712"
+  },
+  {
+   "kind": "icons",
+   "event_id": "stain_busters",
+   "path": "res://assets/ui/final/events/icons/stain_busters.png",
+   "source": "icons/stain_busters.png",
+   "source_sha256": "9e0a858aadc017b128a4c5fd9245f8c2b09a29252db49c6db16c3587abbf0d81",
+   "source_size": [
+    512,
+    512
+   ],
+   "size": [
+    256,
+    256
+   ],
+   "sha256": "b80d46a56127f44d63d0fb3c3e94d4d6f5ab822773587166dc795dd298e99883"
+  },
+  {
+   "kind": "icons",
+   "event_id": "weekly_cleanup_challenge",
+   "path": "res://assets/ui/final/events/icons/weekly_cleanup_challenge.png",
+   "source": "icons/weekly_cleanup_challenge.png",
+   "source_sha256": "8c9974c861d040189bfabf126a106c3d9fa3dc1971ae1b4270537385cbcdc7ed",
+   "source_size": [
+    512,
+    512
+   ],
+   "size": [
+    256,
+    256
+   ],
+   "sha256": "4d02d3f1949f895e52dafadec7d240992da51fb09c8355fdad07680980765ad1"
+  },
+  {
+   "kind": "icons",
+   "event_id": "weekly_scrub_league",
+   "path": "res://assets/ui/final/events/icons/weekly_scrub_league.png",
+   "source": "icons/weekly_scrub_league.png",
+   "source_sha256": "a1407cb1ff81a82ae073feb8c41d7b8d398e4329ca94e831e079411bafa0cb20",
+   "source_size": [
+    512,
+    512
+   ],
+   "size": [
+    256,
+    256
+   ],
+   "sha256": "382de3a1dfc32b1ff99ac8492542b3cd8e4fac3b518f21379a95d7f3ffff25ea"
+  },
+  {
+   "kind": "icons",
+   "event_id": "world_cleanup_cup",
+   "path": "res://assets/ui/final/events/icons/world_cleanup_cup.png",
+   "source": "icons/world_cleanup_cup.png",
+   "source_sha256": "a527e1e68556cfd30aa4597c19fc2d06e4026ebc39f4e7a94f4fc6d726cb971f",
+   "source_size": [
+    512,
+    512
+   ],
+   "size": [
+    256,
+    256
+   ],
+   "sha256": "bfc6ecfcd658b4b801dbc29a8f24cdbbdedc61a7b71b01f8c043834881d9b1ff"
+  },
+  {
+   "kind": "backgrounds",
+   "event_id": null,
+   "path": "res://assets/ui/final/events/backgrounds/race_brush_circuit.png",
+   "source": "backgrounds/race_brush_circuit.png",
+   "source_sha256": "151f5a845d5e304786a2956fe2d828340f057a81f9a77e6ad4fa2cd279938222",
+   "source_size": [
+    1024,
+    1024
+   ],
+   "size": [
+    768,
+    768
+   ],
+   "sha256": "e17e6c8470b150d67b3743ca68e81abb84054ddc0d8756afbe3c361b7ce80c04"
+  },
+  {
+   "kind": "backgrounds",
+   "event_id": null,
+   "path": "res://assets/ui/final/events/backgrounds/race_royale_arena.png",
+   "source": "backgrounds/race_royale_arena.png",
+   "source_sha256": "da6e11d2cfe77d876f4dfa47594605927ae131020a2e35bd1b1b66934e124aa9",
+   "source_size": [
+    1024,
+    1024
+   ],
+   "size": [
+    768,
+    768
+   ],
+   "sha256": "cc6095aa8e99267cb3837b92c3c30dd8c37344b1e343efe405bf1442f529ddbb"
+  },
+  {
+   "kind": "backgrounds",
+   "event_id": null,
+   "path": "res://assets/ui/final/events/backgrounds/race_sprint.png",
+   "source": "backgrounds/race_sprint.png",
+   "source_sha256": "401c03688bf63e0a872c92af294477aad76f42a5f5462e1fe0a624737b9430d4",
+   "source_size": [
+    1024,
+    1024
+   ],
+   "size": [
+    768,
+    768
+   ],
+   "sha256": "d335707069dd50c42bd1f19608adf587441b678d04fa728b4adf8ad549a2d067"
+  },
+  {
+   "kind": "backgrounds",
+   "event_id": null,
+   "path": "res://assets/ui/final/events/backgrounds/team_squad_course.png",
+   "source": "backgrounds/team_squad_course.png",
+   "source_sha256": "4c42710a357eeb170d8275fb990cb35b5f408228caa77b98ac2379fa17ca6357",
+   "source_size": [
+    1024,
+    1024
+   ],
+   "size": [
+    768,
+    768
+   ],
+   "sha256": "7e29fb80031e280ebcc3aee6daf1f4a0774d4e9276dc87d18e8107753ab9610f"
+  },
+  {
+   "kind": "backgrounds",
+   "event_id": null,
+   "path": "res://assets/ui/final/events/backgrounds/team_treasure_garden.png",
+   "source": "backgrounds/team_treasure_garden.png",
+   "source_sha256": "8d22a78e36a8a0117cc328548a6b2a460a4f2d951d27366ca01b6abb576e8507",
+   "source_size": [
+    1024,
+    1024
+   ],
+   "size": [
+    768,
+    768
+   ],
+   "sha256": "4920fbf66074a6354f7f28aad1c1b6ee4fe7d1deeffe87df13a3a9e4c7901f35"
+  },
+  {
+   "kind": "decorations",
+   "event_id": null,
+   "path": "res://assets/ui/final/events/decorations/reward_checkpoint_route.png",
+   "source": "decorations/reward_checkpoint_route.png",
+   "source_sha256": "41333d9cf7ef846f82672959f4f06aa798868ce269e57d823d5561818ba64b6a",
+   "source_size": [
+    1024,
+    420
+   ],
+   "size": [
+    1024,
+    420
+   ],
+   "sha256": "41333d9cf7ef846f82672959f4f06aa798868ce269e57d823d5561818ba64b6a"
+  },
+  {
+   "kind": "decorations",
+   "event_id": null,
+   "path": "res://assets/ui/final/events/decorations/reward_unlock_frame.png",
+   "source": "decorations/reward_unlock_frame.png",
+   "source_sha256": "f7bcf2440d2cd68596710304d89117e87e7119137353cdba7bf45734c65027bd",
+   "source_size": [
+    1024,
+    420
+   ],
+   "size": [
+    1024,
+    420
+   ],
+   "sha256": "f7bcf2440d2cd68596710304d89117e87e7119137353cdba7bf45734c65027bd"
+  },
+  {
+   "kind": "master",
+   "event_id": null,
+   "path": "res://assets/ui/generated/masters/scrubbots_events_master_v02.png",
+   "source": "masters/events_ui_master.png",
+   "source_sha256": "234511f4f200d9a191fb591c061209800088bc8760f1558d737e543885be5ec2",
+   "source_size": [
+    1170,
+    2532
+   ],
+   "size": [
+    1170,
+    2532
+   ],
+   "sha256": "7057e546d4a03a8a87d784d9cd9500bafc896be133e2ac823b0ac331efd2e2fb"
+  }
+ ],
+ "tutorial_storyboards_not_shipped": {
+  "reason": "Owner plan: 72 native Godot tutorial states, not painted full-screen images; storyboards are visual references only (227 MB).",
+  "count": 172,
+  "files": [
+   {
+    "event_id": "clean_team_treasure",
+    "source": "tutorials/clean_team_treasure/tutorial_01.png",
+    "source_sha256": "71d381ac63f0ccdd6bea73acf87c16d9e38522fb209c01df1cbfc9b25eb489e4"
+   },
+   {
+    "event_id": "clean_team_treasure",
+    "source": "tutorials/clean_team_treasure/tutorial_02.png",
+    "source_sha256": "8a0d3f6bacc489bf32d93ab7c21d2e259f7b0a1681c477c872e573c56acc7eb8"
+   },
+   {
+    "event_id": "clean_team_treasure",
+    "source": "tutorials/clean_team_treasure/tutorial_03.png",
+    "source_sha256": "cc58beb8177412c8980733431c88871a5a76afdf04ab0423d8e8575af6827079"
+   },
+   {
+    "event_id": "clean_team_treasure",
+    "source": "tutorials/clean_team_treasure/tutorial_04.png",
+    "source_sha256": "bafcbc88646fdf4b2ca65ab4f9e2b97c632925f89c1a4c51988a3064f1d98e24"
+   },
+   {
+    "event_id": "clean_team_treasure",
+    "source": "tutorials/clean_team_treasure/tutorial_05.png",
+    "source_sha256": "49146ac665436c63dc832dd42cc2c9fbcb59eabe819a59ef25df9a9646c268f1"
+   },
+   {
+    "event_id": "clean_team_treasure",
+    "source": "tutorials/clean_team_treasure/tutorial_06.png",
+    "source_sha256": "de9052ab02c4bc0b9e126975e75b5f475e9ea363c90b64d0cce394b80a1efdfb"
+   },
+   {
+    "event_id": "clean_team_treasure",
+    "source": "tutorials/clean_team_treasure/tutorial_07.png",
+    "source_sha256": "28047ebdddd8b2412f56fdd146e17455772fea9852970887172376045bf6abbf"
+   },
+   {
+    "event_id": "color_scrub_rush",
+    "source": "tutorials/color_scrub_rush/tutorial_01.png",
+    "source_sha256": "1b35c585093906dc5ed49a8f57c83274d21f52e8d94fd0937950af1fa8a9eab3"
+   },
+   {
+    "event_id": "color_scrub_rush",
+    "source": "tutorials/color_scrub_rush/tutorial_02.png",
+    "source_sha256": "9d43ce7a611c762dd08229547a66c85e47da61227cf549c5b70dd5c54619faab"
+   },
+   {
+    "event_id": "color_scrub_rush",
+    "source": "tutorials/color_scrub_rush/tutorial_03.png",
+    "source_sha256": "3c20c9b830b54de908141cfb6083ea67a3af023692cdbacb0c1cdcf9464b4c72"
+   },
+   {
+    "event_id": "color_scrub_rush",
+    "source": "tutorials/color_scrub_rush/tutorial_04.png",
+    "source_sha256": "08eb049bce6648cdc20b2555ebcee2da459c0c553e34d059b3c3b83513d136d7"
+   },
+   {
+    "event_id": "color_scrub_rush",
+    "source": "tutorials/color_scrub_rush/tutorial_05.png",
+    "source_sha256": "d1e760f0286591438a0892311cf04618691e1de734e01165e710a2aa332ab532"
+   },
+   {
+    "event_id": "color_scrub_rush",
+    "source": "tutorials/color_scrub_rush/tutorial_06.png",
+    "source_sha256": "955fd8241cc7e882626dc084cdf97a31395b3b2be2a6720931837d08ec025e75"
+   },
+   {
+    "event_id": "first_brush_race",
+    "source": "tutorials/first_brush_race/tutorial_01.png",
+    "source_sha256": "d409b5740f2f449a3b4e5411c2eac315c9c161af09bc181b15d13692e4af5b45"
+   },
+   {
+    "event_id": "first_brush_race",
+    "source": "tutorials/first_brush_race/tutorial_02.png",
+    "source_sha256": "89082c12f859ed655ce20a16dc3844d0f35eea2a8e520c916564d1cec781500b"
+   },
+   {
+    "event_id": "first_brush_race",
+    "source": "tutorials/first_brush_race/tutorial_03.png",
+    "source_sha256": "341827882e6d72ae4680070822d72ff649d44b41ad33a104a282b8382c06e310"
+   },
+   {
+    "event_id": "first_brush_race",
+    "source": "tutorials/first_brush_race/tutorial_04.png",
+    "source_sha256": "bd810f1dce9e82c3ccef8f6a6fcff461b948717dbc5f9ffddb316e18d3218661"
+   },
+   {
+    "event_id": "first_brush_race",
+    "source": "tutorials/first_brush_race/tutorial_05.png",
+    "source_sha256": "91d49c961f7d9577d0a7d9a5389c868a174d96a5cf9d571f70bfe98928b5baa9"
+   },
+   {
+    "event_id": "first_brush_race",
+    "source": "tutorials/first_brush_race/tutorial_06.png",
+    "source_sha256": "990eeb4e222de1df524daa4ced4dc69ac55ba29cfbf00c1b73217dc2b538b9ab"
+   },
+   {
+    "event_id": "first_brush_race",
+    "source": "tutorials/first_brush_race/tutorial_07.png",
+    "source_sha256": "1e7c4a6939f09abfa2b302b06e332e1d7de4e6ae3cf417d8fe6a9a736f554b8f"
+   },
+   {
+    "event_id": "golden_brush_championship",
+    "source": "tutorials/golden_brush_championship/tutorial_01.png",
+    "source_sha256": "0ce9b23ac2151d45fba946a2382fcb36e2058445d1e304a304ded8f12c5995ae"
+   },
+   {
+    "event_id": "golden_brush_championship",
+    "source": "tutorials/golden_brush_championship/tutorial_02.png",
+    "source_sha256": "92a520d072e95052332fa3eec6308570a235623215c27baefa81bd4ab84df427"
+   },
+   {
+    "event_id": "golden_brush_championship",
+    "source": "tutorials/golden_brush_championship/tutorial_03.png",
+    "source_sha256": "e07f1cb1d03c37f208480cdd63909aa0881e443e8ff33ec0c6ea48b5271afbe4"
+   },
+   {
+    "event_id": "golden_brush_championship",
+    "source": "tutorials/golden_brush_championship/tutorial_04.png",
+    "source_sha256": "d73c8ffd982394d80d407cde949f8e54bacc380419341fe4d8b181c1e9c7675f"
+   },
+   {
+    "event_id": "golden_brush_championship",
+    "source": "tutorials/golden_brush_championship/tutorial_05.png",
+    "source_sha256": "bbcfd27218515333291d1d2211b45e579e0a3e37a0dd9f1d157d388bc381c5c8"
+   },
+   {
+    "event_id": "golden_brush_championship",
+    "source": "tutorials/golden_brush_championship/tutorial_06.png",
+    "source_sha256": "960267497d1a57bbb66592bafd9c080936051986fb93e7a6aff8d72b4e80dbb0"
+   },
+   {
+    "event_id": "golden_brush_championship",
+    "source": "tutorials/golden_brush_championship/tutorial_07.png",
+    "source_sha256": "e457d41718972dad2833fb62b9279eb93d0e02ffddec36d7bd2b94b61ee67fd4"
+   },
+   {
+    "event_id": "golden_brush_championship",
+    "source": "tutorials/golden_brush_championship/tutorial_08.png",
+    "source_sha256": "f47a8c4a96079dc7bbd2e8905ecae7bbf71470b7bb6fb9f67581723642226973"
+   },
+   {
+    "event_id": "golden_brush_championship",
+    "source": "tutorials/golden_brush_championship/tutorial_09.png",
+    "source_sha256": "145c5ae47210669601e808d83aa45096b273ff1f193e7adc4c0736974b843a63"
+   },
+   {
+    "event_id": "lost_card_rescue",
+    "source": "tutorials/lost_card_rescue/tutorial_01.png",
+    "source_sha256": "55a255218b8cec8f18fc8624c1c305afc78567f3b65ee90b60a206f6d2f366cc"
+   },
+   {
+    "event_id": "lost_card_rescue",
+    "source": "tutorials/lost_card_rescue/tutorial_02.png",
+    "source_sha256": "7cba5a704d7fd7713481984b1a541115fb57e681b62acb5da4bb2ee644689d68"
+   },
+   {
+    "event_id": "lost_card_rescue",
+    "source": "tutorials/lost_card_rescue/tutorial_03.png",
+    "source_sha256": "26f01f13ed4869757cf8e425d37636842c7e50d161532fd018ace972482a3d8e"
+   },
+   {
+    "event_id": "lost_card_rescue",
+    "source": "tutorials/lost_card_rescue/tutorial_04.png",
+    "source_sha256": "53ae37bb05b1c299aad98deebba22ca1955fff00fea4a14678cdafdcc7975d98"
+   },
+   {
+    "event_id": "lost_card_rescue",
+    "source": "tutorials/lost_card_rescue/tutorial_05.png",
+    "source_sha256": "68d4041246566a0de36f4857676250efd008b1b3f55c70584fe250b5d2c0da2e"
+   },
+   {
+    "event_id": "lost_card_rescue",
+    "source": "tutorials/lost_card_rescue/tutorial_06.png",
+    "source_sha256": "a86a652af25b4b7964a8f9554f5744b634fb9228983d8f93e4fcf482b46c3a93"
+   },
+   {
+    "event_id": "master_cleaner_quest",
+    "source": "tutorials/master_cleaner_quest/tutorial_01.png",
+    "source_sha256": "73aa3f63b39d71d990b7792e96fa1f37679d086aaaadd83417ca7127cff944e8"
+   },
+   {
+    "event_id": "master_cleaner_quest",
+    "source": "tutorials/master_cleaner_quest/tutorial_02.png",
+    "source_sha256": "c0c7d431f2ffde834755b82956756eae7d153e80ace66a59164d5c44862a0b3a"
+   },
+   {
+    "event_id": "master_cleaner_quest",
+    "source": "tutorials/master_cleaner_quest/tutorial_03.png",
+    "source_sha256": "a0b9573b4015e83d411843914e5b092a385948705c2b59211791e4c67d5080de"
+   },
+   {
+    "event_id": "master_cleaner_quest",
+    "source": "tutorials/master_cleaner_quest/tutorial_04.png",
+    "source_sha256": "40ffe5799c128d5f40e85376d0919841a350a3b43799ace7b83a50cea914ce7f"
+   },
+   {
+    "event_id": "master_cleaner_quest",
+    "source": "tutorials/master_cleaner_quest/tutorial_05.png",
+    "source_sha256": "41e448c79ddfb02dcca85a96117cd8a4e1facb0073afa08824fb423fc75da17b"
+   },
+   {
+    "event_id": "master_cleaner_quest",
+    "source": "tutorials/master_cleaner_quest/tutorial_06.png",
+    "source_sha256": "50d330a62aab785e678a454a495fb24da34c095f8f1cb750ad857c7cfba08d0b"
+   },
+   {
+    "event_id": "master_cleaner_quest",
+    "source": "tutorials/master_cleaner_quest/tutorial_07.png",
+    "source_sha256": "15641b8b813e9a18bd0dd12820c207cb4599f1962b94c0312743b109a9951911"
+   },
+   {
+    "event_id": "master_cleaner_quest",
+    "source": "tutorials/master_cleaner_quest/tutorial_08.png",
+    "source_sha256": "ba78038942c40008ae13be1a0755a2c45663215c7dbb9c9d07ad069212f14d38"
+   },
+   {
+    "event_id": "mega_stain_cleanup",
+    "source": "tutorials/mega_stain_cleanup/tutorial_01.png",
+    "source_sha256": "778bba9f41447fcff0ea366de583e82645ee6ffb5fd61cabb86aec7aa1f87c70"
+   },
+   {
+    "event_id": "mega_stain_cleanup",
+    "source": "tutorials/mega_stain_cleanup/tutorial_02.png",
+    "source_sha256": "8750adc376bb8024607e04b6de9f851ab05dfeefb45decc54adaa9c9ea649ce6"
+   },
+   {
+    "event_id": "mega_stain_cleanup",
+    "source": "tutorials/mega_stain_cleanup/tutorial_03.png",
+    "source_sha256": "ac39ffc2af8965810393a2a82caf98da17548cb0a157d670b351a5542af51bb7"
+   },
+   {
+    "event_id": "mega_stain_cleanup",
+    "source": "tutorials/mega_stain_cleanup/tutorial_04.png",
+    "source_sha256": "40a8af878101ed053b86e479be30759d1e1b1573214defc4aa3ff0bc792a49cb"
+   },
+   {
+    "event_id": "mega_stain_cleanup",
+    "source": "tutorials/mega_stain_cleanup/tutorial_05.png",
+    "source_sha256": "9c2d1613da693cd7575bd510bd8f8b7a0e1c5d737396a68915bb9774f6f9b10d"
+   },
+   {
+    "event_id": "mega_stain_cleanup",
+    "source": "tutorials/mega_stain_cleanup/tutorial_06.png",
+    "source_sha256": "da5cff55aed65fe367d70993c1bb3b837cdb2934d31288f349977ea60c2cf1a9"
+   },
+   {
+    "event_id": "mega_stain_cleanup",
+    "source": "tutorials/mega_stain_cleanup/tutorial_07.png",
+    "source_sha256": "c0c03183e55cad014dde60e783d5ebf7785de2baaa2c907fc722c9cf05249c09"
+   },
+   {
+    "event_id": "mystery_scrubbox_hunt",
+    "source": "tutorials/mystery_scrubbox_hunt/tutorial_01.png",
+    "source_sha256": "c3926c71aa7b89decc877dd02222873ce26bd5dc9fe0cdd68bce3b47d3ad0ba1"
+   },
+   {
+    "event_id": "mystery_scrubbox_hunt",
+    "source": "tutorials/mystery_scrubbox_hunt/tutorial_02.png",
+    "source_sha256": "f9bd0af5200119c149fc1f4ca8e73e7661f1be44006faa9ce02332f8dafd8096"
+   },
+   {
+    "event_id": "mystery_scrubbox_hunt",
+    "source": "tutorials/mystery_scrubbox_hunt/tutorial_03.png",
+    "source_sha256": "ca771570f3469efc2085d360585cd39634448c6ec1d6916621828c5e9eb169b1"
+   },
+   {
+    "event_id": "mystery_scrubbox_hunt",
+    "source": "tutorials/mystery_scrubbox_hunt/tutorial_04.png",
+    "source_sha256": "eb8c28b29cf0c0a3739e5a73532538378a8f5d470a6c7a4b9b4ebd63442b9031"
+   },
+   {
+    "event_id": "mystery_scrubbox_hunt",
+    "source": "tutorials/mystery_scrubbox_hunt/tutorial_05.png",
+    "source_sha256": "228e51beb7c8bcdee6a63b06c342a8bf0f843e56a37da01da5c09d9788ac21eb"
+   },
+   {
+    "event_id": "mystery_scrubbox_hunt",
+    "source": "tutorials/mystery_scrubbox_hunt/tutorial_06.png",
+    "source_sha256": "e349b74f04e58bac76d0e13d77f85a55efd7965c5f227475d8eb6d822780f8ee"
+   },
+   {
+    "event_id": "mystery_scrubbox_hunt",
+    "source": "tutorials/mystery_scrubbox_hunt/tutorial_07.png",
+    "source_sha256": "5b1d945ce50c2fde78397908a3a33ce76766dc61ce4615b5a9703efce7332fe0"
+   },
+   {
+    "event_id": "perfect_first_clean",
+    "source": "tutorials/perfect_first_clean/tutorial_01.png",
+    "source_sha256": "080d08c73b78eb3f8cafc6fb86b168f2f68737c9411e60c738315b808c6a55d0"
+   },
+   {
+    "event_id": "perfect_first_clean",
+    "source": "tutorials/perfect_first_clean/tutorial_02.png",
+    "source_sha256": "2bf9511920c75de203daa5414f6f7b9b342cc594df06bbaa2b1b296fa9bd66a5"
+   },
+   {
+    "event_id": "perfect_first_clean",
+    "source": "tutorials/perfect_first_clean/tutorial_03.png",
+    "source_sha256": "31b5e55cec32193022b79704723b2d2f37f5866b148033fbeb0a0cbbf4ea6c26"
+   },
+   {
+    "event_id": "perfect_first_clean",
+    "source": "tutorials/perfect_first_clean/tutorial_04.png",
+    "source_sha256": "afbc747a5e30fa65eef8a5653544ba60c1955bc8dfdd117a69796044230b85e3"
+   },
+   {
+    "event_id": "perfect_first_clean",
+    "source": "tutorials/perfect_first_clean/tutorial_05.png",
+    "source_sha256": "1beea25265e440f1e682f7d58e076dbd17292f84b94142e3e658cb0136e8d108"
+   },
+   {
+    "event_id": "perfect_first_clean",
+    "source": "tutorials/perfect_first_clean/tutorial_06.png",
+    "source_sha256": "366c890e9a0e78f0e3c1f4639464d24055e6c47937aceed5ddd5d698f209a9ac"
+   },
+   {
+    "event_id": "pure_scrub_challenge",
+    "source": "tutorials/pure_scrub_challenge/tutorial_01.png",
+    "source_sha256": "ab58b00dcf6b79742b6ccd03b70e808c9e6377d9eb79ab2b5356a4ace62cde0b"
+   },
+   {
+    "event_id": "pure_scrub_challenge",
+    "source": "tutorials/pure_scrub_challenge/tutorial_02.png",
+    "source_sha256": "5fd0a82335cbdb6020e51fa7134e4f50fc44025101a491648fe734295e834680"
+   },
+   {
+    "event_id": "pure_scrub_challenge",
+    "source": "tutorials/pure_scrub_challenge/tutorial_03.png",
+    "source_sha256": "be66b28e3ea2b1d9a5d9cf28f01ef821a1b10696b258adaaaed165ad85d06ef4"
+   },
+   {
+    "event_id": "pure_scrub_challenge",
+    "source": "tutorials/pure_scrub_challenge/tutorial_04.png",
+    "source_sha256": "f5175c0df7597e1b9dbe0e1e13bf7acf383d49cc30ae41adf206776d1763d7ae"
+   },
+   {
+    "event_id": "pure_scrub_challenge",
+    "source": "tutorials/pure_scrub_challenge/tutorial_05.png",
+    "source_sha256": "cffac2c96e00be51f4854e7d6359c38bbd13e23c817e94298fe2d2401482bbcc"
+   },
+   {
+    "event_id": "pure_scrub_challenge",
+    "source": "tutorials/pure_scrub_challenge/tutorial_06.png",
+    "source_sha256": "d475d8318c4a07025b6c72fa26d2ff19107c4c19ed92250f23babe542bac1f01"
+   },
+   {
+    "event_id": "robot_parts_recovery",
+    "source": "tutorials/robot_parts_recovery/tutorial_01.png",
+    "source_sha256": "881d1f8d280aebafc478f196bc97e932a733bc8ca97060ea63bf0f6b926e8b36"
+   },
+   {
+    "event_id": "robot_parts_recovery",
+    "source": "tutorials/robot_parts_recovery/tutorial_02.png",
+    "source_sha256": "d77b21785bffeec98994b73e44bd0c396db8d96a5700d4cbc0cd5b836115bea4"
+   },
+   {
+    "event_id": "robot_parts_recovery",
+    "source": "tutorials/robot_parts_recovery/tutorial_03.png",
+    "source_sha256": "c9f4c424e1a3a258a7b580e877408281ed5f760838197b39053e5e32f41a8576"
+   },
+   {
+    "event_id": "robot_parts_recovery",
+    "source": "tutorials/robot_parts_recovery/tutorial_04.png",
+    "source_sha256": "bd5a6a0d23eb1a8b5c6e3e2281bbb8b900c62b1a5c5281573b9453f3a2afd512"
+   },
+   {
+    "event_id": "robot_parts_recovery",
+    "source": "tutorials/robot_parts_recovery/tutorial_05.png",
+    "source_sha256": "0f1bcc8eb15fc275beaabec05f4089530d4f0de4c205aa38256335481a2f7cdc"
+   },
+   {
+    "event_id": "robot_parts_recovery",
+    "source": "tutorials/robot_parts_recovery/tutorial_06.png",
+    "source_sha256": "f6c558ba59293d46e9186ab2d673fe737baa4e63a8ec23dbed30fe21916c1b98"
+   },
+   {
+    "event_id": "scrub_relay",
+    "source": "tutorials/scrub_relay/tutorial_01.png",
+    "source_sha256": "b1d251309d98ac1d854ced8718456d2fa17d1b49d5bc7e7617ca1aba1f95157f"
+   },
+   {
+    "event_id": "scrub_relay",
+    "source": "tutorials/scrub_relay/tutorial_02.png",
+    "source_sha256": "d90448be7f4d8494fd974403340ddb0feae053aedaaf7b5a970ca9b920ff4210"
+   },
+   {
+    "event_id": "scrub_relay",
+    "source": "tutorials/scrub_relay/tutorial_03.png",
+    "source_sha256": "7d77998b210a13acc02ac9535e1216485d37880a9435a646880281cbdd8c442e"
+   },
+   {
+    "event_id": "scrub_relay",
+    "source": "tutorials/scrub_relay/tutorial_04.png",
+    "source_sha256": "02f37f5205e44a8c84ebb8fcf63edeaa3606e50700d2b370c950b6637ea931ef"
+   },
+   {
+    "event_id": "scrub_relay",
+    "source": "tutorials/scrub_relay/tutorial_05.png",
+    "source_sha256": "a3ad4b5a411415623e584cb193ce90d743a5dd31a20ac84700137021e2acc21b"
+   },
+   {
+    "event_id": "scrub_relay",
+    "source": "tutorials/scrub_relay/tutorial_06.png",
+    "source_sha256": "452eb1fa499d9b381e482ad0baf38fd8735e4be186415dae8ef7a1e272f0ff91"
+   },
+   {
+    "event_id": "scrub_relay",
+    "source": "tutorials/scrub_relay/tutorial_07.png",
+    "source_sha256": "7243679765c054e20cfac752175d68e91310a63bec3074f84d9286963cb950c8"
+   },
+   {
+    "event_id": "scrub_relay",
+    "source": "tutorials/scrub_relay/tutorial_08.png",
+    "source_sha256": "f49a714abf45ccad06dfbf1cfd3481d3e6997462f634c6aeadb18e624d05678a"
+   },
+   {
+    "event_id": "scrub_season_pass",
+    "source": "tutorials/scrub_season_pass/tutorial_01.png",
+    "source_sha256": "bee966b8b860a2234636c3fd1f8d01d67d7733635306efff30389ac9b51172bd"
+   },
+   {
+    "event_id": "scrub_season_pass",
+    "source": "tutorials/scrub_season_pass/tutorial_02.png",
+    "source_sha256": "4d7708fbfe60e094ff83569266a7725317e8a657be5c8915d57ae7869e55627a"
+   },
+   {
+    "event_id": "scrub_season_pass",
+    "source": "tutorials/scrub_season_pass/tutorial_03.png",
+    "source_sha256": "9ead03dd7f831ddc44d94543b1d16299f2df0ee281ac39efd3b32b7a7826745e"
+   },
+   {
+    "event_id": "scrub_season_pass",
+    "source": "tutorials/scrub_season_pass/tutorial_04.png",
+    "source_sha256": "7a04eb53b49fce07768f47d99a23201f455a8734fa67ceba43b87126e9a0d0ca"
+   },
+   {
+    "event_id": "scrub_season_pass",
+    "source": "tutorials/scrub_season_pass/tutorial_05.png",
+    "source_sha256": "058eca3e5658db5c19898b0c2c175cfaac481eb904332ae1636257aa6c24905f"
+   },
+   {
+    "event_id": "scrub_season_pass",
+    "source": "tutorials/scrub_season_pass/tutorial_06.png",
+    "source_sha256": "0cf533c7cc47c337e9e9d066bd6c73b6fa7036f9ea76c4bc94dcb50bc571c04c"
+   },
+   {
+    "event_id": "scrub_season_pass",
+    "source": "tutorials/scrub_season_pass/tutorial_07.png",
+    "source_sha256": "a9da5d3d444e2ba5483f142430c342ff77137b59d80e782ee410f3946772aef8"
+   },
+   {
+    "event_id": "scrub_season_pass",
+    "source": "tutorials/scrub_season_pass/tutorial_08.png",
+    "source_sha256": "fd97147f872fae6246f3cfa0f5cf3244407b4b65bd62f4c9d0c55e06f64d29a3"
+   },
+   {
+    "event_id": "scrub_sprint",
+    "source": "tutorials/scrub_sprint/tutorial_01.png",
+    "source_sha256": "feafdfe9f29d93ce036888017edc2f8478dc582ac746708b8d26c3c7bf35b603"
+   },
+   {
+    "event_id": "scrub_sprint",
+    "source": "tutorials/scrub_sprint/tutorial_02.png",
+    "source_sha256": "8083d8db514a34cfa0270bbcfb4419506e04aa5ed9edd45fb9915e6cae0bd2dd"
+   },
+   {
+    "event_id": "scrub_sprint",
+    "source": "tutorials/scrub_sprint/tutorial_03.png",
+    "source_sha256": "d439346a0bb0ae462387a92700868a30f778e127fbe32fe69753370ef1e8a38e"
+   },
+   {
+    "event_id": "scrub_sprint",
+    "source": "tutorials/scrub_sprint/tutorial_04.png",
+    "source_sha256": "87c2e5a78014c62c81521dd0217f5589a8158cb2d07f06477e9f36ee5dbce64d"
+   },
+   {
+    "event_id": "scrub_sprint",
+    "source": "tutorials/scrub_sprint/tutorial_05.png",
+    "source_sha256": "880f3a0656f000742ddaf1f6a48310b30678a960e5c8dff646f3b5259cb866a0"
+   },
+   {
+    "event_id": "scrub_sprint",
+    "source": "tutorials/scrub_sprint/tutorial_06.png",
+    "source_sha256": "341c603d508188b46a34ef4960bab965243db4866815475c7c22fe526ab61ae2"
+   },
+   {
+    "event_id": "scrub_sprint",
+    "source": "tutorials/scrub_sprint/tutorial_07.png",
+    "source_sha256": "a54528dde26a479356fbba3c0ded6725ee68bfed982f26c91faa4eee0377ee5e"
+   },
+   {
+    "event_id": "scrub_squad_tournament",
+    "source": "tutorials/scrub_squad_tournament/tutorial_01.png",
+    "source_sha256": "26c275e7ddf2b7bf482858b19189973b1d25439ba377de9d36b2a9ef7d3850d2"
+   },
+   {
+    "event_id": "scrub_squad_tournament",
+    "source": "tutorials/scrub_squad_tournament/tutorial_02.png",
+    "source_sha256": "e921fd50036cfa91376024d8c9d6569f0aeebdeea1d55f39fd339403c462bac2"
+   },
+   {
+    "event_id": "scrub_squad_tournament",
+    "source": "tutorials/scrub_squad_tournament/tutorial_03.png",
+    "source_sha256": "350f0fe3bfd1af3872891b680f40fc7654f63f62a79beb6e6bbbe121ff856d77"
+   },
+   {
+    "event_id": "scrub_squad_tournament",
+    "source": "tutorials/scrub_squad_tournament/tutorial_04.png",
+    "source_sha256": "e9cf5ad3e05691557e9b0f9d4b66491f8ebd56bad8ce8d7abf50a391a941bc69"
+   },
+   {
+    "event_id": "scrub_squad_tournament",
+    "source": "tutorials/scrub_squad_tournament/tutorial_05.png",
+    "source_sha256": "749e80bfe94618f2ea94472d4053e5d7c391f186727cf72b6c6e4401ef20dde2"
+   },
+   {
+    "event_id": "scrub_squad_tournament",
+    "source": "tutorials/scrub_squad_tournament/tutorial_06.png",
+    "source_sha256": "28e095c56d9f3127978d8be032644934b43da61c388771a3d08825bc291ce013"
+   },
+   {
+    "event_id": "scrub_squad_tournament",
+    "source": "tutorials/scrub_squad_tournament/tutorial_07.png",
+    "source_sha256": "c9ac4f22e40e784c3e8d560d537e8ebcea411dd7fa39df71ea0e4b9978d764fa"
+   },
+   {
+    "event_id": "scrub_squad_tournament",
+    "source": "tutorials/scrub_squad_tournament/tutorial_08.png",
+    "source_sha256": "19688d53f284001ae185167f0f9bb15fc01ebaea7e456880d6ca5cabcf5801b6"
+   },
+   {
+    "event_id": "scrub_squad_tournament",
+    "source": "tutorials/scrub_squad_tournament/tutorial_09.png",
+    "source_sha256": "ed3b313224784c47ccddbd489722880ac314f91ce63e2d687a29284d38395d53"
+   },
+   {
+    "event_id": "scrubbots_royale",
+    "source": "tutorials/scrubbots_royale/tutorial_01.png",
+    "source_sha256": "3446c29078f950535c2cbab154ebbfd0d910674748b069542b14eb5179d9bf87"
+   },
+   {
+    "event_id": "scrubbots_royale",
+    "source": "tutorials/scrubbots_royale/tutorial_02.png",
+    "source_sha256": "c281aa1a0ec1ed3450e9c89e58b1a14badf70c7751d365e3b343f7acd32d2543"
+   },
+   {
+    "event_id": "scrubbots_royale",
+    "source": "tutorials/scrubbots_royale/tutorial_03.png",
+    "source_sha256": "4aca63f64ee52d825bd3d39d2cea6f9ea21b3eecccf24210dc7a772bc1aa9a70"
+   },
+   {
+    "event_id": "scrubbots_royale",
+    "source": "tutorials/scrubbots_royale/tutorial_04.png",
+    "source_sha256": "a76edaf0f0a8542f7b44881ede481b20bf81e26fbb9c8e2a8f907975dc1385b5"
+   },
+   {
+    "event_id": "scrubbots_royale",
+    "source": "tutorials/scrubbots_royale/tutorial_05.png",
+    "source_sha256": "3c6743de82320adda68b407066934d7063678d85fd52ccc44a81c14103561eab"
+   },
+   {
+    "event_id": "scrubbots_royale",
+    "source": "tutorials/scrubbots_royale/tutorial_06.png",
+    "source_sha256": "e5588eab405b15d51638231fe5ab2ea1103bfd386073d921901ea86a21b4b445"
+   },
+   {
+    "event_id": "scrubbots_royale",
+    "source": "tutorials/scrubbots_royale/tutorial_07.png",
+    "source_sha256": "3fa0affb2fa55827ca3026e5c22a7527e5d73cdcce29b93560799e2d2cf2c900"
+   },
+   {
+    "event_id": "scrubbots_royale",
+    "source": "tutorials/scrubbots_royale/tutorial_08.png",
+    "source_sha256": "23bceea7225f5466c37bb715c68dd8322ec6472ec6f2f5abb851e30ef26b6f64"
+   },
+   {
+    "event_id": "scrubbots_royale",
+    "source": "tutorials/scrubbots_royale/tutorial_09.png",
+    "source_sha256": "9f1c142dec7427cf283cbe2144165184523d2e11e3ccf415125771aa0f0a0c53"
+   },
+   {
+    "event_id": "scrubbots_royale",
+    "source": "tutorials/scrubbots_royale/tutorial_10.png",
+    "source_sha256": "3194d7246c9bde745f8450e6bbe871991f1ad7c6824a5ad5add80c43b04818cd"
+   },
+   {
+    "event_id": "scrubbys_cleanup_workshop",
+    "source": "tutorials/scrubbys_cleanup_workshop/tutorial_01.png",
+    "source_sha256": "e05d5dfdd236f7beba4cc62dde09a4380d19057d6b9f71cc084213942c9d9292"
+   },
+   {
+    "event_id": "scrubbys_cleanup_workshop",
+    "source": "tutorials/scrubbys_cleanup_workshop/tutorial_02.png",
+    "source_sha256": "550ccfb25caffebe8a425b28302e50578c58e19e00ce4f12fbdc301b30701152"
+   },
+   {
+    "event_id": "scrubbys_cleanup_workshop",
+    "source": "tutorials/scrubbys_cleanup_workshop/tutorial_03.png",
+    "source_sha256": "c091cab81c725e339de1d4fe47f3c099abeb7ac85dda49df2fdebd1c15df273a"
+   },
+   {
+    "event_id": "scrubbys_cleanup_workshop",
+    "source": "tutorials/scrubbys_cleanup_workshop/tutorial_04.png",
+    "source_sha256": "8c217e78d1322792a8778708fe8fb4c60e44a3b6b1e97a24718034841e3d87ca"
+   },
+   {
+    "event_id": "scrubbys_cleanup_workshop",
+    "source": "tutorials/scrubbys_cleanup_workshop/tutorial_05.png",
+    "source_sha256": "29707a7217e20afd4e299f54e4a2983cdef77898254cfd5afc8e126f203c14b1"
+   },
+   {
+    "event_id": "scrubbys_cleanup_workshop",
+    "source": "tutorials/scrubbys_cleanup_workshop/tutorial_06.png",
+    "source_sha256": "0473cb5b25e23d97351d0194bf98c44ec2217d0de1a02ed905edd7d636a90427"
+   },
+   {
+    "event_id": "scrubbys_rescue_mission",
+    "source": "tutorials/scrubbys_rescue_mission/tutorial_01.png",
+    "source_sha256": "2e8a478920d18bd02a945a9143311c4880b379fb9760781d0942956a9d0600d2"
+   },
+   {
+    "event_id": "scrubbys_rescue_mission",
+    "source": "tutorials/scrubbys_rescue_mission/tutorial_02.png",
+    "source_sha256": "062b40088bda1eef3784d6e5f614c8d524a721d43297f2671e5d5df36261503d"
+   },
+   {
+    "event_id": "scrubbys_rescue_mission",
+    "source": "tutorials/scrubbys_rescue_mission/tutorial_03.png",
+    "source_sha256": "3bf5b0398f1bfd168581df9d144ba1cf25acaf2f9ca8d2a55cbebf82e5be9f81"
+   },
+   {
+    "event_id": "scrubbys_rescue_mission",
+    "source": "tutorials/scrubbys_rescue_mission/tutorial_04.png",
+    "source_sha256": "f265288406db899ecd83bfd6bbbdb0f1d88588d5a2d09dd433529671879ba0a9"
+   },
+   {
+    "event_id": "scrubbys_rescue_mission",
+    "source": "tutorials/scrubbys_rescue_mission/tutorial_05.png",
+    "source_sha256": "6c9a0dda59cf5d3e7fd39b9ecb091ecff187b041dec01df163b8f7d82e23c77f"
+   },
+   {
+    "event_id": "scrubbys_rescue_mission",
+    "source": "tutorials/scrubbys_rescue_mission/tutorial_06.png",
+    "source_sha256": "61d3b8652c20c91bba3161e1034e7de2db835954d64be99d15971d5bc45ece1d"
+   },
+   {
+    "event_id": "scrubbys_rescue_mission",
+    "source": "tutorials/scrubbys_rescue_mission/tutorial_07.png",
+    "source_sha256": "f77349a5ff1b160954f77770309f51ee3eaa8eb1aa61779b9818a821bb31657d"
+   },
+   {
+    "event_id": "scrubbys_rescue_mission",
+    "source": "tutorials/scrubbys_rescue_mission/tutorial_08.png",
+    "source_sha256": "e8caad06452698e069869f88b7a3a95ced8adc20cfe27983be4e71e13a904767"
+   },
+   {
+    "event_id": "seasonal_scrub_festival",
+    "source": "tutorials/seasonal_scrub_festival/tutorial_01.png",
+    "source_sha256": "5cb523fe9714d91f129d1903a405abbef0ca41dce481e6bef7853047410bc1d8"
+   },
+   {
+    "event_id": "seasonal_scrub_festival",
+    "source": "tutorials/seasonal_scrub_festival/tutorial_02.png",
+    "source_sha256": "a282fa6a31dd97a645476e8a0acad89f3e2b15954a8d64d3bdc0a61734f1cbd3"
+   },
+   {
+    "event_id": "seasonal_scrub_festival",
+    "source": "tutorials/seasonal_scrub_festival/tutorial_03.png",
+    "source_sha256": "06ad5337f9c812f9f7073d02007f779a0be0280160d700bd3440726cba533605"
+   },
+   {
+    "event_id": "seasonal_scrub_festival",
+    "source": "tutorials/seasonal_scrub_festival/tutorial_04.png",
+    "source_sha256": "353a6c6f79005329521fb09550608036666be76e0a29312fca3aa69a074a1fba"
+   },
+   {
+    "event_id": "seasonal_scrub_festival",
+    "source": "tutorials/seasonal_scrub_festival/tutorial_05.png",
+    "source_sha256": "d126e8daa6835a4b7c4789edfaabe9faaea5e9b4fe12a57fc630eca8747340db"
+   },
+   {
+    "event_id": "seasonal_scrub_festival",
+    "source": "tutorials/seasonal_scrub_festival/tutorial_06.png",
+    "source_sha256": "4caa4c7ef38b43c193815628ebec941d4aaa950ba28d8662cc8eb3649abc41b5"
+   },
+   {
+    "event_id": "seasonal_scrub_festival",
+    "source": "tutorials/seasonal_scrub_festival/tutorial_07.png",
+    "source_sha256": "0c7e60ffd7fbc03d5aadf02ed7c82bf6dff52b40b27fd4ab765e080ac93e6ba6"
+   },
+   {
+    "event_id": "sparkling_streak",
+    "source": "tutorials/sparkling_streak/tutorial_01.png",
+    "source_sha256": "5149549dd2495c98167f5b5229e61fa32d652352d0917eed1feacf821e1373d0"
+   },
+   {
+    "event_id": "sparkling_streak",
+    "source": "tutorials/sparkling_streak/tutorial_02.png",
+    "source_sha256": "efb0fb05693e51d29fb7c5606f4a31d7516630ed081579b98649d7ac3b886862"
+   },
+   {
+    "event_id": "sparkling_streak",
+    "source": "tutorials/sparkling_streak/tutorial_03.png",
+    "source_sha256": "6b375f84261c8b86c456bb83bd43227a863fc9f6a35d771fc4876905cbcfab0c"
+   },
+   {
+    "event_id": "sparkling_streak",
+    "source": "tutorials/sparkling_streak/tutorial_04.png",
+    "source_sha256": "9813cca8a8d38d31a446329a146c1b9ec74bd59cb68cd9799d1b91a26a5ed1b8"
+   },
+   {
+    "event_id": "sparkling_streak",
+    "source": "tutorials/sparkling_streak/tutorial_05.png",
+    "source_sha256": "10226426894c78c2d10490a138c1dacff0224e674ba6bfb3e548365829a32959"
+   },
+   {
+    "event_id": "sparkling_streak",
+    "source": "tutorials/sparkling_streak/tutorial_06.png",
+    "source_sha256": "521dbc355ef5d335e18a3b5a9dabd05dd55d1e5f575c4b3b3d98c2764a86094c"
+   },
+   {
+    "event_id": "sparkling_streak",
+    "source": "tutorials/sparkling_streak/tutorial_07.png",
+    "source_sha256": "9b765cc0a887c79e42bd22491ecb353ec60872a54b6f2bbe28d2cd6edc6b3412"
+   },
+   {
+    "event_id": "stain_busters",
+    "source": "tutorials/stain_busters/tutorial_01.png",
+    "source_sha256": "7dbe4e77a8f343528eb05659a87a42f53e33c81bb17b099b3afc45f45e26797a"
+   },
+   {
+    "event_id": "stain_busters",
+    "source": "tutorials/stain_busters/tutorial_02.png",
+    "source_sha256": "62f134af1cb4bb64dcaa733ab10961ccd5e7adb6550e371737a601b8ed49bbe3"
+   },
+   {
+    "event_id": "stain_busters",
+    "source": "tutorials/stain_busters/tutorial_03.png",
+    "source_sha256": "3bd79932ded617a1a7d3b285633ca754196b624333ad162dd02e0bd0907b531d"
+   },
+   {
+    "event_id": "stain_busters",
+    "source": "tutorials/stain_busters/tutorial_04.png",
+    "source_sha256": "2bbff3b934fe186a9c53a56d8aee4ad023efe08029873d29230cd33d282a2cca"
+   },
+   {
+    "event_id": "stain_busters",
+    "source": "tutorials/stain_busters/tutorial_05.png",
+    "source_sha256": "8a73296dcaafcb8d305abfded12af99f114e8d1df9c7c21b6b4d1ff1090530bc"
+   },
+   {
+    "event_id": "stain_busters",
+    "source": "tutorials/stain_busters/tutorial_06.png",
+    "source_sha256": "bb33dc5a8eb5940769dd32366023421dd1766bb87b5e7c8de31ab5f7c7147066"
+   },
+   {
+    "event_id": "weekly_cleanup_challenge",
+    "source": "tutorials/weekly_cleanup_challenge/tutorial_01.png",
+    "source_sha256": "907396cfa33b855d81eefc588add0a81f56ebb4b7f0cb7f9601d888dcb67c6a7"
+   },
+   {
+    "event_id": "weekly_cleanup_challenge",
+    "source": "tutorials/weekly_cleanup_challenge/tutorial_02.png",
+    "source_sha256": "beb120ad44cec737fc9b38420062408762ac102823f61bc17c95b1e16f64da77"
+   },
+   {
+    "event_id": "weekly_cleanup_challenge",
+    "source": "tutorials/weekly_cleanup_challenge/tutorial_03.png",
+    "source_sha256": "de59929a3a738f05818d857045e3949580eed8aea1447df93cdd0f8b10f90110"
+   },
+   {
+    "event_id": "weekly_cleanup_challenge",
+    "source": "tutorials/weekly_cleanup_challenge/tutorial_04.png",
+    "source_sha256": "455c6c807699299bc7749f3b0c20afa0e02309e05d4392ed0f61673faebd7fec"
+   },
+   {
+    "event_id": "weekly_cleanup_challenge",
+    "source": "tutorials/weekly_cleanup_challenge/tutorial_05.png",
+    "source_sha256": "4e6114b4f81dea7bf74a43a441a05b39c0c6aee4ad079a51856042783f0a98d3"
+   },
+   {
+    "event_id": "weekly_cleanup_challenge",
+    "source": "tutorials/weekly_cleanup_challenge/tutorial_06.png",
+    "source_sha256": "083435369809df9cb88de0be65ada9b03b17c025416e98445b97911df6354951"
+   },
+   {
+    "event_id": "weekly_scrub_league",
+    "source": "tutorials/weekly_scrub_league/tutorial_01.png",
+    "source_sha256": "ae912936f5489e8ca4d87579b8fe78f4cca9b1bb05c4c89cd9c398e06d9bfe97"
+   },
+   {
+    "event_id": "weekly_scrub_league",
+    "source": "tutorials/weekly_scrub_league/tutorial_02.png",
+    "source_sha256": "13ab862f139f9c8d00c753fe0873ff2bd981133b0d6abb690c00ec1e35a8a461"
+   },
+   {
+    "event_id": "weekly_scrub_league",
+    "source": "tutorials/weekly_scrub_league/tutorial_03.png",
+    "source_sha256": "0101f204beb705f7464ed5ec6955b674eb7b33e2282dc428047b7940013c501a"
+   },
+   {
+    "event_id": "weekly_scrub_league",
+    "source": "tutorials/weekly_scrub_league/tutorial_04.png",
+    "source_sha256": "8c7dc9c9ec3ab71ac2c98dc8a6cd9695d444254dcc42098049a91709eeba3b07"
+   },
+   {
+    "event_id": "weekly_scrub_league",
+    "source": "tutorials/weekly_scrub_league/tutorial_05.png",
+    "source_sha256": "ff225ee82a28d7a4da2b521a0dc3101ed2808de03fd98b680684fa3fe89dffcb"
+   },
+   {
+    "event_id": "weekly_scrub_league",
+    "source": "tutorials/weekly_scrub_league/tutorial_06.png",
+    "source_sha256": "f16fb9cae204fc9fd95c7591f0a77262ea5c936e6df8bbe5251be5581021d762"
+   },
+   {
+    "event_id": "weekly_scrub_league",
+    "source": "tutorials/weekly_scrub_league/tutorial_07.png",
+    "source_sha256": "480a15fef1f022a1256d42b9cf9e29cf6cf924f78b39f6d879cbea01f977620c"
+   },
+   {
+    "event_id": "world_cleanup_cup",
+    "source": "tutorials/world_cleanup_cup/tutorial_01.png",
+    "source_sha256": "8b63fce812b18bf068a218ff7f91cd644a501890891c743bd5d99373c698436d"
+   },
+   {
+    "event_id": "world_cleanup_cup",
+    "source": "tutorials/world_cleanup_cup/tutorial_02.png",
+    "source_sha256": "b16ff634d6599b08b8616291c83ed12efcbece0041559544cce9a67e1ddae263"
+   },
+   {
+    "event_id": "world_cleanup_cup",
+    "source": "tutorials/world_cleanup_cup/tutorial_03.png",
+    "source_sha256": "c02388d83afb16af23ee4df6fc7e5093b4651235180455f43fa43b8263706b6c"
+   },
+   {
+    "event_id": "world_cleanup_cup",
+    "source": "tutorials/world_cleanup_cup/tutorial_04.png",
+    "source_sha256": "d16b101eb4fd17694068989e9fc2614af72f5552311aabe48ff0a514db587362"
+   },
+   {
+    "event_id": "world_cleanup_cup",
+    "source": "tutorials/world_cleanup_cup/tutorial_05.png",
+    "source_sha256": "6e2d966a590dac923fd599c4a86e3b4cd017a4734c82100a31cda7518ad9565b"
+   },
+   {
+    "event_id": "world_cleanup_cup",
+    "source": "tutorials/world_cleanup_cup/tutorial_06.png",
+    "source_sha256": "31e8f2b87e091bb3299f37bd8002626cd240160fb010d709ed05ed07ee7f533d"
+   },
+   {
+    "event_id": "world_cleanup_cup",
+    "source": "tutorials/world_cleanup_cup/tutorial_07.png",
+    "source_sha256": "a899fa2fcd2fed15202d62d17647317f3cc023ad0e30a0af9cb34742fc2bab85"
+   },
+   {
+    "event_id": "world_cleanup_cup",
+    "source": "tutorials/world_cleanup_cup/tutorial_08.png",
+    "source_sha256": "38e4343938f9bed8cb36026c48dbee096469db762f21e46c840b70a815894635"
+   }
+  ]
+ }
+}
