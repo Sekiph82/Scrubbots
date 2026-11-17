@@ -147,9 +147,11 @@ merger adds no implied legacy permissions, and its receiver is not exported.
 
 No `INTERNET`, location, camera, microphone, contacts, storage, phone-state or account
 permission. Godot's export adds no other dangerous permission. Builds with the input
-`billing_ads` merge the plugin manifests: `com.android.vending.BILLING` (Play Billing),
-`INTERNET`, `ACCESS_NETWORK_STATE` and `com.google.android.gms.permission.AD_ID` (Google Mobile
-Ads); a default build has none of them.
+`billing_ads` merge the plugin manifests (APK of CI run 44108551008): `com.android.vending.BILLING`
+(Play Billing); `INTERNET`, `ACCESS_NETWORK_STATE`, `AD_ID`, `com.google.android.gms.permission.AD_ID`,
+`ACCESS_ADSERVICES_AD_ID`, `ACCESS_ADSERVICES_ATTRIBUTION`, `ACCESS_ADSERVICES_TOPICS`, `WAKE_LOCK`,
+`FOREGROUND_SERVICE` and the package's `DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION` (Google Mobile
+Ads / Play services); a default build has none of them.
 
 ### iOS (`.github/workflows/ios-ipa.yml` preset)
 
