@@ -29,7 +29,7 @@ Debug is the default and is the earlier behaviour:
 
 Release:
 
-- Android: `--export-release`, package `com.sekiph82.scrubbots` ("SCRUBBOTS"), signed only
+- Android: `--export-release`, package `com.sekiphayit.scrubbots` ("SCRUBBOTS"; `com.sekiph82.scrubbots` is taken on Google Play, the Play Console app uses this one; iOS keeps the bundle id `com.sekiph82.scrubbots`), signed only
   with the release keystore secrets below. If any of them is missing, or the keystore does not
   open with the password and alias, the run stops with an error before export. It never falls
   back to the debug key. After export the run fails if the APK is debuggable or its signer

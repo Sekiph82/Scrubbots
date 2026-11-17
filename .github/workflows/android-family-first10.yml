@@ -665,7 +665,7 @@ jobs:
       - name: Export preset (tracked template -> export_presets.cfg)
         run: |
           # debug keeps the family dev package (installs beside a store build); release = store package.
-          if [ "$BUILD_TYPE" = release ]; then PKG=com.sekiph82.scrubbots; LABEL=SCRUBBOTS; else PKG=com.sekiph82.scrubbots.familydev; LABEL="ScrubBots Family Dev"; fi
+          if [ "$BUILD_TYPE" = release ]; then PKG=com.sekiphayit.scrubbots; LABEL=SCRUBBOTS; else PKG=com.sekiph82.scrubbots.familydev; LABEL="ScrubBots Family Dev"; fi
           sed -e "s/@VERSION_CODE@/${APP_BUILD}/" -e "s/@VERSION_NAME@/${APP_VERSION_NAME}/" \
             -e "s/@PACKAGE@/${PKG}/" -e "s/@APP_LABEL@/${LABEL}/" \
             .github/android/export_presets_family_first10.cfg > export_presets.cfg
