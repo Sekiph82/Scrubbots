@@ -1,13 +1,16 @@
 extends SceneTree
 ## SB-M54-032 / SB-M43-136..141 / SB-M43-073 — the owner world table (2026-10-22: 20 named worlds
 ## x 150 levels = 3000; a world ends at its last level, the next starts after), WorldService over
-## every level 1..3000, and the live World Transition trigger: once at L150 -> L151 (catalog
-## injected: only 30 levels ship), never with the shipped catalog, idempotent across relaunch and
-## cloud-save import, grants nothing, Ranks / Events unchanged.
+## every level 1..3000, and the live World Transition trigger: once at L150 -> L151 on the shipped
+## catalog (200 levels since SB-CAMPAIGN-L31-L200), never while L151 is absent (injected 1..150
+## catalog), idempotent across relaunch and cloud-save import, grants nothing, Ranks / Events
+## unchanged; r08 plays the real L150 win in the booted app through to the World 02 popup.
 ##
 ## Run: godot --headless --path . -s res://tests/m54_world_regression.gd
 
 const AppState = preload("res://scripts/app/app_state.gd")
+const MainScript = preload("res://scripts/app/main.gd")
+const MainScene = preload("res://scenes/app/main.tscn")
 const WorldService = preload("res://scripts/progression/world_service.gd")
 const CeremonyPresenter = preload("res://scripts/ui/ceremony/ceremony_presenter.gd")
 const ModalStack = preload("res://scripts/ui/popup/modal_stack.gd")
@@ -22,7 +25,7 @@ const OWNER_NAMES := ["Whispering Park", "Bubble District", "Neon Sewers", "Crys
 
 var EXPECTED_CASES := [
 	"r01_owner_table_verbatim", "r02_invalid_fail_closed", "r03_every_level_1_3000", "r04_progress_next_states",
-	"r05_names_en_tr", "r06_ceremony_once_at_l150", "r07_relaunch_import_idempotent",
+	"r05_names_en_tr", "r06_ceremony_once_at_l150", "r07_relaunch_import_idempotent", "r08_real_app_l150_win",
 ]
 
 var _fail := 0
@@ -47,6 +50,7 @@ func _initialize() -> void:
 	await _r06()
 	await _r07()
 	_sub.free()
+	await _r08()
 	_cleanup()
 	_done()
 
@@ -135,16 +139,16 @@ func _r05() -> void:
 	_complete("r05_names_en_tr")
 
 func _r06() -> void:
-	print("[r06 L150 first clear -> World 02 ceremony once; nothing on the shipped catalog; grants nothing]")
+	print("[r06 L150 first clear -> World 02 ceremony once on the shipped catalog; nothing while L151 is absent; grants nothing]")
 	var app = _app("r06")
 	var pr = _presenter(app)
 	_win_to(app, 150)
-	_set_catalog(app, 151)
 	_ok(pr.world_events().is_empty(), "frontier 150 (World 01): no world event")
 	_win_to(app, 151)
+	_set_catalog(app, 150)
+	_ok(not app.catalog_has_level(151) and pr.world_events().is_empty(), "catalog 1..150 (L151 absent) -> nothing triggers")
 	app._catalog_orders = []
-	_ok(not app.catalog_has_level(151) and pr.world_events().is_empty(), "shipped catalog (%d levels): L151 absent -> nothing triggers" % app._catalog_orders.size())
-	_set_catalog(app, 151)
+	_ok(app.catalog_has_level(151) and app._catalog_orders.size() == 200, "shipped catalog (%d levels) has L151" % app._catalog_orders.size())
 	var ev: Array = pr.world_events()
 	_ok(ev.size() == 1 and ev[0]["key"] == "world:world_02" and ev[0]["title"] == "Bubble District" and ev[0]["subtitle"] == UiText.t("HOME_AREA_NUMBER", [2]) and ev[0]["art"] == WorldService.load_table()["fallback_art"], "one event: Bubble District, AREA 2, World 01 fallback art %s" % str(ev))
 	var before := _truth(app)
@@ -203,6 +207,55 @@ func _presenter(app):
 	var pr = CeremonyPresenter.new()
 	pr.bind(_stack, app)
 	return pr
+
+## r08: the booted app plays the real L150 (World 01's last level) to WON. The win goes Home; once the
+## reward flight lands, the Home ceremony drain opens the World 02 popup (Bubble District, World 01
+## fallback art) and the Home area label shows World 02. Popups queued before it are acknowledged.
+func _r08() -> void:
+	print("[r08 real app: L150 WON -> Home -> World 02 popup, Home label BUBBLE DISTRICT / AREA 2]")
+	var path := "user://m54_world_r08_%d.save" % Time.get_ticks_usec()
+	_tmp.append(path)
+	AppState.new(path).request_save()
+	MainScript.boot_save_path_override = path
+	var root = MainScene.instantiate()
+	get_root().add_child(root)
+	await process_frame
+	var app = root.get_app_state()
+	_win_to(app, 150)
+	_ok(root.play_current_frontier().get("ok", false), "Home PLAY launches L150")
+	await process_frame
+	var h = root.get_gameplay_host()
+	_ok(h != null and int(h.progression_level) == 150, "L150 host (%s)" % (h.get_level().id if h != null else "none"))
+	if h != null:
+		h.get_runtime().set_process(false)
+		h.get_completion().terminal_reached.emit(&"WON", {})
+	await _frames(3)
+	var home = root.get_home()
+	if home.is_reward_flight_running():
+		home.get_reward_flight().finish()
+	var seen: Array = []
+	var world = null
+	for _i in range(20):
+		await _frames(3)
+		var top = root.get_modal_stack().top()
+		if top == null:
+			break
+		seen.append(String(top.popup_id))
+		if top.popup_id == "ceremony_world_unlock":
+			world = top
+			break
+		top._on_action(top.get_action_ids()[0])
+	_ok(app.progression.current_level() == 151 and world != null and world.get_title() == "Bubble District" and world.find_child("WorldArt", true, false) != null,
+		"World 02 popup after the real L150 win (popups seen %s)" % str(seen))
+	_ok(home.get_region("HomeAreaTitle").text == "BUBBLE DISTRICT" and home.get_region("HomeAreaNumber").text == UiText.t("HOME_AREA_NUMBER", [2]), "Home area label: %s / %s" % [home.get_region("HomeAreaTitle").text, home.get_region("HomeAreaNumber").text])
+	if world != null:
+		world._on_action(world.get_action_ids()[0])
+		await _frames(3)
+	_ok(app.economy.meta_ui.is_seen("world:world_02") and root.get_ceremonies().world_events().is_empty(), "acknowledged; nothing pending for World 02")
+	root.free()
+	MainScript.boot_save_path_override = ""
+	await process_frame
+	_complete("r08_real_app_l150_win")
 
 ## Clears forward to frontier `n` through the real first-clear rule.
 func _win_to(app, n: int) -> void:

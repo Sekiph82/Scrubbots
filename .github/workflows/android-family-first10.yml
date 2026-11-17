@@ -418,10 +418,10 @@ jobs:
           else
             echo "M43-172-NOTIFY verdict=FAIL (exact 12/12 summary missing)" | tee -a "$S"; fail=1
           fi
-          if grep -qxF 'M54 world regression evidence: PASS (7/7 cases, 0 fail)' validate_logs/m54_world_regression.log 2>/dev/null; then
-            echo "M54-WORLDS verdict=PASS (7/7)" | tee -a "$S"
+          if grep -qxF 'M54 world regression evidence: PASS (8/8 cases, 0 fail)' validate_logs/m54_world_regression.log 2>/dev/null; then
+            echo "M54-WORLDS verdict=PASS (8/8)" | tee -a "$S"
           else
-            echo "M54-WORLDS verdict=FAIL (exact 7/7 summary missing)" | tee -a "$S"; fail=1
+            echo "M54-WORLDS verdict=FAIL (exact 8/8 summary missing)" | tee -a "$S"; fail=1
           fi
           if grep -qxF 'SB-M59 credits evidence: PASS (3/3 cases, 0 fail)' validate_logs/m59_credits.log 2>/dev/null; then
             echo "M59-CREDITS verdict=PASS (3/3)" | tee -a "$S"

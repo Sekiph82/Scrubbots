@@ -13,7 +13,8 @@ extends SceneTree
 ## were written by this script from the unoptimized code (commit 5d19621c). A further case checks
 ## the verdict-only ProductionTargetAccess mode against the full route probe cell by cell.
 ##
-## Sets: campaign (the 30 catalog levels; intended clicks, L1 its seed-1 solver trace),
+## Sets: campaign (catalog L1..L30, the golden set; L31+ are release-pool levels with no goldens,
+## SB-CAMPAIGN-L31-L200; intended clicks, L1 its seed-1 solver trace),
 ## anchors (tests/fixtures/difficulty_anchors, solver trace), factory (two 56x56 Level
 ## Factory levels). CI runs the CI_ONLY subset; the full sets take ~15 min locally.
 ##
@@ -47,6 +48,8 @@ const FACTORY := ["LF-000147", "LF-000148"]
 const CI_SETS := ["campaign", "anchors"]
 const CI_ONLY := ["m21_level_001_hazard_bot", "level_014_goose", "hard_maze8_24", "x_rings12q_r1_split_24"]
 const EXPECTED := {"campaign": 30, "anchors": 24, "factory": 2}
+## The campaign set is the catalog up to this order (the levels the goldens were written for).
+const CAMPAIGN_MAX_ORDER := 30
 
 var _fail := 0
 var _cases := 0
@@ -77,8 +80,12 @@ func _initialize() -> void:
 	for set_name in sets:
 		var levels: Dictionary = Analyzer._read_json(GOLDEN_FMT % set_name).get("levels", {})
 		var inputs := _inputs(set_name)
-		_ok(inputs.size() == int(EXPECTED.get(set_name, -1)) and (write or levels.size() == inputs.size()),
-			"%s set has %d levels, %d golden records" % [set_name, inputs.size(), levels.size()])
+		var keys: Array = inputs.map(func(i): return "%s/%s" % [set_name, i["id"]])
+		keys.sort()
+		var golden_keys: Array = levels.keys()
+		golden_keys.sort()
+		_ok(inputs.size() == int(EXPECTED.get(set_name, -1)) and (write or golden_keys == keys),
+			"%s set has %d levels, %d golden records, same ids" % [set_name, inputs.size(), levels.size()])
 		for inp in inputs:
 			if not only.is_empty() and not only.has(inp["id"]):
 				continue
@@ -185,7 +192,7 @@ func _inputs(set_name: String) -> Array:
 	if set_name == "campaign":
 		var cat = LevelCatalog.new()
 		cat.load_manifest()
-		for e in cat.get_entries_ordered():
+		for e in cat.get_entries_ordered().filter(func(x): return x.order <= CAMPAIGN_MAX_ORDER):
 			var lvl = LevelLoader.load_from_path(e.level_path).level_data
 			if e.supply_plan_path.is_empty():
 				# Level 1: the historical seed-1 generated supply + its solver trace.
