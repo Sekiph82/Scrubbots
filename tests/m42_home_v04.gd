@@ -31,7 +31,8 @@ const OLD_WORLD_PATH := "res://assets/ui/final/home/worlds/world_01_whispering_p
 const M28_WORLD_PATH := "res://assets/ui/final/home/background/home_background.png"
 const M28_WORLD_SHA := "9d5db29513d25ad5c0932840c08027be0198d0cd85dc758a69e09e800c7aabe2"
 const KEYED_STILL_PATH := "res://assets/ui/final/home/videos/home_scrubby_still_keyed.png"
-const KEYED_GESTURES := ["wave", "turn"]
+## SB-HOME-VIDEO-MAGENTA-2026-11-17: + bow, full_turn, sweep from the owner's magenta Flow videos.
+const KEYED_GESTURES := ["wave", "turn", "bow", "full_turn", "sweep"]
 const FEET := Vector2(470, 1240)
 const SAFE_BOX := Rect2(305, 620, 330, 620)
 const WORLD_ASPECT := 941.0 / 1672.0
@@ -153,6 +154,11 @@ func _binds(home) -> void:
 	_ok(acc["HOME-125"]["mode"] == "STATIC" and acc["HOME-125"]["nodes"][0]["name"] == "WorldStill" and still.texture != null and still.texture.resource_path == KEYED_STILL_PATH and still.is_visible_in_tree(), "HOME-125 keyed still bound on WorldStill and shown")
 	_ok(hero.has_video() and hero.get_streams().keys() == KEYED_GESTURES and keyed and not home.get_region("HeroFocusShade").visible and home.get_region("Art_scrubby").self_modulate.a == 0.0, "keyed video set bound (%s), still + player chroma-keyed, shade + frame Scrubby off" % str(hero.get_streams().keys()))
 	_ok(still.get_global_rect().is_equal_approx(wb.get_global_rect()) and video.get_global_rect().is_equal_approx(wb.get_global_rect()), "keyed still + video share the WorldBackground rect (Scrubby where the frame-set Scrubby stands)")
+	var pins_ok := true
+	for g in KEYED_GESTURES:
+		var v: Dictionary = m["video_sets"]["home_scrubby_videos_keyed_v2"]["videos"][g]
+		pins_ok = pins_ok and FileAccess.get_sha256("res://" + String(v["path"])) == String(v["sha256"]) and String(v["path"]).ends_with("_keyed.ogv") and hero.get_streams()[g] is VideoStreamTheora
+	_ok(pins_ok, "all %d keyed videos pinned (sha256 == bytes) and bound as Theora streams" % KEYED_GESTURES.size())
 	_complete("world_binds_through_lifecycle")
 
 func _no_duplicates(home) -> void:

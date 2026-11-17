@@ -1757,7 +1757,7 @@
     "home_scrubby_videos_keyed_v2": {
       "status": "APPROVED",
       "authority": "SB-HOME-VIDEO-2026-11-17 owner chat 2026-11-17",
-      "provenance": "owner Google Flow masters (flow_videos/home_scrubby_{wave,turn}_master.mp4, untouched) with Scrubby keyed out of the old park onto exact magenta #FF00FF (factory/jobs/160-home-scrubby-video-key/key_home_videos.py), re-encoded with ffmpeg libtheora -q:v 8, 720x1280, 24 fps, 185 frames, no audio; keyed at runtime by chroma_key_magenta.gdshader. Bow and full turn are left out: their mattes keep park pixels / holes (owner contact sheets in the job folder).",
+      "provenance": "owner Google Flow masters (flow_videos/home_scrubby_{wave,turn}_master.mp4, untouched) with Scrubby keyed out of the old park onto exact magenta #FF00FF (factory/jobs/160-home-scrubby-video-key/key_home_videos.py), re-encoded with ffmpeg libtheora -q:v 8, 720x1280, 24 fps, 185 frames, no audio; keyed at runtime by chroma_key_magenta.gdshader. Bow and full turn from the park masters are left out: their mattes keep park pixels / holes (owner contact sheets in the job folder). SB-HOME-VIDEO-MAGENTA-2026-11-17 owner 2026-11-17 adds bow, full_turn and sweep from the owner's magenta Flow videos (flow_videos/home_scrubby_{bow,full_turn,sweep}_magenta.mp4, untouched; first = last frame flow_start_frame_home_scrubby_magenta_1080x1920.png): trimmed to frames 0..184 (184 == frame 0), clear background pixels set to exact #FF00FF (factory/jobs/166-home-scrubby-magenta-videos/make_videos.py), libtheora -q:v 8, 24 fps, 185 frames, no audio; frame 0 overlays the keyed still at 0 px offset.",
       "still_slug": "home_scrubby_video_still_keyed",
       "videos": {
         "wave": {
@@ -1767,6 +1767,18 @@
         "turn": {
           "path": "assets/ui/final/home/videos/home_scrubby_turn_keyed.ogv",
           "sha256": "679d7eaf83460fa5279bd0663357123b15b495137c759df85f911a524f3b6467"
+        },
+        "bow": {
+          "path": "assets/ui/final/home/videos/home_scrubby_bow_keyed.ogv",
+          "sha256": "916cd7b44e1ae5da4cc649312f9bc84470347237d157214c9df44819edbf5900"
+        },
+        "full_turn": {
+          "path": "assets/ui/final/home/videos/home_scrubby_full_turn_keyed.ogv",
+          "sha256": "9c00b52953bda8ebdf4baa2906088d1645f4878738497f9cb246dea7a82a84e9"
+        },
+        "sweep": {
+          "path": "assets/ui/final/home/videos/home_scrubby_sweep_keyed.ogv",
+          "sha256": "92619140b674e2d73ee4ae18e4e219a5b437c53946ef814889396f2125fe37dd"
         }
       }
     },
