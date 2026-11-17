@@ -119,7 +119,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: android-family-first10
+  group: android-family-first10-${{ github.ref }}   # per branch: parallel factory jobs never cancel each other's pending runs
   cancel-in-progress: false
 
 env:
