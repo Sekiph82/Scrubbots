@@ -5,7 +5,7 @@ extends SceneTree
 ##   Intro video has finished), 5 the end of the real win animation of that level.
 ## One size + language per process (a second main.tscn in one run can render an empty texture).
 ## Needs a rendering driver (not --headless):
-##   godot --path . -s res://tests/tools/store_screens_capture.gd -- --out <dir> --size 1080x1920 --lang en
+##   godot --path . -s res://tests/tools/store_screens_capture.gd -- --out <dir> --size 1080x1920 --lang en [--level 15]
 
 const MainScene = preload("res://scenes/app/main.tscn")
 const MainScript = preload("res://scripts/app/main.gd")
@@ -17,7 +17,7 @@ const LevelIntroOverlay = preload("res://scripts/ui/level_intro_overlay.gd")
 const LevelCatalog = preload("res://scripts/data/level_catalog.gd")
 const RealPlayDriver = preload("res://scripts/gameplay/solver/real_play_driver.gd")
 
-const LEVEL := 15
+var LEVEL := 15   # --level N (SB-AAB-SIZE before/after captures use 11)
 
 var _out := ""
 var _size := Vector2i(1080, 1920)
@@ -40,6 +40,9 @@ func _initialize() -> void:
 	if s >= 0:
 		var wh: PackedStringArray = args[s + 1].split("x")
 		_size = Vector2i(int(wh[0]), int(wh[1]))
+	var lv := args.find("--level")
+	if lv >= 0:
+		LEVEL = int(args[lv + 1])
 	var l := args.find("--lang")
 	if l >= 0:
 		_lang = args[l + 1]
