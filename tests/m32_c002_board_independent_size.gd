@@ -6,17 +6,17 @@ extends SceneTree
 ##      -> measured displayed body footprint within +-3% of the 32x32 reference (screen seam:
 ##      reference = display cell a 32x32 board gets from the SAME rail fit in the SAME region).
 ##   s1 geometry-derived formula: on ONE available presentation rect the live local body span
-##      = 2.4 * reference_32_cell_size / actual_rendered_cell_size (BoardPresentation seam), for
+##      = 3.0 * reference_32_cell_size / actual_rendered_cell_size (BoardPresentation seam), for
 ##      20/32/38/59, width- and height-limited rectangles and a TEST-only synthetic 100x100; a
 ##      generic sweep over many (w, h, rect) proves it follows geometry, not a size table.
-##   s2 32x32 reference lock: compensation exactly 1.0, local span exactly 2.4 cells.
+##   s2 32x32 reference lock: compensation exactly 1.0, local span exactly 3.0 cells.
 ##   s3 apparent size: MEASURED global body footprint (sprite global transform x texture) of
 ##      every board within +-3% of the 32x32 reference (it is in fact exact).
 ##   s4 live relayout on a REAL laid-out production host: same agent instance, route, progress
 ##      and position survive a viewport resize; the body re-sizes; movement continues to arrival.
 ##   s5 presentation-only differential: compensated visual under a relaid-out presentation vs
 ##      bare agent -> identical position / progress / arrival / completion count / endpoint.
-##   s6 retire echo: same compensation, echo/live = 2.1/2.4, exact cell centre, lifetime /
+##   s6 retire echo: same compensation, echo/live = 2.625/3.0, exact cell centre, lifetime /
 ##      shrink / cap unchanged, mid-echo relayout rescales.
 ##   s7 performance: 59x59 + 30 live visuals, shared texture, bounded relayout cost, no object
 ##      growth, no per-frame work beyond an O(1) generation compare.
@@ -36,8 +36,8 @@ const RouteRequest = preload("res://scripts/gameplay/routing/route_request.gd")
 const ProductionGameplayHost = preload("res://scripts/gameplay/runtime/production_gameplay_host.gd")
 
 const HEX := ["#FF4500FF", "#FFA800FF", "#FFD635FF", "#00CC78FF", "#00CCC0FF", "#51E9F4FF"]
-const REF_SPAN := 2.4
-const ECHO_REF_SPAN := 2.1
+const REF_SPAN := 3.0   # SB-TF-02 (owner 2026-11-18): was 2.4
+const ECHO_REF_SPAN := 2.625
 
 var _fail := 0
 var _checks := 0
@@ -128,10 +128,10 @@ func _s1_formula() -> void:
 		var got: float = d["v"].get_local_body_span_cells()
 		var limit := "width" if _rect.x / c[0] < _rect.y / c[1] else ("height" if _rect.x / c[0] > _rect.y / c[1] else "square-fit")
 		_ok(is_equal_approx(p.get_reference_cell_size(), ref) and is_equal_approx(got, want),
-			"%dx%d: cell %.0f px, ref32 %.0f px, compensation %.4f, local span %.4f cells (= 2.4*ref/cell %.4f; naive 2.4*N/32 %.3f) [%s-limited]" % [
-				c[0], c[1], cs, ref, p.get_scrubbot_size_compensation(), got, want, 2.4 * maxf(c[0], c[1]) / 32.0, limit])
+			"%dx%d: cell %.0f px, ref32 %.0f px, compensation %.4f, local span %.4f cells (= 3.0*ref/cell %.4f; naive 3.0*N/32 %.3f) [%s-limited]" % [
+				c[0], c[1], cs, ref, p.get_scrubbot_size_compensation(), got, want, REF_SPAN * maxf(c[0], c[1]) / 32.0, limit])
 		rows.append({"board": "%dx%d" % c, "available_rect": [_rect.x, _rect.y], "cell_px": cs, "reference_32_cell_px": ref,
-			"compensation": p.get_scrubbot_size_compensation(), "local_body_span_cells": got, "naive_span_cells": 2.4 * maxf(c[0], c[1]) / 32.0,
+			"compensation": p.get_scrubbot_size_compensation(), "local_body_span_cells": got, "naive_span_cells": REF_SPAN * maxf(c[0], c[1]) / 32.0,
 			"limited_by": limit, "synthetic_test_only": c[0] > 59 or c[1] > 59})
 		_free(d)
 	_report["s1_rows"] = rows
@@ -169,9 +169,9 @@ func _s2_reference_lock() -> void:
 		var p = d["p"]
 		_ok(p.get_scrubbot_size_compensation() == 1.0 and d["v"].get_local_body_span_cells() == REF_SPAN
 			and is_equal_approx(_displayed_span(d["v"]), REF_SPAN * p.get_cell_size()),
-			"rect %s: 32x32 compensation exactly 1.0, local span exactly 2.4 cells, displayed %.2f px = 2.4 x %.0f px cell" % [str(rect), _displayed_span(d["v"]), p.get_cell_size()])
+			"rect %s: 32x32 compensation exactly 1.0, local span exactly 3.0 cells, displayed %.2f px = 3.0 x %.0f px cell" % [str(rect), _displayed_span(d["v"]), p.get_cell_size()])
 		_free(d)
-	_ok(ScrubbotVisual.BODY_SPAN_CELLS == 2.4 and RetireEcho.ECHO_SPAN_CELLS == 2.1, "owner reference constants unchanged (2.4 body / 2.1 echo)")
+	_ok(ScrubbotVisual.BODY_SPAN_CELLS == 3.0 and RetireEcho.ECHO_SPAN_CELLS == 2.625, "owner reference constants (SB-TF-02: 3.0 body / 2.625 echo)")
 
 func _s3_apparent_size() -> void:
 	print("[s3 measured apparent size vs 32x32 reference]")
@@ -183,7 +183,7 @@ func _s3_apparent_size() -> void:
 		var d := _presentation(_board(c[0], c[1]), _rect)
 		var px: float = _displayed_span(d["v"])
 		var delta: float = (px - ref_px) / ref_px * 100.0
-		var old_px: float = REF_SPAN * d["p"].get_cell_size()   # pre-C002 constant 2.4-cell look
+		var old_px: float = REF_SPAN * d["p"].get_cell_size()   # pre-C002 constant-cell look
 		_ok(absf(delta) <= 3.0, "%dx%d: displayed body %.2f px vs 32x32 %.2f px (delta %+.3f%%; pre-C002 would be %.1f px, %+.1f%%)" % [
 			c[0], c[1], px, ref_px, delta, old_px, (old_px - ref_px) / ref_px * 100.0])
 		rows.append({"board": "%dx%d" % c, "displayed_body_px": px, "reference_px": ref_px, "delta_pct": delta,
@@ -201,7 +201,7 @@ func _host_cases() -> Array:
 		["24x40 TEST rect (height-limited)", _level_json(24, 40, "m32c002_24x40")],
 		["100x100 TEST synthetic (not production; screen-only)", "SYNTH100"]]
 
-## Displayed px expected from the presentation seam: 2.4 x reference display cell x the
+## Displayed px expected from the presentation seam: 3.0 x reference display cell x the
 ## presentation parent's global scale (the screen's own shell transform, same for every board).
 func _expected_px(pres, span: float = REF_SPAN) -> float:
 	return span * pres.get_reference_cell_size() * pres.get_parent().get_global_transform().x.length()
@@ -392,7 +392,7 @@ func _s6_echo() -> void:
 		var pos: Vector2i = b.get_cell_position(idx)
 		_ok(absf(echo_px / live_px - ECHO_REF_SPAN / REF_SPAN) < 1e-4 and absf(echo_px - ref_echo) / ref_echo <= 0.03
 			and e.position == Vector2(pos.x + 0.5, pos.y + 0.5) and e.texture == ScrubbotVisual._shared_texture_for_echo(),
-			"%dx%d: echo %.2f px (32x32 %.2f), live %.2f px, ratio %.4f (2.1/2.4 = %.4f), at exact cell centre" % [c[0], c[1], echo_px, ref_echo, live_px, echo_px / live_px, ECHO_REF_SPAN / REF_SPAN])
+			"%dx%d: echo %.2f px (32x32 %.2f), live %.2f px, ratio %.4f (2.625/3.0 = %.4f), at exact cell centre" % [c[0], c[1], echo_px, ref_echo, live_px, echo_px / live_px, ECHO_REF_SPAN / REF_SPAN])
 		# Aging: shrink/fade unchanged; a mid-echo relayout rescales with the same seam.
 		var base: Vector2 = fx._active[0]["base"]
 		fx.age(RetireEcho.LIFETIME * 0.5)
@@ -402,7 +402,7 @@ func _s6_echo() -> void:
 		var gt2: Transform2D = e.get_global_transform()
 		var echo_px2: float = maxf(tex.x * gt2.x.length(), tex.y * gt2.y.length()) / (1.0 - RetireEcho.SHRINK * 0.5)
 		var ref2: float = maxf(floor(minf(700.0 / 32.0, 900.0 / 32.0)), 1.0)
-		_ok(is_equal_approx(echo_px2, ECHO_REF_SPAN * ref2), "%dx%d: mid-echo relayout -> echo %.2f px = 2.1 x new ref %.0f px" % [c[0], c[1], echo_px2, ref2])
+		_ok(is_equal_approx(echo_px2, ECHO_REF_SPAN * ref2), "%dx%d: mid-echo relayout -> echo %.2f px = 2.625 x new ref %.0f px" % [c[0], c[1], echo_px2, ref2])
 		fx.age(RetireEcho.LIFETIME)
 		_ok(fx.get_active_count() == 0, "%dx%d echo expires on the unchanged lifetime" % c)
 		rows.append({"board": "%dx%d" % c, "echo_px": echo_px, "live_px": live_px, "ratio": echo_px / live_px, "compensation": fx.get_size_compensation()})

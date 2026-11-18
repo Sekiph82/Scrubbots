@@ -37,9 +37,10 @@ const LIFETIME := 0.28
 ## it shrinks over its life. M28-C002-C002-R01: 1.6 -> 2.1, keeping the previous ~0.89
 ## echo/live ratio with the enlarged 2.4-cell live body. Presentation only.
 ## M32-C002: span at the 32x32 REFERENCE presentation; the live span is multiplied by the
-## SAME BoardPresentation compensation as the travel body, so the 2.1/2.4 ratio holds and
+## SAME BoardPresentation compensation as the travel body, so the echo/body ratio holds and
 ## the echo is board-resolution independent too.
-const ECHO_SPAN_CELLS := 2.1
+## SB-TF-02: scaled with the 3.0-cell body (2.1 x 3.0/2.4), same echo/live ratio.
+const ECHO_SPAN_CELLS := 2.625
 const SHRINK := 0.5
 
 var _layer: Node2D = null

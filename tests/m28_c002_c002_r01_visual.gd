@@ -22,7 +22,7 @@ const UiTokens = preload("res://scripts/ui/ui_tokens.gd")
 const BAKED_TEXT := Rect2(38, 1168, 158, 130)
 
 var EXPECTED_CASES := [
-	"body_span_2_4", "route_unchanged_by_scale", "echo_proportional", "bubble_live_text",
+	"body_span_3_0", "route_unchanged_by_scale", "echo_proportional", "bubble_live_text",
 	"short_phone_hitboxes", "ad_invisible_reserved", "accepted_styling_preserved",
 	"square_only_production", "masters_unchanged", "no_accumulation",
 ]
@@ -39,7 +39,7 @@ func _initialize() -> void:
 	MainScript.boot_opening_override = 0
 	AppState.test_unlock_all = true   # boosters / +1 Slot unlock at L6+ (SB-M44-032); this suite plays L2..4
 	await _boot_main(2)
-	await _body_span_2_4()
+	await _body_span_3_0()
 	await _route_unchanged_by_scale()
 	await _echo_proportional()
 	await _bubble_live_text()
@@ -143,9 +143,9 @@ func _drive(ticks: int, per_tick: Callable = Callable()) -> Array:
 
 # ------------------------------------------------------------------ cases ----
 
-func _body_span_2_4() -> void:
-	print("[mini Scrubby 2.4-cell span]")
-	_ok(is_equal_approx(ScrubbotVisual.BODY_SPAN_CELLS, 2.4), "ScrubbotVisual.BODY_SPAN_CELLS == 2.4 (was 1.8)")
+func _body_span_3_0() -> void:
+	print("[mini Scrubby 3.0-cell span]")
+	_ok(is_equal_approx(ScrubbotVisual.BODY_SPAN_CELLS, 3.0), "ScrubbotVisual.BODY_SPAN_CELLS == 3.0 (SB-TF-02; was 2.4, 1.8)")
 	_drive(60)
 	var spans: Array = []
 	for a in _agents():
@@ -154,12 +154,12 @@ func _body_span_2_4() -> void:
 				var body: Sprite2D = v.get_child(0)
 				var tex: Vector2 = body.texture.get_size()
 				spans.append(maxf(tex.x, tex.y) * v._base_scale.x)
-	_ok(spans.size() > 5 and spans.all(func(x): return absf(x - 2.4) < 1e-4), "every live agent body spans exactly 2.4 board cells (%d agents)" % spans.size())
+	_ok(spans.size() > 5 and spans.all(func(x): return absf(x - 3.0) < 1e-4), "every live agent body spans exactly 3.0 board cells (%d agents)" % spans.size())
 	var cell: float = _screen().get_cell_size()
-	_ok(spans.size() > 0 and absf(spans[0] * cell - 2.4 * cell) < 1e-3, "cell-relative: %.1f px on a %.1f px cell (no fixed pixel size)" % [2.4 * cell, cell])
-	_complete("body_span_2_4")
+	_ok(spans.size() > 0 and absf(spans[0] * cell - 3.0 * cell) < 1e-3, "cell-relative: %.1f px on a %.1f px cell (no fixed pixel size)" % [3.0 * cell, cell])
+	_complete("body_span_3_0")
 
-## The visual never drives movement: identical trajectories whether bodies render at 2.4
+## The visual never drives movement: identical trajectories whether bodies render at 3.0
 ## or are forced back to the old 1.8 look every tick.
 func _route_unchanged_by_scale() -> void:
 	print("[route truth unchanged by body scale]")
@@ -176,12 +176,12 @@ func _route_unchanged_by_scale() -> void:
 	var same: bool = trace_a.size() == trace_b.size()
 	for t in range(mini(trace_a.size(), trace_b.size())):
 		same = same and trace_a[t] == trace_b[t]
-	_ok(same and trace_a.size() == 400, "400 ticks: agent positions + board truth identical with 2.4 vs 1.8 bodies")
+	_ok(same and trace_a.size() == 400, "400 ticks: agent positions + board truth identical with 3.0 vs 1.8 bodies")
 	_complete("route_unchanged_by_scale")
 
 func _echo_proportional() -> void:
 	print("[retire echo proportional]")
-	_ok(is_equal_approx(RetireEcho.ECHO_SPAN_CELLS, 2.1), "ECHO_SPAN_CELLS == 2.1 (was 1.6)")
+	_ok(is_equal_approx(RetireEcho.ECHO_SPAN_CELLS, 2.625), "ECHO_SPAN_CELLS == 2.625 (SB-TF-02; was 2.1, 1.6)")
 	var ratio: float = RetireEcho.ECHO_SPAN_CELLS / ScrubbotVisual.BODY_SPAN_CELLS
 	_ok(absf(ratio - 1.6 / 1.8) < 0.02, "echo/live ratio %.3f keeps the previous %.3f" % [ratio, 1.6 / 1.8])
 	await _boot_main(2)
@@ -196,7 +196,7 @@ func _echo_proportional() -> void:
 				var tx: Vector2 = e["node"].texture.get_size()
 				spans.append(maxf(tx.x, tx.y) * e["base"].x))
 	_ok(_host.get_board().count_cells_by_state(0) < active0 and fx.get_peak_active() > 0, "real authenticated clears spawned echoes (peak %d, active board %d -> %d)" % [fx.get_peak_active(), active0, _host.get_board().count_cells_by_state(0)])
-	_ok(spans.size() > 5 and spans.all(func(x): return absf(x - 2.1) < 1e-4), "every spawned echo spans 2.1 cells at birth (%d sampled)" % spans.size())
+	_ok(spans.size() > 5 and spans.all(func(x): return absf(x - 2.625) < 1e-4), "every spawned echo spans 2.625 cells at birth (%d sampled)" % spans.size())
 	_ok(layer != null and layer.get_children().size() <= RetireEcho.MAX_ACTIVE_ECHOES, "echo layer bounded by the unchanged cap")
 	_ok(is_equal_approx(RetireEcho.LIFETIME, 0.28) and RetireEcho.MAX_ACTIVE_ECHOES == 16, "echo lifetime / cap unchanged (0.28 s / 16)")
 	_complete("echo_proportional")

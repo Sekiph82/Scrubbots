@@ -4,15 +4,17 @@ Date: 2026-09-29
 Status: OWNER-LOCKED / QUEUED
 Repository: Sekiph82/Scrubbots
 
+**Owner amendment 2026-11-18 (SB-TF-02, TestFlight "robots too small"):** the reference body span is now `ScrubbotVisual.BODY_SPAN_CELLS = 3.0` at the 32x32 reference (was 2.4; retire echo 2.1 -> 2.625, same ratio). The board-resolution independence rule below is unchanged; read the 2.4 figures below as the historical 2026-09-29 reference.
+
 This decision defines two separate follow-up tasks. Neither is part of the currently running M28-C002-C003-R01 V02 remediation.
 
 ## 1. Board-resolution-independent Scrubbot apparent size
 
 ### Problem
 
-Current gameplay Scrubbot rendering uses:
+Gameplay Scrubbot rendering then used (2026-09-29; current value 3.0, see the amendment above):
 
-`ScrubbotVisual.BODY_SPAN_CELLS = 2.4`
+`ScrubbotVisual.BODY_SPAN_CELLS = 2.4 (historical)`
 
 Because that value is expressed in logical board cells, apparent screen size changes with board resolution:
 

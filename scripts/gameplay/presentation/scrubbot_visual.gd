@@ -48,7 +48,8 @@ const BODY_TEX_PATH := "res://assets/ui/final/characters/scrubby/scrubby_gamepla
 ## M32-C002: this is the span at the 32x32 REFERENCE presentation. The live local span is
 ## BODY_SPAN_CELLS * BoardPresentation.get_scrubbot_size_compensation() (reference cell size /
 ## actual rendered cell size), so the DISPLAYED size is board-resolution independent.
-const BODY_SPAN_CELLS := 2.4
+## SB-TF-02 (owner 2026-11-18, TestFlight "robots too small"): 2.4 -> 3.0.
+const BODY_SPAN_CELLS := 3.0
 ## How far up the parent chain (agent -> AgentLayer -> BoardPresentation) to look for the
 ## presentation geometry seam. Without one (bare tests) the compensation is 1.0.
 const _PRESENTATION_SEARCH_DEPTH := 4

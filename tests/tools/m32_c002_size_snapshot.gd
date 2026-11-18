@@ -139,8 +139,8 @@ func _record(h, stem: String, extra: Dictionary = {}) -> void:
 		"board": [h.get_screen().get_presentation().get_renderer().get_board_pixel_size().x / b.get_cell_size(), h.get_screen().get_presentation().get_renderer().get_board_pixel_size().y / b.get_cell_size()],
 		"renderer_cell_px": b.get_cell_size(), "presentation_scale": pres.scale.x, "display_cell_px": b.get_cell_size() * pres.scale.x,
 		"reference_32_display_cell_px": pres.get_reference_cell_size(), "compensation": pres.get_scrubbot_size_compensation(),
-		"local_body_span_cells": 2.4 * pres.get_scrubbot_size_compensation(), "shell_scale": k,
-		"expected_body_px": 2.4 * pres.get_reference_cell_size() * k, "expected_echo_px": 2.1 * pres.get_reference_cell_size() * k,
+		"local_body_span_cells": ScrubbotVisual.BODY_SPAN_CELLS * pres.get_scrubbot_size_compensation(), "shell_scale": k,
+		"expected_body_px": ScrubbotVisual.BODY_SPAN_CELLS * pres.get_reference_cell_size() * k, "expected_echo_px": 2.625 * pres.get_reference_cell_size() * k,
 		"live_agents": spans.size(), "measured_live_body_px": spans}
 	row.merge(extra)
 	_measure.append(row)
@@ -171,13 +171,13 @@ func _shot(stem: String, lvl, with_pre: bool) -> void:
 	_record(h, stem)
 	await _capture(h, stem)
 	if with_pre:
-		# Pre-C002 look for comparison: the old constant 2.4 board-cell body (display only).
+		# Pre-C002 look for comparison: the old constant board-cell body (display only).
 		for a in _agents(h):
 			for v in a.get_children():
 				if v is ScrubbotVisual and v.has_body():
 					v.set_process(false)
 					var tx: Vector2 = v.get_child(0).texture.get_size()
-					v.get_child(0).scale = Vector2.ONE * (2.4 / maxf(tx.x, tx.y))
+					v.get_child(0).scale = Vector2.ONE * (ScrubbotVisual.BODY_SPAN_CELLS / maxf(tx.x, tx.y))
 		await _capture(h, "pre_" + stem)
 	h.get_meta("sub").free()
 
