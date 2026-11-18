@@ -112,7 +112,7 @@ func _p02() -> void:
 	for c in panel.find_child("Cards", true, false).get_children():
 		if String(c.name).begins_with("Card_"):
 			cards.append(String(c.name))
-	_ok(cards.slice(-4) == ["Card_HapticsToggle", "Card_ReducedEffectsToggle", "Card_ColorSymbolsRow", "Card_LanguageRow"], "cards unchanged, Reduced Effects in place %s" % str(cards))
+	_ok(cards.slice(-5) == ["Card_HapticsToggle", "Card_ReducedEffectsToggle", "Card_ColorSymbolsRow", "Card_LanguageRow", "Card_NotificationsButton"], "cards unchanged, Reduced Effects in place %s" % str(cards))
 	var close: Button = panel.find_child("CloseButton", true, false)
 	_ok(close.get_parent() == b.get_parent() and b.get_parent().get_parent() == body, "PRIVACY shares the CLOSE row (no extra row)")
 	_completed["p02_settings_row"] = true

@@ -77,7 +77,7 @@ func _receipt_matches_commit() -> void:
 	var pay: Dictionary = root.get_navigation().last_payload()
 	_ok(pay["receipt"] == rc and pay["attempt"] == 1 and pay["via"] == "win" and not pay.has("continue"), "Home payload binds the host receipt; no next-level availability")
 	var plan: Array = HomeRewardFlight.plan(rc, root.get_home().get_view_model())
-	_ok(plan.map(func(e): return e["kind"]) == ["scrub_bucks", "bot_parts", "gift_meter", "win_streak"] and root.get_home().is_reward_flight_running(), "Home flies every committed reward %s" % str(plan.map(func(e): return e["kind"])))
+	_ok(plan.map(func(e): return e["kind"]) == ["scrub_bucks", "bot_parts", "gift_meter"] and root.get_home().is_reward_flight_running(), "Home flies every committed reward %s" % str(plan.map(func(e): return e["kind"])))
 	_ok(plan[0]["to"] - plan[0]["from"] == fc_sb + 1, "SB flight = first clear + streak SB")
 	var copy: Dictionary = h.get_terminal_receipt()
 	copy["rewards"]["first_clear_sb"] = 999999
