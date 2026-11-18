@@ -22,10 +22,17 @@ extends Node2D
 ## agents inherit this transform.
 
 const BoardRenderer = preload("res://scripts/gameplay/board/board_renderer.gd")
-## BG01 Midnight Slate (palette V3 gameplayBackground, owner-locked): one rect under exactly the
-## board rect so CLEARED cells and the edge rows show BG01 rather than the baked shell's blue
-## field / bright aperture bevel the outer cells overhang on large boards (SB-PHONE-2026-11-12-D).
+## BG01 Midnight Slate (palette V3 gameplayBackground, owner-locked palette truth).
 const BG01 := Color8(32, 37, 51)
+## Board floor: one rect under exactly the board rect so CLEARED cells and the edge rows show the
+## floor rather than the baked aperture bevel the outer cells overhang on large boards
+## (SB-PHONE-2026-11-12-D). SB-TF-04 (owner 2026-11-18 "brighter, like the rail glow"): four
+## candidates sampled from the rail glow (deep halo, mid glow, cyan core, deep blue), each at the
+## brightest level where every C01..C16 keeps >= 1.3:1 contrast (C14 / C08 cap it at ~0.052
+## luminance; BG01 is 0.019). Picking a tone = changing the selector below; the masters' navy field
+## is baked to tone 0 (tools/gameplay_shell_masters.py TONE0).
+const BOARD_FLOOR_TONES: Array[Color] = [Color8(0, 66, 116), Color8(4, 68, 104), Color8(16, 70, 85), Color8(0, 61, 140)]
+const BOARD_FLOOR_TONE := 0
 
 var _background: ColorRect  # BoardBackground: created once, first child, never per cell
 var _renderer  # BoardRenderer (Control)
@@ -72,7 +79,7 @@ func configure(board, palette: PackedStringArray, available_size: Vector2) -> vo
 	if _background == null or not is_instance_valid(_background):
 		_background = ColorRect.new()
 		_background.name = "BoardBackground"
-		_background.color = BG01
+		_background.color = BOARD_FLOOR_TONES[BOARD_FLOOR_TONE]
 		_background.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		add_child(_background)
 		move_child(_background, 0)

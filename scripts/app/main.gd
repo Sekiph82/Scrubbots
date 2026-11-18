@@ -209,6 +209,8 @@ func _ready() -> void:
 		var ads = app_state.economy.ads
 		var banner := func():
 			_home.set_ad_slot_enabled(ads.allowed("banner"))
+			if _gameplay_host != null and is_instance_valid(_gameplay_host):
+				_gameplay_host.get_screen().set_ad_slot_enabled(ads.allowed("banner"))   # SB-TF-04
 			ads.update_banner()
 		banner.call()
 		store.resolved.connect(banner.unbind(2))

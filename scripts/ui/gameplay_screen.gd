@@ -15,7 +15,8 @@ extends Control
 ##   BoardRenderer (fitted so the runtime ScrubRailGeometry loop lands on the baked rail),
 ##   Scrubbot agents, live slot colour/count/state, live supply colour/count + front-only
 ##   hitboxes, profile portrait/Level/Bot Parts, Pause state, 2x state/timer, four boosters,
-##   the reserved bottom ad region, and a clean mask over the obsolete baked bubble text.
+##   and a clean mask under the live bubble text. Screen space, outside the shell: the same
+##   bottom banner area as Home (HomeStyle.ad_banner, SB-TF-04), collapsed by No Ads.
 ## No second visible rail, slot frame, connector, supply frame or profile/control chrome is
 ## drawn. Presentation only: no gameplay truth is owned here; controls emit intents.
 
@@ -54,9 +55,11 @@ const PROFILE_NAME := [157, 116, 278, 166]
 const PROFILE_LEVEL := [269, 116, 374, 166]
 const PROFILE_BAR := [157, 175, 374, 212]
 ## Invisible anchors on the baked Scrubby / bubble / props (future FTUE text anchor, tests).
-const SPEECH_ANCHOR := [14, 1150, 214, 1345]
-const SCRUBBY_ANCHOR := [14, 1325, 262, 1600]
-const PROPS_ANCHOR := [600, 1230, 845, 1625]
+## SB-TF-04: bubble widened behind the slot strip / Supply panel, Scrubby x1.25 (feet 54 px
+## lower), bucket + Caution sign x0.75 about their bottom-right corner, beside the Supply panel.
+const SPEECH_ANCHOR := [14, 1150, 304, 1345]
+const SCRUBBY_ANCHOR := [14, 1310, 324, 1654]
+const PROPS_ANCHOR := [661, 1204, 845, 1500]
 
 const BOOSTERS := [
 	{"id": "plus_one_slot", "art": "res://assets/ui/final/boosters/extra_slot.png"},
@@ -66,8 +69,8 @@ const BOOSTERS := [
 ]
 ## Live bubble copy layout inside the masked text area (master px) + colours sampled to
 ## match the master's own navy lettering.
-const BUBBLE_HEADLINE_REF := [34, 1166, 200, 1218]
-const BUBBLE_INSTRUCTION_REF := [34, 1228, 200, 1302]
+const BUBBLE_HEADLINE_REF := [32, 1178, 206, 1226]
+const BUBBLE_INSTRUCTION_REF := [32, 1230, 206, 1306]
 const BUBBLE_HEADLINE_COLOR := Color8(22, 36, 128)
 const BUBBLE_TEXT_COLOR := Color8(28, 44, 110)
 const BUBBLE_HEADLINE_REF_PX := 21.0
@@ -135,7 +138,8 @@ var _booster_row: HBoxContainer
 var _booster_buttons: Dictionary = {}
 var _booster_states: Dictionary = {}
 var _boosters_populated := false
-var _ad_region: Panel
+var _ad_banner: PanelContainer        # SB-TF-04 bottom banner area (HomeStyle.ad_banner)
+var _ad_slot_enabled := true
 ## M50-BOARD press-and-hold board loupe (covers exactly the board rect; presentation only).
 var _magnifier
 var _booster_vfx                      # SB-POLISH-003 activation effects (one overlay)
@@ -322,18 +326,15 @@ func _build_tree() -> void:
 		_booster_states[spec["id"]] = {"charges": 0, "price": 0, "state": BOOSTER_UNAVAILABLE}
 		_apply_booster_visual(spec["id"])
 
-	# Reserved bottom ad region (layout only; ad serving is M57).
-	_ad_region = Panel.new()
-	_ad_region.name = "AdRegion"
-	_ad_region.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	# S3-B: reserved but INVISIBLE until M57 real ad integration (no band, no label).
-	_ad_region.add_theme_stylebox_override("panel", StyleBoxEmpty.new())
-	_screen_content.add_child(_ad_region)
-
 	# Last child: its loupe draws over the HUD while the board is held.
 	_magnifier = BoardMagnifier.new()
 	_magnifier.visible = false
 	_screen_content.add_child(_magnifier)
+	# SB-TF-04: Home's banner area, flush with the screen bottom over the shell's lower floor
+	# (the shell is not shrunk, so the board keeps its size). Ad serving is M57.
+	_ad_banner = HomeStyle.ad_banner()
+	_ad_banner.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+	add_child(_ad_banner)
 	_booster_vfx = BoosterVfx.new()
 	add_child(_booster_vfx)
 
@@ -642,8 +643,11 @@ func relayout() -> void:
 	_layout_batch()
 	# Button minimums first, THEN the row rect: the row is clamped to its children's
 	# minimum, so placing it first would keep a larger previous-size minimum on shrink.
-	var bsz: float = maxf(Shell.rect(Shell.BOOSTERS).size.y * _scale, float(UiTokens.TOUCH_MIN))
-	_booster_row.add_theme_constant_override("separation", int(28.0 * _scale))
+	var band: Vector2 = Shell.rect(Shell.BOOSTERS).size * _scale
+	var bsz: float = maxf(floorf(band.y), float(UiTokens.TOUCH_MIN))   # whole px: never past the band
+	# The four squares spread over the band width, leaving room for the icon art that overhangs
+	# each plate by 2.5% (SB-TF-02); they touch at the TOUCH_MIN floor.
+	_booster_row.add_theme_constant_override("separation", maxi(int((band.x - 4.05 * bsz) / 3.0), 0))
 	for b in _booster_row.get_children():
 		b.custom_minimum_size = Vector2(bsz, bsz)
 		b.add_theme_stylebox_override("normal", HomeStyle.box(Color(0.96, 0.92, 0.84), Color(0.62, 0.72, 0.88), 4, int(bsz / 2), 8, 3))
@@ -652,8 +656,26 @@ func relayout() -> void:
 		b.get_node("Badge").add_theme_font_size_override("font_size", int(26.0 * _scale))
 		HomeStyle.fit_font(b.get_node("Price"), int(20.0 * _scale), bsz * 0.88)
 	_place_ref(_booster_row, Shell.BOOSTERS)
-	_place_ref(_ad_region, Shell.AD)
+	_layout_ad_banner()
 	_queue_connector_update()
+
+func _layout_ad_banner() -> void:
+	_ad_banner.visible = _ad_slot_enabled
+	_ad_banner.offset_top = -HomeStyle.ad_slot_height(get_viewport_rect().size.x) if _ad_slot_enabled else 0.0
+	_ad_banner.offset_bottom = 0.0
+
+## SB-TF-04: the No Ads entitlement (AdService.allowed("banner") false, wired by the host and
+## main.gd, same flag as Home) collapses the banner to height 0; the shell layout is unchanged.
+func set_ad_slot_enabled(enabled: bool) -> void:
+	_ad_slot_enabled = enabled
+	if _built:
+		_layout_ad_banner()
+
+func is_ad_slot_enabled() -> bool:
+	return _ad_slot_enabled
+
+func get_ad_mount() -> Control:
+	return _ad_banner.get_node("AdMount")
 
 func _place_rect(c: Control, ref: Rect2) -> void:
 	var r := ref_rect_to_local(ref)
@@ -1102,8 +1124,10 @@ func get_speed_button() -> Button:
 func get_bubble_mask() -> Panel:
 	return _bubble_mask
 
+## The bottom banner area (zero height when collapsed by No Ads).
 func get_ad_region_rect() -> Rect2:
-	return _global_rect(_ad_region)
+	var r := _global_rect(_ad_banner)
+	return r if _ad_banner.visible else Rect2(r.position.x, r.end.y, r.size.x, 0.0)
 
 func _global_rect(c: Control) -> Rect2:
 	return Rect2(c.global_position, c.size)
@@ -1161,21 +1185,18 @@ func has_goal_moves_panel() -> bool:
 func has_level_lock_rail() -> bool:
 	return _find_named(self, ["LevelRail", "LockRail", "LevelLockRail"])
 
-## Legacy C001-era bottom Pause/ad/speed row (must stay absent). The owner-reserved
-## lower ad region (`AdRegion`) is a different, authorised layout band.
+## Legacy C001-era bottom Pause/ad/speed row (must stay absent). The SB-TF-04 bottom banner
+## area (`AdBannerSlot`) is a different, authorised band.
 func has_ad_placeholder() -> bool:
 	return _find_named(self, ["AdPlaceholder", "BottomActionRow"])
 
-## The reserved ad band exists (layout anchor for M57) ...
+## The banner area is shown (No Ads not owned) ...
 func has_ad_region() -> bool:
-	return _ad_region != null and _ad_region.visible
+	return _ad_banner != null and _ad_banner.visible
 
-## ... but draws nothing until M57 (owner S3-B).
+## ... but carries no fake ad content until M57 (empty AdMount, owner S3-B).
 func is_ad_placeholder_visible() -> bool:
-	if _ad_region == null:
-		return false
-	var drawn: bool = not (_ad_region.get_theme_stylebox("panel") is StyleBoxEmpty)
-	return drawn or _ad_region.get_children().any(func(c): return c is CanvasItem and c.visible)
+	return _ad_banner != null and get_ad_mount().get_children().any(func(c): return c is CanvasItem and c.visible)
 
 func get_bubble_labels() -> Array:
 	return [_bubble_headline, _bubble_instruction]

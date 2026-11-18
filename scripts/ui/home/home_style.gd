@@ -191,6 +191,31 @@ static func fit_row(row: Control, px: int, width: float) -> void:
 		if row.get_combined_minimum_size().x <= width:
 			return
 
+## SB-TF-03 / SB-TF-04 persistent banner area, shared by Home and gameplay: the standard 320x50
+## banner scaled to the viewport width, clamped 72..112. Explicit reservation only, never
+## EXPAND/FILL, not a provider contract; the ad SDK view attaches to the empty "AdMount" child.
+const AD_SLOT_RATIO := 50.0 / 320.0
+const AD_SLOT_MIN_H := 72.0
+const AD_SLOT_MAX_H := 112.0
+
+static func ad_slot_height(viewport_width: float) -> float:
+	return clampf(viewport_width * AD_SLOT_RATIO, AD_SLOT_MIN_H, AD_SLOT_MAX_H)
+
+static func ad_banner() -> PanelContainer:
+	var ad := PanelContainer.new()
+	ad.name = "AdBannerSlot"
+	var adsb := box(Color(0.03, 0.05, 0.10), Color(0.16, 0.26, 0.42), 0, 0, 0)
+	adsb.border_width_top = 2
+	adsb.expand_margin_bottom = 600   # covers the bottom inset down to the screen edge
+	ad.add_theme_stylebox_override("panel", adsb)
+	ad.mouse_filter = Control.MOUSE_FILTER_PASS
+	ad.size_flags_vertical = Control.SIZE_SHRINK_END   # fixed reservation, never EXPAND/FILL
+	var ad_mount := Control.new()
+	ad_mount.name = "AdMount"   # the future ad SDK view attaches here; empty in V04
+	ad_mount.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	ad.add_child(ad_mount)
+	return ad
+
 static func art(name: String) -> TextureRect:
 	var t := TextureRect.new()
 	t.name = name

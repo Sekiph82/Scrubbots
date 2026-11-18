@@ -3,8 +3,9 @@ extends SceneTree
 ## Owner phone (Galaxy A10, Level 20): the top C08 Dark Blue row was nearly invisible. Root
 ## cause: CLEARED holes and the board edge showed the baked shell's blue field and the bright
 ## aperture bevel the outer cells of a >31-cell board overhang (C08 vs bevel 1.07:1), instead
-## of BG01 Midnight Slate (CLAUDE.md §7/§8). BoardPresentation now puts one BG01 rect exactly
-## under the board rect.
+## of BG01 Midnight Slate (CLAUDE.md §7/§8). BoardPresentation now puts one backdrop rect exactly
+## under the board rect. SB-TF-04 (owner 2026-11-18): its colour is the selected board floor tone
+## (BOARD_FLOOR_TONES[BOARD_FLOOR_TONE], brighter than BG01); BG01 stays the palette constant.
 ##
 ## Run: godot --headless --path . -s res://tests/board_bg01_backdrop.gd
 
@@ -95,8 +96,8 @@ func _check(s, label: String) -> void:
 	var board: Rect2 = s.get_board_rect()
 	var bg_rect: Rect2 = bg.get_global_transform() * Rect2(Vector2.ZERO, bg.size)
 	var renderer_index: int = p.get_renderer().get_index()
-	_ok(bg.color == BoardPresentation.BG01 and bg.visible and bg.get_index() == 0 and renderer_index > 0
-		and bg.mouse_filter == Control.MOUSE_FILTER_IGNORE, "%s: one BG01 BoardBackground drawn first (under renderer index %d), ignores input" % [label, renderer_index])
+	_ok(bg.color == _floor() and bg.visible and bg.get_index() == 0 and renderer_index > 0
+		and bg.mouse_filter == Control.MOUSE_FILTER_IGNORE, "%s: one floor-tone BoardBackground drawn first (under renderer index %d), ignores input" % [label, renderer_index])
 	_ok(_near(bg_rect, board), "%s: backdrop rect %s == board rect %s" % [label, str(bg_rect), str(board)])
 	var inner: Rect2 = s.ref_rect_to_global(Shell.rail_rect(s.get_shell_id())).grow(-FRAME_HALF * s.get_shell_scale())
 	_ok(board.size.x > 0.0 and inner.encloses(board), "%s: board %s fully inside the frame's inner edge %s (no cell under the frame)" % [label, str(board), str(inner)])
@@ -105,6 +106,9 @@ func _check(s, label: String) -> void:
 		if c is ColorRect:
 			bgs += 1
 	_ok(bgs == 1, "%s: exactly one backdrop node (never per cell)" % label)
+
+func _floor() -> Color:
+	return BoardPresentation.BOARD_FLOOR_TONES[BoardPresentation.BOARD_FLOOR_TONE]
 
 func _near(a: Rect2, b: Rect2) -> bool:
 	return a.position.distance_to(b.position) < 0.5 and a.end.distance_to(b.end) < 0.5
@@ -118,8 +122,8 @@ func _cleared_shows_backdrop() -> void:
 	p.configure(board, lvl.palette, Vector2(480, 480))
 	board.set_cell_state(0, BoardState.CellState.CLEARED)
 	p.get_renderer().refresh_all()
-	_ok(p.get_renderer().get_pixel_color(0, 0).a == 0.0 and p.get_background().color == BoardPresentation.BG01
-		and p.get_background().size == p.get_renderer().size, "CLEARED cell alpha 0 over a renderer-sized BG01 backdrop")
+	_ok(p.get_renderer().get_pixel_color(0, 0).a == 0.0 and p.get_background().color == _floor()
+		and p.get_background().size == p.get_renderer().size, "CLEARED cell alpha 0 over a renderer-sized floor-tone backdrop")
 	p.free()
 	_completed["cleared_shows_backdrop"] = true
 

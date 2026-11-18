@@ -439,6 +439,8 @@ func build() -> bool:
 				_save = SaveService.new(save_path, _audio_settings, _haptics_settings, _progression, _economy)
 				_save.load()
 	if _economy != null:
+		# SB-TF-04: the Home banner's No Ads flag also collapses the gameplay banner area.
+		_screen.set_ad_slot_enabled(_economy.ads.allowed("banner"))
 		_booster_adapter = ProductionBoosterAdapter.new(_level, _board, _supply, _slots, _scheduler)
 		_booster_service = BoosterService.new(_economy.boosters)
 		# M39 V04 (F-M39-V03-005): the ONE canonical production action surface.

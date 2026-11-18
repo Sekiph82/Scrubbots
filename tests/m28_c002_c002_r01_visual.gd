@@ -19,7 +19,7 @@ const SupplyPlanLoader = preload("res://scripts/gameplay/supply/supply_plan_load
 const UiText = preload("res://scripts/ui/ui_text.gd")
 const UiTokens = preload("res://scripts/ui/ui_tokens.gd")
 
-const BAKED_TEXT := Rect2(38, 1168, 158, 130)
+const BAKED_TEXT := Rect2(32, 1178, 174, 128)   # SB-TF-04 live text area (baked sentence erased)
 
 var EXPECTED_CASES := [
 	"body_span_3_0", "route_unchanged_by_scale", "echo_proportional", "bubble_live_text",
@@ -290,8 +290,9 @@ func _ad_invisible_reserved() -> void:
 	print("[AD hidden, region reserved]")
 	await _boot_main(2)
 	var s = _screen()
-	_ok(not s.is_ad_placeholder_visible(), "no visible AD band / label")
-	_ok(s.has_ad_region() and _near(s.get_ad_region_rect(), s.ref_rect_to_global(Shell.rect(Shell.AD)), 1.5), "reserved ad region kept at the bottom band (M57 anchor)")
+	_ok(not s.is_ad_placeholder_visible(), "no fake ad content / label in the banner area")
+	var ad: Rect2 = s.get_ad_region_rect()
+	_ok(s.has_ad_region() and absf(ad.end.y - s.get_viewport_rect().size.y) < 0.5 and s.get_ad_mount().get_child_count() == 0, "SB-TF-04 banner area at the screen bottom, empty AdMount (M57 anchor)")
 	_ok(s.get_booster_row_rect().end.y <= s.get_ad_region_rect().position.y + 1.0, "boosters still above the reserved band")
 	_complete("ad_invisible_reserved")
 

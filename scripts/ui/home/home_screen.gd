@@ -109,11 +109,10 @@ const V03_ICON_BOX := Vector2(206, 164)
 const PANEL_LABEL_BAND := 34   # 0.7 x 46, +2 so a 20 px label line still fits the 109 px panel
 const PANEL_FONT := 20
 const PANEL_EDGE_MARGIN := 26
-## SB-TF-03 banner area: the standard 320x50 banner scaled to the viewport width, clamped
-## 72..112. Explicit reservation only — never EXPAND/FILL, not a provider contract.
-const AD_SLOT_RATIO := 50.0 / 320.0
-const AD_SLOT_MIN_H := 72.0
-const AD_SLOT_MAX_H := 112.0
+## SB-TF-03 banner area (HomeStyle.ad_banner, shared with gameplay since SB-TF-04).
+const AD_SLOT_RATIO := HomeStyle.AD_SLOT_RATIO
+const AD_SLOT_MIN_H := HomeStyle.AD_SLOT_MIN_H
+const AD_SLOT_MAX_H := HomeStyle.AD_SLOT_MAX_H
 
 ## V05 world-transform lock. The V04 transform was derived from the V04 layout; these
 ## are that layout's measured reference values (commit a8b953e, per layout mode
@@ -452,19 +451,9 @@ func _build() -> void:
 	actions.add_child(_reg(stack))
 	_build_play(stack)
 
-	var ad := PanelContainer.new()
-	ad.name = "AdBannerSlot"
-	var adsb := HomeStyle.box(Color(0.03, 0.05, 0.10), Color(0.16, 0.26, 0.42), 0, 0, 0)
-	adsb.border_width_top = 2
-	adsb.expand_margin_bottom = 600   # covers the bottom inset down to the screen edge
-	ad.add_theme_stylebox_override("panel", adsb)
-	ad.mouse_filter = Control.MOUSE_FILTER_PASS
-	ad.size_flags_vertical = Control.SIZE_SHRINK_END   # fixed reservation, never EXPAND/FILL
+	var ad := HomeStyle.ad_banner()
 	layout.add_child(_reg(ad))
-	var ad_mount := Control.new()
-	ad_mount.name = "AdMount"   # the future ad SDK view attaches here; empty in V04
-	ad_mount.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	ad.add_child(_reg(ad_mount))
+	_reg(ad.get_node("AdMount"))
 
 	_build_hud(hud)
 	_build_gift_meter(gm)
@@ -1272,7 +1261,7 @@ func _apply_layout_mode() -> void:
 	(_nodes["HomeActionLayer"] as VBoxContainer).add_theme_constant_override("separation", gap)
 	(_nodes["BottomActionStack"] as VBoxContainer).add_theme_constant_override("separation", gap)
 	(_nodes["ProfileCard"] as Control).custom_minimum_size.x = clampf(vp.x * PROFILE_CARD_WIDTH_FRACTION, 460.0, 620.0)
-	(_nodes["AdBannerSlot"] as Control).custom_minimum_size.y = clampf(vp.x * AD_SLOT_RATIO, AD_SLOT_MIN_H, AD_SLOT_MAX_H)
+	(_nodes["AdBannerSlot"] as Control).custom_minimum_size.y = HomeStyle.ad_slot_height(vp.x)
 	(_nodes["WorldMargin"] as MarginContainer).add_theme_constant_override("margin_top", PANEL_TOP)
 	for side in ["LeftShortcutColumn", "RightShortcutColumn"]:
 		(_nodes[side] as VBoxContainer).add_theme_constant_override("separation", PANEL_GAP)

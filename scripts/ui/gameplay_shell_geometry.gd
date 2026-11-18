@@ -2,8 +2,11 @@ extends RefCounted
 ## GameplayShellGeometry — preload (res://scripts/ui/gameplay_shell_geometry.gd).
 ##
 ## M28-C002-C002 (OWNER_GAMEPLAY_345_STATIC_MASTER_SHELL_V01) + owner 2026-11-16 amendment
-## (SB-GAMEPLAY-BG-2026-11-16): the six plaza gameplay masters (852x1846), all cut from the ONE
-## owner plaza image (5slot_4col = that image unchanged), and their MEASURED reference coordinates.
+## (SB-GAMEPLAY-BG-2026-11-16) + owner 2026-11-18 amendment (SB-TF-04): the six plaza gameplay
+## masters (852x1846), all built from the ONE owner plaza image by
+## tools/gameplay_shell_masters.py (Scrubby x1.25, bucket + Caution sign x0.75 beside the Supply
+## panel, speech bubble widened behind the slot strip and Supply panel, navy board field lifted to
+## BoardPresentation.BOARD_FLOOR_TONES[0]), and their MEASURED reference coordinates.
 ## Pure data. Every rect is [x0, y0, x1, y1] in master pixels, measured by pixel analysis of the
 ## committed masters (factory/jobs/159-gameplay-shell-plaza/measure.py):
 ##   rail      — centrelines of the baked Railway loop (left/right x, top/bottom y): the measured
@@ -13,8 +16,9 @@ extends RefCounted
 ##   slots     — interiors of the baked execution-slot frames (navy connected components), left -> right;
 ##   connector_x — centre x of the glow cap of each baked slot->bottom-rail pipe;
 ##   cols/rows — Batch Supply cell interiors (navy components; x ranges per column, y ranges per row);
-## plus the shared top-bar boxes, the speech-bubble text area to mask, and the
-## booster / ad bands reserved on the empty floor below the supply panel.
+## plus the shared top-bar boxes, the speech-bubble text area to mask, and the booster band
+## on the floor right of Scrubby, below the supply panel (the bottom banner is screen space,
+## HomeStyle.ad_banner, not part of the master).
 ## Selection is by the two authoritative runtime facts: supply column count (3/4/5) and
 ## execution-slot capacity (5/6). Anything else fails closed ("").
 
@@ -23,12 +27,12 @@ const DIR := "res://assets/ui/final/gameplay/master/"
 
 ## Locked SHA-256 of each master (coordination/OWNER_GAMEPLAY_345_STATIC_MASTER_SHELL_V01.md).
 const SHA256 := {
-	"5slot_3col": "9242651d436cd354005b0311a0ff2a43f4ff789123fa5741412d9d39123b0e8d",
-	"5slot_4col": "47a8b9f86c74fcda2f94fd144db2d82a42aa9fdc6d2aca83dce6bf3b5722a4d8",
-	"5slot_5col": "ce27985eaa6b883e311f6616a901e7c27a7787ef9ec99ca95334f58c2cf7c231",
-	"6slot_3col": "e7502d7e6286fafa7d02254174fad6f1459c75e9d4f62f53792662f1de4d5ddc",
-	"6slot_4col": "c042c211fdb76c8177062be460fc2b6a95dd5e2b05718b566633a0086cef0272",
-	"6slot_5col": "a5e49191891277a15024d47ba1db2657c2934db07c21be2c6a66fff468ca76a8",
+	"5slot_3col": "44abe4991856b6ae4074e1d320f28227bfe60ae729d0bb89eca24324206f734a",
+	"5slot_4col": "4c5dc02f2b12b45da66683871557c4e90fca02e055d6b011ce77c1321675207f",
+	"5slot_5col": "1a2ad824b32c31470eccbadc28e18ab94df585b70bea96728a964c6b19658779",
+	"6slot_3col": "3eee34daa553de609646e8b0737860fb7ffe6961a83d8b8df128bbef34d79b70",
+	"6slot_4col": "41080173a490a06671411f5412fa10158e4715cd5c5ac75ca121af06984f3ef6",
+	"6slot_5col": "3b2a1cb6f9f1daa23a3913450ae170402e7ce151fe389d837f541c77b4857f28",
 }
 
 ## The rail is the same baked loop in all six masters.
@@ -56,13 +60,13 @@ const SHELLS := {
 const PROFILE := [30, 106, 383, 228]
 const PAUSE := [592, 112, 693, 211]
 const SPEED := [717, 112, 821, 211]
-## Obsolete baked instruction text inside the speech bubble (masked; bubble art kept).
-const BUBBLE_TEXT := [30, 1162, 204, 1306]
+## Live-text area of the speech bubble, below the slot strip and left of every Supply panel
+## (the baked sentence is erased in the masters; masked in the bubble fill all the same).
+const BUBBLE_TEXT := [28, 1174, 208, 1310]
 const BUBBLE_FILL := Color8(253, 247, 231)
-## Lower floor bands reserved by the owner decision (§4): four boosters on the empty floor
-## below the supply panel / Scrubby / caution sign, above the ad region.
-const BOOSTERS := [178, 1640, 674, 1738]
-const AD := [0, 1762, 852, 1846]
+## SB-TF-04: the four boosters on the floor right of Scrubby, below the supply panel and above
+## the tallest bottom banner (112 px) at every required viewport.
+const BOOSTERS := [332, 1528, 840, 1648]
 
 ## "<5|6>slot_<3|4|5>col" or "" (fail closed) for the two authoritative facts.
 static func shell_id(columns: int, capacity: int) -> String:

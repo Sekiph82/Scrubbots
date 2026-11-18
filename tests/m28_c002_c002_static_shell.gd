@@ -24,8 +24,9 @@ const MATRIX := [
 	Vector2i(1080, 2160), Vector2i(1170, 2532), Vector2i(1290, 2796), Vector2i(1080, 2400),
 	Vector2i(1440, 3200), Vector2i(1080, 1920), Vector2i(1536, 2048),
 ]
-## Baked obsolete-instruction bounding box measured on the masters (must be covered).
-const BAKED_TEXT := Rect2(38, 1168, 158, 130)
+## Live bubble-text area (SB-TF-04: the baked sentence is erased in the masters; the mask still
+## covers the whole text area).
+const BAKED_TEXT := Rect2(32, 1178, 174, 128)
 
 var EXPECTED_CASES := [
 	"masters_locked", "shell_selection_matrix", "no_duplicate_chrome", "board_on_baked_rail",
@@ -440,7 +441,7 @@ func _timed_2x_wallclock() -> void:
 ## props, speech bubble and the AD region; the count badge draws above the icon.
 func _booster_icons_ok(scr) -> void:
 	var band: Rect2 = scr.ref_rect_to_global(Shell.rect(Shell.BOOSTERS))
-	var ad: Rect2 = scr.ref_rect_to_global(Shell.rect(Shell.AD))
+	var ad: Rect2 = scr.get_ad_region_rect()   # SB-TF-04 bottom banner area
 	var avoid: Array = [scr.get_supply_panel_rect(), scr.get_scrubby_anchor_rect(), scr.get_props_anchor_rect(), scr.get_speech_anchor_rect(), ad]
 	var ok := true
 	var ratio := 0.0
@@ -464,7 +465,8 @@ func _boosters_and_ad_region() -> void:
 	var ad: Rect2 = s.get_ad_region_rect()
 	var row: Rect2 = s.get_booster_row_rect()
 	_ok(s.get_booster_count() == 4 and s.get_booster_ids() == ["plus_one_slot", "random", "selector", "tornado"], "exactly four canonical boosters")
-	_ok(s.has_ad_region() and _near(ad, s.ref_rect_to_global(Shell.rect(Shell.AD)), _tol()) and ad.end.y <= shell.end.y + 1.0, "reserved ad region at the bottom of the shell")
+	var vp: Vector2 = s.get_viewport_rect().size
+	_ok(s.has_ad_region() and absf(ad.end.y - vp.y) < 0.5 and absf(ad.size.x - vp.x) < 0.5 and ad.end.y >= shell.end.y - 1.0, "banner area flush with the screen bottom, full width (SB-TF-04)")
 	_ok(row.end.y <= ad.position.y + 1.0 and row.position.y >= s.get_supply_panel_rect().end.y, "boosters above the ad region, below the supply")
 	_ok(not s.has_ad_placeholder(), "legacy C001-era bottom Pause/ad/speed row absent")
 	_complete("boosters_and_ad_region")
@@ -475,7 +477,7 @@ func _bubble_text_masked() -> void:
 	var mask: Panel = s.get_bubble_mask()
 	var sb := mask.get_theme_stylebox("panel") as StyleBoxFlat
 	_ok(mask.is_visible_in_tree() and sb != null and sb.bg_color.a == 1.0 and sb.bg_color == Shell.BUBBLE_FILL, "opaque mask in the bubble's own fill colour")
-	_ok(mask.get_global_rect().encloses(s.ref_rect_to_global(BAKED_TEXT)), "mask covers the whole baked instruction")
+	_ok(mask.get_global_rect().encloses(s.ref_rect_to_global(BAKED_TEXT)), "mask covers the whole bubble text area")
 	_ok(mask.get_children().is_empty() and s.find_children("*", "Label", true, false).all(func(l): return String(l.text).to_lower().find("tap on") == -1), "bubble left blank; no tutorial copy invented")
 	_complete("bubble_text_masked")
 
