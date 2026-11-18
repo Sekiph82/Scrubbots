@@ -1,0 +1,3 @@
+APPROVE — SB-TF-02 (factory 181-tf02-gameplay-fixes), round 1 reviewer-code VERDICT: PASS (CLAUDE_PEER_REVIEW).
+Slot pop hold now released when the slot's own pop leaves the overlay (was a second countdown that outlasted the pop by a frame at 120 Hz); level intro blocks supply/booster/speed input; free auto endgame speed 3x (paid 2x stays 2x, HUD "3x"); Scrubbot BODY_SPAN_CELLS 3.0; Collection Details button removed (tap card); booster icons 1.38x (2.5 ref px band overhang accepted; SB-TF-04 moves the band).
+LOCAL_PASS: slot pop hold 100/100, level intro 9/9, M29 speed authority PASS (re-run by reviewer) + suites in build.md. Builder's TASKS.md commit reverted; orchestrator writes the row.
