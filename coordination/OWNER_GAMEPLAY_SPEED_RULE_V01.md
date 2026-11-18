@@ -43,8 +43,6 @@ This is a gameplay-time control, not Settings.
 
 ## 3. Automatic 3x endgame acceleration
 
-(Auto 3x since 2026-11-18; read "automatic 2x" below as the automatic 3x mode.)
-
 The game automatically switches to `3x` immediately after the FINAL remaining M23 supply batch has been successfully transferred into M24 through the normal transactional handoff.
 
 Canonical trigger:
@@ -61,11 +59,11 @@ The trigger is NOT:
 - the three visible preview rows merely appearing empty while hidden batches remain;
 - a click/request that later fails because M24 cannot accept the batch.
 
-If the final transfer is rejected, M23 is not exhausted and automatic 2x must not activate.
+If the final transfer is rejected, M23 is not exhausted and the automatic 3x must not activate.
 
 If gameplay is already in the automatic 3x mode, the trigger is an idempotent no-op. If a paid/manual 2x is on, the automatic 3x takes over (it is the free speed-up); toggling speed off then returns to 1x. A new level / reset restores 1x (or the paid timed 2x default).
 
-Automatic activation does not permanently lock 2x. The player may always return to 1x afterward. Returning from that free automatic 2x to 2x manually again before/after the automatic condition is no longer free unless a valid paid entitlement exists; the automatic M23-exhausted trigger itself may reassert free 2x only according to the authoritative runtime rule.
+Automatic activation does not permanently lock 3x. The player may always return to 1x afterward. Returning from that free automatic 3x to 2x manually again before/after the automatic condition is no longer free unless a valid paid entitlement exists; the automatic M23-exhausted trigger itself may reassert the free 3x only according to the authoritative runtime rule.
 
 ## 4. What 2x means
 
@@ -119,7 +117,7 @@ M28 does not need to activate gameplay timing.
 
 M29 is the first production input milestone and must wire the manual speed-control interaction.
 
-The automatic `M23 supply exhausted -> 2x` transition must be integrated with the production gameplay controller/runtime when speed behavior is activated; it must consume authoritative M23 exhaustion state rather than infer exhaustion from UI visuals.
+The automatic `M23 supply exhausted -> 3x` transition must be integrated with the production gameplay controller/runtime when speed behavior is activated; it must consume authoritative M23 exhaustion state rather than infer exhaustion from UI visuals.
 
 ## 8. Precedence
 
