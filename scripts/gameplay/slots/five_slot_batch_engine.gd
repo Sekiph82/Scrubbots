@@ -320,6 +320,12 @@ func has_finish_hold() -> bool:
 func clear_finish_holds() -> void:
 	_finish_hold.clear()
 
+## SB-TF-02: release every hold for which `done(index)` is true (its pop has left the screen).
+func release_finish_holds_if(done: Callable) -> void:
+	for i in _finish_hold.keys():
+		if done.call(i):
+			_finish_hold.erase(i)
+
 # ----------------------------------------------- supply -> slot placement (WP02) --
 
 ## Player selects an M23 supply COLUMN/front batch (never a slot). On success the batch

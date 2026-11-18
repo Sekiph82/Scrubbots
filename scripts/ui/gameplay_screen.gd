@@ -148,6 +148,7 @@ var _speed_btn: Button
 var _speed_main: Label
 var _speed_time: Label
 var _speed_2x := false
+var _speed_auto_3x := false   # SB-TF-02: free automatic endgame speed-up
 var _speed_entitlement := "none"
 var _speed_remaining := 0
 
@@ -193,7 +194,7 @@ func refresh_slot_snapshot(slot_snapshots: Array, batch_fx: bool = true) -> Arra
 			var was = _slot_snapshots[i]
 			var now = slot_snapshots[i]
 			if was is Dictionary and now is Dictionary and was.get("occupied", false) and not now.get("occupied", false):
-				_booster_vfx.pop_batch(views[i].get_tile().get_global_rect(), _color_of(int(was.get("color_id", -1))))
+				_booster_vfx.pop_batch(views[i].get_tile().get_global_rect(), _color_of(int(was.get("color_id", -1))), i)
 				popped.append(i)
 	_slot_snapshots = slot_snapshots.duplicate(true)
 	if _five_slot_strip != null:
@@ -489,7 +490,9 @@ func _make_booster(spec: Dictionary) -> Button:
 	b.add_child(glow)
 	var icon := HomeStyle.art("Icon")
 	icon.texture = load(spec["art"]) as Texture2D
-	_frac(icon, 0.12, 0.12, 0.88, 0.88)
+	# SB-TF-02 (owner 2026-11-18 "booster icons too small"): 1.05 x the plate (was 0.76, +38%);
+	# the art may sit just over the plate edge, badge / price / lock still draw above it.
+	_frac(icon, -0.025, -0.025, 1.025, 1.025)
 	b.add_child(icon)
 	var burst := HomeStyle.art("ActivatedBurst")
 	burst.texture = load(BOOSTER_ACTIVATED_BURST_ART) as Texture2D
@@ -823,13 +826,23 @@ func set_speed_presentation(entitlement: String, timed_remaining: int = 0) -> vo
 	_apply_speed_visual()
 
 func get_speed_state() -> String:
+	if _speed_auto_3x:
+		return "3x"
 	return "2x" if _speed_2x else "1x"
 
+## Paid/manual 2x on/off; also leaves the free auto 3x (as the speed authority does).
 func set_speed_2x(value: bool) -> void:
 	_speed_2x = value
+	_speed_auto_3x = false
+	_apply_speed_visual()
+
+func set_speed_auto_3x(value: bool) -> void:
+	_speed_auto_3x = value
 	_apply_speed_visual()
 
 func get_speed_mode() -> String:
+	if _speed_auto_3x:
+		return SPEED_AUTO
 	if _speed_entitlement == "timed" and _speed_remaining > 0:
 		return SPEED_TIMED
 	if not _speed_2x:
@@ -846,14 +859,15 @@ static func format_remaining(seconds: int) -> String:
 	return "%02d:%02d" % [s / 60, s % 60]
 
 ## 2x state lives INSIDE the baked box: selected = translucent cyan fill, free automatic
-## 2x = translucent green, timed = small "2x" over the live wall-clock countdown.
+## 3x = translucent green "3x", timed = small "2x" over the live wall-clock countdown.
 func _apply_speed_visual() -> void:
 	if _speed_btn == null:
 		return
 	var mode := get_speed_mode()
 	var timed := mode == SPEED_TIMED
-	_speed_btn.text = format_remaining(_speed_remaining) if timed else "2x"
-	_speed_main.text = "2x"
+	var main_text := "3x" if _speed_auto_3x else "2x"
+	_speed_btn.text = format_remaining(_speed_remaining) if timed else main_text
+	_speed_main.text = main_text
 	_speed_time.visible = timed
 	_speed_time.text = _speed_btn.text if timed else ""
 	if timed:
@@ -863,7 +877,7 @@ func _apply_speed_visual() -> void:
 		_speed_main.anchor_bottom = 1.0
 		_speed_main.add_theme_font_size_override("font_size", int(46.0 * _scale))
 	var fill := Color(0, 0, 0, 0)
-	if _speed_2x:
+	if _speed_2x or _speed_auto_3x:
 		fill = Color(0.45, 1.0, 0.55, 0.30) if mode == SPEED_AUTO else Color(0.25, 0.85, 1.0, 0.34)
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = fill
@@ -1013,6 +1027,10 @@ func set_reduced_effects(on: bool) -> void:
 
 func get_booster_vfx():
 	return _booster_vfx
+
+## SB-TF-02: the finish pop of slot `i` is still on screen (the slot's hold follows it).
+func is_slot_popping(i: int) -> bool:
+	return _booster_vfx != null and is_instance_valid(_booster_vfx) and _booster_vfx.is_slot_popping(i)
 
 ## Short fade-out; the tween lives on the button, so it dies with it.
 func _flash(rect: TextureRect) -> void:

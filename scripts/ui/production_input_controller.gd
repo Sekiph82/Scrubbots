@@ -13,10 +13,10 @@ extends Node
 ##   3. calls the REAL FiveSlotBatchEngine.select_front_batch(real M23, column)
 ##      (never M23 commit directly, never a destination slot, never legacy activation);
 ##   4. on rejection preserves supply + slots exactly (M24 guarantees atomicity) and
-##      triggers no scheduler wake and no auto-2x;
+##      triggers no scheduler wake and no auto 3x;
 ##   5. on success refreshes the DETACHED M23/M24 UI snapshots, wakes the scheduler
 ##      (notify_placed), then and only then reads authoritative M23.is_exhausted();
-##   6. if exhausted, switches runtime speed to 2x (owner rule §3).
+##   6. if exhausted, switches runtime speed to the free auto 3x (owner rule §3, SB-TF-02).
 ##
 ## The controller validates that the authoritative M23 column count is exactly 3/4/5 at
 ## bind — UI clamping is never trusted as gameplay truth (M28 audit O-M28-002).
@@ -42,6 +42,7 @@ var _activating := false
 ## fresh attempt.
 var _terminal_stopped := false
 var _modal_blocked := false
+var _intro_blocked := false   # SB-TF-02: a Level Intro overlay is up
 var _last_placement := {}   # detached copy of the most recent successful result
 
 ## Bind the production bundle. Fail-closed: returns false and stays unbound on a
@@ -100,11 +101,21 @@ func set_modal_blocked(value: bool) -> void:
 func is_modal_blocked() -> bool:
 	return _modal_blocked
 
+## SB-TF-02: the host sets this while a Level Intro overlay exists (playing or fading out).
+func set_intro_blocked(value: bool) -> void:
+	_intro_blocked = value
+	_sync_hit_areas()
+	if value:
+		cancel_all_gestures()
+
+func is_intro_blocked() -> bool:
+	return _intro_blocked
+
 ## SB-POLISH-004: the panel's top_level front HitAreas pick above every other app Control, so
 ## they stop picking while a terminal result (Results) or any ModalStack popup covers gameplay.
 func _sync_hit_areas() -> void:
 	if _panel != null and is_instance_valid(_panel) and _panel.has_method("set_hit_areas_pickable"):
-		_panel.set_hit_areas_pickable(not (_terminal_stopped or _modal_blocked))
+		_panel.set_hit_areas_pickable(not (_terminal_stopped or _modal_blocked or _intro_blocked))
 
 func get_last_placement() -> Dictionary:
 	return _last_placement.duplicate(true)
@@ -143,6 +154,10 @@ func activate_front(column: int) -> Dictionary:
 		var mr := {"ok": false, "error": "modal"}
 		activation_result.emit(column, false, "modal")
 		return mr
+	if _intro_blocked:
+		var ir := {"ok": false, "error": "intro"}
+		activation_result.emit(column, false, "intro")
+		return ir
 	_activating = true
 	var result := _commit_activation(column)
 	_activating = false
@@ -150,12 +165,16 @@ func activate_front(column: int) -> Dictionary:
 	return result
 
 func _commit_activation(column: int) -> Dictionary:
+	# SB-TF-02: a slot's finish hold ends when its pop has left the overlay, checked at tap
+	# time, so a tap in the frame right after the pop is never refused by a lagging countdown.
+	if _screen != null and is_instance_valid(_screen) and _screen.has_method("is_slot_popping"):
+		_slots.release_finish_holds_if(func(i): return not _screen.is_slot_popping(i))
 	# REAL M24 transactional placement against REAL M23. M24 owns full-slots rejection,
 	# atomic supply commit, and the busy guard — a rejection consumes nothing.
 	var res: Dictionary = _slots.select_front_batch(_supply, column)
 	if not bool(res.get("ok", false)):
 		# Rejection (slots full / no front / reentrant): supply + slots unchanged, no
-		# scheduler wake, no auto-2x.
+		# scheduler wake, no auto 3x.
 		return {"ok": false, "error": str(res.get("error", "rejected"))}
 	_last_placement = res.duplicate(true)
 	# Refresh DETACHED M23/M24 snapshots only after the authoritative result.
@@ -166,11 +185,11 @@ func _commit_activation(column: int) -> Dictionary:
 	if _runtime != null and _runtime.has_method("request_immediate_step"):
 		_runtime.request_immediate_step(int(res.get("slot", -1)))
 	# Only AFTER a successful final transfer, read authoritative M23 exhaustion; hidden
-	# future batches count. Exhausted => switch runtime to 2x (idempotent if already 2x).
-	if _supply.is_exhausted() and _runtime != null and _runtime.has_method("set_speed_2x"):
-		_runtime.set_speed_2x(true)
-		if _screen != null and is_instance_valid(_screen) and _screen.has_method("set_speed_2x"):
-			_screen.set_speed_2x(true)
+	# future batches count. Exhausted => free auto 3x (idempotent; wins over a paid 2x).
+	if _supply.is_exhausted() and _runtime != null and _runtime.has_method("set_speed_auto_3x"):
+		_runtime.set_speed_auto_3x(true)
+		if _screen != null and is_instance_valid(_screen) and _screen.has_method("set_speed_auto_3x"):
+			_screen.set_speed_auto_3x(true)
 	return res
 
 func _on_front_activated(column: int) -> void:

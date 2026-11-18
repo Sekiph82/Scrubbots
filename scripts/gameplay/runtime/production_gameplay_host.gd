@@ -165,9 +165,10 @@ var _pause_popup = null
 ## Last 2x purchase result from the popup (diagnostic/tests).
 var last_speed_purchase_result: Dictionary = {}
 ## True while the live 2x is a PAID/entitled 2x (timed default, purchase or entitled
-## toggle) as opposed to the free M23 supply-exhausted auto-2x. Only a paid 2x is dropped
+## toggle) as opposed to the free M23 supply-exhausted auto 3x. Only a paid 2x is dropped
 ## when its entitlement expires mid-level (OWNER_TIMED_2X_CROSS_LEVEL_RUNTIME_V01 §5).
 var _paid_2x := false
+var _intro_overlay: Node = null   # SB-TF-02: Level Intro overlay gating input while it exists
 ## M28-C002 V02: last booster-control request result (diagnostic/tests) and the 1 s HUD
 ## redraw timer (wall-clock values are read from services, never accumulated).
 var last_booster_request: Dictionary = {}
@@ -662,14 +663,14 @@ func _sync_slots() -> void:
 
 ## SB-PHONE-2026-11-12-F (owner 2026-11-12): a slot whose finish pop starts takes no new pick
 ## until the pop (lift + burst + stars, BoosterVfx.pop_duration()) is over. The hold is exactly
-## what is shown: no pop (Reduced Effects, Retry reset) means no hold, and once no pop is
-## live any more (Reduced Effects switched on, overlay gone) every hold is released.
+## what is shown: no pop (Reduced Effects, Retry reset) means no hold, and a slot's hold ends
+## the moment ITS pop leaves the overlay (SB-TF-02: read from the live pop, not a parallel
+## countdown; the input controller re-checks at tap time).
 func _refresh_slots() -> void:
 	var vfx = _screen.get_booster_vfx()
 	for i in _screen.refresh_slot_snapshot(_slots.snapshot()):
 		_slots.hold_finished_slot(i, vfx.pop_duration())
-	if not is_instance_valid(vfx) or vfx.pop_count() == 0:
-		_slots.clear_finish_holds()
+	_slots.release_finish_holds_if(func(i): return not _screen.is_slot_popping(i))
 
 func _on_clear_event(_owner_id, _target_index, _color_id, _agent) -> void:
 	if _completion != null:
@@ -1008,7 +1009,7 @@ func _wire_controls() -> void:
 ## cross-level entitlement, so the attempt starts at live 2x; otherwise 1x. The runtime
 ## speed authority and the HUD are set together so the countdown and the live factor
 ## cannot disagree. The current-level 200 SB entitlement is level-scoped and manual, so
-## it never auto-starts 2x here. Free M23 auto-2x is applied by the input controller
+## it never auto-starts 2x here. The free M23 auto 3x is applied by the input controller
 ## later and is never touched by this.
 func _apply_default_speed() -> void:
 	var two: bool = _economy != null and _economy.speed.timed_seconds_remaining() > 0
@@ -1019,7 +1020,7 @@ func _apply_default_speed() -> void:
 		_screen.set_speed_2x(two)
 
 ## Timed / level 2x expired mid-level: a PAID 2x no longer holds gameplay at 2x, but the
-## free M23 supply-exhausted auto-2x stays independent and is never dropped.
+## free M23 supply-exhausted auto 3x stays independent and is never dropped.
 func _drop_expired_paid_2x() -> void:
 	if not _paid_2x or _economy == null or _speed == null or not _speed.is_2x():
 		return
@@ -1027,7 +1028,7 @@ func _drop_expired_paid_2x() -> void:
 		return
 	_paid_2x = false
 	if _supply != null and _supply.is_exhausted():
-		return   # the free auto-2x owns the speed now
+		return   # the free auto 3x owns the speed now
 	_runtime.set_speed_2x(false)
 	_screen.set_speed_2x(false)
 
@@ -1302,6 +1303,8 @@ func request_booster(id: String) -> Dictionary:
 		r = {"ok": false, "reason": "terminal"}
 	elif is_modal_open():
 		r = {"ok": false, "reason": "modal_open"}
+	elif _intro_overlay != null:
+		r = {"ok": false, "reason": "intro"}
 	elif _economy.boosters.charges(id) <= 0:
 		# M43-C003: zero charge -> the canonical Booster Acquire popup (SB / rewarded).
 		r = {"ok": false, "reason": "acquire_required"}
@@ -1372,6 +1375,22 @@ func get_acquisition():
 
 func is_modal_open() -> bool:
 	return modal_stack != null and is_instance_valid(modal_stack) and modal_stack.is_open()
+
+## SB-TF-02 (owner 2026-11-18): no Supply / booster selection while the Level Intro plays. The
+## supply front HitAreas are top_level (picked above the overlay), so the overlay alone cannot
+## stop them: gameplay input is gated until `intro` (a child overlay) leaves the tree.
+func hold_input_for_intro(intro: Node) -> void:
+	_intro_overlay = intro
+	if _input != null:
+		_input.set_intro_blocked(true)
+	intro.tree_exited.connect(func():
+		if _intro_overlay == intro:
+			_intro_overlay = null
+			if _input != null and is_instance_valid(_input):
+				_input.set_intro_blocked(false), CONNECT_ONE_SHOT)
+
+func is_intro_blocking() -> bool:
+	return _intro_overlay != null
 
 ## Canonical modal hold: while ANY popup is on the stack over gameplay, supply input is
 ## gated and the runtime is held in user pause (no cadence, no agent travel). Closing the
@@ -1501,7 +1520,7 @@ func exit_to_home() -> Dictionary:
 ## M29 temporal/debug seam. Economy V1 supersedes free shipping manual 2x:
 ## M39 must route this production-facing request through SpeedEntitlementService
 ## (level/timed SB entitlement) before enabling 2x. Keep this direct toggle only as
-## pre-M39 playable/audit behavior; authoritative M23-exhausted auto-2x remains free.
+## pre-M39 playable/audit behavior; authoritative M23-exhausted auto 3x remains free.
 ## M40 V03 (F-M40-V02-008): durable save at a defined runtime boundary. Used by
 ## host-owned action APIs (activate_plus_one_slot, terminal, purchase, claim,
 ## unlock, exchange, settings) and by external callers via request_save(). Not
@@ -1520,16 +1539,16 @@ func request_save() -> Dictionary:
 
 ## Manual 2x control (M52-C001-R01; OWNER_PARALLEL_SLOT_DISPATCH_AND_DEPARTURE_COUNT_V01
 ## §6). The control NEVER silently does nothing:
-##   - currently 2x                    -> back to 1x (always allowed);
+##   - currently 2x or auto 3x          -> back to 1x (always allowed);
 ##   - 1x + manual entitlement          -> 2x;
 ##   - 1x + NO entitlement (Economy V1) -> open the functional 2x acquisition popup.
 ## Turning 2x ON stays gated by SpeedEntitlementService. The free M23-exhausted automatic
-## 2x uses the speed authority directly (set_2x), never this button, so it stays free and
+## 3x uses the speed authority directly (set_auto_3x), never this button, so it stays free and
 ## entitlement-independent.
 func _on_speed_pressed() -> void:
-	if is_modal_open():
+	if is_modal_open() or is_intro_blocking():
 		return
-	var currently_2x: bool = _speed != null and _speed.is_2x()
+	var currently_2x: bool = _speed != null and _speed.factor() > GameplaySpeedAuthority.FACTOR_1X
 	if not currently_2x and _economy != null:
 		if not _economy.speed.is_manual_2x_entitled(progression_level):
 			_open_speed_acquisition()

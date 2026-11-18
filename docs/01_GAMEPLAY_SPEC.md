@@ -329,7 +329,7 @@ Core V1 rules:
 - Bot Parts unlock robots only; each post-Scrubby robot costs 250 Bot Parts.
 - Hearts max at 5 and regenerate one per 15 real-world minutes (900 s; owner V06, `coordination/OWNER_M42_HOME_POLISH_V06.md` §E supersedes the earlier 30 minutes).
 - Duplicate cards exchange to SB through Cards Exchange.
-- Production manual 2x is paid/entitlement-gated; automatic M23-exhausted 2x remains free.
+- Production manual 2x is paid/entitlement-gated; automatic M23-exhausted speed-up remains free and is 3x since SB-TF-02 (owner 2026-11-18).
 - Exactly four boosters exist: +1 Slot, Random, Selector and Tornado.
 - Daily includes a consecutive-login counter and repeating 5-day rewards.
 - Gift Meter thresholds are 1/5/10/25/100/250/500/1000 (SB-POLISH-002) and progress ONLY from Win Streak SB.

@@ -5,9 +5,10 @@ extends SceneTree
 ## (OWNER_GAMEPLAY_SPEED_RULE_V01), decoupled from full-board play:
 ##   J: 1x default, manual toggle, exact half cadence interval at 2x, runtime agent
 ##      travel accelerates (future + in-flight), no global Engine.time_scale.
-##   K: automatic M23-exhausted -> 2x ONLY after a successful final transfer; NOT on
-##      rejection, NOT on visible-empty-while-hidden-remains, NOT on five-full; idempotent
-##      when already 2x; manual toggle back to 1x afterward; reset/new session -> 1x.
+##   K: automatic M23-exhausted -> auto 3x (SB-TF-02, owner 2026-11-18; was 2x) ONLY after a
+##      successful final transfer; NOT on rejection, NOT on visible-empty-while-hidden-remains,
+##      NOT on five-full; idempotent; manual toggle back to 1x afterward; reset -> 1x. Paid /
+##      manual set_2x stays exactly 2.0.
 ##
 ## Run: godot --headless --path . -s res://tests/m29_speed_authority_evidence.gd
 ## Exits 0 on success, 1 on any failure.
@@ -54,6 +55,21 @@ func _test_speed_authority_unit() -> void:
 	sp.set_2x(true)
 	sp.reset()
 	_ok(not sp.is_2x(), "reset restores 1x")
+	# SB-TF-02: the free automatic endgame mode is a distinct 3x state.
+	sp.set_auto_3x(true)
+	_ok(sp.is_auto_3x() and not sp.is_2x() and sp.factor() == 3.0, "auto mode: factor 3.0, distinct from paid 2x")
+	_ok(is_equal_approx(sp.cadence_interval(), 0.5 / 3.0), "auto 3x cadence interval is EXACTLY a third of 1x")
+	sp.reset()
+	_ok(sp.factor() == 1.0 and not sp.is_auto_3x(), "reset from auto 3x -> 1.0")
+	sp.set_2x(true)
+	_ok(sp.factor() == 2.0, "paid/manual set_2x(true) is still factor 2.0")
+	sp.set_auto_3x(true)
+	_ok(sp.factor() == 3.0 and sp.is_2x(), "paid 2x then auto: the free auto 3x takes over")
+	_ok(not sp.toggle() and sp.factor() == 1.0 and not sp.is_auto_3x(), "toggle from auto 3x -> 1x")
+	sp.set_auto_3x(true)
+	sp.set_2x(true)
+	_ok(sp.factor() == 2.0 and not sp.is_auto_3x(), "an explicit paid set_2x leaves the auto mode (2.0)")
+	sp.reset()
 
 # ------------------------------------------------- K: auto-2x on final transfer --
 
@@ -87,18 +103,18 @@ func _test_auto_2x_final_transfer() -> void:
 	var h = _harness([[_b("a", 0, 3)], [_b("b", 1, 3)], [_b("c", 2, 3)]])
 	var input = h["input"]; var runtime = h["runtime"]; var supply = h["supply"]
 	input.activate_front(0)
-	_ok(not runtime.is_2x(), "no auto-2x after first transfer (supply not exhausted)")
+	_ok(h["speed"].factor() == 1.0, "no auto speed-up after first transfer (supply not exhausted)")
 	input.activate_front(1)
-	_ok(not runtime.is_2x() and not supply.is_exhausted(), "no auto-2x mid-supply")
+	_ok(h["speed"].factor() == 1.0 and not supply.is_exhausted(), "no auto speed-up mid-supply")
 	input.activate_front(2)
 	_ok(supply.is_exhausted(), "final transfer leaves every M23 column empty")
-	_ok(runtime.is_2x(), "auto-2x engaged after the successful FINAL transfer (owner rule §3)")
+	_ok(runtime.is_auto_3x() and h["speed"].factor() == 3.0, "auto 3x engaged after the successful FINAL transfer (owner rule §3, SB-TF-02)")
 	# Idempotent: any further (rejected) activation does not re-toggle or flip speed.
 	input.activate_front(0)
-	_ok(runtime.is_2x(), "already-2x stays 2x on a subsequent rejected activation (idempotent)")
-	# Manual toggle back to 1x works after auto-2x.
+	_ok(h["speed"].factor() == 3.0, "auto 3x stays 3x on a subsequent rejected activation (idempotent)")
+	# Manual toggle back to 1x works after auto 3x.
 	runtime.toggle_speed()
-	_ok(not runtime.is_2x(), "manual toggle back to 1x works after auto-2x")
+	_ok(h["speed"].factor() == 1.0, "manual toggle back to 1x works after auto 3x")
 	# Reset -> 1x.
 	runtime.set_speed_2x(true)
 	runtime.reset_runtime()
@@ -117,7 +133,7 @@ func _test_no_auto_2x_rejection_and_partial() -> void:
 	_ok(not supply.is_exhausted(), "supply NOT exhausted (one batch still queued)")
 	var res: Dictionary = input.activate_front(2)
 	_ok(not res.get("ok", false) and res.get("error", "") == "slots_full", "sixth activation rejected (slots full)")
-	_ok(not runtime.is_2x(), "five-full rejection does NOT trigger auto-2x")
+	_ok(h["speed"].factor() == 1.0, "five-full rejection does NOT trigger the auto speed-up")
 	# Visible-empty-while-hidden-remains style: partial consumption never exhausts.
 	var h2 = _harness([[_b("x", 0, 3), _b("y", 0, 3), _b("z", 0, 3), _b("w", 0, 3)], [_b("p", 1, 3)], [_b("q", 2, 3)]])
 	var in2 = h2["input"]; var rt2 = h2["runtime"]; var sup2 = h2["supply"]
@@ -125,7 +141,7 @@ func _test_no_auto_2x_rejection_and_partial() -> void:
 	in2.activate_front(1)
 	in2.activate_front(2)
 	_ok(not sup2.is_exhausted(), "hidden future batches remain -> supply not exhausted")
-	_ok(not rt2.is_2x(), "visible rows empty while hidden supply remains does NOT auto-2x")
+	_ok(h2["speed"].factor() == 1.0, "visible rows empty while hidden supply remains does NOT auto speed-up")
 	_cleanup(h)
 	_cleanup(h2)
 
@@ -178,6 +194,13 @@ func _test_agent_travel_scaling() -> void:
 	runtime.tick(0.1)
 	var moved_1x: float = a3.get_route_length() * a3.get_progress()
 	_ok(moved_2x >= 1.9 * moved_1x or is_equal_approx(moved_2x, 2.0 * moved_1x), "already-moving agent updates to 2x immediately (%.3f vs 1x %.3f)" % [moved_2x, moved_1x])
+	# SB-TF-02: auto 3x: a fresh agent travels 3x the 1x distance in one tick of the same length.
+	speed.set_auto_3x(true)
+	var a4 = ScrubbotAgent.new(); layer.add_child(a4)
+	a4.assign(3, routed["color"], routed["req"], routed["route"])
+	runtime.tick(0.1)
+	var moved_3x: float = a4.get_route_length() * a4.get_progress()
+	_ok(absf(moved_3x - 3.0 * moved_1x) < 1e-3, "auto 3x agent travels 3x the 1x distance per tick (%.3f vs 1x %.3f)" % [moved_3x, moved_1x])
 	layer.free()
 	runtime.free()
 

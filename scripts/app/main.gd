@@ -985,6 +985,7 @@ func _show_level_intro(host) -> void:
 	intro.level = int(host.progression_level)
 	intro.reduced = app_state.effects.is_reduced()
 	host.add_child(intro)
+	host.hold_input_for_intro(intro)
 
 func get_results_screen():
 	return _results

@@ -376,6 +376,12 @@ func _g003() -> void:
 		_root.refresh_coachmark()
 		var tip: String = cm.get_step_id() if cm.is_showing() else "-"
 		var e = entries[n - 1]
+		# SB-TF-02: no selection while the Level Intro plays; the player taps it away first.
+		var intro = host.get_node_or_null("LevelIntro")
+		if intro != null:
+			intro.close()
+			while is_instance_valid(intro):
+				await process_frame
 		var r: Dictionary = RealPlayDriver.play_on_host(host, RealPlayDriver.clicks_for(e.id, e.supply_plan_path, prov))
 		await _frames(4)
 		var anim: bool = _root.get_win_overlay() != null

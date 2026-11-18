@@ -10,6 +10,11 @@ extends SceneTree
 ##   - Reduced Effects: no pop -> no hold; switched on mid-pop -> hold released;
 ##   - cannot stick: pause / terminal stop keep the clock running, reset() clears holds;
 ##   - +1 Slot: the sixth slot holds the same way.
+##   - SB-TF-02 (owner 2026-11-18 "slot not active right after the pop"): through the REAL supply
+##     panel touch path (panel gesture -> front_batch_activated -> input gate -> M24), with every
+##     other slot busy: a tap on every tick while the pop is visible is refused with supply
+##     unchanged, the tap on the first tick after the pop left the overlay lands in that slot;
+##     at 1x, paid 2x, auto 3x and across a pause/resume.
 ## Run: godot --headless --path . -s res://tests/sb_phone_2026_11_12_f_slot_pop_hold.gd
 
 const ProductionGameplayHost = preload("res://scripts/gameplay/runtime/production_gameplay_host.gd")
@@ -31,6 +36,8 @@ func _initialize() -> void:
 	_reduced_effects()
 	_cannot_stick()
 	_sixth_slot()
+	for mode in ["1x", "2x", "3x", "pause", "120hz", "jitter"]:
+		_real_tap_path(mode)
 	for p in _tmp:
 		if FileAccess.file_exists(p):
 			DirAccess.remove_absolute(ProjectSettings.globalize_path(p))
@@ -99,9 +106,9 @@ func _click(h, col: int) -> Dictionary:
 	return h.get_input_controller().activate_front(col - 1)
 
 ## One frame: runtime clock + the pop overlay, same delta (as on a phone).
-func _tick(h) -> void:
-	h.get_runtime().tick(DT)
-	h.get_screen().get_booster_vfx()._process(DT)
+func _tick(h, dt: float = DT) -> void:
+	h.get_runtime().tick(dt)
+	h.get_screen().get_booster_vfx()._process(dt)
 
 ## Tick until `slot` is finish-held (its batch finished and its pop started). Returns ticks.
 func _until_held(h, slot: int, cap: int = 600) -> int:
@@ -255,6 +262,82 @@ func _sixth_slot() -> void:
 	e.grow_to_sixth()
 	e.hold_finished_slot(5, 1.6)
 	_ok(e.rollback_grow_to_sixth() and not e.has_finish_hold(), "rolling back the sixth slot drops its hold")
+
+## Columns: x1 batches / 30-robot batches / the rest. Slot 4 gets a x1 batch, slots 0..3 get
+## 30-robot batches that stay busy through the whole pop, so slot 4 is the only pick target.
+func _busy_host():
+	var ones: Array = []
+	var big: Array = []
+	for cid in C:
+		ones.append([cid, 1])
+		big.append([cid, 30])
+	var h = ProductionGameplayHost.new()
+	h.auto_build = false
+	h.level_path = _write("lvl", JSON.stringify(_level()))
+	h.supply_plan_path = _write("plan", JSON.stringify(_plan([ones, big, []])))
+	get_root().add_child(h)
+	_ok(h.build(), "busy fixture host builds %s" % h.get_build_error())
+	h.get_runtime().set_process(false)
+	h.get_screen().get_booster_vfx().set_process(false)
+	return h
+
+## One physical touch tap on column `col`'s front, through the real panel gesture handler.
+func _panel_tap(h, col: int) -> void:
+	var panel = h.get_screen().get_supply_panel()
+	for pressed in [true, false]:
+		var e := InputEventScreenTouch.new()
+		e.index = 0
+		e.pressed = pressed
+		panel._on_front_gui_input(e, col)
+
+func _real_tap_path(mode: String) -> void:
+	print("[SB-TF-02 real tap path: %s]" % mode)
+	var h = _busy_host()
+	var slots = h.get_slots()
+	var rt = h.get_runtime()
+	var vfx = h.get_screen().get_booster_vfx()
+	var last := {}
+	h.get_input_controller().activation_result.connect(func(c, ok, err): last.merge({"col": c, "ok": ok, "error": err}, true))
+	if mode == "2x":
+		rt.set_speed_2x(true)
+	elif mode == "3x":
+		rt.set_speed_auto_3x(true)
+	_panel_tap(h, 0)
+	_ok(last.get("ok", false) and slots.is_occupied(4), "%s: tap on column 1 -> x1 batch in slot 4" % mode)
+	for i in range(4):
+		_panel_tap(h, 1)
+	_ok(slots.occupied_count() == 5 or (slots.is_empty(4) and slots.occupied_count() == 4), "%s: slots 0..3 hold 30-robot batches" % mode)
+	_ok(_until_held(h, 4) >= 0 and vfx.is_slot_popping(4), "%s: slot 4 finished, held, its pop playing" % mode)
+	_ok(slots.is_occupied(0) and slots.is_occupied(1) and slots.is_occupied(2) and slots.is_occupied(3), "%s: every other slot busy" % mode)
+	var pop: float = vfx.pop_duration()
+	var supply0: Array = h.get_supply().player_snapshot()
+	var refused_all := true
+	var n := 0
+	var elapsed := 0.0
+	while vfx.is_slot_popping(4) and n < 400:
+		if mode == "pause" and n == 30:
+			rt.set_user_paused(true)
+		if mode == "pause" and n == 60:
+			rt.set_user_paused(false)
+		_panel_tap(h, 0)
+		var want := "paused" if rt.is_paused() else "slots_full"
+		refused_all = refused_all and not last.get("ok", true) and last.get("error", "") == want and slots.is_empty(4)
+		refused_all = refused_all and h.get_supply().player_snapshot() == supply0
+		var dt := DT
+		if mode == "120hz":
+			dt = 1.0 / 120.0
+		elif mode == "jitter":
+			dt = [1.0 / 60.0, 1.0 / 120.0, 0.021, 0.0123][n % 4]   # uneven phone frames
+		_tick(h, dt)
+		elapsed += dt
+		n += 1
+	_ok(refused_all, "%s: %d taps while the pop was visible (the last one tick before it ended) all refused, supply unchanged" % [mode, n])
+	_ok(absf(elapsed - pop) <= 0.021 + 0.0001, "%s: hold == shown pop: %d ticks = %.3f s vs pop_duration %.2f s (<= one tick)" % [mode, n, elapsed, pop])
+	_ok(vfx.pop_count() == 0 and not rt.is_paused(), "%s: pop left the overlay on the release tick" % mode)
+	_panel_tap(h, 0)
+	_ok(last.get("ok", false) and slots.is_occupied(4) and slots.get_color_id(4) >= 0 and not slots.is_finish_held(4),
+		"%s: tap on the first tick after the pop -> accepted into slot 4 (no extra delay, no second lock)" % mode)
+	h.free()
 
 func _ok(cond: bool, msg: String) -> void:
 	_cases += 1

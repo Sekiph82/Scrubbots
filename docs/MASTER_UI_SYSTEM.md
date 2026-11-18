@@ -156,7 +156,7 @@ Production manual 2x is economy-gated:
 
 Timed entitlements are wall-clock expiry periods and continue counting in gameplay, Home/menus, pause, background and while the app is closed. If an entitlement exists, the player may switch 1x<->2x without another charge during that entitlement.
 
-The game also automatically switches to 2x for free when authoritative M23 supply is exhausted: every FIFO column, including formerly hidden future batches, has zero remaining batches after the final successful transactional transfer into M24. This is not the same as "all normal slots are occupied." A rejected final placement does not trigger auto-2x.
+The game also automatically switches to 3x for free (SB-TF-02, owner 2026-11-18; was 2x; the speed box shows "3x" on the green auto fill) when authoritative M23 supply is exhausted: every FIFO column, including formerly hidden future batches, has zero remaining batches after the final successful transactional transfer into M24. This is not the same as "all normal slots are occupied." A rejected final placement does not trigger the auto 3x.
 
 2x is a gameplay-time multiplier only and must not change FIFO order, target selection, reservations, routing, quotas, no-ghost invariants or solver semantics. See `coordination/OWNER_GAMEPLAY_SPEED_RULE_V01.md` and `coordination/OWNER_ECONOMY_REWARDS_V01.md`.
 

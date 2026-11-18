@@ -261,19 +261,19 @@ func _timed_expiry_and_scope() -> void:
 	await _boot(2)
 	await _buy_timed_15()
 	var exhausted := _drive_to_exhausted(_host)
-	_ok(exhausted and _host.get_speed_authority().is_2x(), "supply exhausted: free auto-2x active (%s)" % str(exhausted))
+	_ok(exhausted and _host.get_speed_authority().factor() == 3.0, "supply exhausted: free auto 3x active (%s)" % str(exhausted))
 	_now[0] += 901
 	_host._refresh_hud()
-	_ok(_host.get_speed_authority().is_2x() and _host.get_screen().get_speed_mode() == "auto",
-		"T4b expiry while the free M23 auto-2x is active: speed stays 2x, HUD shows the free-auto state")
+	_ok(_host.get_speed_authority().factor() == 3.0 and _host.get_screen().get_speed_mode() == "auto" and _host.get_screen().get_speed_label() == "3x",
+		"T4b expiry while the free M23 auto 3x is active: speed stays 3x, HUD shows the free-auto 3x state")
 	# T6 free auto-2x is independent of any entitlement, and never leaks into the next level.
 	_now[0] = T0
 	await _boot(2)
 	_ok(not _eco().speed.is_manual_2x_entitled(2), "no entitlement of any kind")
 	var sb0: int = _eco().wallet.scrub_bucks()
 	var ex2 := _drive_to_exhausted(_host)
-	_ok(ex2 and _host.get_speed_authority().is_2x() and _eco().wallet.scrub_bucks() == sb0 and _host.get_speed_acquisition_popup() == null,
-		"T6 free M23 auto-2x with no entitlement: 2x, no SB, no popup")
+	_ok(ex2 and _host.get_speed_authority().factor() == 3.0 and _eco().wallet.scrub_bucks() == sb0 and _host.get_speed_acquisition_popup() == null,
+		"T6 free M23 auto 3x (SB-TF-02) with no entitlement: 3x, no SB, no popup")
 	await _win_and_continue()
 	_speed_ok(false, "T6 next level starts 1x again (auto-2x never becomes a default)")
 	_complete("t06_free_auto_2x_independent")

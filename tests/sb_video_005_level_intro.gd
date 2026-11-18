@@ -5,6 +5,8 @@ extends SceneTree
 ##   then the overlay; Reduced Effects / no video = keyed still + CharacterMotion `ready`, no
 ##   VideoStreamPlayer; the app root shows it on PLAY and RETRY of the started level, never over a
 ##   live FTUE coachmark, and never for an injected test save path unless forced on.
+## SB-TF-02 (owner 2026-11-18): while the overlay exists no Supply / slot / booster selection
+##   happens by any path (the supply HitAreas are top_level and used to pick above it).
 ##
 ## Run: godot --headless --path . -s res://tests/sb_video_005_level_intro.gd
 
@@ -13,10 +15,12 @@ const CharacterMotion = preload("res://scripts/ui/feel/character_motion.gd")
 const MainScript = preload("res://scripts/app/main.gd")
 const MainScene = preload("res://scenes/app/main.tscn")
 const NavigationController = preload("res://scripts/app/navigation_controller.gd")
+const AppState = preload("res://scripts/app/app_state.gd")
+const BoosterInventory = preload("res://scripts/economy/booster_inventory.gd")
 
 var EXPECTED_CASES := [
 	"video_level_label", "tap_skips_consumed", "finish_frees", "reduced_still", "no_video_fallback",
-	"app_play_retry", "app_off_for_test_save", "app_not_over_coachmark",
+	"app_play_retry", "app_off_for_test_save", "app_not_over_coachmark", "intro_blocks_selection",
 ]
 
 var _fail := 0
@@ -33,6 +37,7 @@ func _initialize() -> void:
 	await _app_play_retry()
 	await _app_off_for_test_save()
 	await _app_not_over_coachmark()
+	await _intro_blocks_selection()
 	_cleanup()
 	_done()
 
@@ -175,6 +180,75 @@ func _app_not_over_coachmark() -> void:
 	MainScript.boot_ftue_override = -1
 	MainScript.boot_level_intro_override = -1
 	_complete("app_not_over_coachmark")
+
+## SB-TF-02: real app in a phone-size SubViewport. With the intro up, mouse + touch at a Supply
+## front, a slot and the +1 Slot booster change nothing (supply, slots, booster charges, speed,
+## pause); the programmatic paths refuse too. After close() + free the same events work.
+func _intro_blocks_selection() -> void:
+	MainScript.boot_level_intro_override = 1
+	AppState.test_unlock_all = true
+	var sub := SubViewport.new()
+	sub.size = Vector2i(1080, 2160)
+	get_root().add_child(sub)
+	MainScript.boot_save_path_override = _uniq("block")
+	var root = MainScene.instantiate()
+	sub.add_child(root)
+	await process_frame
+	root.get_app_state().progression.record_win(1)
+	root.play_current_frontier()
+	for _i in range(4):
+		await process_frame
+	var h = root.get_gameplay_host()
+	h.get_runtime().set_process(false)
+	var intro = h.get_node_or_null("LevelIntro")
+	var s = h.get_screen()
+	var eco = h.get_economy()
+	eco.boosters.add_charges(BoosterInventory.PLUS_ONE_SLOT, 1)
+	var points: Array = [s.get_supply_panel().get_front_hit_rect(0).get_center(),
+		s.get_five_slot_strip().get_slot_views()[4].get_global_rect().get_center(),
+		s.get_booster_button(BoosterInventory.PLUS_ONE_SLOT).get_global_rect().get_center()]
+	var state := func(): return [h.get_supply().player_snapshot(), h.get_slots().snapshot(),
+		eco.boosters.charges(BoosterInventory.PLUS_ONE_SLOT), h.get_speed_authority().factor(), h.get_runtime().is_paused()]
+	var before: Array = state.call()
+	_ok(intro != null and h.is_intro_blocking(), "intro up over gameplay and gating input")
+	for p in points:
+		await _click(sub, p)
+	_ok(state.call() == before, "intro up: mouse + touch at Supply / slot / booster changed nothing")
+	_ok(h.get_input_controller().activate_front(0).get("error", "") == "intro" and h.request_booster(BoosterInventory.PLUS_ONE_SLOT).get("reason", "") == "intro"
+		and state.call() == before, "intro up: programmatic supply / booster paths refused too")
+	if is_instance_valid(intro):
+		intro.close()
+	await create_timer(LevelIntroOverlay.FADE_S + 0.15).timeout
+	_ok(not is_instance_valid(intro) and not h.is_intro_blocking(), "overlay freed: gate released")
+	await _click(sub, points[0])
+	var after: Array = state.call()
+	_ok(after[0] != before[0] and h.get_slots().occupied_count() == 2, "after the intro: the Supply mouse tap and touch tap each place a batch")
+	await _click(sub, points[2])
+	_ok(eco.boosters.charges(BoosterInventory.PLUS_ONE_SLOT) == 0 and h.get_slots().get_slot_count() == 6, "after the intro: the booster tap works")
+	root.free()
+	sub.free()
+	MainScript.boot_save_path_override = ""
+	MainScript.boot_level_intro_override = -1
+	AppState.test_unlock_all = false
+	_complete("intro_blocks_selection")
+
+## Mouse press/release then a touch press/release at `p` (sub-viewport coordinates).
+func _click(sub: SubViewport, p: Vector2) -> void:
+	for pressed in [true, false]:
+		var ev := InputEventMouseButton.new()
+		ev.button_index = MOUSE_BUTTON_LEFT
+		ev.pressed = pressed
+		ev.position = p
+		ev.global_position = p
+		sub.push_input(ev)
+		await process_frame
+	for pressed in [true, false]:
+		var t := InputEventScreenTouch.new()
+		t.index = 0
+		t.pressed = pressed
+		t.position = p
+		sub.push_input(t)
+		await process_frame
 
 # ---------------------------------------------------------------- helpers ----
 

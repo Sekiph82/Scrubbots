@@ -303,8 +303,8 @@ func _level_and_auto() -> void:
 			i += 1
 			continue
 		rt.tick(1.0)
-	_ok(h.get_supply().is_exhausted() and h.get_speed_authority().is_2x() and app.economy.wallet.scrub_bucks() == sb0,
-		"supply exhausted -> free automatic 2x, no SB charged, independent of the timed guard")
+	_ok(h.get_supply().is_exhausted() and h.get_speed_authority().factor() == 3.0 and app.economy.wallet.scrub_bucks() == sb0,
+		"supply exhausted -> free automatic 3x (SB-TF-02), no SB charged, independent of the timed guard")
 	h.free()
 	await process_frame
 	_done_cases["8_level_and_auto"] = true

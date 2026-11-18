@@ -103,15 +103,23 @@ func stop() -> void:
 	queue_redraw()
 
 ## SB-POLISH-012: the batch that just left the slot at `rect` lifts, pops and sheds stars.
-func pop_batch(rect: Rect2, col: Color) -> void:
+## `slot` tags the pop so the slot's finish hold can follow it (is_slot_popping).
+func pop_batch(rect: Rect2, col: Color, slot: int = -1) -> void:
 	if _pops.size() >= POP_MAX:
 		_pops.pop_front()
-	_pops.append({"rect": rect, "color": col, "t": 0.0})
+	_pops.append({"rect": rect, "color": col, "t": 0.0, "slot": slot})
 	set_process(true)
 	queue_redraw()
 
 func pop_count() -> int:
 	return _pops.size()
+
+## SB-TF-02: true while the finish pop of slot `slot` is still on the overlay.
+func is_slot_popping(slot: int) -> bool:
+	for p in _pops:
+		if int(p["slot"]) == slot:
+			return true
+	return false
 
 func clear_pops() -> void:
 	_pops.clear()

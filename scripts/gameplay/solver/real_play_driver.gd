@@ -8,7 +8,7 @@ extends RefCounted
 ## canonical-timing proof and analysis model, not a shippability verdict.
 ##
 ## Canonical timing model (real_play_v2): fixed simulation dt = 1/60 s, speed 1x (the
-## runtime's own auto-2x after the last placement stays as in production), runtime processing
+## runtime's own auto 3x (SB-TF-02) after the last placement stays as in production), runtime processing
 ## is disabled and runtime.tick(1/60) is called directly so agents are driven by the production
 ## controller. Solver acceptance is based only on this canonical game-host execution.
 ##

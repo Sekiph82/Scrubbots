@@ -30,6 +30,8 @@ func _initialize() -> void:
 	_test_cancel_focus()
 	_test_rapid_and_multitouch()
 	_test_pause_background()
+	_test_final_placement_auto_3x()
+	_test_intro_gate()
 	_done()
 
 # --------------------------------------------------------------- harness ------
@@ -176,7 +178,7 @@ func _test_exact_transaction() -> void:
 	_ok(not res.get("ok", false), "full-slots activation rejected")
 	_ok([sup2.get_remaining(0), sup2.get_remaining(1), sup2.get_remaining(2)] == rem_before, "rejection consumed ZERO supply")
 	_ok(s2.snapshot() == snap_before, "rejection mutated ZERO slots")
-	_ok(not rt2.is_2x(), "rejection caused no auto-2x")
+	_ok(h2["speed"].factor() == 1.0, "rejection caused no auto speed-up")
 	_cleanup(h); _cleanup(h2)
 
 # ----------------------------------------------------- D: mouse/touch dedup ----
@@ -298,6 +300,36 @@ func _test_pause_background() -> void:
 	runtime.set_user_paused(true)
 	runtime.tick(10.0)   # must be a no-op
 	_ok(runtime.is_paused(), "paused tick is a no-op (no cadence / no travel)")
+	_cleanup(h)
+
+# ------------------------------------------- SB-TF-02: final placement -> 3x ----
+
+## Real panel touch taps: non-final placements leave 1x, the placement that exhausts M23
+## sets the free automatic endgame factor 3.0 (a paid 2x on before is taken over).
+func _test_final_placement_auto_3x() -> void:
+	var h = _harness([[_b("a", 0, 3)], [_b("b", 1, 3)], [_b("c", 2, 3)]])
+	var panel = h["panel"]; var speed = h["speed"]; var supply = h["supply"]
+	_touch_tap(panel, 0)
+	_touch_tap(panel, 1)
+	_ok(not supply.is_exhausted() and speed.factor() == 1.0, "non-final placements leave 1x")
+	speed.set_2x(true)
+	_touch_tap(panel, 2)
+	_ok(supply.is_exhausted() and speed.factor() == 3.0 and speed.is_auto_3x(), "last Supply batch placed -> factor 3.0 (auto takes over a paid 2x)")
+	_ok(is_equal_approx(speed.cadence_interval(), 0.5 / 3.0), "auto 3x cadence = base / 3")
+	_cleanup(h)
+
+## SB-TF-02: the Level Intro gate rejects activation and stops the HitAreas picking.
+func _test_intro_gate() -> void:
+	var h = _harness()
+	var input = h["input"]; var panel = h["panel"]; var slots = h["slots"]; var supply = h["supply"]
+	var rem: int = supply.get_remaining(0)
+	input.set_intro_blocked(true)
+	_touch_tap(panel, 0)
+	var r: Dictionary = input.activate_front(0)
+	_ok(r.get("error", "") == "intro" and supply.get_remaining(0) == rem and slots.occupied_count() == 0, "intro up: tap / activation rejected, nothing consumed")
+	input.set_intro_blocked(false)
+	_touch_tap(panel, 0)
+	_ok(supply.get_remaining(0) == rem - 1 and slots.occupied_count() == 1, "intro gone: the same tap places the batch")
 	_cleanup(h)
 
 # --------------------------------------------------------------- helpers ------

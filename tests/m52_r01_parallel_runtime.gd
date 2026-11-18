@@ -43,7 +43,7 @@ func _initialize() -> void:
 	_terminal_cardinality_n()
 	_speed_cadence_and_travel()
 	await _two_x_acquisition()
-	_auto_2x_free()
+	_auto_3x_free()
 	_prefilter_equivalence()
 	_fast_route_equivalence()
 	_keyed_sort_equivalence()
@@ -443,26 +443,54 @@ func _two_x_acquisition() -> void:
 	h2.free()
 	await process_frame
 
-func _auto_2x_free() -> void:
-	print("[free supply-exhausted auto-2x]")
-	var h = _host_level(2)
-	var eco = h.get_economy()
-	_ok(not eco.speed.is_manual_2x_entitled(2), "no entitlement")
-	var plan: Dictionary = SupplyPlanLoader.load_plan(h.supply_plan_path)["plan"]
-	var clicks: Array = plan["intendedColumnClicks"]
-	var rt = h.get_runtime()
-	var slots = h.get_slots()
+## Place the level's intended clicks until M23 is exhausted (the free auto speed-up trigger).
+func _drain_clicks(h) -> void:
+	var clicks: Array = SupplyPlanLoader.load_plan(h.supply_plan_path)["plan"]["intendedColumnClicks"]
 	var i := 0
 	var guard := 0
 	while i < clicks.size() and guard < 200000:
 		guard += 1
-		if slots.rightmost_empty_index() != -1:
+		if h.get_slots().rightmost_empty_index() != -1:
 			if h.get_input_controller().activate_front(int(clicks[i]) - 1).get("ok", false):
 				i += 1
 				continue
-		rt.tick(DT)
-	_ok(h.get_supply().is_exhausted() and h.get_speed_authority().is_2x(), "supply exhausted -> automatic 2x without purchase")
+		h.get_runtime().tick(DT)
+
+## SB-TF-02 (owner 2026-11-18): the free automatic endgame speed-up is 3x; paid 2x stays 2x.
+func _auto_3x_free() -> void:
+	print("[free supply-exhausted auto 3x]")
+	var h = _host_level(2)
+	var eco = h.get_economy()
+	var s = h.get_screen()
+	var sp = h.get_speed_authority()
+	_ok(not eco.speed.is_manual_2x_entitled(2), "no entitlement")
+	_drain_clicks(h)
+	_ok(h.get_supply().is_exhausted() and sp.factor() == 3.0 and sp.is_auto_3x(), "supply exhausted -> automatic 3x without purchase")
+	_ok(s.get_speed_mode() == "auto" and s.get_speed_label() == "3x" and s.get_speed_state() == "3x" and s.get_speed_button().text == "3x",
+		"HUD: green auto mode shows 3x")
+	s.get_speed_button().pressed.emit()
+	_ok(sp.factor() == 1.0 and s.get_speed_state() == "1x" and s.get_speed_label() == "2x" and h.get_speed_acquisition_popup() == null,
+		"speed press in auto 3x -> 1x (no purchase popup), label back to 2x")
+	h.retry()
+	_ok(sp.factor() == 1.0 and s.get_speed_state() == "1x", "level restart -> 1x")
 	h.free()
+	# Paid timed 2x first, then exhaustion: the free auto 3x takes over; toggle -> 1x; retry -> paid 2x.
+	var h2 = _host_level(2)
+	var eco2 = h2.get_economy()
+	var s2 = h2.get_screen()
+	var sp2 = h2.get_speed_authority()
+	eco2.wallet.credit(EconomyWallet.SCRUB_BUCKS, 1000)
+	s2.get_speed_button().pressed.emit()
+	h2.get_speed_acquisition_popup().get_offer_button("timed_900").pressed.emit()
+	_ok(sp2.factor() == 2.0 and s2.get_speed_mode() == "timed", "paid timed 2x: factor 2.0")
+	_drain_clicks(h2)
+	_ok(h2.get_supply().is_exhausted() and sp2.factor() == 3.0 and s2.get_speed_mode() == "auto" and s2.get_speed_label() == "3x",
+		"paid timed 2x then exhaustion -> auto 3x (factor 3.0, HUD 3x)")
+	s2.get_speed_button().pressed.emit()
+	_ok(sp2.factor() == 1.0 and s2.get_speed_state() == "1x", "toggle off -> 1x")
+	h2.retry()
+	_ok(sp2.factor() == 2.0 and not sp2.is_auto_3x() and s2.get_speed_mode() == "timed", "level restart under the timed entitlement -> paid default 2.0")
+	h2.free()
 
 # ---------------------------------------------- perf-fix equivalence proofs -----
 ## The reachability prefilter may only skip candidates the full route would reject.

@@ -10,8 +10,8 @@ extends Node
 ## also owns the in-flight ScrubbotAgent travel clock and the two pause reasons.
 ##
 ## Speed authority (OWNER_GAMEPLAY_SPEED_RULE_V01): the single GameplaySpeedAuthority
-## sets factor 1x/2x. 2x halves the cadence interval AND doubles the per-frame travel
-## delta fed to agents — it does NOT use Engine.time_scale and touches NO gameplay
+## sets factor 1x/2x/auto 3x. 2x halves the cadence interval AND doubles the per-frame travel
+## delta fed to agents (3x: a third / triple) — it does NOT use Engine.time_scale and touches NO gameplay
 ## accounting. Both current and future agents accelerate uniformly because EVERY agent
 ## is advanced with the same delta*factor here (agent self-_process is disabled so this
 ## controller is the sole time source; pause therefore truly freezes travel).
@@ -157,6 +157,14 @@ func toggle_speed() -> bool:
 func set_speed_2x(value: bool) -> void:
 	if _speed != null:
 		_speed.set_2x(value)
+
+func is_auto_3x() -> bool:
+	return _speed != null and _speed.is_auto_3x()
+
+## SB-TF-02: the free automatic endgame speed-up (3x).
+func set_speed_auto_3x(value: bool) -> void:
+	if _speed != null:
+		_speed.set_auto_3x(value)
 
 # ------------------------------------------------------------------- reset -----
 

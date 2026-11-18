@@ -308,6 +308,7 @@ func _six_slot_switch() -> void:
 		var supply0: Array = _host.get_supply().player_snapshot()
 		var slots0: Array = _host.get_slots().snapshot()
 		var n0 := _count(s)
+		_booster_icons_ok(s)
 		var ok := true
 		for cycle in range(3):
 			eco.boosters.add_charges(BoosterInventory.PLUS_ONE_SLOT, 1)
@@ -321,6 +322,8 @@ func _six_slot_switch() -> void:
 			six_ok = six_ok and s.get_connector_segments().size() == 6 and not s.get_rail_view().visible
 			six_ok = six_ok and _host.get_supply().player_snapshot() == supply0 and _host.get_slots().snapshot().slice(0, 5) == slots0
 			six_ok = six_ok and _host.get_board().count_cells_by_state(0) == board0
+			if cycle == 0:
+				_booster_icons_ok(s)
 			_host.retry()
 			await _settle()
 			var five_ok: bool = s.get_shell_id() == "5slot_%dcol" % cols and s.get_five_slot_strip().get_slot_count() == 5
@@ -423,12 +426,36 @@ func _timed_2x_wallclock() -> void:
 	_ok(s.get_speed_label() == "13:58", "rollback frozen (anti-rollback)")
 	_now[0] += 600
 	s.get_speed_button().pressed.emit()
-	_host.get_runtime().set_speed_2x(true)
-	s.set_speed_2x(true)
+	_host.get_runtime().set_speed_auto_3x(true)
+	s.set_speed_auto_3x(true)
 	_now[0] += 5000
 	_host._refresh_hud()
-	_ok(s.get_speed_mode() == "auto" and s.get_speed_label() == "2x", "after expiry with free auto-2x: distinct auto state")
+	_ok(s.get_speed_mode() == "auto" and s.get_speed_label() == "3x" and s.get_speed_state() == "3x" and _host.get_speed_authority().factor() == 3.0,
+		"after expiry with free auto 3x: distinct auto state, label 3x (SB-TF-02)")
 	_complete("timed_2x_wallclock")
+
+## SB-TF-02: booster icons >= 1.35x the pre-change icon (0.76 x the button), button still a
+## >= TOUCH_MIN square in the BOOSTERS band; the icon stays in its band column (it may pass the
+## band's top/bottom edge by <= 2.5% of the button) and clear of the supply panel, Scrubby,
+## props, speech bubble and the AD region; the count badge draws above the icon.
+func _booster_icons_ok(scr) -> void:
+	var band: Rect2 = scr.ref_rect_to_global(Shell.rect(Shell.BOOSTERS))
+	var ad: Rect2 = scr.ref_rect_to_global(Shell.rect(Shell.AD))
+	var avoid: Array = [scr.get_supply_panel_rect(), scr.get_scrubby_anchor_rect(), scr.get_props_anchor_rect(), scr.get_speech_anchor_rect(), ad]
+	var ok := true
+	var ratio := 0.0
+	for id in scr.get_booster_ids():
+		var b: Button = scr.get_booster_button(id)
+		var icon: Rect2 = (b.get_node("Icon") as Control).get_global_rect()
+		var btn: Rect2 = b.get_global_rect()
+		ratio = icon.size.y / (0.76 * btn.size.y)
+		ok = ok and ratio >= 1.35 and btn.size.x >= UiTokens.TOUCH_MIN and btn.size.y >= UiTokens.TOUCH_MIN
+		ok = ok and band.grow(0.5).encloses(btn) and icon.position.x >= band.position.x - 0.5 and icon.end.x <= band.end.x + 0.5
+		ok = ok and icon.position.y >= band.position.y - 0.025 * btn.size.y - 0.5 and icon.end.y <= band.end.y + 0.025 * btn.size.y + 0.5
+		for r in avoid:
+			ok = ok and not icon.intersects(r)
+		ok = ok and b.get_node("Badge").get_index() > b.get_node("Icon").get_index()
+	_ok(ok, "%s: booster icons %.2fx the old icon, inside the BOOSTERS band column, clear of supply / Scrubby / props / bubble / AD" % [scr.get_shell_id(), ratio])
 
 func _boosters_and_ad_region() -> void:
 	print("[boosters + ad region]")

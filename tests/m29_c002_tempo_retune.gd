@@ -384,6 +384,9 @@ func _s5_truth_equivalence() -> void:
 ## and 2x runs stay comparable.
 func _truth_run(two: bool, dt: float, pin: bool) -> Dictionary:
 	var h = _host_level(2)
+	# SB-PHONE-2026-11-12-F finish holds follow the wall-clock pop, so they are not tempo-scaled:
+	# Reduced Effects (no pop, no hold) keeps this a pure 1x-vs-2x tempo comparison.
+	h.get_screen().set_reduced_effects(true)
 	var rt = h.get_runtime()
 	rt.set_speed_2x(two)
 	var clicks: Array = SupplyPlanLoader.load_plan(h.supply_plan_path)["plan"]["intendedColumnClicks"]
@@ -402,8 +405,8 @@ func _truth_run(two: bool, dt: float, pin: bool) -> Dictionary:
 			if h.get_input_controller().activate_front(int(clicks[i]) - 1).get("ok", false):
 				i += 1
 				continue
-		if pin and rt.is_2x() != two:
-			rt.set_speed_2x(two)
+		if pin and rt.get_speed_authority().factor() != (2.0 if two else 1.0):
+			rt.set_speed_2x(two)   # also leaves the free auto 3x (SB-TF-02), kept out of 1x/2x truth runs
 		rt.tick(dt)
 		clock[0] += dt
 		frames += 1
@@ -471,7 +474,7 @@ func _s6_authorities() -> void:
 	rows["timed_expired"] = _eff(h2)
 	_ok(not h2.get_speed_authority().is_2x() and rows["timed_expired"] == V1_SPEED, "timed expiry mid-level -> 9 cells/s (%.3f)" % rows["timed_expired"])
 	h2.free()
-	# 4) expiry while M23 free auto-2x owns 2x -> stays 18.
+	# 4) expiry while the M23 free auto 3x owns the speed -> stays 27 (SB-TF-02: auto is 3x).
 	_ok(app2.economy.speed.purchase_timed(900)["ok"], "second timed purchase for the M23-overlap case")
 	var h3 = _host_app(app2)
 	_drain_supply(h3)
@@ -479,18 +482,18 @@ func _s6_authorities() -> void:
 	_now[0] += 1000
 	h3._refresh_hud()
 	rows["timed_expired_m23_owns"] = _eff(h3)
-	_ok(h3.get_speed_authority().is_2x() and rows["timed_expired_m23_owns"] == V2_SPEED, "timed expiry while M23 auto-2x owns speed -> stays 18 cells/s (%.3f)" % rows["timed_expired_m23_owns"])
+	_ok(h3.get_speed_authority().is_auto_3x() and rows["timed_expired_m23_owns"] == 3.0 * V1_SPEED, "timed expiry while M23 auto 3x owns speed -> stays 27 cells/s (%.3f)" % rows["timed_expired_m23_owns"])
 	h3.free()
-	# 5) M23 supply exhaustion free auto-2x, no entitlement, nothing spent.
+	# 5) M23 supply exhaustion free auto 3x, no entitlement, nothing spent.
 	var app3 = AppState.new(_uniq("m23"), func(): return _now[0])
 	app3.progression.record_win(1)
 	var h4 = _host_app(app3)
 	var sb0: int = app3.economy.wallet.scrub_bucks()
 	_ok(not app3.economy.speed.is_manual_2x_entitled(2) and not h4.get_speed_authority().is_2x(), "no entitlement, 1x")
 	_drain_supply(h4)
-	rows["m23_auto_2x"] = _eff(h4)
-	_ok(h4.get_speed_authority().is_2x() and rows["m23_auto_2x"] == V2_SPEED and app3.economy.wallet.scrub_bucks() == sb0,
-		"M23 supply-exhausted auto-2x -> 18 cells/s, free (%.3f)" % rows["m23_auto_2x"])
+	rows["m23_auto_3x"] = _eff(h4)
+	_ok(h4.get_speed_authority().is_auto_3x() and rows["m23_auto_3x"] == 3.0 * V1_SPEED and app3.economy.wallet.scrub_bucks() == sb0,
+		"M23 supply-exhausted auto 3x -> 27 cells/s, free (%.3f)" % rows["m23_auto_3x"])
 	h4.free()
 	await process_frame
 	_report["authorities_effective_cells_per_s"] = rows
@@ -644,8 +647,8 @@ func _run_fixture(w: int, slots_n: int, two: bool, fps: int, window_s: float, le
 					break
 			if placed:
 				continue
-		if not two and rt.is_2x():
-			rt.set_speed_2x(false)   # hold 1x through M23 exhaustion so 1x stress stays 1x
+		if rt.get_speed_authority().factor() != (2.0 if two else 1.0):
+			rt.set_speed_2x(two)   # hold 1x / 2x through M23 exhaustion (no auto 3x in the stress rows)
 		per_frame[0] = 0
 		var t0 := Time.get_ticks_usec()
 		rt.tick(dt)

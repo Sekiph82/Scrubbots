@@ -7,12 +7,13 @@ Scope: Production gameplay speed behavior
 
 ## 1. Supported gameplay speeds
 
-Production gameplay V1 supports exactly:
+Production gameplay supports exactly:
 
 - `1x` normal speed
-- `2x` accelerated speed
+- `2x` accelerated speed (paid / manual / timed; factor 2.0)
+- `3x` free automatic endgame speed-up only (§3; `GameplaySpeedAuthority.FACTOR_AUTO_3X` = 3.0)
 
-No 3x or higher speed is part of this rule.
+**Owner amendment 2026-11-18 (SB-TF-02, TestFlight feedback 27):** the free automatic endgame acceleration of §3 is `3x` (was `2x`). The paid/manual `2x` (`FACTOR_2X` = 2.0) is unchanged. No other speed exists; the player cannot select 3x manually.
 
 A new level/session starts at `1x`.
 
@@ -40,9 +41,11 @@ Until the M39 economy services exist, M29 may keep a direct toggle seam for head
 
 This is a gameplay-time control, not Settings.
 
-## 3. Automatic 2x endgame acceleration
+## 3. Automatic 3x endgame acceleration
 
-The game automatically switches to `2x` immediately after the FINAL remaining M23 supply batch has been successfully transferred into M24 through the normal transactional handoff.
+(Auto 3x since 2026-11-18; read "automatic 2x" below as the automatic 3x mode.)
+
+The game automatically switches to `3x` immediately after the FINAL remaining M23 supply batch has been successfully transferred into M24 through the normal transactional handoff.
 
 Canonical trigger:
 
@@ -60,7 +63,7 @@ The trigger is NOT:
 
 If the final transfer is rejected, M23 is not exhausted and automatic 2x must not activate.
 
-If gameplay is already at 2x, the automatic trigger is an idempotent no-op.
+If gameplay is already in the automatic 3x mode, the trigger is an idempotent no-op. If a paid/manual 2x is on, the automatic 3x takes over (it is the free speed-up); toggling speed off then returns to 1x. A new level / reset restores 1x (or the paid timed 2x default).
 
 Automatic activation does not permanently lock 2x. The player may always return to 1x afterward. Returning from that free automatic 2x to 2x manually again before/after the automatic condition is no longer free unless a valid paid entitlement exists; the automatic M23-exhausted trigger itself may reassert free 2x only according to the authoritative runtime rule.
 
