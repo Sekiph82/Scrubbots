@@ -58,27 +58,33 @@ func _initialize() -> void:
 # ------------------------------------------------------------------ cases ----
 
 func _m01() -> void:
-	print("[m01 BottomNav: EVENTS / ROBOTS / RANKS / HOME / SETTINGS real, no dead tab]")
+	print("[m01 SB-TF-03: no BottomNav; Profile ROBOTS / RANKS, deep-link EVENTS real, no dead entry]")
 	await _boot("m01")
 	var h = _root.get_home()
+	_ok(h.get_region("BottomNav") == null and h.find_children("Nav_*", "", true, false).is_empty(), "no bottom nav on Home")
 	var opened := {}
-	for id in ["events", "robots", "leaderboard"]:
-		var b: Button = h.get_region("Nav_" + id)
-		_ok(not b.disabled, "Nav_%s live" % id)
-		b.pressed.emit()
+	for id in ["robots", "ranks"]:
+		(h.get_region("ProfileButton") as Button).pressed.emit()
+		await _frames(2)
+		var b: Button = _top().get_action_button(id)
+		_ok(b != null and not b.disabled, "Profile %s live" % id)
+		_tap(id)
 		await _frames(2)
 		opened[id] = _top_id()
 		_root.get_modal_stack().clear("test")
 		await _frames(2)
-	_ok(opened == {"events": "events", "robots": "robots", "leaderboard": "ranks"}, "EVENTS / ROBOTS / RANKS open their destinations %s" % str(opened))
-	var r: Button = h.get_region("Nav_leaderboard")
-	_ok(r.tooltip_text == "", "RANKS (SB-M43-122 personal ladder) has no coming-later tooltip")
+	_ok(_root.open_deep_link("events") == "events", "EVENTS deep link still opens")
+	await _frames(2)
+	opened["events"] = _top_id()
+	_root.get_modal_stack().clear("test")
+	await _frames(2)
+	_ok(opened == {"events": "events", "robots": "robots", "ranks": "ranks"}, "EVENTS / ROBOTS / RANKS open their destinations %s" % str(opened))
 	_complete("m01_bottom_nav_real_or_disabled")
 
 func _m02() -> void:
 	print("[m02 SETTINGS stays the M41 panel]")
 	await _boot("m02")
-	var b: Button = _root.get_home().get_region("Nav_settings")
+	var b: Button = _root.get_home().get_region("SettingsButton")
 	b.pressed.emit()
 	await _frames(2)
 	var panel = _root.get_settings_panel() if _root.has_method("get_settings_panel") else null
@@ -120,7 +126,7 @@ func _m03() -> void:
 		bests_ok = bests_ok and row != null and _txt(row, "Current") == str(int(bests[n][0])) and _txt(row, "Best") == str(int(bests[n][1]))
 	_ok(bests_ok, "profile bests: 3 rows with Current / Best from streak + records")
 	var tall := true
-	for id in ["achievements", "notifications", "close"]:
+	for id in ["achievements", "robots", "ranks", "collection", "close"]:
 		var b: Button = p.get_action_button(id)
 		tall = tall and b != null and maxf(b.custom_minimum_size.y, b.size.y) >= 88
 	_ok(tall, "profile action buttons >= 88 px tall")
@@ -263,7 +269,7 @@ func _m06() -> void:
 	_ok(not src.contains("rewarded") and not src.contains("purchase") and not src.contains("debit") and not src.contains("wallet") and not src.contains("shop"), "no ad / purchase / spend input to event progress")
 	await _lose(3)
 	_ok(e.events.view("wk1")["progress"] == 2, "a loss adds nothing")
-	_ok(_events_badge() == [1, true], "SB-M43-134: claimable event reward -> EVENTS badge 1 on Home BottomNav %s" % str(_events_badge()))
+	_ok(_events_badge() == [1, false], "SB-M43-134: claimable weekly (v1) event reward -> HomeBadges events 1; SB-TF-03 removed the EVENTS tab, Home badges only V02 Event buttons %s" % str(_events_badge()))
 	var p = ProfileScreens.open_events(_root.get_modal_stack(), _root.get_app_state())
 	await _frames(2)
 	var m0b: Array = p.find_child("Event_wk1", true, false).find_child("Milestone_0", true, false).find_children("*", "Button", true, false)
@@ -401,7 +407,7 @@ func _m10() -> void:
 	b = HomeBadges.compute(a)
 	_ok(b["tasks"] == 1 and b["gift_bar"] == 4 and b["robots"] == 1 and b["collection"] == 1, "tasks / gift / robots / collection %s" % str(b))
 	var h = _root.get_home()
-	_ok(h.get_region("Shortcut_tasks").badge.visible and h.get_region("Shortcut_collection").badge.visible and h.get_region("NavBadge_robots").visible, "badges rendered on Home + BottomNav")
+	_ok(h.get_region("Shortcut_tasks").badge.visible and h.get_region("ProfileBadge").visible and h.get_region("ProfileBadge").text == str(int(b["robots"]) + int(b["collection"]) + int(b["achievements"])), "badges rendered on Home: Tasks + the profile card (robots + collection + achievements, SB-TF-03) '%s'" % h.get_region("ProfileBadge").text)
 	a.actions.claim_daily_task(0)
 	a.actions.claim_daily_login()
 	a.actions.claim_rewarded_daily_free()   # slot 1 claimed; slot 2 needs an ad and no provider -> not actionable
@@ -422,7 +428,7 @@ func _m10() -> void:
 			e.meta_ui.mark_seen("card:" + cid)
 	h.refresh()
 	b = HomeBadges.compute(a)
-	_ok(b.values().all(func(v): return v == 0) and not h.get_region("Shortcut_tasks").badge.visible and not h.get_region("NavBadge_robots").visible and not h.get_region("ProfileBadge").visible, "all handled -> no badge %s" % str(b))
+	_ok(b.values().all(func(v): return v == 0) and not h.get_region("Shortcut_tasks").badge.visible and not h.get_region("ProfileBadge").visible, "all handled -> no badge %s" % str(b))
 	_complete("m10_badges")
 
 func _m11() -> void:
@@ -478,10 +484,11 @@ func _event_config(o: Dictionary) -> void:
 	f.close()
 	_eco().events.load_config(path)
 
-## [HomeBadges events count, Home NavBadge_events visible] after a Home refresh.
+## [HomeBadges events count, any Home Event activity button badge visible] after a Home refresh.
 func _events_badge() -> Array:
 	_root.get_home().refresh()
-	return [int(HomeBadges.compute(_root.get_app_state())["events"]), _root.get_home().get_region("NavBadge_events").visible]
+	var shown: bool = _root.get_home().find_children("Shortcut_event_*", "", true, false).any(func(b): return b.visible and b.badge.visible)
+	return [int(HomeBadges.compute(_root.get_app_state())["events"]), shown]
 
 func _event_ending() -> bool:
 	return NotificationPolicy.candidates(_root.get_app_state()).any(func(c): return c["category"] == "event_ending")

@@ -18,11 +18,11 @@ const SCRUBBY_PATH := "res://assets/ui/final/characters/scrubby/scrubby_home_pos
 ## HOME-026 approved pin (assets/ui/HOME_ASSET_MANIFEST.json) — the texture is never replaced.
 const SCRUBBY_SHA := "fc30b992787c644822a6cd02510e481fab9010cd89ab75fc4a9909ca713d5c18"
 ## Functional surfaces the hero must leave clear (hit rects of the live controls).
-const FUNCTIONAL := ["TopCurrencyHUD", "GiftMeter", "PlayButton", "BottomNav",
-	"Shortcut_shop", "Shortcut_collection", "Shortcut_tasks", "Shortcut_daily"]
+const FUNCTIONAL := ["TopCurrencyHUD", "GiftMeter", "PlayButton", "SettingsButton",
+	"RewardedAdsButton", "Shortcut_tasks", "Shortcut_daily"]
 ## Live controls probed with real pointer events (hero area neighbours included).
-const FUNCTIONAL_CONTROLS := ["PlayButton", "Shortcut_shop", "Shortcut_collection", "Shortcut_tasks",
-	"Shortcut_daily", "Nav_settings", "Nav_home", "ScrubBucksPlus", "HeartsPlus"]
+const FUNCTIONAL_CONTROLS := ["PlayButton", "RewardedAdsButton", "Shortcut_tasks",
+	"Shortcut_daily", "SettingsButton", "ScrubBucksPlus", "HeartsPlus"]
 ## Measured M42-C002 geometry of the fixed-anchor 1.612 hero vs the left baked helper bot's
 ## catalog rect: only the brush bristles (canvas x >= 204, bucket/spray strip) enter it.
 const LEFT_BOT_MAX_X_INTRUSION := 47.0
@@ -136,7 +136,7 @@ static func measure(home) -> Dictionary:
 		"world_clip": _local_rect(home, "Background"),
 		"ui": {}, "sign": {}, "bots": [],
 	}
-	for n in FUNCTIONAL + ["WinStreakRewardTrack", "AdBannerSlot"]:
+	for n in FUNCTIONAL + ["AdBannerSlot"]:
 		var r := _local_rect(home, n)
 		var o := opaque_in(img, hr, r)
 		m["ui"][n] = {"rect": r, "bbox_hit": (m["new_visible_screen"] as Rect2).intersects(r), "opaque_px": o["px"], "opaque_rect": o["rect"], "clearance": clearance(img, hr, r)}
@@ -147,9 +147,9 @@ static func measure(home) -> Dictionary:
 		var br := _to_screen(home, b)
 		var bo := opaque_in(img, hr, br)
 		var panels: Array = []
-		for id in ["shop", "collection", "tasks", "daily"]:
-			if _local_rect(home, "Shortcut_" + id).intersects(br):
-				panels.append(id)
+		for n in ["RewardedAdsButton", "Shortcut_tasks", "Shortcut_daily"]:
+			if _local_rect(home, n).intersects(br):
+				panels.append(n)
 		m["bots"].append({"canvas": b, "rect": br, "bbox_hit": (m["new_visible_screen"] as Rect2).intersects(br), "opaque_px": bo["px"], "opaque_area": bo.get("area", 0.0), "opaque_rect": bo["rect"], "panel_hits": panels})
 	return m
 
@@ -277,11 +277,11 @@ func _ui_truth() -> void:
 			if hov == null or not (hov == ctl or ctl.is_ancestor_of(hov)):
 				picks.append("%s->%s" % [n, hov.name if hov else "null"])
 		_ok(picks.is_empty(), "%s every functional control is the top hit at its centre %s" % [str(vp), str(picks)])
-		for n in ["PlayButton", "Shortcut_shop", "Shortcut_collection", "Shortcut_tasks", "Shortcut_daily", "Nav_settings"]:
+		for n in ["PlayButton", "RewardedAdsButton", "Shortcut_tasks", "Shortcut_daily", "SettingsButton"]:
 			await _click(sub, _local_rect(home, n).get_center())
 			home.close_top_popup()
 			await process_frame
-		_ok(got == ["play", "daily", "settings"], "%s real clicks: Play / DAILY / Settings fire, disabled SHOP/COLLECTION/TASKS stay inert %s" % [str(vp), str(got)])
+		_ok(got == ["play", "daily", "settings"], "%s real clicks: Play / DAILY / Settings fire, standalone-disabled REWARDED ADS / TASKS stay inert (SB-TF-03) %s" % [str(vp), str(got)])
 		_ok(app.economy.snapshot() == before, "%s no economy mutation from presentation" % str(vp))
 		for n in ["Art_scrubby", "HeroFocusShade", "Layer_characters"]:
 			_ok(home.get_region(n).mouse_filter == Control.MOUSE_FILTER_IGNORE, "%s %s never takes input" % [str(vp), n])

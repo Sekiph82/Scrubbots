@@ -268,8 +268,8 @@ func _r10() -> void:
 	var e = a.economy
 	var home = _root.get_home()
 	var cta: Button = home.get_region("RewardedAdsButton")
-	_ok(cta != null and not cta.disabled and cta.get_parent() == home.get_region("Shortcut_collection"), "REWARDED ADS CTA live, attached under COLLECTION")
-	_ok(_names(home.get_region("RightShortcutColumn")) == ["Shortcut_tasks", "Shortcut_daily"] and _names(home.get_region("LeftShortcutColumn")) == ["Shortcut_shop", "Shortcut_collection"], "four primary panels unchanged")
+	_ok(cta != null and not cta.disabled and cta.get_parent() == home.get_region("LeftShortcutColumn"), "REWARDED ADS CTA live, an activity button in the left column (SB-TF-03)")
+	_ok(_names(home.get_region("LeftShortcutColumn")).slice(0, 3) == ["RewardedAdsButton", "Shortcut_tasks", "Shortcut_daily"] and home.get_region("Shortcut_shop") == null and home.get_region("Shortcut_collection") == null, "SB-TF-03 activity order Rewarded Ads, Tasks, Daily; no Shop / Collection tiles")
 	cta.pressed.emit()
 	await _frames(2)
 	var p = _root.get_modal_stack().top()
@@ -341,7 +341,7 @@ func _r11() -> void:
 		var cta: Rect2 = home.get_region("RewardedAdsButton").get_global_rect()
 		var vp := Rect2(Vector2.ZERO, Vector2(lv))
 		var others := {}
-		for n in ["PlayButton", "GiftMeter", "BottomNav", "WinStreakRewardTrack", "Shortcut_daily", "Shortcut_tasks", "Shortcut_shop", "Shortcut_collection", "TopCurrencyHUD"]:
+		for n in ["PlayButton", "GiftMeter", "AdBannerSlot", "Shortcut_daily", "Shortcut_tasks", "TopCurrencyHUD"]:
 			others[n] = (home.get_region(n) as Control).get_global_rect()
 		var strip: Control = home.get_region("HomeJourneyStrip")
 		others["HomeJourneyStrip"] = strip.get_global_rect()
@@ -358,8 +358,8 @@ func _r11() -> void:
 			if cta.intersects(br) or icon.intersects(br):
 				hits.append("helper_bot")
 		_ok(vp.encloses(cta) and vp.encloses(icon) and hits.is_empty() and cta.size.y >= 88.0 - 0.5, "%s (logical %s): card %s + icon inside viewport, >= 88 px, no overlap %s" % [phys, lv, cta, hits])
-		var col: Rect2 = others["Shortcut_collection"]
-		_ok(cta.size.is_equal_approx(col.size) and cta.size.is_equal_approx(others["Shortcut_shop"].size) and is_equal_approx(cta.position.x, col.position.x) and cta.position.y > col.end.y, "%s: owner placement - under COLLECTION, same size / x as COLLECTION and SHOP (%s vs %s)" % [phys, cta, col])
+		var col: Rect2 = others["Shortcut_tasks"]
+		_ok(cta.size.is_equal_approx(col.size) and cta.size.is_equal_approx(others["Shortcut_daily"].size) and is_equal_approx(cta.position.x, col.position.x) and cta.end.y < col.position.y, "%s: SB-TF-03 placement - top of the left column, same size / x as TASKS and DAILY (%s vs %s)" % [phys, cta, col])
 		var opaque := _scrubby_opaque_in(home, [cta, icon])
 		_ok(opaque == 0, "%s: no opaque Scrubby pose pixel under the card or icon (%d)" % [phys, opaque])
 	_complete("r11_home_cta_geometry")
@@ -393,7 +393,7 @@ func _r12() -> void:
 	var home = _root.get_home()
 	var ra: Button = home.get_region("RewardedAdsButton")
 	var daily: Button = home.get_region("Shortcut_daily")
-	_ok(ra.get_script() == daily.get_script() and ra.get_parent() == home.get_region("Shortcut_collection") and ra.find_children("*", "", true, false).all(func(c): return not String(c.name).contains("Triangle")), "same UiShortcutButton component, attached under COLLECTION; no native play triangle")
+	_ok(ra.get_script() == daily.get_script() and ra.get_parent() == daily.get_parent() and ra.find_children("*", "", true, false).all(func(c): return not String(c.name).contains("Triangle")), "same UiShortcutButton component, in the activity column with DAILY; no native play triangle")
 	var a_sb: StyleBoxFlat = ra.get_theme_stylebox("normal")
 	var d_sb: StyleBoxFlat = daily.get_theme_stylebox("normal")
 	_ok(a_sb.bg_color == d_sb.bg_color and a_sb.border_color == d_sb.border_color and a_sb.bg_color != Color(0.337, 0.769, 0.169), "same cyan/blue light glass panel as DAILY (green CTA body gone)")

@@ -373,7 +373,7 @@ func _coachmarks(key: String, phys: Vector2i) -> void:
 			await _frames(2)
 			_walk(key)
 
-## SB-M22-029: RANKS is served now (SB-M43-122 personal ladder, BottomNav at L40).
+## SB-M22-029: RANKS is served now (SB-M43-122 personal ladder; SB-TF-03: Profile RANKS at L40).
 func _ranks(key: String, phys: Vector2i) -> void:
 	await _quiet(key, phys)
 	await _popup(key, ProfileScreens.open_ranks(_root.get_modal_stack(), _root.get_app_state()))

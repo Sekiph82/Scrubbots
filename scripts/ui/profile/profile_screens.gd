@@ -28,14 +28,22 @@ const UiProgressMeter = preload("res://scripts/ui/components/ui_progress_meter.g
 const UiEventCard = preload("res://scripts/ui/components/ui_event_card.gd")
 const EventsV02Ui = preload("res://scripts/ui/events/events_v02_ui.gd")
 const MetaCeremonies = preload("res://scripts/ui/ceremony/meta_ceremonies.gd")
+const RobotsScreen = preload("res://scripts/ui/robots/robots_screen.gd")
+const CollectionScreen = preload("res://scripts/ui/collection/collection_screen.gd")
+const UiShortcutButton = preload("res://scripts/ui/components/ui_shortcut_button.gd")
 
 # ---------------------------------------------------------------- PROFILE ----
 
 const F := "res://assets/ui/final/"
 
 ## SB-M43-125-REBUILD: native rebuild of scrubbots_profile_master_v01 — hero card, 2x3 stat
-## tiles, Personal Bests table (Current / Best), self-only note, three actions.
-static func open_profile(stack, app) -> BasePopup:
+## tiles, Personal Bests table (Current / Best), self-only note, actions. SB-TF-03: Profile hosts
+## the former Home destinations ROBOTS / RANKS / COLLECTION (one row, feature-gated like their
+## Home entries; Collection carries the new-card badge); Notifications moved to Settings.
+## ceremonies / open_packs: the app's ceremony presenter and earned-pack route (main.gd).
+## [action id (= feature id), label key, badge node].
+const DESTINATIONS := [["robots", "PROFILE_ROBOTS", "RobotsBadge"], ["ranks", "RANKS_TITLE", "RanksBadge"], ["collection", "PROFILE_COLLECTION", "CollectionBadge"]]
+static func open_profile(stack, app, ceremonies = null, open_packs: Callable = Callable()) -> BasePopup:
 	var e = app.economy
 	var rid: String = e.robots.active_robot()
 	var p := BasePopup.new("profile")
@@ -92,19 +100,69 @@ static func open_profile(stack, app) -> BasePopup:
 	p.add_body_line(UiText.t("PROFILE_BOOSTERLESS_TOTAL", [UiText.num(int(r.get_value("boosterless_wins")))]), "BoosterlessTotal", BasePopup.INK, 22)
 	p.add_body_line(UiText.t("PROFILE_SELF_ONLY"), "SelfOnly", BasePopup.INK, 24)
 	p.add_action("achievements", UiText.t("ACHIEVEMENTS_TITLE"), "primary", false)
-	p.add_action("notifications", UiText.t("NOTIFY_TITLE"), "secondary", false)
+	for d in DESTINATIONS:
+		var b := p.add_action(d[0], UiText.caps(UiText.t(d[1])), "secondary", false, "destinations")
+		# The owner unlock gate of the former Home entries (feature id == button id): blocked,
+		# naming its unlock level like the former Home tab.
+		var feature: String = d[0]
+		p.set_action_blocked(d[0], not app.feature_unlocked(feature))
+		if not app.feature_unlocked(feature):
+			b.tooltip_text = UiText.t("HOME_UNLOCKS_AT_LEVEL", [app.feature_unlock_level(feature)])
+			b.accessibility_description = b.tooltip_text
+		HomeStyle.fit_on_resize(b, UiTokens.FONT_BUTTON)   # three per row: long locales shrink, never widen
+		var badge := UiShortcutButton.make_badge()
+		badge.name = String(d[2])
+		badge.offset_left = -UiShortcutButton.BADGE_SIZE - 4   # inside the button's top-right corner
+		badge.offset_right = -4
+		badge.offset_top = 4
+		badge.offset_bottom = UiShortcutButton.BADGE_SIZE + 4
+		b.add_child(badge)
+	_render_destination_badges(p, app)
 	p.add_action("close", UiText.t("SHOP_CLOSE"), "secondary", true)
 	p.action_selected.connect(func(id, _c):
-		if id == "achievements" or id == "notifications":
-			var a = open_achievements(stack, app) if id == "achievements" else open_notifications(stack, app)
-			if a != null:
-				a.closed.connect(func(_x):
-					if is_instance_valid(p):
-						p.rearm(), CONNECT_ONE_SHOT))
+		var a = null
+		for d in DESTINATIONS:   # SB-M44-013: the first press acknowledges a NEW entry
+			if id == d[0] and HomeBadges.new_features(app).has(_entry(d[0])) and app.economy.meta_ui.mark_seen(HomeBadges.visited_key(d[0])):
+				app.request_save()
+		match id:
+			"achievements":
+				a = open_achievements(stack, app)
+			"robots":
+				a = RobotsScreen.open(stack, app, ceremonies)
+			"ranks":
+				a = open_ranks(stack, app)
+			"collection":
+				a = CollectionScreen.open_album(stack, app, open_packs)
+		if a != null:
+			a.closed.connect(func(_x):
+				if is_instance_valid(p):
+					_render_destination_badges(p, app)
+					p.rearm(), CONNECT_ONE_SHOT)
+		elif id != "close" and is_instance_valid(p):
+			p.rearm())
 	if not stack.push(p):
 		p.free()
 		return null
 	return p
+
+## The HomeBadges entry id of a feature (the former Home entry; Ranks keeps its old tab id).
+static func _entry(feature: String) -> String:
+	return String(HomeBadges.GATED_ENTRIES.find_key(feature))
+
+## Destination badges: the HomeBadges count (robots: unseen / unlockable robots; collection: owned
+## cards not yet viewed in the album, cleared by its card:<id> seen marks), else SB-M44-013 "NEW"
+## while a newly unlocked entry is unvisited; nothing while locked.
+static func _render_destination_badges(p: BasePopup, app) -> void:
+	var counts := HomeBadges.compute(app)
+	var fresh := HomeBadges.new_features(app)
+	for d in DESTINATIONS:
+		var b: Button = p.get_action_button(d[0])
+		var badge: Label = b.get_node(String(d[2])) if b != null else null
+		if badge == null:
+			continue
+		var n: int = int(counts.get(_entry(d[0]), 0)) if app.feature_unlocked(d[0]) else 0
+		badge.text = str(n) if n > 0 else (UiText.t("HOME_BADGE_NEW") if fresh.has(_entry(d[0])) else "")
+		badge.visible = not badge.text.is_empty()
 
 ## Blue hero card: active robot portrait in the round HUD frame, its name, the campaign level
 ## badge and the same Bot Parts meter as the Home top HUD (next 250-part robot, never XP).

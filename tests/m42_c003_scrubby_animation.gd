@@ -26,8 +26,8 @@ const COUNTS := {"wave": 14, "bow": 15, "turn": 17, "full_turn": 17}
 const DURATION := {"wave": [1.0, 1.5], "bow": [1.0, 1.6], "turn": [1.2, 1.8], "full_turn": [1.0, 1.8]}
 const SOURCE_FAMILY := {"wave": "wave", "bow": "bow", "turn": "turn_look", "full_turn": "full_turn"}
 ## Hard blockers (live functional UI). Helper bots are warning-only (owner V03).
-const HARD := ["TopCurrencyHUD", "GiftMeter", "PlayButton", "BottomNav",
-	"Shortcut_shop", "Shortcut_collection", "Shortcut_tasks", "Shortcut_daily"]
+const HARD := ["TopCurrencyHUD", "GiftMeter", "PlayButton", "SettingsButton",
+	"RewardedAdsButton", "Shortcut_tasks", "Shortcut_daily"]
 const DT := 1.0 / 60.0
 ## SB-ASSET-PURGE-2026-11-17: the park-baked v1 set was deleted; the video seam runs on the keyed set.
 const VIDEO_SET_ID := "home_scrubby_videos_keyed_v2"
@@ -491,7 +491,7 @@ func _screen_space() -> void:
 	for vp in VIEWPORTS:
 		var r = await _home(vp)
 		var m := measure_frames(r[1])
-		_ok((m["hard"] as Dictionary).is_empty(), "%s: 0 opaque gesture pixels in Play / HUD / Gift / BottomNav / 4 shortcuts %s" % [str(vp), str(m["hard"])])
+		_ok((m["hard"] as Dictionary).is_empty(), "%s: 0 opaque gesture pixels in Play / HUD / Gift / Settings / 3 activity buttons (SB-TF-03) %s" % [str(vp), str(m["hard"])])
 		_ok((m["clip_out"] as Array).is_empty(), "%s: no frame clipped by the viewport/world clip (union %s)" % [str(vp), str(m["union"])])
 		var lh := 0
 		var rh := 0
@@ -671,7 +671,7 @@ func _buttons() -> void:
 		for g in COUNTS:
 			hero.start_gesture(g)
 			_run(hero, 0.6)   # mid-gesture
-			for n in ["PlayButton", "Shortcut_shop", "Shortcut_collection", "Shortcut_tasks", "Shortcut_daily", "Nav_settings", "ScrubBucksPlus", "HeartsPlus"]:
+			for n in ["PlayButton", "RewardedAdsButton", "Shortcut_tasks", "Shortcut_daily", "SettingsButton", "ScrubBucksPlus", "HeartsPlus"]:
 				var mv := InputEventMouseMotion.new()
 				mv.position = _local(home, n).get_center()
 				mv.global_position = mv.position
@@ -682,7 +682,7 @@ func _buttons() -> void:
 				top_ok = top_ok and hov != null and (hov == ctl or ctl.is_ancestor_of(hov))
 			_run(hero, 2.0)
 		hero.start_gesture("wave")
-		for n in ["PlayButton", "Shortcut_daily", "Nav_settings"]:
+		for n in ["PlayButton", "Shortcut_daily", "SettingsButton"]:
 			for pressed in [true, false]:
 				var e := InputEventMouseButton.new()
 				e.button_index = MOUSE_BUTTON_LEFT

@@ -52,10 +52,16 @@ func _initialize() -> void:
 	_cleanup()
 	_done()
 
+## SB-TF-03: Collection lives in Profile (no Home tile): profile card -> Profile -> COLLECTION.
+func _open_album() -> void:
+	(_root.get_home().get_region("ProfileButton") as Button).pressed.emit()
+	await _frames(2)
+	_root.get_modal_stack().top()._on_action("collection")
+
 func _k01() -> void:
-	print("[k01 Home COLLECTION panel opens the album]")
+	print("[k01 Home profile card -> Profile COLLECTION opens the album (SB-TF-03)]")
 	await _boot("k01")
-	(_root.get_home().get_region("Shortcut_collection") as Button).pressed.emit()
+	await _open_album()
 	await _frames(2)
 	_ok(_top_id() == "collection" and _top().find_child("Sets", true, false).get_child_count() == 16, "album with 15 set rows + Master row")
 	_ok(_txt("Summary") == "0 / 135 cards · 0 / 15 sets complete", "fresh summary from the inventory")
@@ -287,7 +293,7 @@ func _k11() -> void:
 
 func _k12() -> void:
 	print("[k12 Cards Exchange lives inside Collection, not on Home]")
-	var ids: Array = (HomeScreen.LEFT_SHORTCUTS + HomeScreen.RIGHT_SHORTCUTS).map(func(s): return s[0])
+	var ids: Array = HomeScreen.ACTIVITY_FIXED.map(func(s): return s[0])
 	var src := FileAccess.get_file_as_string("res://scripts/ui/collection/collection_screen.gd")
 	_ok(not ids.has("cards_exchange") and src.contains("static func open_exchange") and not src.contains("remove_copies(") and not src.contains("wallet."), "no Home exchange shortcut; exchange opened from the album; UI never edits counts/balances")
 	_complete("k12_exchange_inside_collection")
@@ -312,14 +318,14 @@ func _k14() -> void:
 	print("[k14 pack entry: live pending counts, OPEN routes to the C005 ceremony, UI never draws]")
 	await _boot("k14")
 	var e = _eco()
-	(_root.get_home().get_region("Shortcut_collection") as Button).pressed.emit()
+	await _open_album()
 	await _frames(2)
 	var p = _top()
 	_ok(_txt("Packs") == UiText.t("COLLECTION_PACKS_EMPTY") and p.get_action_button("packs").disabled, "empty queue: empty-state label, OPEN PACKS blocked")
 	p.close("test")
 	await _frames(1)
 	_ok(e.reward.grant("k14_tx", {"standard_card_packs": 2, "premium_card_packs": 1}) and e.pending_packs.size() == 3, "2 standard + 1 premium earned (queued, not drawn)")
-	(_root.get_home().get_region("Shortcut_collection") as Button).pressed.emit()
+	await _open_album()
 	await _frames(2)
 	p = _top()
 	_ok(_top_id() == "collection" and _txt("Packs") == "Packs to open: 2 Standard · 1 Premium" and not p.get_action_button("packs").disabled, "album shows 2 / 1 and OPEN PACKS enabled")
@@ -329,7 +335,7 @@ func _k14() -> void:
 	_ok(e.pending_packs.entries() == queue0 and e.collection.snapshot() == col0, "the press itself changes neither the queue nor the Collection")
 	await _frames(3)
 	var pack = _top()
-	_ok(pack != null and String(pack.popup_id) == "standard_pack" and _root.get_modal_stack().ids() == ["collection", "standard_pack"], "OPEN routed through Main.request_earned_packs: oldest pack ceremony over the album")
+	_ok(pack != null and String(pack.popup_id) == "standard_pack" and _root.get_modal_stack().ids() == ["profile", "collection", "standard_pack"], "OPEN routed through Main.request_earned_packs: oldest pack ceremony over the album (opened from Profile, SB-TF-03)")
 	pack.tap()
 	for _i in range(1500):
 		if not is_instance_valid(pack) or pack.phase() == "AWAIT_ROUTE":

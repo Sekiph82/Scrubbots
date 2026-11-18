@@ -115,7 +115,7 @@ func _report(out_dir: String, rows: Array) -> void:
 	L.append("| Viewport | Control | Rect (screen) | bbox | opaque px | clearance px |")
 	L.append("|---|---|---|---|---|---|")
 	for m in rows:
-		for n in Suite.FUNCTIONAL + ["WinStreakRewardTrack", "AdBannerSlot"]:
+		for n in Suite.FUNCTIONAL + ["AdBannerSlot"]:
 			var u: Dictionary = m["ui"][n]
 			L.append("| %dx%d | %s | %s | %s | %d | %s |" % [m["viewport"].x, m["viewport"].y, n, _r(u["rect"]), "hit" if u["bbox_hit"] else "clear", u["opaque_px"], ("%.1f" % u["clearance"]) if is_finite(u["clearance"]) else ">96"])
 	L.append("\n## Baked sign / helper bots\n")

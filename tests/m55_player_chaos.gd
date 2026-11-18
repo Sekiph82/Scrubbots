@@ -363,8 +363,10 @@ func _popup_spam() -> void:
 func _open(id: String) -> void:
 	var home = _root.get_home()
 	match id:
-		"events", "robots", "leaderboard":
-			(home.find_child("Nav_" + id, true, false) as Button).pressed.emit()
+		"events", "robots":   # SB-TF-03: no BottomNav; the app-level entries (deep links / Profile)
+			_root._on_home_shortcut(id)
+		"leaderboard":
+			(home.find_child("ProfileButton", true, false) as Button).pressed.emit()
 		"life":
 			home.hearts_purchase_requested.emit()
 		"scrub_bucks":
@@ -765,26 +767,26 @@ func _triple_loss() -> void:
 # ================================================================ SB-M55-021 ====
 
 func _nav_churn() -> void:
-	print("[021 BottomNav churn 2 x 200 while badges / rewards update]")
+	print("[021 Home entry churn 2 x 200 while badges / rewards update (SB-TF-03: no BottomNav)]")
 	await _boot(30, 1000)
 	var home = _root.get_home()
 	var e = _e()
-	var tabs := ["events", "robots", "leaderboard", "settings", "home"]
+	var tabs := ["ProfileButton", "Shortcut_tasks", "Shortcut_daily", "SettingsButton", "GiftMeterButton"]
 	var cards: Array = e.collection.all_card_ids()
 	var lap: Array = []
 	for rep in range(2):
 		var bad: Array = []
 		for i in range(200):
 			var id: String = tabs[i % tabs.size()]
-			var b: Button = home.find_child("SettingsButton" if id == "settings" else "Nav_" + id, true, false)
+			var b: Button = home.find_child(id, true, false)
 			for _k in range(3):
 				b.pressed.emit()
 			# Badges / rewards change underneath (wallet, cards = Collection badge, a robot's parts).
 			e.wallet.credit(EconomyWallet.SCRUB_BUCKS, 1)
 			e.collection.add_copies(cards[(i + rep * 200) % cards.size()], 1)
 			home.refresh()
-			var want := 0 if id == "home" or id == "settings" else 1
-			if _stack().depth() != want or (id == "settings") != _nav().is_settings_open():
+			var want := 0 if id == "SettingsButton" else 1
+			if _stack().depth() != want or (id == "SettingsButton") != _nav().is_settings_open():
 				bad.append([i, id, _stack().ids(), _nav().is_settings_open()])
 			if i % 10 == 0:
 				await process_frame

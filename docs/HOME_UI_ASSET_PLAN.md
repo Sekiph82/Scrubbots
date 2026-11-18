@@ -52,6 +52,8 @@ The owner reference is art direction, not literal economic semantics. Production
 - top event bar -> Gift Meter (streak-SB-only; 1/5/10/25/100/250/500/1000 (SB-POLISH-002));
 - top event timer -> removed/replaced by live next-milestone information;
 - Star Exchange -> Cards Exchange;
-- star road -> Win Streak SB Reward Track.
+- star road -> Win Streak SB Reward Track (SB-TF-03 owner 2026-11-18: removed from Home; the streak stays an economy rule).
+
+SB-TF-03 (owner 2026-11-18) Home layout: no bottom navigation (its Settings art is the top-HUD Settings icon), no Shop / Collection tiles (Shop via the HUD (+) popups, Collection in Profile), no win-streak strip, a Bot Parts icon instead of the level on the profile card and PLAY · LEVEL N. The retired art keeps its manifest entries; `scripts/ui/home/home_presentation_map.gd` marks it OWNER_RETIRED.
 
 Do not generate art that reintroduces Star currency or Event Points.

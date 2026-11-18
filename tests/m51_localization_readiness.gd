@@ -230,7 +230,7 @@ func _l07() -> void:
 	for c in panel.find_child("Cards", true, false).get_children():
 		if String(c.name).begins_with("Card_"):
 			order.append(String(c.name))
-	_ok(order.slice(-4) == ["Card_HapticsToggle", "Card_ReducedEffectsToggle", "Card_ColorSymbolsRow", "Card_LanguageRow"], "one LANGUAGE card added after the existing cards, Reduced Effects in place %s" % str(order))
+	_ok(order.slice(-5) == ["Card_HapticsToggle", "Card_ReducedEffectsToggle", "Card_ColorSymbolsRow", "Card_LanguageRow", "Card_NotificationsButton"], "one LANGUAGE card added after the existing cards (SB-TF-03 NOTIFICATIONS after it), Reduced Effects in place %s" % str(order))
 	var en_b: Button = panel.get_language_button("en")
 	var tr_b: Button = panel.get_language_button("tr")
 	_ok(en_b.button_pressed and not tr_b.button_pressed and en_b.size.y >= 88.0 and tr_b.size.y >= 88.0 and tr_b.text == "TÜRKÇE", "EN active by default; both buttons >= 88 px tall %s %s" % [str(en_b.size), str(tr_b.size)])

@@ -1,7 +1,7 @@
 extends RefCounted
 ## RobotsScreen — preload (res://scripts/ui/robots/robots_screen.gd).
 ##
-## M43-C008 (SB-M43-102..111) — the ROBOTS BottomNav destination: the canonical 10-robot roster
+## M43-C008 (SB-M43-102..111) — the ROBOTS destination (SB-TF-03: a Profile button): the canonical 10-robot roster
 ## (OWNER_ROBOT_ROSTER_V01 order) in the approved popup family, every value live.
 ##   - per robot: portrait, name, role, canonical 20% meta perk (meta only — never puzzle power),
 ##     ACTIVE / UNLOCKED / LOCKED, NEW until first seen here after its unlock;

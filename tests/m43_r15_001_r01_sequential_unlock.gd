@@ -365,9 +365,9 @@ func _s14() -> void:
 	var a = _root.get_app_state()
 	var home = _root.get_home()
 	var cta: Button = home.get_region("RewardedAdsButton")
-	var col: Rect2 = (home.get_region("Shortcut_collection") as Control).get_global_rect()
+	var tasks: Rect2 = (home.get_region("Shortcut_tasks") as Control).get_global_rect()
 	var r: Rect2 = cta.get_global_rect()
-	_ok(cta.get_parent() == home.get_region("Shortcut_collection") and r.size.is_equal_approx(col.size) and is_equal_approx(r.position.x, col.position.x) and r.position.y > col.end.y, "CTA still under COLLECTION at the same size / x (%s vs %s)" % [r, col])
+	_ok(cta.get_parent() == home.get_region("LeftShortcutColumn") and cta.get_index() == 0 and r.size.is_equal_approx(tasks.size) and is_equal_approx(r.position.x, tasks.position.x) and r.end.y < tasks.position.y, "SB-TF-03: CTA first in the left activity column, same size / x as TASKS below it (%s vs %s)" % [r, tasks])
 	var badges: Dictionary = HomeBadges.compute(a)
 	# Superseded by the M47-FAMILY-APK-TOUCH-R01 owner decision (OWNER_DEVICE_FEEDBACK_V02): the CTA now
 	# carries a red "1" while the ONE sequential frontier slot is actionable; the CTA geometry above is unchanged.

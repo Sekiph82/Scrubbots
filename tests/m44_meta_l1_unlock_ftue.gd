@@ -27,7 +27,8 @@ const RewardedGrantService = preload("res://scripts/economy/rewarded_grant_servi
 const BOOSTERS := ["plus_one_slot", "random", "selector", "tornado"]
 const BOOSTER_LEVEL := {"plus_one_slot": 6, "random": 11, "selector": 16, "tornado": 21}
 const L1_OPEN := ["hearts", "gift_bar", "daily", "shop", "tasks", "collection", "card_packs", "achievements"]
-const LOCKED_NAV := {"Nav_robots": 25, "Nav_events": 30, "Nav_leaderboard": 40}
+## SB-TF-03: Robots / Ranks are Profile buttons; Events are per-event Home activity buttons.
+const LOCKED_PROFILE := {"robots": 25, "ranks": 40}
 
 var EXPECTED_CASES := ["first_home_l1_meta_open", "gate_bypass", "welcome_claim_once", "booster_edges",
 	"old_save_same_gate", "booster_intro_once"]
@@ -64,15 +65,20 @@ func _first_home() -> void:
 	_ok(L1_OPEN.all(func(id): return app.feature_unlocked(id)), "L1 unlocked: %s" % str(L1_OPEN))
 	_ok(["robots", "events", "ranks"] + BOOSTERS == (["robots", "events", "ranks"] + BOOSTERS).filter(func(id): return not app.feature_unlocked(id)), "L1 locked: robots / events / ranks / four boosters")
 	var sc_ok := true
-	for id in ["daily", "tasks", "shop", "collection"]:
-		var b: Button = home.get_region("Shortcut_" + id)
+	for n in ["Shortcut_daily", "Shortcut_tasks", "RewardedAdsButton"]:
+		var b: Button = home.get_region(n)
 		sc_ok = sc_ok and not b.disabled and b.tooltip_text == ""
-	_ok(sc_ok, "DAILY / TASKS / SHOP / COLLECTION enabled, no lock text")
-	var nav_ok := true
-	for n in LOCKED_NAV:
-		var nb: Button = home.get_region(n)
-		nav_ok = nav_ok and nb.disabled and nb.tooltip_text == UiText.t("HOME_UNLOCKS_AT_LEVEL", [LOCKED_NAV[n]])
-	_ok(nav_ok, "ROBOTS 25 / EVENTS 30 / RANKS 40 disabled with their unlock level")
+	_ok(sc_ok, "DAILY / TASKS / REWARDED ADS enabled, no lock text")
+	(home.get_region("ProfileButton") as Button).pressed.emit()
+	await _frames(2)
+	var prof = _root.get_modal_stack().top()
+	var nav_ok: bool = prof != null and not prof.get_action_button("collection").disabled
+	for n in LOCKED_PROFILE:
+		var nb: Button = prof.get_action_button(n) if prof != null else null
+		nav_ok = nav_ok and nb != null and nb.disabled and nb.tooltip_text == UiText.t("HOME_UNLOCKS_AT_LEVEL", [LOCKED_PROFILE[n]])
+	_ok(nav_ok and home.find_children("Shortcut_event_*", "", true, false).is_empty(), "Profile ROBOTS 25 / RANKS 40 blocked with their unlock level, COLLECTION open; no Event button before L30")
+	_root.get_modal_stack().clear("test")
+	await _frames(2)
 	_ok(not home.get_region("GiftMeterButton").disabled, "Gift Bar visible / enabled at L1")
 	var bd: Dictionary = HomeBadges.compute(app)
 	_ok(int(bd["daily"]) == 1 and int(bd["tasks"]) == 1, "Daily + Welcome task badges live at L1 %s" % str(bd))
@@ -90,10 +96,11 @@ func _gate_bypass() -> void:
 	var app = _root.get_app_state()
 	var ms = _root.get_modal_stack()
 	_ok(_root.open_deep_link("robots") == "home" and ms.depth() == 0, "deep link to locked ROBOTS lands on Home, nothing opens")
-	_root._on_home_nav("robots")
-	_root._on_home_nav("events")
-	_root._on_home_nav("leaderboard")
-	_ok(ms.depth() == 0, "direct nav entry to ROBOTS / EVENTS / RANKS opens nothing while locked")
+	_root._on_home_shortcut("robots")
+	_root._on_home_shortcut("events")
+	_root._on_home_shortcut("leaderboard")
+	_root._on_home_shortcut("event:any")
+	_ok(ms.depth() == 0, "direct entry to ROBOTS / EVENTS / RANKS / an event opens nothing while locked")
 	_ok(_root.open_deep_link("tasks") == "tasks" and _top_id() == "tasks", "deep link to (L1) TASKS opens it")
 	ms.clear("test")
 	await _frames(2)

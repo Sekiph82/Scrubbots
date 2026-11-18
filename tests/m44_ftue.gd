@@ -430,7 +430,7 @@ func _t14() -> void:
 	var tasks_b: Button = _root.get_home().get_region("Shortcut_tasks")
 	# SB-M44-032: Daily / Tasks / Shop / Collection open at L1 (owner 2026-11-03).
 	_ok(cm.get_step_id() == "home_daily" and cm.get_target() == daily_b.get_global_rect(), "Scrubby tip points at the real DAILY panel")
-	_ok(not daily_b.disabled and not tasks_b.disabled and not _root.get_home().get_region("Shortcut_shop").disabled and not _root.get_home().get_region("Shortcut_collection").disabled, "all four Home panels live at L1")
+	_ok(not daily_b.disabled and not tasks_b.disabled and not _root.get_home().get_region("RewardedAdsButton").disabled, "all three Home activity buttons live at L1 (SB-TF-03)")
 	tasks_b.pressed.emit()
 	await _frames(2)
 	_root.refresh_coachmark()

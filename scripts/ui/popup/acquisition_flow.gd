@@ -168,6 +168,8 @@ func open_life(source: String):
 	var watch := p.add_action("watch", UiText.t("REWARDED_FREE"), "primary", false)
 	_play_glyph(watch)
 	_badge(watch, HEART_ICON_ART, "+1")
+	# SB-TF-03: the same MORE IN SHOP hand-off as the Scrub Bucks "+" popup (the Shop is no Home tile).
+	p.add_action("shop", UiText.t("SB_POPUP_MORE"), "primary", true)
 	p.add_footer_note(UiText.t("LIFE_CHEER"), "Cheer")
 	p.add_body_line("", "RewardedNote", BasePopup.INK, 24)
 	p.add_body_line("", "Status", BasePopup.INK, UiTokens.FONT_BODY)
@@ -250,6 +252,8 @@ func _on_life_action(id: String, _ctx: Dictionary, p) -> void:
 			_refresh_life(p)
 		"watch":
 			_start_rewarded(p, RewardedGrantService.HEART, {"kind": "heart"})
+		"shop":
+			open_shop({"source": String(p.context.get("source", "life"))})
 
 # ============================================================ Scrub Bucks ==========
 

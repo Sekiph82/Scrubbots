@@ -707,24 +707,24 @@ func _home() -> void:
 	var drawn: Array = []
 	for n in home.find_children("*", "TextureRect", true, false):
 		var t: Texture2D = (n as TextureRect).texture
-		if t != null and (n as CanvasItem).is_visible_in_tree():
+		if t != null and (n as CanvasItem).is_visible_in_tree() and n.name != "WorldEdgeBottom":
 			drawn.append(t.resource_path)
 	var stale: Array = drawn.filter(func(p): return String(p).find("worlds/world_01") != -1 or String(p).find("home_bg_") != -1 or p == OLD_HOME_BG or String(p).ends_with("home_scrubby_still.png"))
 	var count_bg: int = drawn.count(HOME_BG)
 	# SB-HOME-VIDEO-2026-11-17: the keyed still (Scrubby on magenta) is allowed; the baked one is not.
-	_ok(stale.is_empty() and count_bg == 1, "H2 the new background is drawn once; no old world / layered background texture is visible (%d, stale %s)" % [count_bg, str(stale)])
+	_ok(stale.is_empty() and count_bg == 1, "H2 the new background is drawn once (besides its SB-TF-03 mirrored floor continuation WorldEdgeBottom); no old world / layered background texture is visible (%d, stale %s)" % [count_bg, str(stale)])
 	var wb_index: int = wb.get_index()
 	var bgnode: Node = home.get_region("Background")
 	_ok(bgnode.get_child(0) == wb or bgnode.get_child(0).name == "WorldBackground", "H2 the background is the bottom-most world layer")
 	_complete("h02_no_stale_background")
 	# Live UI intact.
-	var names := ["PlayButton", "Shortcut_shop", "Shortcut_collection", "Shortcut_tasks", "Shortcut_daily", "Nav_events", "Nav_robots", "Nav_home", "Nav_leaderboard", "Nav_settings", "GiftMeter", "ScrubBucksChip"]
+	var names := ["PlayButton", "RewardedAdsButton", "Shortcut_tasks", "Shortcut_daily", "SettingsButton", "ProfileButton", "GiftMeter", "ScrubBucksChip"]
 	var missing: Array = []
 	for n in names:
 		if home.get_region(n) == null:
 			missing.append(n)
 	var play: Button = home.get_region("PlayButton")
-	_ok(missing.is_empty() and play != null and not play.disabled and home.get_region("Art_scrubby").texture != null, "H3 PLAY, 4 shortcuts, 5 nav buttons, Gift Meter, currency chip and Scrubby are live native nodes %s" % str(missing))
+	_ok(missing.is_empty() and play != null and not play.disabled and home.get_region("Art_scrubby").texture != null, "H3 PLAY, 3 activity buttons, Settings icon, profile card, Gift Meter, currency chip and Scrubby are live native nodes (SB-TF-03) %s" % str(missing))
 	var baked_ui := 0
 	for p in drawn:
 		if String(p).find("play_button") != -1 and String(p) != "res://assets/ui/final/home/play_cta/play_button_frame.png":

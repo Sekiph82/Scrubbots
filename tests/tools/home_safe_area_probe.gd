@@ -36,7 +36,6 @@ func _initialize() -> void:
 		"pre_v07_margins_ltrb=%s" % str(old_margins),
 		"v07_applied_margins_ltrb=%s" % str(home.get_region("SafeAreaRoot").get_applied_margins()),
 		"ad_banner_slot=%s" % str(home.get_region("AdBannerSlot").get_global_rect()),
-		"bottom_nav=%s" % str(home.get_region("BottomNav").get_global_rect()),
 		"play=%s" % str(home.get_region("PlayButton").get_global_rect()),
 		"world_transform=%s" % str(home.get_world_transform()),
 	]

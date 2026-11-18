@@ -23,7 +23,12 @@ const OWNER_TABLE := {"hearts": 1, "gift_bar": 1, "daily": 1, "shop": 1, "tasks"
 	"card_packs": 1, "robots": 25, "events": 30, "achievements": 1, "ranks": 40,
 	"plus_one_slot": 6, "random": 11, "selector": 16, "tornado": 21}
 const WALK := [1, 3, 4, 5, 6, 8, 11, 12, 16, 20, 21, 25, 30, 35, 39, 40]
-const HOME_ENTRIES := ["Shortcut_daily", "Shortcut_tasks", "Shortcut_shop", "Shortcut_collection", "Nav_robots", "Nav_events", "Nav_leaderboard"]
+## SB-TF-03: Home keeps the activity buttons; Robots / Ranks / Collection are Profile buttons
+## (gated there), Events are per-event activity buttons (absent while locked).
+const HOME_ENTRIES := ["Shortcut_daily", "Shortcut_tasks", "RewardedAdsButton"]
+const PROFILE_ENTRIES := ["robots", "ranks", "collection"]
+const ProfileScreens = preload("res://scripts/ui/profile/profile_screens.gd")
+const ModalStack = preload("res://scripts/ui/popup/modal_stack.gd")
 
 var EXPECTED_CASES := ["config_reader", "level_walk", "no_grandfather", "home_gating", "booster_gating", "ftue_director"]
 
@@ -115,34 +120,33 @@ func _home_gating() -> void:
 	var home = await _home(a)
 	var emitted: Array = []
 	home.shortcut_requested.connect(func(id): emitted.append(id))
-	home.nav_requested.connect(func(id): emitted.append(id))
 	var en := HOME_ENTRIES.filter(func(n): return not home.get_region(n).disabled)
-	_ok(en == ["Shortcut_daily", "Shortcut_tasks", "Shortcut_shop", "Shortcut_collection"], "fresh L1: daily / tasks / shop / collection enabled, robots / events / ranks disabled %s" % str(en))
-	var texts_ok := true
-	for n in HOME_ENTRIES:
-		var fid: String = "ranks" if n == "Nav_leaderboard" else n.get_slice("_", 1)
-		var want: String = "" if int(OWNER_TABLE[fid]) <= 1 else UiText.t("HOME_UNLOCKS_AT_LEVEL", [OWNER_TABLE[fid]])
-		texts_ok = texts_ok and home.get_region(n).tooltip_text == want
-	_ok(texts_ok and home.get_region("Nav_robots").tooltip_text == "Unlocks at level 25", "each locked entry shows its table unlock level")
-	_ok(home.get_region("Shortcut_daily").badge.visible and home.get_region("Shortcut_tasks").badge.visible and not home.get_region("NavBadge_robots").visible, "L1: DAILY / TASKS badges live (login + welcome task); locked ROBOTS carries none")
+	_ok(en == HOME_ENTRIES, "fresh L1: daily / tasks / rewarded ads activity buttons enabled %s" % str(en))
+	_ok(HOME_ENTRIES.all(func(n): return home.get_region(n).tooltip_text == ""), "L1 activity entries carry no lock text")
+	_ok(home.find_children("Shortcut_event_*", "", true, false).is_empty(), "locked EVENTS (L30): no Event activity button")
+	var pen := await _profile_blocked(a)
+	_ok(pen == {"robots": true, "ranks": true, "collection": false}, "fresh L1 Profile: robots / ranks blocked, collection open %s" % str(pen))
+	var pb: Button = _stack.top().get_action_button("robots")
+	_ok(pb.tooltip_text == "Unlocks at level 25" and _stack.top().get_action_button("ranks").tooltip_text == UiText.t("HOME_UNLOCKS_AT_LEVEL", [OWNER_TABLE["ranks"]]), "each locked Profile entry shows its table unlock level")
+	_ok(home.get_region("Shortcut_daily").badge.visible and home.get_region("Shortcut_tasks").badge.visible and not home.get_region("ProfileBadge").visible, "L1: DAILY / TASKS badges live (login + welcome task); locked ROBOTS adds nothing to the profile card")
 	_ok(not home.get_region("GiftMeterButton").disabled, "Gift Bar stays enabled at L1")
-	for id in ["robots", "events", "leaderboard"]:
-		home.get_region("Nav_" + id).pressed.emit()
-	_ok(emitted.is_empty(), "locked press: no nav_requested")
+	for id in ["robots", "events", "leaderboard", "event:x"]:
+		home._shortcut_pressed(id)
+	_ok(emitted.is_empty(), "locked entries: no shortcut_requested")
 	home._shortcut_pressed("tasks")
 	_ok(emitted == ["tasks"], "unlocked TASKS press emits shortcut_requested")
 	_walk_to(a, 25)
 	home.refresh()
-	en = HOME_ENTRIES.filter(func(n): return home.get_region(n).disabled)
-	_ok(en == ["Nav_events", "Nav_leaderboard"], "L25: only EVENTS / RANKS still disabled %s" % str(en))
+	pen = await _profile_blocked(a)
+	_ok(pen == {"robots": false, "ranks": true, "collection": false}, "L25: only RANKS still blocked in Profile %s" % str(pen))
 	_walk_to(a, 40)
 	home.refresh()
-	en = HOME_ENTRIES.filter(func(n): return not home.get_region(n).disabled)
-	_ok(en == HOME_ENTRIES and home.get_region("Nav_leaderboard").tooltip_text == "", "L40: every entry enabled, RANKS live (SB-M43-122 personal ladder) %s" % str(en))
+	pen = await _profile_blocked(a)
+	_ok(pen.values().all(func(v): return not v) and _stack.top().get_action_button("ranks").tooltip_text == "", "L40: every Profile entry live, RANKS no lock text %s" % str(pen))
 	var est = AppState.new(_path("home_est"))
 	var h2 = await _home(est)
-	en = HOME_ENTRIES.filter(func(n): return h2.get_region(n).disabled)
-	_ok(en == ["Nav_robots", "Nav_events", "Nav_leaderboard"], "established L1 save: the same gate (robots / events / ranks disabled) %s" % str(en))
+	pen = await _profile_blocked(est)
+	_ok(pen == {"robots": true, "ranks": true, "collection": false} and HOME_ENTRIES.all(func(n): return not h2.get_region(n).disabled), "established L1 save: the same gate %s" % str(pen))
 	_shutdown()
 	_complete("home_gating")
 
@@ -217,10 +221,23 @@ func _home(app):
 	_sub.add_child(home)
 	home.bind(app)
 	home.set_app_shortcuts(MainScript.APP_SHORTCUTS)
-	home.set_app_nav(MainScript.APP_NAV)
 	await _frames(2)
 	home.refresh()
 	return home
+
+## Opens a real Profile on a fresh ModalStack; {entry: blocked} for the SB-TF-03 destinations.
+var _stack = null
+func _profile_blocked(app) -> Dictionary:
+	if _stack != null and is_instance_valid(_stack):
+		_stack.free()
+	_stack = ModalStack.new()
+	_sub.add_child(_stack)
+	var p = ProfileScreens.open_profile(_stack, app)
+	await _frames(2)
+	var out := {}
+	for id in PROFILE_ENTRIES:
+		out[id] = p.get_action_button(id).disabled
+	return out
 
 func _boot(tag: String) -> void:
 	_shutdown()

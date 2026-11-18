@@ -11,22 +11,22 @@ const SafeAreaRootScript = preload("res://scripts/ui/safe_area_root.gd")
 const SafeAreaRootScene = preload("res://scenes/components/ui/common/safe_area_root.tscn")
 const HS = preload("res://scripts/ui/home/home_screen.gd")
 
-## World transforms re-baselined for the owner-selected 940x1672 Home background (M28-C002-C003-R01 V02), [size, inset top, inset bottom, scale, offset].
+## World transforms re-baselined for the owner-selected Home background (M28-C002-C003-R01 V02; SB-TF-03: x offsets for its real 941 px canvas, as in m42_home_v06), [size, inset top, inset bottom, scale, offset].
 const WORLD_MATRIX := [
-	[Vector2i(1080, 2160), 0, 0, 1.23544, Vector2(-40.65534, -74.65048)],
-	[Vector2i(1080, 2160), 132, 96, 1.13337, Vector2(7.314593, -42.05024)],
-	[Vector2i(1170, 2532), 0, 0, 1.4067, Vector2(-76.14832, 0.0)],
-	[Vector2i(1170, 2532), 132, 96, 1.34928, Vector2(-49.16268, 0.0)],
-	[Vector2i(1290, 2796), 0, 0, 1.56459, Vector2(-90.35885, 0.0)],
-	[Vector2i(1290, 2796), 132, 96, 1.50718, Vector2(-63.37321, 0.0)],
-	[Vector2i(1080, 2400), 0, 0, 1.33433, Vector2(-87.13517, 0.0)],
-	[Vector2i(1080, 2400), 132, 96, 1.27691, Vector2(-60.14952, -6.911483)],
-	[Vector2i(1440, 3200), 0, 0, 1.80622, Vector2(-128.9234, 0.0)],
-	[Vector2i(1440, 3200), 132, 96, 1.7488, Vector2(-101.9378, 0.0)],
-	[Vector2i(1080, 1920), 0, 0, 1.04725, Vector2(47.79306, -53.53349)],
-	[Vector2i(1080, 1920), 132, 96, 0.98983, Vector2(74.77871, -77.189)],
-	[Vector2i(1536, 2048), 0, 0, 1.14269, Vector2(230.9357, -56.78947)],
-	[Vector2i(1536, 2048), 132, 96, 1.05981, Vector2(269.89, -48.35885)],
+	[Vector2i(1080, 2160), 0, 0, 1.23544, Vector2(-41.2731, -74.65048)],
+	[Vector2i(1080, 2160), 132, 96, 1.13337, Vector2(6.7479, -42.05024)],
+	[Vector2i(1170, 2532), 0, 0, 1.4067, Vector2(-76.8517, 0.0)],
+	[Vector2i(1170, 2532), 132, 96, 1.34928, Vector2(-49.8373, 0.0)],
+	[Vector2i(1290, 2796), 0, 0, 1.56459, Vector2(-91.1411, 0.0)],
+	[Vector2i(1290, 2796), 132, 96, 1.50718, Vector2(-64.1268, 0.0)],
+	[Vector2i(1080, 2400), 0, 0, 1.33433, Vector2(-87.8023, 0.0)],
+	[Vector2i(1080, 2400), 132, 96, 1.27691, Vector2(-60.788, -6.911483)],
+	[Vector2i(1440, 3200), 0, 0, 1.80622, Vector2(-129.8266, 0.0)],
+	[Vector2i(1440, 3200), 132, 96, 1.7488, Vector2(-102.8122, 0.0)],
+	[Vector2i(1080, 1920), 0, 0, 1.04725, Vector2(47.2694, -53.53349)],
+	[Vector2i(1080, 1920), 132, 96, 0.98983, Vector2(74.2838, -77.189)],
+	[Vector2i(1536, 2048), 0, 0, 1.14269, Vector2(230.3643, -56.78947)],
+	[Vector2i(1536, 2048), 132, 96, 1.05981, Vector2(269.36, -48.35885)],
 ]
 
 var EXPECTED_CASES := [
@@ -132,7 +132,7 @@ func _home_canonical() -> void:
 	var home = r[1]
 	var ad: Rect2 = home.get_region("AdBannerSlot").get_global_rect()
 	_ok(home.get_region("SafeAreaRoot").get_applied_margins() == [0, 0, 0, 0], "desktop policy: zero margins")
-	_ok(absf(ad.size.y - 100.0) < 0.5 and absf(ad.end.y - 2160.0) < 0.5, "1080x2160: AdBannerSlot 100 px at the screen bottom (%s)" % str(ad))
+	_ok(absf(ad.size.y - 112.0) < 0.5 and absf(ad.end.y - 2160.0) < 0.5, "1080x2160: AdBannerSlot clamp(1080*50/320) = 112 px at the screen bottom (SB-TF-03) (%s)" % str(ad))
 	r[0].free()
 	_complete("home_canonical_ad")
 
@@ -141,10 +141,10 @@ func _home_683() -> void:
 	var r = await _home(Vector2i(683, 1366), "w683")
 	var home = r[1]
 	var ad: Rect2 = home.get_region("AdBannerSlot").get_global_rect()
-	var nav: Rect2 = home.get_region("BottomNav").get_global_rect()
+	var play: Rect2 = home.get_region("PlayButton").get_global_rect()
 	_ok(home.get_region("SafeAreaRoot").get_applied_margins()[3] == 0, "683x1366: bottom safe inset 0")
-	_ok(absf(ad.size.y - 72.0) < 0.5, "683x1366: width-clamped ad reservation 72 px (%.1f)" % ad.size.y)
-	_ok(nav.end.y <= ad.position.y + 0.5 and (home.get_region("AdBannerSlot").get_theme_stylebox("panel") as StyleBoxFlat).expand_margin_bottom > 0.0, "nav directly above the ad slot; inset painting kept for real mobile insets")
+	_ok(absf(ad.size.y - 106.7) < 0.5, "683x1366: width-scaled banner area 683*50/320 = 106.7 px (%.1f)" % ad.size.y)
+	_ok(play.end.y <= ad.position.y + 0.5 and (home.get_region("AdBannerSlot").get_theme_stylebox("panel") as StyleBoxFlat).expand_margin_bottom > 0.0, "PLAY directly above the banner area (SB-TF-03, no nav); inset painting kept for real mobile insets")
 	# Note: a 683-px LOGICAL viewport is narrower than the V06 Home minimum layout width
 	# (V06 targets the 1080-wide logical canvas; in the real app the 683x1366 window is
 	# scaled by stretch mode canvas_items to a 1080x2160 logical viewport). This case only
@@ -188,8 +188,8 @@ func _synthetic_matrix() -> void:
 
 func _constants() -> void:
 	print("[v06 constants unchanged]")
-	_ok(is_equal_approx(HS.AD_SLOT_RATIO, 100.0 / 1080.0) and HS.AD_SLOT_MIN_H == 72.0 and HS.AD_SLOT_MAX_H == 112.0, "ad reservation rule unchanged (100 px @1080, clamp 72..112)")
-	_ok(HS.SCRUBBY_SCALE == 1.612 and HS.PANEL_ALPHA == 0.51 and HS.CURRENCY_PILL_H == 68.0, "hero 1.612 (M42-C002 owner lock) / V06 panel / pill constants unchanged")
+	_ok(is_equal_approx(HS.AD_SLOT_RATIO, 50.0 / 320.0) and HS.AD_SLOT_MIN_H == 72.0 and HS.AD_SLOT_MAX_H == 112.0, "SB-TF-03 banner rule: 320x50 scaled to the width, clamp 72..112 unchanged")
+	_ok(HS.SCRUBBY_SCALE == 1.612 and is_equal_approx(HS.PANEL_ALPHA, 0.51 * 0.5) and HS.CURRENCY_PILL_H == 68.0, "hero 1.612 (M42-C002 owner lock) / SB-TF-03 panel glass (half V06) / pill constants")
 	_complete("v06_constants_unchanged")
 
 func _complete(c: String) -> void:

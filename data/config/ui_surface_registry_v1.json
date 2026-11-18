@@ -47,14 +47,6 @@
   ],
   "routes": [
     {
-      "source": "home.shortcut_shop",
-      "destination": "shop"
-    },
-    {
-      "source": "home.shortcut_collection",
-      "destination": "collection"
-    },
-    {
       "source": "home.shortcut_tasks",
       "destination": "tasks"
     },
@@ -84,28 +76,32 @@
       "destination": "gameplay"
     },
     {
-      "source": "bottom_nav.events",
-      "destination": "events"
-    },
-    {
-      "source": "bottom_nav.robots",
-      "destination": "robots"
-    },
-    {
-      "source": "bottom_nav.home",
-      "destination": "home"
-    },
-    {
-      "source": "bottom_nav.ranks",
-      "destination": "ranks"
-    },
-    {
-      "source": "bottom_nav.settings",
+      "source": "home.settings",
       "destination": "settings"
+    },
+    {
+      "source": "home.event",
+      "destination": "event_detail"
     },
     {
       "source": "home.profile",
       "destination": "profile"
+    },
+    {
+      "source": "profile.robots",
+      "destination": "robots"
+    },
+    {
+      "source": "profile.ranks",
+      "destination": "ranks"
+    },
+    {
+      "source": "profile.collection",
+      "destination": "collection"
+    },
+    {
+      "source": "life.more_in_shop",
+      "destination": "shop"
     },
     {
       "source": "gameplay.pause",

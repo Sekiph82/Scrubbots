@@ -9,16 +9,17 @@ extends RefCounted
 ##   Scrub Bucks       SB currency icon               ScrubBucksChip    wallet before -> after
 ##   Bot Parts         Bot Parts icon                 ProfileBotParts   parts before -> after
 ##   Gift Meter        Gift Meter emblem              GiftMeterBar      cycle progress (tick overlay pulses)
-##   Win Streak        Win Streak badge               TrackGift<after>  streak before -> after
-##   Collection cards  standard pack art              Shortcut_collection  (fly only)
+##   Collection cards  standard pack art              ProfileCard       (fly only)
+## SB-TF-03: Home has no win-streak strip any more, so the streak flies nowhere (its Scrub Bucks
+## still land in the wallet row); Collection moved into Profile, so cards fly to the profile card.
 ##
 ## Each reward (SB-HOME-FLIGHT-LOCK-2026-11-17, owner 2026-11-17) = its icon + a "+N" label fade
 ## in at the screen centre -> K = min(N, 5) copies fly one after another (staggered) to the target
 ## -> each arrival steps the target's counter by its share of N (the last lands exactly on the live
-## value) with an adapter REWARD pickup. N = SB / Bot Parts / Gift Meter / Win Streak counter
+## value) with an adapter REWARD pickup. N = SB / Bot Parts / Gift Meter counter
 ## increase, Collection = cards won. Driven by the shared RevealSequencer: one-shot per key (one
 ## terminal attempt), Reduced Effects lands the final state at once (no flight), finish()
-## fast-forwards. The 10-level journey strip and the streak track get the existing HomeMicroFeel
+## fast-forwards. The 10-level journey strip gets the existing HomeMicroFeel
 ## pops on the same Home entry.
 ## PRESENTATION ONLY: it never grants, saves or reads anything but the receipt and the Home view
 ## model; `completed` only tells the app root it may present the ceremonies.
@@ -34,7 +35,6 @@ const ICONS := {
 	"scrub_bucks": "res://assets/ui/final/common/currencies/icon_currency_scrub_bucks.png",
 	"bot_parts": "res://assets/ui/final/robots/bot_parts_icon.png",
 	"gift_meter": "res://assets/ui/final/home/gift_meter/gift_meter_emblem.png",
-	"win_streak": "res://assets/ui/final/home/reward_track/win_streak_reward_badge.png",
 	"collection_cards": "res://assets/ui/final/rewards/card_pack_standard.png",
 }
 const ICON_PX := 132.0
@@ -127,11 +127,8 @@ static func plan(receipt: Dictionary, vm: Dictionary) -> Array:
 			var g: Dictionary = receipt.get("gift_meter", {})
 			var wrapped: bool = int(g.get("cycles_after", 0)) > int(g.get("cycles_before", 0))
 			out.append({"kind": "gift_meter", "from": 0 if wrapped else int(e["from"]), "to": int(e["to"]), "target": "GiftMeterBar"})
-	var st: Dictionary = receipt.get("streak", {})
-	if int(st.get("after", 0)) > int(st.get("before", 0)):
-		out.append({"kind": "win_streak", "from": int(st["before"]), "to": int(st["after"]), "target": "TrackGift%d" % clampi(int(st["after"]), 1, 5)})
 	if int(receipt.get("cards_delta", 0)) > 0:
-		out.append({"kind": "collection_cards", "from": 0, "to": 0, "n": int(receipt["cards_delta"]), "target": "Shortcut_collection"})
+		out.append({"kind": "collection_cards", "from": 0, "to": 0, "n": int(receipt["cards_delta"]), "target": "ProfileCard"})
 	for e in out:
 		if not e.has("n"):
 			e["n"] = int(e["to"]) - int(e["from"])

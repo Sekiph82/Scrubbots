@@ -1,7 +1,8 @@
 extends RefCounted
 ## HomeBadges — preload (res://scripts/ui/home/home_badges.gd).
 ##
-## M43-C010 (SB-M43-134) — one read-only attention model for Home shortcuts and BottomNav.
+## M43-C010 (SB-M43-134) — one read-only attention model for the Home activity buttons, the
+## profile card and the Profile destinations (SB-TF-03 moved Robots / Ranks / Collection there).
 ## Each surface gets a single count derived from canonical state (never stored, never pushed):
 ##   tasks       finished-but-unclaimed orders + an openable ScrubBox
 ##   daily       1 while today's login reward is claimable

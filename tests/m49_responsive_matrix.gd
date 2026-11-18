@@ -87,7 +87,7 @@ func _m02() -> void:
 				await _frames(6)
 			var safe := _safe_rect(lv, notch)
 			var bad: Array = []
-			for n in ["PlayButton", "Shortcut_shop", "Shortcut_collection", "Shortcut_tasks", "Shortcut_daily", "BottomNav", "TopCurrencyHUD", "GiftMeter"]:
+			for n in ["PlayButton", "RewardedAdsButton", "Shortcut_tasks", "Shortcut_daily", "SettingsButton", "TopCurrencyHUD", "GiftMeter", "AdBannerSlot"]:
 				var c = home.get_region(n)
 				if c == null or not (c as Control).is_visible_in_tree():
 					bad.append(n + ":missing")
@@ -98,9 +98,19 @@ func _m02() -> void:
 				if (c is BaseButton) and r.size.y < TOUCH - 0.5:
 					bad.append(n + "<88")
 			var play: Rect2 = home.get_region("PlayButton").get_global_rect()
-			for n in ["Shortcut_shop", "Shortcut_collection", "Shortcut_tasks", "Shortcut_daily"]:
+			for n in ["RewardedAdsButton", "Shortcut_tasks", "Shortcut_daily"]:
 				if play.intersects(home.get_region(n).get_global_rect()):
 					bad.append("PLAY overlaps " + n)
+			# SB-TF-03: Settings icon, profile card, currency widgets, activity columns, PLAY and the
+			# banner area never overlap each other.
+			var parts := {}
+			for n in ["SettingsButton", "ProfileCard", "ScrubBucksWidget", "HeartsWidget", "PlayButton", "AdBannerSlot", "RewardedAdsButton", "Shortcut_tasks", "Shortcut_daily"]:
+				parts[n] = (home.get_region(n) as Control).get_global_rect()
+			var keys: Array = parts.keys()
+			for i in range(keys.size()):
+				for j in range(i + 1, keys.size()):
+					if (parts[keys[i]] as Rect2).grow(-0.5).intersects(parts[keys[j]]):
+						bad.append("%s x %s" % [keys[i], keys[j]])
 			_ok(bad.is_empty(), "%s (logical %s)%s: Home ok %s" % [str(phys), str(lv), " notch" if notch else "", str(bad)])
 	_complete("m02_home_matrix_notch")
 

@@ -295,7 +295,7 @@ func _t07() -> void:
 
 # --------------------------------------------------------------------- F012 ----
 
-## Real WON (from t01) -> Home: one frontier MICRO on the Journey strip, then the streak.
+## Real WON (from t01) -> Home: one frontier MICRO on the Journey strip (SB-TF-03: no streak strip).
 func _h05_after_real_won() -> void:
 	print("[h05 F012 real frontier + Win Streak delta after the real WON (win animation -> Home)]")
 	var before := _micro().size()
@@ -311,7 +311,7 @@ func _h05_after_real_won() -> void:
 	await create_timer(0.9).timeout
 	m = _micro()
 	var modal: bool = _home().is_modal_active()
-	_ok(m.size() == 2 and m[1] == ["win_streak", "TrackGift1"] or (modal and m.size() == 1), "second delta (streak) serialized on the current track gift %s (modal %s)" % [str(m), str(modal)])
+	_ok(m.size() == 1 and not m.any(func(x): return x[0] == "win_streak"), "SB-TF-03: no win-streak strip, so the streak delta gets no Home answer; only the frontier %s (modal %s)" % [str(m), str(modal)])
 	_ok(strip.scale == Vector2.ONE, "strip restored to scale 1")
 	var micro: Array = _root.feel.dispatch_log().filter(func(r): return r[0] == "MICRO" and String(r[1]).is_empty())
 	_ok(micro.size() == m.size(), "MICRO only, no Spark particles for Home (%d)" % micro.size())
@@ -427,12 +427,13 @@ func _h09() -> void:
 	await _home_boot("h09")
 	_root.get_app_state().set_reduced_effects(true)
 	await _frames(2)
-	_e().streak.process_first_clear_win(1)
+	# SB-TF-03: the Home win-streak strip is gone; the frontier delta is the visible Home answer.
+	_root.get_app_state().progression.record_win(1)
 	_home().refresh()
-	var track = _home().get_region("TrackGift1")
+	var track = _home().get_journey_strip() if _home().get_journey_strip().visible else _home().get_region("PlayButton")
 	await _frames(4)
-	_ok((_home().get_region("TrackStreakValue") as Label).text == "1", "streak value rendered")
-	_ok(_micro().size() == 1 and _micro()[0][0] == "win_streak", "delta observed once")
+	_ok((_home().get_region("PlayButton") as Button).text == "PLAY · LEVEL 2", "frontier value rendered (%s)" % (_home().get_region("PlayButton") as Button).text)
+	_ok(_micro().size() == 1 and _micro()[0][0] == "frontier", "delta observed once")
 	_ok(_gff.plays.is_empty() and _spark.bursts.is_empty() and _root.feel.owned_count() == 0, "zero plugin work")
 	_ok(track.scale == Vector2.ONE, "no native pulse")
 	_root.get_app_state().set_reduced_effects(false)
@@ -443,11 +444,10 @@ func _h10() -> void:
 	for faulty in [false, true]:
 		await _home_boot("h10_%s" % ("faulty" if faulty else "missing"))
 		_root.feel.set_backends_for_test(SpyGff.new() if faulty else null, FaultySpark.new() if faulty else null)
-		_e().streak.process_first_clear_win(1)
-		_e().streak.process_first_clear_win(2)
+		_root.get_app_state().progression.record_win(1)
 		_home().refresh()
 		await _frames(6)
-		_ok((_home().get_region("TrackStreakValue") as Label).text == "2" and _micro().size() == 1, "%s: value correct, one event" % ("throwing" if faulty else "missing"))
+		_ok((_home().get_region("PlayButton") as Button).text == "PLAY · LEVEL 2" and _micro().size() == 1, "%s: value correct, one event" % ("throwing" if faulty else "missing"))
 		var r: Dictionary = _root.play_current_frontier()
 		_ok(r.get("ok", false) and _nav().current() == R.GAMEPLAY, "%s: PLAY still navigates" % ("throwing" if faulty else "missing"))
 	_complete("h10_plugins_missing_throwing_home_ok")

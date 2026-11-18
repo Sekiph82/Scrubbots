@@ -53,17 +53,23 @@ func _initialize() -> void:
 # ------------------------------------------------------------------ cases ----
 
 func _r01() -> void:
-	print("[r01 BottomNav ROBOTS opens the real 10-robot roster]")
+	print("[r01 Profile ROBOTS opens the real 10-robot roster (SB-TF-03: no bottom nav)]")
 	await _boot("r01")
-	var b: Button = _root.get_home().get_region("Nav_robots")
-	_ok(b != null and not b.disabled, "Nav_robots live")
-	b.pressed.emit()
+	_ok(_root.get_home().get_region("Nav_robots") == null, "no Home ROBOTS tab")
+	(_root.get_home().get_region("ProfileButton") as Button).pressed.emit()
+	await _frames(2)
+	var b: Button = _top().get_action_button("robots") if _top_id() == "profile" else null
+	_ok(b != null and not b.disabled, "Profile ROBOTS live")
+	_top()._on_action("robots")
 	await _frames(2)
 	_ok(_top_id() == "robots", "ROBOTS -> Robots destination")
 	var ids: Array = []
 	for c in _top().find_children("Robot_*", "PanelContainer", true, false):
 		ids.append(String(c.get_meta("robot_id")))
 	_ok(ids == RobotRoster.ids() and ids.size() == 10, "10 rows in owner order %s" % str(ids))
+	_top().close("test")
+	await _frames(2)
+	_ok(_top_id() == "profile", "closed back to Profile")
 	_top().close("test")
 	await _frames(2)
 	_ok(_top() == null, "closed back to Home")

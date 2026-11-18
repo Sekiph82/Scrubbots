@@ -145,24 +145,23 @@ func _panels(home) -> void:
 	for n in home.find_children("Shortcut_*", "Button", true, false):
 		names.append(String(n.name))
 	names.sort()
-	_ok(names == ["Shortcut_collection", "Shortcut_daily", "Shortcut_shop", "Shortcut_tasks"], "four panels only %s" % str(names))
+	_ok(names == ["Shortcut_daily", "Shortcut_tasks"] and home.get_region("RewardedAdsButton") != null, "SB-TF-03: Tasks / Daily (+ Rewarded Ads) only, no Shop / Collection %s" % str(names))
 	var ok := true
-	for id in ["shop", "collection", "tasks", "daily"]:
-		var sb := home.get_region("Shortcut_" + id).get_theme_stylebox("normal") as StyleBoxFlat
-		ok = ok and sb.bg_color.a >= 0.40 and sb.bg_color.a <= 0.52 and sb.border_width_left >= 2 and sb.border_width_left <= 3 and sb.border_color.a >= 0.7
-	_ok(ok, "glass body alpha %.2f (V05 0.40..0.48 / V06 0.50..0.52), outline %d px visible" % [HS.PANEL_ALPHA, HS.PANEL_BORDER])
+	for n in ["RewardedAdsButton", "Shortcut_tasks", "Shortcut_daily"]:
+		var sb := home.get_region(n).get_theme_stylebox("normal") as StyleBoxFlat
+		ok = ok and sb.bg_color.a >= 0.24 and sb.bg_color.a <= 0.27 and sb.border_width_left >= 2 and sb.border_width_left <= 3 and sb.border_color.a >= 0.7
+	_ok(ok, "glass body alpha %.3f (SB-TF-03: half the V06 0.51), outline %d px visible" % [HS.PANEL_ALPHA, HS.PANEL_BORDER])
 	var d := {}
-	for id in ["shop", "collection", "tasks", "daily"]:
+	for id in ["tasks", "daily"]:
 		var tex: Texture2D = home.get_region("ShortcutIcon_" + id).texture
 		var a := float(tex.get_width()) / float(tex.get_height())
-		var box := Vector2(206, 164)
+		var box := Vector2(206, 164) * 0.7
 		d[id] = [home.get_region("Shortcut_" + id).get_icon_draw_size(), Vector2(box.y * a, box.y) if box.y * a <= box.x else Vector2(box.x, box.x / a)]
-	_ok(d["tasks"][0].is_equal_approx(d["tasks"][1]) and d["daily"][0].is_equal_approx(d["daily"][1]), "TASKS / DAILY exact V04 (= V03) icon size")
-	_ok(d["shop"][0].x > d["shop"][1].x * 1.15 and d["collection"][0].x > d["collection"][1].x * 1.15, "SHOP / COLLECTION keep the V04 enlargement")
+	_ok(d["tasks"][0].is_equal_approx(d["tasks"][1]) and d["daily"][0].is_equal_approx(d["daily"][1]), "TASKS / DAILY icons 0.7x the V04 (= V03) size")
 	var vp: Vector2 = home.get_viewport_rect().size
 	var margin_ok := true
-	for id in ["shop", "collection", "tasks", "daily"]:
-		var r: Rect2 = home.get_region("Shortcut_" + id).get_global_rect()
+	for n in ["RewardedAdsButton", "Shortcut_tasks", "Shortcut_daily"]:
+		var r: Rect2 = home.get_region(n).get_global_rect()
 		margin_ok = margin_ok and r.position.x >= 20.0 and vp.x - r.end.x >= 20.0
 	_ok(margin_ok, "outer screen margin preserved")
 	_complete("panels_glass")
@@ -222,43 +221,19 @@ func _gift(home) -> void:
 	_complete("gift_meter")
 
 func _rail(home) -> void:
-	print("[reward rail]")
-	var track: Control = home.get_region("WinStreakRewardTrack")
-	var rail: Rect2 = home.get_region("TrackRail").get_global_rect()
-	_ok(track.size.y <= 130.0 and rail.size.y <= 90.0, "shallow rail (track %.0f, rail %.0f)" % [track.size.y, rail.size.y])
-	var over := true
-	for i in range(1, 6):
-		over = over and home.get_region("TrackGift%d" % i).get_global_rect().position.y < rail.position.y
-	_ok(over, "gifts overhang the rail top")
-	var badge: Rect2 = home.get_region("TrackBadge").get_global_rect()
-	_ok(badge.position.x < rail.position.x and home.get_region("TrackBadge").get_index() > home.get_region("TrackRail").get_index(), "streak badge in front, overhanging the rail's left end")
-	var vals: Array = []
-	for i in range(1, 6):
-		vals.append(home.get_region("TrackStep%d" % i).text)
-	_ok(vals == ["1", "5", "10", "25", "100"], "values exactly 1/5/10/25/100")
-	var bad: Array = []
-	for l in track.find_children("*", "Label", true, false):
-		var t := String(l.text)
-		if t.find("+") != -1 or t.to_upper().find("WIN") != -1:
-			bad.append(t)
-	var sb_path := "res://assets/ui/final/common/currencies/icon_currency_scrub_bucks.png"
-	for n in track.find_children("*", "TextureRect", true, false):
-		if (n as TextureRect).texture != null and (n as TextureRect).texture.resource_path == sb_path:
-			bad.append("sb_icon")
-	_ok(bad.is_empty(), "no '+', WIN or per-step SB icon %s" % str(bad))
-	_ok(home.get_region("TrackGlow1").visible == false and home.get_region("TrackGlow5").visible == false, "no glow when no step is current (fresh save)")
+	print("[reward rail -> SB-TF-03: removed]")
+	_ok(home.get_region("WinStreakRewardTrack") == null and home.find_children("Track*", "", true, false).is_empty(), "no win-streak rail on Home (owner 2026-11-18)")
 	var app = home.get_app_state()
 	app.economy.streak.process_first_clear_win(1)
 	app.economy.streak.process_first_clear_win(2)
 	home.refresh()
-	_ok(home.get_region("TrackGlow2").visible and not home.get_region("TrackGlow1").visible and home.get_region("TrackStep2").get_theme_color("font_color") == HomeStyle.GOLD, "current step: glow + gold value")
-	_ok(home.get_region("TrackGift1").modulate.a == 1.0 and home.get_region("TrackGift4").modulate.a < 1.0 and home.get_region("TrackGift4").modulate.a >= 0.7, "reached full, future dimmed but readable")
+	_ok(app.economy.streak.streak() == 2 and home.find_children("Track*", "", true, false).is_empty(), "the economy streak still counts; nothing is drawn for it on Home")
 	_complete("reward_rail")
 
 func _ad(home) -> void:
 	print("[ad slot]")
 	var ad: Control = home.get_region("AdBannerSlot")
-	_ok(absf(ad.size.y - 100.0) < 1.0, "ad slot at the current owner reservation (V05 144 -> V06 100 px) at 1080x2160 (%.0f)" % ad.size.y)
+	_ok(absf(ad.size.y - 112.0) < 1.0, "banner area at the current owner reservation (V05 144 -> V06 100 -> SB-TF-03 320x50 scaled, clamped 112 px) at 1080x2160 (%.0f)" % ad.size.y)
 	_ok(ad.size_flags_vertical & Control.SIZE_EXPAND == 0 and ad.size.y == ad.custom_minimum_size.y, "fixed reservation, no vertical EXPAND")
 	_ok(home.get_ad_mount().get_child_count() == 0 and ad.find_children("*", "Label", true, false).is_empty(), "empty AdMount, no fake ad content")
 	_complete("ad_slot")
@@ -268,20 +243,19 @@ func _stack(home) -> void:
 	var names: Array = []
 	for c in home.get_region("BottomActionStack").get_children():
 		names.append(String(c.name))
-	_ok(names == ["PlayButton", "WinStreakRewardTrack", "BottomNav"], "stack = PLAY -> track -> nav %s" % str(names))
+	_ok(names == ["PlayButton"], "SB-TF-03 stack = PLAY only (no track, no nav) %s" % str(names))
 	var stack: Rect2 = home.get_region("BottomActionStack").get_global_rect()
 	var ad: Rect2 = home.get_region("AdBannerSlot").get_global_rect()
 	var sep: int = home.get_region("HomeLayout").get_theme_constant("separation")
-	_ok(home.get_region("PlayButton").get_global_rect().end.y <= home.get_region("WinStreakRewardTrack").get_global_rect().position.y and home.get_region("WinStreakRewardTrack").get_global_rect().end.y <= home.get_region("BottomNav").get_global_rect().position.y and absf(ad.position.y - stack.end.y - sep) < 1.0, "nav sits directly above the ad slot (one layout gap)")
+	_ok(absf(ad.position.y - stack.end.y - sep) < 1.0 and absf(home.get_region("PlayButton").get_global_rect().end.y - stack.end.y) < 1.0, "PLAY sits directly above the banner area (one layout gap)")
 	_ok(home.get_region("StatusLabel").get_parent() == home.get_region("PlayButton"), "status pill attached to PLAY (no extra row)")
 	var play_top: float = home.get_region("PlayButton").get_global_rect().position.y
-	var ad_now: float = home.get_region("AdBannerSlot").size.y
-	_ok(absf(play_top - (V04_PLAY_TOP_1080 + (V04_AD_H_1080 - ad_now))) < 1.0, "1080x2160: PLAY moved down by exactly the released ad height (%.0f = V04 %.0f + %.0f)" % [play_top, V04_PLAY_TOP_1080, V04_AD_H_1080 - ad_now])
+	_ok(play_top > V04_PLAY_TOP_1080, "1080x2160: PLAY lower than in V04 (%.0f > %.0f): the track / nav space went to the world" % [play_top, V04_PLAY_TOP_1080])
 	_complete("bottom_stack")
 
 func _reflow(home) -> void:
 	print("[stack reflow]")
-	var names := ["PlayButton", "WinStreakRewardTrack", "BottomNav"]
+	var names := ["PlayButton"]
 	var before := {}
 	for n in names:
 		before[n] = home.get_region(n).get_global_rect().position.y
@@ -293,7 +267,7 @@ func _reflow(home) -> void:
 	var moved := true
 	for n in names:
 		moved = moved and absf(home.get_region(n).get_global_rect().position.y - before[n] - (ad_h + home.get_region("HomeLayout").get_theme_constant("separation"))) < 1.0
-	_ok(moved, "released ad space lowers PLAY, track and nav by the same amount")
+	_ok(moved, "released banner space lowers PLAY by exactly that amount")
 	_ok(home.get_region("WorldBackground").get_global_rect().is_equal_approx(world_before), "HOME-120 does not move")
 	home.set_ad_slot_enabled(true)
 	for _i in range(4):
@@ -325,7 +299,7 @@ func _modals(home) -> void:
 	await process_frame
 	await process_frame
 	var h2 = root.get_home()
-	h2.get_region("Nav_settings").pressed.emit()
+	h2.get_region("SettingsButton").pressed.emit()
 	await process_frame
 	_ok(root.get_settings_panel().visible and _hidden(h2), "Settings: bottom stack + action layer + (+) hidden")
 	root.handle_back()

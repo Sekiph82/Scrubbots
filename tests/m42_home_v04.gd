@@ -217,9 +217,9 @@ func _no_duplicates(home) -> void:
 	_ok(title.text == "WHISPERING PARK" and number.text == "AREA 1" and _area_fits(home), "back on world 1: %s / %s" % [title.text, number.text])
 	var tex_count := 0
 	for n in home.find_children("*", "TextureRect", true, false):
-		if (n as TextureRect).texture != null and (n as TextureRect).texture.resource_path == WORLD_PATH and n.is_visible_in_tree():
+		if (n as TextureRect).texture != null and (n as TextureRect).texture.resource_path == WORLD_PATH and n.is_visible_in_tree() and not String(n.name).begins_with("WorldEdge"):
 			tex_count += 1
-	_ok(tex_count == 1, "at 1:2 the world image is drawn exactly once (%d)" % tex_count)
+	_ok(tex_count == 1, "at 1:2 the world image is drawn exactly once, besides its SB-TF-03 mirrored floor continuation below (%d)" % tex_count)
 	_complete("no_duplicate_world_art")
 
 ## Both area label lines are one line and their text fits the label width.
@@ -265,32 +265,32 @@ func _names(c: Node) -> Array:
 	return out
 
 func _panels(home) -> void:
-	print("[four panels]")
-	_ok(_names(home.get_region("LeftShortcutColumn")) == ["Shortcut_shop", "Shortcut_collection"], "left = SHOP, COLLECTION")
-	_ok(_names(home.get_region("RightShortcutColumn")) == ["Shortcut_tasks", "Shortcut_daily"], "right = TASKS, DAILY")
+	print("[four panels -> SB-TF-03 activity buttons]")
+	_ok(_names(home.get_region("LeftShortcutColumn")) == ["RewardedAdsButton", "Shortcut_tasks", "Shortcut_daily"], "left = REWARDED ADS, TASKS, DAILY")
+	_ok(_names(home.get_region("RightShortcutColumn")).is_empty(), "right = the Event buttons (none on a standalone L1 Home)")
 	var all: Array = home.find_children("Shortcut_*", "Button", true, false)
-	_ok(all.size() == 4, "exactly four Home shortcut panels (%d)" % all.size())
+	_ok(all.size() == 2 and home.get_region("RewardedAdsButton") != null, "exactly three activity buttons, no Shop / Collection tile (%d + Rewarded Ads)" % all.size())
 	var gone: Array = []
-	for id in ["win_streak", "gift_bar", "no_ads", "cards_exchange"]:
+	for id in ["win_streak", "gift_bar", "no_ads", "cards_exchange", "shop", "collection"]:
 		if home.get_region("Shortcut_" + id) != null:
 			gone.append(id)
-	_ok(gone.is_empty(), "WIN STREAK / GIFTS / NO ADS / CARDS EXCHANGE panels removed %s" % str(gone))
+	_ok(gone.is_empty(), "WIN STREAK / GIFTS / NO ADS / CARDS EXCHANGE / SHOP / COLLECTION panels removed %s" % str(gone))
 	var app = home.get_app_state()
 	_ok(app.economy.gift != null and app.economy.exchange != null and app.economy.streak != null, "their services still exist")
-	_ok(not home.get_region("Shortcut_daily").disabled and home.get_region("Shortcut_shop").disabled and home.get_region("Shortcut_collection").disabled and home.get_region("Shortcut_tasks").disabled, "DAILY live; SHOP / COLLECTION / TASKS remain future-disabled seams")
+	_ok(not home.get_region("Shortcut_daily").disabled and home.get_region("Shortcut_tasks").disabled and home.get_region("RewardedAdsButton").disabled, "standalone Home: DAILY live; TASKS / REWARDED ADS wait for the app root destinations")
 	_complete("four_panels")
 
 func _icons(home) -> void:
 	print("[panel icons]")
 	var d: Dictionary = {}
-	for id in ["shop", "collection", "tasks", "daily"]:
-		var b = home.get_region("Shortcut_" + id)
+	for id in ["rewarded_ads", "tasks", "daily"]:
+		var b = home.get_region("RewardedAdsButton" if id == "rewarded_ads" else "Shortcut_" + id)
 		var tex: Texture2D = home.get_region("ShortcutIcon_" + id).texture
 		var a := float(tex.get_width()) / float(tex.get_height())
-		var v03 := Vector2(V03_ICON_BOX.y * a, V03_ICON_BOX.y) if V03_ICON_BOX.y * a <= V03_ICON_BOX.x else Vector2(V03_ICON_BOX.x, V03_ICON_BOX.x / a)
+		var box := V03_ICON_BOX * 0.7
+		var v03 := Vector2(box.y * a, box.y) if box.y * a <= box.x else Vector2(box.x, box.x / a)
 		d[id] = {"now": b.get_icon_draw_size(), "v03": v03, "rect": home.get_region("ShortcutIcon_" + id).size}
-	_ok(d["shop"]["now"].x > d["shop"]["v03"].x * 1.15 and d["collection"]["now"].x > d["collection"]["v03"].x * 1.15, "SHOP / COLLECTION icons enlarged vs V03 (%s / %s)" % [str(d["shop"]), str(d["collection"])])
-	_ok(d["tasks"]["now"].is_equal_approx(d["tasks"]["v03"]) and d["daily"]["now"].is_equal_approx(d["daily"]["v03"]), "TASKS / DAILY icons keep the V03 size (%s / %s)" % [str(d["tasks"]), str(d["daily"])])
+	_ok(d["rewarded_ads"]["now"].is_equal_approx(d["rewarded_ads"]["v03"]) and d["tasks"]["now"].is_equal_approx(d["tasks"]["v03"]) and d["daily"]["now"].is_equal_approx(d["daily"]["v03"]), "SB-TF-03: icons at 0.7x the V03 box (%s / %s / %s)" % [str(d["rewarded_ads"]), str(d["tasks"]), str(d["daily"])])
 	var ok := true
 	for id in d:
 		ok = ok and (d[id]["rect"] as Vector2).is_equal_approx(d[id]["now"])
@@ -303,16 +303,16 @@ func _panel_style(home) -> void:
 	var sizes := {}
 	var alpha_ok := true
 	var margin_ok := true
-	for id in ["shop", "collection", "tasks", "daily"]:
-		var b: Button = home.get_region("Shortcut_" + id)
+	for n in ["RewardedAdsButton", "Shortcut_tasks", "Shortcut_daily"]:
+		var b: Button = home.get_region(n)
 		sizes[b.size] = true
 		var sb := b.get_theme_stylebox("normal") as StyleBoxFlat
-		alpha_ok = alpha_ok and sb != null and sb.bg_color.a >= 0.40 and sb.bg_color.a <= 0.52 and sb.border_width_left >= 2 and sb.border_width_left <= 3
+		alpha_ok = alpha_ok and sb != null and sb.bg_color.a >= 0.24 and sb.bg_color.a <= 0.27 and sb.border_width_left >= 2 and sb.border_width_left <= 3
 		var r: Rect2 = b.get_global_rect()
 		margin_ok = margin_ok and r.position.x >= 20.0 and vp.x - r.end.x >= 20.0
-	_ok(sizes.size() == 1, "one panel size system for all four (%s)" % str(sizes.keys()))
-	_ok(sizes.keys()[0].x <= 226.0 and sizes.keys()[0].y < 220.0, "panels smaller than V03 cards (226 x 220)")
-	_ok(alpha_ok, "translucent glass body (V05 0.40..0.48 / V06 0.50..0.52) with 2-3 px outline")
+	_ok(sizes.size() == 1, "one panel size system for every activity button (%s)" % str(sizes.keys()))
+	_ok(sizes.keys()[0].is_equal_approx(Vector2(147, 109)), "SB-TF-03 panels 0.7x the V06 210x156 (%s)" % str(sizes.keys()[0]))
+	_ok(alpha_ok, "see-through glass body (SB-TF-03: half the V06 0.51 = 0.255) with 2-3 px outline")
 	_ok(margin_ok, "visible outer margin from the screen edges (>= 20 px)")
 	var sc: Rect2 = home.get_region("Art_scrubby").get_global_rect()
 	var t: Dictionary = home.get_world_transform()
@@ -320,8 +320,8 @@ func _panel_style(home) -> void:
 	# texels only; a panel must never cover an opaque hero pixel.
 	var img: Image = (home.get_region("Art_scrubby") as TextureRect).texture.get_image()
 	var hit: Array = []
-	for id in ["shop", "collection", "tasks", "daily"]:
-		var r: Rect2 = home.get_region("Shortcut_" + id).get_global_rect()
+	for id in ["RewardedAdsButton", "Shortcut_tasks", "Shortcut_daily"]:
+		var r: Rect2 = home.get_region(id).get_global_rect()
 		if int(C002.opaque_in(img, sc, r)["px"]) > 0:
 			hit.append(id)
 		for bot in home.get_world()["helper_bot_rects"]:
@@ -338,7 +338,7 @@ func _play(home) -> void:
 	_ok(absf(play.get_global_rect().get_center().x - vp.x * 0.5) < 1.0, "PLAY centred (%.1f)" % play.get_global_rect().get_center().x)
 	_ok(absf(play.size.x - V03_PLAY.x) < 1.0 and play.size.y >= V03_PLAY.y and play.size.y <= V03_PLAY.y + 10.0, "V03 Play size kept (%s)" % str(play.size))
 	_ok(home.get_region("PlayTriangle") != null and not (home.get_region("PlayTriangle") is TextureRect), "native white triangle kept")
-	_ok(play.text == UiText.t("HOME_PLAY") and home.get_region("PlaySubtitle").text == UiText.t("HOME_START_LEVEL", [1]), "live PLAY + frontier subtitle")
+	_ok(play.text == UiText.t("HOME_PLAY_LEVEL", [1]) and home.get_region("PlaySubtitle").text == UiText.t("HOME_START_LEVEL", [1]), "live PLAY + frontier subtitle")
 	_ok(not _drawn_paths(home).has(_paths["HOME-078"]), "HOME-078 stays retired")
 	var status: Label = home.get_region("StatusLabel")
 	_ok(status.get_parent() == play, "status pill floats on the CTA (never resizes the track row)")
@@ -360,8 +360,8 @@ func _profile(home) -> void:
 	var parts = home.get_region("ProfileBotParts")
 	_ok(parts.bar.size.y >= V03_BAR_H * 1.6, "Bot Parts bar thicker than V03 (%.0f vs %.0f)" % [parts.bar.size.y, V03_BAR_H])
 	_ok(parts.caption.get_parent() == parts.bar and parts.caption.text == "0/250" and parts.caption.horizontal_alignment == HORIZONTAL_ALIGNMENT_CENTER and absf(parts.caption.get_global_rect().get_center().y - parts.bar.get_global_rect().get_center().y) < 1.0, "only N/250, centred inside the bar")
-	_ok(home.get_region("ProfileRankBadge").get_parent() == parts.get_parent() and home.get_region("ProfileLevel").text == "1", "level badge attached on the same row, live")
-	_ok(home.get_region("MenuButton") == null, "no top Settings/menu")
+	_ok(home.get_region("ProfileRankBadge").get_parent() == parts.get_parent() and home.get_region("ProfileLevel") == null and home.get_region("ProfileRankBadge").is_ancestor_of(home.get_region("ProfileBotPartsIcon")), "SB-TF-03: badge on the same row shows the Bot Parts icon, not the level")
+	_ok(home.get_region("MenuButton") == null and home.get_region("TopCurrencyHUD").is_ancestor_of(home.get_region("SettingsButton")), "no menu; SB-TF-03 Settings icon in the top HUD")
 	_complete("profile")
 
 func _currency(home) -> void:
@@ -387,54 +387,44 @@ func _currency(home) -> void:
 	_complete("currency_hud")
 
 func _gift_track(home) -> void:
-	print("[gift and track]")
+	print("[gift and track -> SB-TF-03: no win-streak strip]")
 	var meter = home.get_region("GiftMeterBar")
 	var ratio := RegEx.create_from_string("^[0-9,]+/[0-9,]+$")
 	_ok(ratio.search(meter.caption.text) != null and meter.caption.text.ends_with("/1"), "Gift Meter shows only N/next milestone (fresh 0/1, SB-POLISH-002) (%s)" % meter.caption.text)
 	_ok(home.get_region("GiftEmblem").size.x >= 112 and home.get_region("GiftCrate").size.x >= 112, "emblem / crate modestly enlarged")
-	var vals: Array = []
-	for i in range(1, 6):
-		vals.append(home.get_region("TrackStep%d" % i).text)
-	_ok(vals == ["1", "5", "10", "25", "100"], "track values only 1/5/10/25/100 (%s)" % str(vals))
-	var bad: Array = []
-	for l in home.get_region("WinStreakRewardTrack").find_children("*", "Label", true, false):
-		var t := String(l.text)
-		if t.find("+") != -1 or t.to_upper().find("WIN") != -1:
-			bad.append(t)
-	_ok(bad.is_empty() and not _drawn_paths(home.get_region("WinStreakRewardTrack")).has(_paths["HOME-087"]), "no '+', no WIN copy, no per-step SB icon")
-	_ok(home.get_region("WinStreakRewardTrack").size.y < 160.0, "track stays thin (%.0f)" % home.get_region("WinStreakRewardTrack").size.y)
+	_ok(home.get_region("WinStreakRewardTrack") == null and home.find_children("Track*", "", true, false).is_empty(), "win-streak strip removed (owner 2026-11-18)")
+	_ok(not _drawn_paths(home).has(_paths["HOME-086"]), "the win-streak badge (HOME-086) is drawn nowhere on Home")
 	_complete("gift_and_track")
 
 func _nav_ad(home) -> void:
-	print("[nav and ad slot]")
-	var nav: Control = home.get_region("BottomNav")
+	print("[nav and ad slot -> SB-TF-03: PLAY directly above the banner area]")
 	var ad: Control = home.get_region("AdBannerSlot")
-	var track: Control = home.get_region("WinStreakRewardTrack")
+	var play: Control = home.get_region("PlayButton")
 	var vp: Vector2 = home.get_viewport_rect().size
-	_ok(track.get_global_rect().end.y <= nav.get_global_rect().position.y and nav.get_global_rect().end.y <= ad.get_global_rect().position.y + 0.5, "order: track -> nav -> ad slot")
-	_ok(absf(ad.get_global_rect().end.y - vp.y) < 1.0 and ad.size.y >= 72.0 and ad.size.y <= 160.0, "ad slot is the screen-bottom element (%.0f px tall)" % ad.size.y)
+	_ok(home.get_region("BottomNav") == null and play.get_global_rect().end.y <= ad.get_global_rect().position.y + 0.5, "order: PLAY -> banner area (no nav)")
+	_ok(absf(ad.get_global_rect().end.y - vp.y) < 1.0 and absf(ad.size.y - clampf(vp.x * 50.0 / 320.0, 72.0, 112.0)) < 1.0, "banner area is the screen-bottom element, 320x50 scaled + clamped (%.0f px tall)" % ad.size.y)
 	_ok(home.get_ad_mount() != null and home.get_ad_mount().get_parent() == ad and home.get_ad_mount().get_child_count() == 0, "empty AdMount seam (no fake ad content)")
 	var labels := ad.find_children("*", "Label", true, false)
 	_ok(labels.is_empty(), "no fake ad text")
 	var wb: Control = home.get_region("Background")
 	_ok(wb.clip_contents and absf(wb.get_global_rect().end.y - ad.get_global_rect().position.y) < 1.0, "world canvas is clipped at the ad slot top (no world in the ad slot)")
-	_ok(_names(nav.get_child(0)) == ["Nav_events", "Nav_robots", "Nav_home", "Nav_leaderboard", "SettingsButton"] and home.get_region("Nav_home").button_pressed and home.get_region("Nav_leaderboard").text == "RANKS", "five tabs, HOME selected, RANKS kept")
+	_ok(home.find_children("Nav_*", "", true, false).is_empty(), "no nav tabs")
 	_complete("nav_and_ad_slot")
 
 func _ad_collapse(home) -> void:
 	print("[ad slot collapse]")
-	var nav: Control = home.get_region("BottomNav")
+	var stack: Control = home.get_region("BottomActionStack")
 	var vp: Vector2 = home.get_viewport_rect().size
-	var nav_before: float = nav.get_global_rect().end.y
+	var before: float = stack.get_global_rect().end.y
 	home.set_ad_slot_enabled(false)
 	for _i in range(4):
 		await process_frame
-	_ok(not home.get_region("AdBannerSlot").visible and absf(nav.get_global_rect().end.y - vp.y) < 1.0 and nav.get_global_rect().end.y > nav_before, "collapsed: nav moves down to the screen bottom")
-	_ok(absf(home.get_region("Background").size.y - vp.y) < 1.0, "collapsed: world canvas extends to the bottom (behind the dock)")
+	_ok(not home.get_region("AdBannerSlot").visible and absf(stack.get_global_rect().end.y - vp.y) < 1.0 and stack.get_global_rect().end.y > before, "collapsed (No Ads): the PLAY stack moves down to the screen bottom")
+	_ok(absf(home.get_region("Background").size.y - vp.y) < 1.0, "collapsed: world canvas extends to the bottom")
 	home.set_ad_slot_enabled(true)
 	for _i in range(4):
 		await process_frame
-	_ok(absf(nav.get_global_rect().end.y - nav_before) < 1.0 and home.is_ad_slot_enabled(), "re-enabled: layout restored")
+	_ok(absf(stack.get_global_rect().end.y - before) < 1.0 and home.is_ad_slot_enabled(), "re-enabled: layout restored")
 	_complete("ad_slot_collapse")
 
 func _hidden(home) -> bool:
@@ -469,7 +459,7 @@ func _settings_modal() -> void:
 	await process_frame
 	var home = root.get_home()
 	var panel = root.get_settings_panel()
-	home.get_region("Nav_settings").pressed.emit()
+	home.get_region("SettingsButton").pressed.emit()
 	await process_frame
 	_ok(panel.visible and _hidden(home), "Settings open: action layer hidden")
 	_ok(root.handle_back() != "" and not panel.visible and not _hidden(home), "back closes Settings and restores Home")
@@ -505,9 +495,10 @@ func _matrix() -> void:
 			if absf(wb.size.x / wb.size.y - WORLD_ASPECT) > 0.001:
 				bad.append("world_stretched")
 			var canvas: Rect2 = home.get_region("Background").get_global_rect()
-			# V05: the world is locked to its V04 transform; the ad-slot clip may sit lower
-			# than the image bottom only behind the opaque nav dock.
-			var covered: bool = wb.position.y <= canvas.position.y + 0.5 and wb.end.y >= home.get_region("BottomNav").get_global_rect().position.y - 0.5
+			# V05: the world is locked to its V04 transform; SB-TF-03 (no opaque nav dock) it must
+			# reach the canvas bottom (the banner-area top), directly or by its mirrored floor continuation.
+			var below: Control = home.get_region("WorldEdgeBottom")
+			var covered: bool = wb.position.y <= canvas.position.y + 0.5 and (wb.end.y >= canvas.end.y - 0.5 or (below.visible and below.get_global_rect().end.y >= canvas.end.y - 0.5))
 			if not covered:
 				bad.append("world_not_covering_canvas")
 			var play: Rect2 = home.get_region("PlayButton").get_global_rect()
@@ -519,8 +510,8 @@ func _matrix() -> void:
 			var sc: TextureRect = home.get_region("Art_scrubby")
 			if absf(sc.position.y + HomeScreenScript.SCRUBBY_FEET_Y * c["k"] * t["scale"] - feet_screen) > 0.5:
 				bad.append("feet_off_anchor")
-			for id in ["shop", "collection", "tasks", "daily"]:
-				var pr: Rect2 = home.get_region("Shortcut_" + id).get_global_rect()
+			for id in ["rewarded_ads", "tasks", "daily"]:
+				var pr: Rect2 = home.get_region("RewardedAdsButton" if id == "rewarded_ads" else "Shortcut_" + id).get_global_rect()
 				for bot in home.get_world()["helper_bot_rects"]:
 					if pr.intersects(Rect2(home.world_to_screen(bot.position), bot.size * t["scale"])):
 						bad.append(id + "_covers_bot")
@@ -542,7 +533,7 @@ func _matrix() -> void:
 				al = Rect2()
 			elif al.size.x < 200.0 or al.size.y < 40.0:
 				bad.append("area_label_too_small")
-			for n in ["TopCurrencyHUD", "ProfileCard", "GiftMeter", "PlayButton", "Shortcut_shop", "Shortcut_collection", "Shortcut_tasks", "Shortcut_daily"]:
+			for n in ["TopCurrencyHUD", "ProfileCard", "GiftMeter", "PlayButton", "RewardedAdsButton", "Shortcut_tasks", "Shortcut_daily"]:
 				if al.intersects(home.get_region(n).get_global_rect()):
 					bad.append("area_label_over_" + n)
 			if al.intersects(hero_r):

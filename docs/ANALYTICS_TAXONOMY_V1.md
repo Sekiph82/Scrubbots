@@ -59,7 +59,7 @@ Definitions:
 | `collection_master_complete` | 008 | `AppState` on `RewardGrantService.granted` `collection_master` | (none) |
 | `robot_unlock` / `robot_equip` | 008 | `AppState` on the app facade `action_committed` (unlock_robot / equip_robot) | robot (roster order 1..10) |
 | `screen_view` | 009 | `main.gd` route change (opening / home / gameplay / results; results = a LOST / ERROR terminal only, a win goes Home since SB-PHONE-2026-11-12-E), Home shortcuts and BottomNav, Settings, Help | screen |
-| `shop_open` | 009, 010 | `main.gd` on `ShopHandoff.shop_requested` (every Shop entry; store page view, no purchases exist) | source (home_shop, home_sb_plus, life, booster, speed, need_a_hand) |
+| `shop_open` | 009, 010 | `main.gd` on `ShopHandoff.shop_requested` (every Shop entry; store page view, no purchases exist) | source (home_shop = shop deep link, home_sb_plus, home_heart_plus (SB-TF-03 Hearts + MORE IN SHOP), life, booster, speed, need_a_hand) |
 | `launch_failed` | 009 | `main.gd` `launch_gameplay` refusals | reason (APP_BLOCKED, CONTENT_MISSING, CATALOG_INVALID, LEVEL_DISABLED, BUILD_FAILED) |
 | `ad_offer_shown` | 010 | `AcquisitionFlow` Life / Booster / Need a Hand popup opened | placement, available (provider + product state allow a video now) |
 | `ad_request` | 010 | `AcquisitionFlow._start_rewarded`, `RewardedAdsScreen._watch` (player accepted the offer) | product (heart, booster_<id>, daily_slot), ok, reason (refusal reason) |

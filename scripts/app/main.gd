@@ -35,6 +35,7 @@ const CollectionScreen = preload("res://scripts/ui/collection/collection_screen.
 const RobotsScreen = preload("res://scripts/ui/robots/robots_screen.gd")
 const DailyScreens = preload("res://scripts/ui/daily/daily_screens.gd")
 const ProfileScreens = preload("res://scripts/ui/profile/profile_screens.gd")
+const EventsV02Ui = preload("res://scripts/ui/events/events_v02_ui.gd")
 const MetaFeedback = preload("res://scripts/ui/feel/meta_feedback.gd")
 const MetaRewardFeel = preload("res://scripts/ui/feel/meta_reward_feel.gd")
 const NotificationPolicy = preload("res://scripts/economy/notification_policy.gd")
@@ -57,10 +58,10 @@ const COACH_TICK_S := 0.2
 ## M44 peer-review D1: step copy (L2 booster lines run the host's solver-backed legality
 ## proofs) is rebuilt only on a step change or at most this often, never every tick.
 const COACH_COPY_REFRESH_MS := 2000
-## BottomNav tabs the app root serves (RANKS = personal rank ladder, SB-M43-122).
-const APP_NAV := ["events", "leaderboard"]
-## Home shortcut panels the app root turns into app-level destinations (Home opens none of
-## its M42 popups for these; Cards Exchange keeps its Home seam).
+## Home entries the app root turns into app-level destinations (Home opens none of its M42
+## popups for these; Cards Exchange keeps its Home seam). SB-TF-03: Home itself emits only the
+## activity buttons, Gift Meter and profile card; shop / collection / robots / events stay for
+## deep links, and an Event activity button sends "event:<instance id>".
 const APP_SHORTCUTS := ["shop", "collection", "tasks", "daily", "gift_bar", "profile", "rewarded_ads"]
 
 ## Test-only boot seams, read once when the root enters the tree. Production
@@ -196,20 +197,18 @@ func _ready() -> void:
 	_home.scrub_bucks_purchase_requested.connect(func(): _acq.open_scrub_bucks("home_sb_plus"))
 	# M43 destinations from the Home shortcut panels (SB-M43-078 Shop, ...).
 	_home.shortcut_requested.connect(_on_home_shortcut)
-	_home.nav_requested.connect(_on_home_nav)
 	_home.set_app_shortcuts(APP_SHORTCUTS)
-	_home.set_app_nav(APP_NAV)
 	# SB-M57-014..016 / 022: the real store / AdMob providers, only when their native plugin is in
 	# the build (CI input billing_ads); editor / desktop / headless keep the null providers.
 	if app_state != null and app_state.economy != null:
 		_install_native_providers(app_state.economy)
-	# SB-M57-013: the No Ads entitlement collapses the Home bottom banner slot (live after a buy / restore).
-	# SB-M57-001: the same check shows / hides the ad provider's bottom banner.
+	# SB-M57-013 / SB-TF-03: the No Ads entitlement collapses the Home banner area (live after a
+	# buy / restore); SB-M57-001: the same AdService.allowed("banner") shows / hides the provider banner.
 	if app_state != null and app_state.economy != null:
 		var store = app_state.economy.store
 		var ads = app_state.economy.ads
 		var banner := func():
-			_home.set_ad_slot_enabled(store.ads_allowed("banner"))
+			_home.set_ad_slot_enabled(ads.allowed("banner"))
 			ads.update_banner()
 		banner.call()
 		store.resolved.connect(banner.unbind(2))
@@ -406,11 +405,18 @@ func get_home():
 ## SB-M44-032: a Home entry behind the owner unlock table (AppState.feature_unlocked) never
 ## opens, whatever the caller (Home control, deep link, notification).
 func _entry_locked(id: String) -> bool:
+	if id.begins_with("event:"):
+		id = "events"
 	return HomeBadges.GATED_ENTRIES.has(id) and app_state != null and not app_state.feature_unlocked(HomeBadges.GATED_ENTRIES[id])
 
-## BottomNav destinations that open an app-level surface (SETTINGS keeps its M41 overlay).
-func _on_home_nav(id: String) -> void:
+## Home activity buttons / Gift Meter / profile card and deep links that open an app-level
+## destination (APP_SHORTCUTS; robots / events for deep links; "event:<iid>" = one event's details).
+func _on_home_shortcut(id: String) -> void:
 	if nav == null or nav.current() != NavigationController.Route.HOME or (_modals != null and _modals.depth() > 0) or _entry_locked(id):
+		return
+	if id.begins_with("event:"):
+		_track("screen_view", {"screen": "events"})
+		EventsV02Ui.open_details(_modals, app_state, id.substr(6))
 		return
 	_track("screen_view", {"screen": id})
 	match id:
@@ -418,15 +424,6 @@ func _on_home_nav(id: String) -> void:
 			RobotsScreen.open(_modals, app_state, ceremonies)
 		"events":
 			ProfileScreens.open_events(_modals, app_state)
-		"leaderboard":
-			ProfileScreens.open_ranks(_modals, app_state)
-
-## Home shortcut panels / Gift Meter that open an app-level destination (APP_SHORTCUTS).
-func _on_home_shortcut(id: String) -> void:
-	if nav == null or nav.current() != NavigationController.Route.HOME or (_modals != null and _modals.depth() > 0) or _entry_locked(id):
-		return
-	_track("screen_view", {"screen": id})
-	match id:
 		"shop":
 			_acq.open_shop({"source": "home_shop"})
 		"collection":
@@ -440,7 +437,7 @@ func _on_home_shortcut(id: String) -> void:
 		"gift_bar":
 			DailyScreens.open_gift_bar(_modals, app_state)
 		"profile":
-			ProfileScreens.open_profile(_modals, app_state)
+			ProfileScreens.open_profile(_modals, app_state, ceremonies, request_earned_packs)
 
 ## M43 master: on HOME, with no other popup open, present pending meta ceremonies (deferred so
 ## it never pushes from inside a route / modal signal handler).
@@ -501,8 +498,6 @@ func open_deep_link(dest: String) -> String:
 	if _modals != null:
 		_modals.clear("deep_link")
 	match d:
-		"robots", "events":
-			_on_home_nav(d)
 		"home":
 			pass
 		_:
@@ -519,7 +514,7 @@ func get_ceremonies():
 func get_meta_reward_feel():
 	return meta_feel
 
-## M41 V01 Settings panel (M42: opened from the Home bottom-nav SETTINGS button).
+## M41 V01 Settings panel (SB-TF-03: opened from the Home top-HUD Settings icon).
 func _build_settings_entry() -> void:
 	_settings_panel = SettingsPanelScene.instantiate()
 	_settings_panel.name = "SettingsPanel"
@@ -530,6 +525,7 @@ func _build_settings_entry() -> void:
 	_settings_panel.help_requested.connect(open_help)
 	_settings_panel.credits_requested.connect(open_credits)
 	_settings_panel.privacy_requested.connect(open_privacy)
+	_settings_panel.notifications_requested.connect(open_notifications)
 	_settings_panel.language_changed.connect(_on_language_changed)
 
 ## M44: Settings "?" -> the read-only HELP & TIPS popup on the app ModalStack (Home only;
@@ -549,6 +545,14 @@ func open_credits():
 	if nav.is_settings_open():
 		nav.close_settings()
 	return CreditsScreen.open(_modals)
+
+## SB-TF-03: Settings NOTIFICATIONS -> the reminder preferences popup (same rules as Help).
+func open_notifications():
+	if nav == null or nav.current() != NavigationController.Route.HOME or app_state == null:
+		return null
+	if nav.is_settings_open():
+		nav.close_settings()
+	return ProfileScreens.open_notifications(_modals, app_state)
 
 ## SB-M58-008: Settings PRIVACY -> the analytics consent + privacy summary popup (same rules as Help).
 func open_privacy():

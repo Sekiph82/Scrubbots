@@ -160,18 +160,19 @@ func _panels(home) -> void:
 	print("[panels]")
 	var ok := true
 	var geo := true
-	for id in ["shop", "collection", "tasks", "daily"]:
-		var b: Button = home.get_region("Shortcut_" + id)
+	for n in ["RewardedAdsButton", "Shortcut_tasks", "Shortcut_daily"]:
+		var b: Button = home.get_region(n)
 		var sb := b.get_theme_stylebox("normal") as StyleBoxFlat
-		ok = ok and sb.bg_color.a >= 0.50 and sb.bg_color.a <= 0.52 and sb.border_width_left == 3 and sb.shadow_size == 8
-		geo = geo and b.size.is_equal_approx(V05_PANEL)
-	_ok(ok, "normal body alpha %.2f in 0.50..0.52, 3 px outline + restrained 8 px glow" % HS.PANEL_ALPHA)
-	_ok(geo, "panel geometry unchanged (210x156)")
+		ok = ok and is_equal_approx(sb.bg_color.a, 0.51 * 0.5) and sb.border_width_left == 3 and sb.shadow_size == 8
+		geo = geo and b.size.is_equal_approx((V05_PANEL * 0.7).round())
+	_ok(ok, "SB-TF-03 normal body alpha %.3f = half the V06 0.51, 3 px outline + restrained 8 px glow" % HS.PANEL_ALPHA)
+	_ok(geo, "SB-TF-03 panel geometry 0.7x the V06 210x156 = 147x109")
 	for id in ["tasks", "daily"]:
 		var tex: Texture2D = home.get_region("ShortcutIcon_" + id).texture
 		var a := float(tex.get_width()) / float(tex.get_height())
-		var v03 := Vector2(164.0 * a, 164.0) if 164.0 * a <= 206.0 else Vector2(206.0, 206.0 / a)
-		_ok(home.get_region("Shortcut_" + id).get_icon_draw_size().is_equal_approx(v03), "%s icon size unchanged %s" % [id.to_upper(), str(v03)])
+		var box := Vector2(206.0, 164.0) * 0.7
+		var v := Vector2(box.y * a, box.y) if box.y * a <= box.x else Vector2(box.x, box.x / a)
+		_ok(home.get_region("Shortcut_" + id).get_icon_draw_size().is_equal_approx(v), "%s icon 0.7x the V06 size %s" % [id.to_upper(), str(v)])
 	_complete("panels")
 
 func _pills(home) -> void:
@@ -257,11 +258,11 @@ func _hearts() -> void:
 func _ad_stack(home) -> void:
 	print("[ad and stack]")
 	var ad: Control = home.get_region("AdBannerSlot")
-	_ok(absf(ad.size.y - 100.0) < 0.5 and ad.size.y == ad.custom_minimum_size.y and ad.size_flags_vertical & Control.SIZE_EXPAND == 0, "ad slot 100 px, explicit, no EXPAND")
+	_ok(absf(ad.size.y - 112.0) < 0.5 and ad.size.y == ad.custom_minimum_size.y and ad.size_flags_vertical & Control.SIZE_EXPAND == 0, "SB-TF-03 banner area clamp(1080*50/320) = 112 px, explicit, no EXPAND")
 	_ok(HS.AD_SLOT_MIN_H == 72.0 and HS.AD_SLOT_MAX_H == 112.0, "responsive clamp 72..112")
 	_ok(home.get_ad_mount().get_child_count() == 0 and ad.find_children("*", "Label", true, false).is_empty() and home.has_method("set_ad_slot_enabled"), "empty AdMount, collapse seam kept")
-	var d := V05_AD.size.y - ad.size.y
-	_ok(absf(_rect(home, "PlayButton").position.y - (V05_PLAY_TOP + d)) < 0.5 and absf(_rect(home, "WinStreakRewardTrack").position.y - (V05_TRACK_TOP + d)) < 0.5 and absf(_rect(home, "BottomNav").position.y - (V05_NAV_TOP + d)) < 0.5, "PLAY / track / nav all moved down %.0f px vs V05" % d)
+	var gap: int = home.get_region("HomeLayout").get_theme_constant("separation")
+	_ok(home.get_region("BottomNav") == null and home.get_region("WinStreakRewardTrack") == null and absf(_rect(home, "PlayButton").end.y + gap - _rect(home, "AdBannerSlot").position.y) < 0.5 and _rect(home, "PlayButton").position.y > V05_PLAY_TOP, "SB-TF-03: no track / nav; PLAY one gap above the banner area, lower than V05")
 	_ok(absf(_rect(home, "AdBannerSlot").end.y - 2160.0) < 0.5, "ad slot remains the bottom element")
 	_complete("ad_and_stack")
 
@@ -273,16 +274,11 @@ func _gift_locked(home) -> void:
 	_complete("gift_meter_locked")
 
 func _track_locked(home) -> void:
-	print("[win streak locked]")
-	var top: float = _rect(home, "WinStreakRewardTrack").position.y
+	print("[win streak locked -> SB-TF-03: strip removed]")
 	for n in V05_TRACK_REL:
-		var r := _rect(home, n)
-		r.position.y -= top
-		_ok(r.is_equal_approx(V05_TRACK_REL[n]), "%s geometry (relative to the track) == V05" % n)
-	var vals: Array = []
-	for i in range(1, 6):
-		vals.append(home.get_region("TrackStep%d" % i).text)
-	_ok(vals == ["1", "5", "10", "25", "100"], "values unchanged")
+		_ok(home.get_region(n) == null, "%s gone from Home (owner 2026-11-18)" % n)
+	var e = home.get_app_state().economy
+	_ok([1, 2, 3, 4, 5].map(func(i): return e.config.win_streak_sb(i)) == [1, 5, 10, 25, 100], "streak payouts unchanged (economy only)")
 	_complete("win_streak_locked")
 
 func _hidden(home) -> bool:
@@ -309,7 +305,7 @@ func _modals() -> void:
 	await process_frame
 	await process_frame
 	var h2 = root.get_home()
-	h2.get_region("Nav_settings").pressed.emit()
+	h2.get_region("SettingsButton").pressed.emit()
 	await process_frame
 	_ok(root.get_settings_panel().visible and _hidden(h2), "Settings: action layer, stack and (+) hidden")
 	root.handle_back()

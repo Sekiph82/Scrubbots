@@ -195,7 +195,7 @@
     "shop_open": {
       "task": "SB-M56-009",
       "params": {
-        "source": {"type": "enum", "values": ["home_shop", "home_sb_plus", "life", "booster", "speed", "need_a_hand", "other"], "fallback": "other", "required": true}
+        "source": {"type": "enum", "values": ["home_shop", "home_sb_plus", "home_heart_plus", "life", "booster", "speed", "need_a_hand", "other"], "fallback": "other", "required": true}
       }
     },
     "launch_failed": {

@@ -92,16 +92,18 @@ func _p03() -> void:
 	_complete("p03_for_cleared_boundaries")
 
 func _p04() -> void:
-	print("[p04 real app root: RANKS tab live, opens 'ranks', close returns HOME]")
+	print("[p04 real app root: Profile RANKS live (SB-TF-03: no tab), opens 'ranks', close returns HOME]")
 	# SB-M44-032 (no grandfather): RANKS is L40 for every save; p04 / p05 test the live screen.
 	AppStateScript.test_unlock_all = true
 	await _boot("p04", -1)
-	var b: Button = _root.get_home().get_region("Nav_leaderboard")
-	_ok(not b.disabled and b.tooltip_text == "" and b.text == UiText.t("HOME_NAV_LEADERBOARD"), "unlocked RANKS (test seam): enabled, no tooltip")
-	b.pressed.emit()
+	var b: Button = _ranks_button()
+	_ok(not b.disabled and b.tooltip_text == "" and b.text == UiText.caps(UiText.t("RANKS_TITLE")), "unlocked RANKS (test seam): enabled, no tooltip")
+	_root.get_modal_stack().top()._on_action("ranks")
 	await _frames(2)
 	_ok(_top_id() == "ranks" and _top().find_child("Title", true, false) != null, "press -> ranks popup")
 	_root.get_modal_stack().top()._on_action("close")
+	await _frames(3)
+	_root.get_modal_stack().top()._on_action("close")   # Profile
 	await _frames(3)
 	_ok(_root.get_modal_stack().depth() == 0 and _root.get_navigation().current() == NavigationController.Route.HOME, "close -> HOME, no modal")
 	_complete("p04_tab_live_opens_closes")
@@ -122,20 +124,17 @@ func _p05() -> void:
 	_complete("p05_screen_matches_save")
 
 func _p06() -> void:
-	print("[p06 fresh FTUE profile: RANKS locked until L40, then live]")
+	print("[p06 fresh FTUE profile: Profile RANKS locked until L40, then live]")
 	AppStateScript.test_unlock_all = false
 	await _boot("p06", 1)
 	var a = _root.get_app_state()
-	var h = _root.get_home()
-	var b: Button = h.get_region("Nav_leaderboard")
+	var b: Button = _ranks_button()
 	_ok(a.economy.ftue.is_new_profile() and b.disabled and b.tooltip_text == UiText.t("HOME_UNLOCKS_AT_LEVEL", [a.feature_unlock_level("ranks")]) and a.feature_unlock_level("ranks") == 40, "L1: disabled, 'unlocks at level 40'")
 	while a.progression.current_level() < 40:
 		a.progression.record_win(a.progression.current_level())
-	h.refresh()
+	b = _ranks_button()
 	_ok(not b.disabled and b.tooltip_text == "", "L40: enabled, no tooltip")
-	_root.get_modal_stack().clear("test")
-	await _frames(2)
-	b.pressed.emit()
+	_root.get_modal_stack().top()._on_action("ranks")
 	await _frames(2)
 	_ok(_top_id() == "ranks", "L40: press opens ranks")
 	_complete("p06_fresh_profile_gate")
@@ -143,6 +142,10 @@ func _p06() -> void:
 func _p07() -> void:
 	print("[p07 opening / closing the screen changes no economy or save state]")
 	AppStateScript.test_unlock_all = true
+	# Frozen clock: the Heart regen / 2x windows are wall-clock state, and the SB-TF-03 path (Profile ->
+	# RANKS) spans more frames, so a real clock could tick them between the two snapshots.
+	MainScript.boot_clock_override = func(): return 1790000000
+	MainScript.boot_local_day_override = func(): return 20000
 	await _boot("p07", -1)
 	var a = _root.get_app_state()
 	for n in range(1, 31):
@@ -150,12 +153,17 @@ func _p07() -> void:
 	var eco: Dictionary = a.economy.snapshot()
 	var done := int(a.progression.completed_count())
 	var lvl := int(a.progression.current_level())
-	_root.get_home().get_region("Nav_leaderboard").pressed.emit()
+	_ranks_button()
+	_root.get_modal_stack().top()._on_action("ranks")
 	await _frames(2)
 	var opened := _top_id()
 	_root.get_modal_stack().top()._on_action("close")
 	await _frames(2)
-	_ok(opened == "ranks" and a.economy.snapshot() == eco and a.progression.completed_count() == done and a.progression.current_level() == lvl, "snapshot / progression unchanged")
+	var now_snap: Dictionary = a.economy.snapshot()
+	var diff: Array = now_snap.keys().filter(func(k): return now_snap[k] != eco.get(k))
+	_ok(opened == "ranks" and diff.is_empty() and a.progression.completed_count() == done and a.progression.current_level() == lvl, "snapshot / progression unchanged %s" % str(diff))
+	MainScript.boot_clock_override = Callable()
+	MainScript.boot_local_day_override = Callable()
 	_complete("p07_read_only")
 
 func _p08() -> void:
@@ -174,11 +182,18 @@ func _p08() -> void:
 
 # ------------------------------------------------------------------ helpers ----
 
+## SB-TF-03: RANKS lives in Profile. Clears the stack, opens Profile from the Home profile card
+## and returns its RANKS button.
+func _ranks_button() -> Button:
+	_root.get_modal_stack().clear("test")
+	(_root.get_home().get_region("ProfileButton") as Button).pressed.emit()
+	return _root.get_modal_stack().top().get_action_button("ranks")
+
 ## Opens the screen and checks CurrentRank / NextMeter caption / ladder marks against for_cleared(n).
 func _shown(a, t: Array, n: int) -> bool:
-	_root.get_modal_stack().clear("test")
 	var r := PersonalRank.for_cleared(n)
-	_root.get_home().get_region("Nav_leaderboard").pressed.emit()
+	_ranks_button()
+	_root.get_modal_stack().top()._on_action("ranks")
 	var p = _top()
 	if p == null or p.popup_id != "ranks":
 		return false

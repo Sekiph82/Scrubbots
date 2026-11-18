@@ -580,7 +580,7 @@ func _tour_navigation() -> void:
 		_root._on_home_shortcut(id)
 		await _settle()
 		_root.get_modal_stack().clear("t")
-	_root._on_home_nav("robots")
+	_root._on_home_shortcut("robots")
 	await _settle()
 	_root.get_modal_stack().clear("t")
 	_root.open_settings()

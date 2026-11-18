@@ -107,7 +107,8 @@ func _flight_and_ceremony() -> void:
 	_ok(root.get_navigation().current() == R.HOME and not _results_seen, "WON -> HOME at once (animation off in this case)")
 	var flight = home.get_reward_flight()
 	_ok(home.is_reward_flight_running() and flight.get_layer() != null, "reward flight running on Home")
-	var want := {"Fly_scrub_bucks": "ScrubBucksChip", "Fly_bot_parts": "ProfileBotParts", "Fly_gift_meter": "GiftMeterBar", "Fly_win_streak": "TrackGift1"}
+	# SB-TF-03: no win-streak strip on Home, so the streak has no flight target any more.
+	var want := {"Fly_scrub_bucks": "ScrubBucksChip", "Fly_bot_parts": "ProfileBotParts", "Fly_gift_meter": "GiftMeterBar"}
 	var got := {}
 	for c in flight.get_layer().get_children():
 		got[String(c.name)] = String(c.get_meta("target"))
@@ -135,7 +136,7 @@ func _flight_and_ceremony() -> void:
 	var parts = home.get_region("ProfileBotParts")
 	_ok(int(parts.bar.value) == parts0 + int(rc["wallet_delta"]["bot_parts"]), "Bot Parts meter = receipt final %d" % int(parts.bar.value))
 	_ok(int(home.get_region("GiftMeterBar").bar.value) == int(rc["gift_meter"]["after"]) and int(rc["gift_meter"]["after"]) == 10, "Gift meter = receipt after (10)")
-	_ok((home.get_region("TrackStreakValue") as Label).text == UiText.num(int(rc["streak"]["after"])), "Win Streak value = receipt after")
+	_ok(int(eco.streak.streak()) == int(rc["streak"]["after"]) and home.get_region("TrackStreakValue") == null, "Win Streak economy value = receipt after; nothing drawn for it on Home (SB-TF-03)")
 	var log: Array = root.get_ceremonies().presented_log()
 	var cur = root.get_ceremonies().current()
 	_ok(log.size() == 1 and String(log[0][1]) == "gift_milestone" and cur != null and root.get_navigation().current() == R.HOME, "Gift milestone ceremony opened on Home after the flight %s" % str(log))
@@ -248,7 +249,7 @@ func _input_locked_during_flight() -> void:
 	var home = root.get_home()
 	_ok(home.get_reward_flight().get_layer() == null and not home.is_reward_flight_running(), "normal Home entry: no lock layer")
 	_ok(not home.play_reward_flight({}, "lock:empty") and not home.play_reward_flight({"status": "WON"}, "lock:won_empty") and home.get_reward_flight().get_layer() == null, "empty receipt: no flight, no lock")
-	var names := ["PlayButton", "Shortcut_daily", "Nav_robots"]
+	var names := ["PlayButton", "Shortcut_daily", "ProfileButton"]
 	var hits := {}
 	for n in names:
 		hits[n] = 0
@@ -291,14 +292,14 @@ func _input_locked_during_flight() -> void:
 			want.append(int(e["from"]) + int(e["n"]) * j / k)
 		_ok(b.landed == want and (e["to"] == e["from"] or int(want[-1]) == int(e["to"])), "%s: counter per arrival %s, final %d" % [e["kind"], str(b.landed), int(e["to"])])
 	_ok(_chip(home) == UiText.num(int(plan[0]["to"])), "SB chip lands exactly on %d" % int(plan[0]["to"]))
-	for n in ["Nav_robots", "Shortcut_daily"]:
+	for n in ["ProfileButton", "Shortcut_daily"]:
 		if not (home.get_region(n) as Button).disabled:
 			await _tap(home.get_region(n))
 			root.get_modal_stack().clear("test")
 			home.close_top_popup()
 			if nav.current() != R.HOME:
 				nav.back(false)
-	_ok(hits["Nav_robots"] + hits["Shortcut_daily"] >= 1, "nav / shortcut respond after the flight %s" % str(hits))
+	_ok(hits["ProfileButton"] + hits["Shortcut_daily"] >= 1, "profile card / activity button respond after the flight %s" % str(hits))
 	await _frames(2)
 	await _tap(home.get_region("PlayButton"))
 	_ok(hits["PlayButton"] == 1 and nav.current() == R.GAMEPLAY, "PLAY works after the flight")

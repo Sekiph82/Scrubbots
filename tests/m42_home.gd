@@ -70,7 +70,7 @@ func _home_shell_tree() -> void:
 		act_names.append(String(c.name))
 	for c in home.get_region("BottomActionStack").get_children():
 		act_names.append(String(c.name))
-	_ok(act_names == ["WorldMargin", "BottomActionStack", "PlayButton", "WinStreakRewardTrack", "BottomNav"], "V05 HomeActionLayer: panels + bottom stack (PLAY, track, nav) %s" % str(act_names))
+	_ok(act_names == ["WorldMargin", "BottomActionStack", "PlayButton"], "SB-TF-03 HomeActionLayer: activity columns + bottom stack (PLAY only; no track, no nav) %s" % str(act_names))
 	var world_names: Array = []
 	for c in home.get_region("MainWorldArea").get_children():
 		world_names.append(String(c.name))
@@ -81,10 +81,11 @@ func _home_shell_tree() -> void:
 		if (n as Control).mouse_filter != Control.MOUSE_FILTER_IGNORE:
 			full_textures += 1
 	_ok(full_textures == 0, "no interactive bitmap (no input-receiving TextureRect)")
-	_ok(home.get_region("Nav_settings").name == "SettingsButton" and not home.get_region("Nav_settings").disabled, "bottom-nav SETTINGS live")
-	# M43-C008 (SB-M43-102) made ROBOTS a real destination (asserted live in m43_master_c008_robots);
-	# SB-M44-032: at L1 ROBOTS (25) / EVENTS (30) / RANKS (40) are behind the owner unlock table.
-	_ok(home.get_region("Nav_events").disabled and home.get_region("Nav_robots").disabled and home.get_region("Nav_leaderboard").disabled, "L1: ROBOTS / EVENTS / RANKS tabs disabled (unlock table), not faked")
+	_ok(home.get_region("TopCurrencyHUD").is_ancestor_of(home.get_region("SettingsButton")) and not home.get_region("SettingsButton").disabled, "SB-TF-03: top-HUD SETTINGS icon live")
+	# SB-TF-03: ROBOTS / RANKS moved into Profile (gated there, m43_master_c010_meta); Events are
+	# activity buttons, none while Events (L30) are behind the owner unlock table.
+	_ok(home.get_region("Nav_events") == null and home.get_region("Nav_robots") == null and home.get_region("Nav_leaderboard") == null
+		and home.find_children("Shortcut_event_*", "", true, false).is_empty(), "L1: no ROBOTS / EVENTS / RANKS on Home, no Event buttons while Events are locked")
 	sub.free()
 	_complete("home_shell_tree")
 
@@ -124,7 +125,7 @@ func _play_cta_fresh() -> void:
 	var root = await _boot_main(_uniq("play"))
 	var home = root.get_home()
 	var play: Button = home.get_region("PlayButton")
-	_ok(play.text == "PLAY" and not play.disabled, "fresh save: live CTA 'PLAY'")
+	_ok(play.text == "PLAY · LEVEL 1" and not play.disabled, "fresh save: live CTA 'PLAY · LEVEL 1' (SB-TF-03)")
 	_ok(home.get_launch_preview().get("level") == 1 and home.get_launch_preview().get("ok"), "CTA previews canonical frontier level 1")
 	play.pressed.emit()
 	await process_frame
@@ -148,7 +149,7 @@ func _continue_cta_frontier() -> void:
 	var home = root.get_home()
 	var play: Button = home.get_region("PlayButton")
 	var sub_text: String = home.get_region("PlaySubtitle").text
-	_ok(play.text == "PLAY" and sub_text == "CONTINUE · LEVEL 2", "CTA shows PLAY + live subtitle CONTINUE · LEVEL 2 (%s / %s)" % [play.text, sub_text])
+	_ok(play.text == "PLAY · LEVEL 2" and sub_text == "CONTINUE · LEVEL 2", "CTA shows PLAY · LEVEL 2 + live subtitle CONTINUE · LEVEL 2 (%s / %s)" % [play.text, sub_text])
 	# M52-C001: Level 2 (Apple) now exists — no coming-soon state at frontier 2.
 	_ok(not play.disabled and String(home.get_region("StatusLabel").text).find("coming soon") == -1, "frontier 2 has real content: enabled, no coming-soon message")
 	_shutdown(root)
@@ -176,7 +177,7 @@ func _settings_single_authority() -> void:
 	var path := _uniq("settings")
 	var root = await _boot_main(path)
 	var app = root.get_app_state()
-	var btn: Button = root.get_home().get_region("Nav_settings")
+	var btn: Button = root.get_home().get_region("SettingsButton")
 	var panel = root.get_settings_panel()
 	for _i in range(3):
 		btn.pressed.emit()
@@ -224,7 +225,7 @@ func _components_viewport_matrix() -> void:
 					small.append(String(b.name))
 				if not safe.grow(0.5).encloses(r):
 					outside.append(String(b.name))
-			_ok(home.find_children("*", "BaseButton", true, false).size() >= 12, "%s: >= 12 live buttons measured (4 panels + PLAY + 5 nav + 2 HUD +)" % tag)
+			_ok(home.find_children("*", "BaseButton", true, false).size() >= 9, "%s: >= 9 live buttons measured (SB-TF-03: 3 activity + PLAY + Settings + 2 HUD (+) + profile + Gift Meter)" % tag)
 			_ok(small.is_empty(), "%s: every button >= 88x88 %s" % [tag, str(small)])
 			_ok(outside.is_empty(), "%s: every button inside safe area %s" % [tag, str(outside)])
 			var prev_end := -1.0
@@ -376,7 +377,7 @@ func _approved_art_only() -> void:
 	for row in rows:
 		if not HomePresentationMap.INACTIVE_MODES.has(row["mode"]):
 			active += 1
-	_ok(rows.size() == 56 and active == 26 and bound == 26 and home.get_region("ScrubBucksChip").icon.texture != null, "production manifest (owner-approved, R15-004 + HOME-122 + SB-POLISH-009 HOME-123 + SB-HOME-BG HOME-124 + SB-HOME-VIDEO HOME-125 keyed still, HOME-121/123 retired): 56 entries accounted, 26 active entries presented (%d bound), retired/disabled entries present nothing" % bound)
+	_ok(rows.size() == 56 and active == 14 and bound == 14 and home.get_region("ScrubBucksChip").icon.texture != null, "production manifest (owner-approved, R15-004 + HOME-122 + SB-POLISH-009 HOME-123 + SB-HOME-BG HOME-124 + SB-HOME-VIDEO HOME-125 keyed still, HOME-121/123 retired): SB-TF-03 nav / track / Shop + Collection tiles retired): 56 entries accounted, 14 active entries presented (%d bound), retired/disabled entries present nothing" % bound)
 	# Un-approval simulation on an in-memory manifest copy (repo manifest untouched):
 	# entries that are not APPROVED keep native placeholders.
 	var m = V.load_manifest()
@@ -388,8 +389,8 @@ func _approved_art_only() -> void:
 	home.set_art_binder(HomeArtBinder.new(m))
 	await process_frame
 	_ok(home.get_region("WorldBackground").texture != null and home.get_region("Art_scrubby").texture != null, "approved world + Scrubby bind to their nodes")
-	_ok(home.get_region("ProfilePortrait").texture == null and home.get_region("TrackBadge").texture == null, "unapproved art stays empty")
-	_ok(home.get_region("ScrubBucksChip").icon.texture != null and home.get_region("ShortcutIcon_daily").texture != null and home.get_region("ShortcutIcon_shop").texture == null, "approved icons bind; unapproved do not")
+	_ok(home.get_region("ProfilePortrait").texture == null and home.get_region("SettingsIcon").texture == null, "unapproved art stays empty")
+	_ok(home.get_region("ScrubBucksChip").icon.texture != null and home.get_region("ShortcutIcon_daily").texture != null and home.get_region("ShortcutIcon_tasks").texture == null, "approved icons bind; unapproved do not")
 	home.set_art_binder(HomeArtBinder.new())
 	await process_frame
 	var outside: Array = []
@@ -573,9 +574,10 @@ func _cards_exchange_presentation() -> void:
 	sub.free()
 	_complete("cards_exchange_presentation")
 
-## SB-M42-023: Win Streak SB reward track 1/5/10/25/100 for positions 1/2/3/4/5+.
+## SB-M42-023: Win Streak SB 1/5/10/25/100 for positions 1/2/3/4/5+. SB-TF-03: the Home strip is
+## gone (owner 2026-11-18); the economy streak and its payouts are unchanged.
 func _win_streak_track() -> void:
-	print("[win streak track]")
+	print("[win streak (economy only; SB-TF-03 removed the Home strip)]")
 	var app = AppState.new(_uniq("streak"))
 	var sub := _sub(Vector2i(1080, 2160))
 	var home = HomeScreenScene.instantiate()
@@ -584,29 +586,18 @@ func _win_streak_track() -> void:
 	await process_frame
 	var e = app.economy
 	var want := [1, 5, 10, 25, 100]
-	var vals: Array = []
 	for i in range(5):
-		vals.append(home.get_region("TrackStep%d" % (i + 1)).text)
 		_ok(e.config.win_streak_sb(i + 1) == want[i], "config position %d pays %d SB" % [i + 1, want[i]])
-	_ok(vals == ["1", "5", "10", "25", "100"], "V03 track values exactly 1/5/10/25/100 (%s)" % str(vals))
+	_ok(home.get_region("WinStreakRewardTrack") == null and home.find_children("Track*", "", true, false).is_empty(), "no win-streak strip on Home")
 	for lvl in [1, 2, 3]:
 		e.streak.process_first_clear_win(lvl)
 	home.refresh()
 	_ok(e.streak.streak() == 3, "canonical streak 3 after three first-clear wins")
-	_ok(_is_current(home, 3) and not _is_current(home, 2), "current step marked (gold) at position 3")
-	_ok(home.get_region("TrackStep1").modulate.a == 1.0 and home.get_region("TrackStep3").modulate.a == 1.0 and home.get_region("TrackStep4").modulate.a < 1.0, "reached steps opaque, future dimmed")
-	for lvl in [4, 5, 6, 7]:
-		e.streak.process_first_clear_win(lvl)
-	home.refresh()
-	_ok(e.streak.streak() == 7 and _is_current(home, 5), "streak 7 marks the 5+ step")
 	e.streak.on_progression_loss()
 	home.refresh()
-	_ok(home.get_region("TrackStreakValue").text == "0" and not _is_current(home, 1) and home.get_region("TrackStep1").modulate.a < 1.0 and home.get_region("TrackProgress").value == 0, "loss resets the live track")
+	_ok(e.streak.streak() == 0, "loss resets the canonical streak")
 	sub.free()
 	_complete("win_streak_track")
-
-func _is_current(home, pos: int) -> bool:
-	return (home.get_region("TrackStep%d" % pos) as Label).get_theme_color("font_color") == HomeStyle.GOLD
 
 ## SB-M42-024: Daily login count / 5-day cycle / booster reward state from DailyService;
 ## claims via the canonical facade; no Home calendar logic.
@@ -693,11 +684,11 @@ func _localization_seam() -> void:
 						untranslated.append(t)
 	_ok(checked >= 30, "checked %d visible labels/buttons" % checked)
 	_ok(untranslated.is_empty(), "every visible copy string is routed through the seam %s" % str(untranslated))
-	_ok(home.get_region("TrackStep5").text == "100" and home.get_region("GiftMeterBar").caption.text.find("12") != -1, "live values stay arguments; Economy V1 numbers unchanged")
+	_ok(home.get_region("GiftMeterBar").caption.text.find("12") != -1, "live values stay arguments; Economy V1 numbers unchanged")
 	TranslationServer.set_locale(prev_locale)
 	TranslationServer.remove_translation(tr)
 	home.refresh()
-	_ok(home.get_region("PlayButton").text == "PLAY" and UiText.t("HOME_CONTINUE_LEVEL", [3]) == "CONTINUE · LEVEL 3", "English fallback restored")
+	_ok(home.get_region("PlayButton").text.begins_with("PLAY · LEVEL ") and UiText.t("HOME_CONTINUE_LEVEL", [3]) == "CONTINUE · LEVEL 3", "English fallback restored")
 	_ok(UiText.num(1234567) == "1,234,567" and UiText.num(-5000) == "-5,000" and UiText.num(0) == "0", "number formatting seam")
 	sub.free()
 	_complete("localization_seam")

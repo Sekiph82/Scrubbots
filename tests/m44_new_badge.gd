@@ -3,8 +3,10 @@ extends SceneTree
 ##   - HomeBadges.new_features: unlocked + unvisited gated entries of a NEW FTUE profile only;
 ##   - visiting (meta_ui "feature_visited:<feature>") clears it and survives save / reload;
 ##   - grandfathered profiles and legacy snapshots (no feature_visited keys / no meta_ui) never show NEW;
-##   - Home: "NEW" pill on Shortcut_* / NavBadge_*, a real count wins, the press clears it,
-##     locked entries never show NEW and never mark visited.
+##   - Home: "NEW" pill on the activity buttons, a real count wins, the press clears it,
+##     locked entries never show NEW and never mark visited. SB-TF-03: Robots / Ranks / Collection
+##     moved into Profile, so their NEW shows on the Home profile card and on the Profile button
+##     (whose press clears it); Events NEW shows on the Event activity buttons.
 ## SB-M44-032: entries open at L1 (shipped: Daily / Shop / Tasks / Collection) were never
 ## "newly unlocked", so they never show NEW (shipped_table case). The mechanism cases run on an
 ## in-memory fixture table with those four at their 2026-10-22 levels (LEGACY_LEVELS).
@@ -15,6 +17,8 @@ const MainScript = preload("res://scripts/app/main.gd")
 const AppState = preload("res://scripts/app/app_state.gd")
 const HomeBadges = preload("res://scripts/ui/home/home_badges.gd")
 const HomeScreenScene = preload("res://scenes/ui/home/home_screen.tscn")
+const ProfileScreens = preload("res://scripts/ui/profile/profile_screens.gd")
+const ModalStack = preload("res://scripts/ui/popup/modal_stack.gd")
 const UiText = preload("res://scripts/ui/ui_text.gd")
 
 var EXPECTED_CASES := ["rule_walk", "visit_clears", "persistence", "grandfather", "legacy_snapshot", "home_ui", "shipped_table"]
@@ -141,41 +145,62 @@ func _home_ui() -> void:
 	a.bootstrap_new_profile()
 	_walk_to(a, 8)
 	var home = await _home(a)
-	var shop = home.get_region("Shortcut_shop")
-	_ok(shop.badge.visible and shop.badge.text == new_text, "L8: Shortcut_shop shows NEW")
+	_ok(home.get_region("Shortcut_shop") == null and HomeBadges.new_features(a).has("shop"), "L8: SHOP is new but has no Home tile (SB-TF-03: Shop opens from the (+) popups)")
+	var pb: Label = home.get_region("ProfileBadge")
+	_ok(pb.text != new_text, "L8: no Profile destination is new yet -> no NEW on the profile card ('%s' = achievement count only)" % pb.text)
 	var daily = home.get_region("Shortcut_daily")
 	_ok(daily.badge.visible and daily.badge.text == "1", "L8: DAILY count 1 (login claimable) wins over NEW, text '%s'" % daily.badge.text)
 	var tasks = home.get_region("Shortcut_tasks")
 	_ok(not tasks.badge.visible, "L8: locked TASKS shows no badge")
 	home._shortcut_pressed("tasks")
 	_ok(not a.economy.meta_ui.is_seen("feature_visited:tasks"), "locked TASKS press never marks visited")
-	for nid in ["robots", "events"]:
-		home.get_region("Nav_" + nid).pressed.emit()
-	_ok(not a.economy.meta_ui.is_seen("feature_visited:robots") and not a.economy.meta_ui.is_seen("feature_visited:events") and not home.get_region("NavBadge_robots").visible, "locked ROBOTS / EVENTS: no badge, press never marks")
-	home._shortcut_pressed("shop")
-	_ok(not shop.badge.visible and a.economy.meta_ui.is_seen("feature_visited:shop"), "SHOP press: NEW hidden, visited marked")
+	for nid in ["robots", "event:x"]:
+		home._shortcut_pressed(nid)
+	_ok(not a.economy.meta_ui.is_seen("feature_visited:robots") and not a.economy.meta_ui.is_seen("feature_visited:events"), "locked ROBOTS / EVENTS: press never marks")
+	_walk_to(a, 20)
+	home.refresh()
+	var cnt := int(HomeBadges.compute(a)["achievements"]) + int(HomeBadges.compute(a)["robots"]) + int(HomeBadges.compute(a)["collection"])
+	_ok(HomeBadges.new_features(a).has("collection") and pb.visible and pb.text == (str(cnt) if cnt > 0 else new_text), "L20: COLLECTION newly unlocked -> profile card shows NEW, a real count wins ('%s')" % pb.text)
+	var p = await _profile(a)
+	var cb: Label = p.get_action_button("collection").get_node("CollectionBadge")
+	_ok(cb.visible and cb.text == new_text, "L20: Profile COLLECTION shows NEW")
+	p._on_action("collection")
+	_ok(a.economy.meta_ui.is_seen("feature_visited:collection"), "Profile COLLECTION press: visited marked")
 	var re = AppState.new(hp)
-	_ok(re.economy.meta_ui.is_seen("feature_visited:shop"), "press requested a canonical save (visited survives reload)")
+	_ok(re.economy.meta_ui.is_seen("feature_visited:collection"), "press requested a canonical save (visited survives reload)")
+	home.refresh()
+	_ok(pb.text != new_text and not HomeBadges.new_features(a).has("collection"), "profile card NEW cleared ('%s')" % pb.text)
 	home._shortcut_pressed("daily")
 	_ok(daily.badge.text == "1" and a.economy.meta_ui.is_seen("feature_visited:daily"), "DAILY press marks visited; its count badge stays")
 	_walk_to(a, 30)
 	home.refresh()
 	var bd := HomeBadges.compute(a)
-	for nid in ["robots", "events"]:
-		var nl: Label = home.get_region("NavBadge_" + nid)
-		var want: String = str(int(bd[nid])) if int(bd[nid]) > 0 else new_text
-		_ok(nl.visible and nl.text == want, "L30: NavBadge_%s shows '%s'" % [nid, nl.text])
-		home.get_region("Nav_" + nid).pressed.emit()
-		_ok(a.economy.meta_ui.is_seen(HomeBadges.visited_key(nid)) and (int(bd[nid]) > 0 or not nl.visible), "Nav_%s press: visited, NEW hidden" % nid)
+	p = await _profile(a)
+	var rb: Label = p.get_action_button("robots").get_node("RobotsBadge")
+	var want: String = str(int(bd["robots"])) if int(bd["robots"]) > 0 else new_text
+	_ok(rb.visible and rb.text == want, "L30: Profile ROBOTS shows '%s'" % rb.text)
+	_ok(pb.visible and pb.text == (str(int(bd["robots"]) + int(bd["achievements"])) if int(bd["robots"]) + int(bd["achievements"]) > 0 else new_text), "L30: profile card shows the count or NEW ('%s')" % pb.text)
+	p._on_action("robots")
+	_ok(a.economy.meta_ui.is_seen(HomeBadges.visited_key("robots")), "Profile ROBOTS press: visited")
+	var ev: Array = home.find_children("Shortcut_event_*", "", true, false)
+	if not ev.is_empty():
+		_ok((ev[0] as Button).get("badge").text == new_text or int(bd["events"]) > 0, "L30: Event button shows NEW")
+		home._shortcut_pressed("event:" + String(ev[0].get_meta("iid")))
+	else:
+		home._shortcut_pressed("event:none")
+	_ok(a.economy.meta_ui.is_seen(HomeBadges.visited_key("events")), "an Event button press marks EVENTS visited")
 	_walk_to(a, 40)
 	home.refresh()
-	# SB-M43-122: RANKS is a served tab (personal rank ladder), so it gets NEW like any unlocked entry.
-	var rl: Label = home.get_region("NavBadge_leaderboard")
-	_ok(rl.visible and rl.text == new_text, "L40: served RANKS shows NEW, text '%s'" % rl.text)
-	home.get_region("Nav_leaderboard").pressed.emit()
-	_ok(a.economy.meta_ui.is_seen(HomeBadges.visited_key("ranks")) and not rl.visible, "Nav_leaderboard press: visited, NEW hidden")
+	# SB-M43-122: RANKS (personal rank ladder) gets NEW like any unlocked entry, now in Profile.
+	p = await _profile(a)
+	var rl: Label = p.get_action_button("ranks").get_node("RanksBadge")
+	_ok(rl.visible and rl.text == new_text, "L40: Profile RANKS shows NEW, text '%s'" % rl.text)
+	p._on_action("ranks")
+	_ok(a.economy.meta_ui.is_seen(HomeBadges.visited_key("ranks")), "Profile RANKS press: visited")
+	p = await _profile(a)
+	_ok(not p.get_action_button("ranks").get_node("RanksBadge").visible, "reopened Profile: RANKS NEW hidden")
 	var h2 = await _home(AppState.new(_path("home_est")))
-	_ok(["shop", "collection", "tasks"].all(func(s): return not h2.get_region("Shortcut_" + s).badge.visible or h2.get_region("Shortcut_" + s).badge.text != new_text), "established profile Home: no NEW pill")
+	_ok(["tasks", "daily"].all(func(s): return not h2.get_region("Shortcut_" + s).badge.visible or h2.get_region("Shortcut_" + s).badge.text != new_text) and h2.get_region("ProfileBadge").text != new_text, "established profile Home: no NEW pill")
 	_complete("home_ui")
 
 # ------------------------------------------------------------------ helpers ----
@@ -194,10 +219,20 @@ func _home(app):
 	_sub.add_child(home)
 	home.bind(app)
 	home.set_app_shortcuts(MainScript.APP_SHORTCUTS)
-	home.set_app_nav(MainScript.APP_NAV)
 	await _frames(2)
 	home.refresh()
 	return home
+
+## A real Profile popup on its own ModalStack (closes the previous one).
+var _stack = null
+func _profile(app):
+	if _stack != null and is_instance_valid(_stack):
+		_stack.queue_free()
+	_stack = ModalStack.new()
+	_sub.add_child(_stack)
+	var p = ProfileScreens.open_profile(_stack, app)
+	await _frames(2)
+	return p
 
 func _shutdown() -> void:
 	if _sub != null and is_instance_valid(_sub):

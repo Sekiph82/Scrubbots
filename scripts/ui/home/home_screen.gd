@@ -17,15 +17,19 @@ extends Control
 ##   │                         └── HomeAreaLabel   native WHISPERING PARK / AREA n (sky band)
 ##   └── SafeAreaRoot/MarginContainer/Content/HomeLayout (VBox)
 ##       ├── TopCurrencyHUD      narrow profile card (portrait in front of its frame,
-##       │                       bottom-anchored; level badge + thick Bot Parts N/250 bar)
-##       │                       · Scrub Bucks chip + (+) · Hearts chip + (+)
+##       │                       bottom-anchored; Bot Parts icon badge + thick Bot Parts bar)
+##       │                       · SettingsButton · Scrub Bucks chip + (+) · Hearts chip + (+)
 ##       ├── GiftMeter           emblem · thick gold meter with only N/next · crate
 ##       ├── ActionHost/HomeActionLayer   (hidden as ONE layer while a modal is open)
-##       │     ├── WorldMargin/MainWorldArea   SHOP, COLLECTION | (world) | TASKS, DAILY
-##       │     └── BottomActionStack   bottom-anchored (V05): PLAY (+ StatusLabel pill)
-##       │                             -> WinStreakRewardTrack rail -> BottomNav
-##       └── AdBannerSlot        fixed banner reservation (V05 ~144 px @1080), empty
-##                               SDK seam, collapsible (future No-Ads entitlement)
+##       │     ├── WorldMargin/MainWorldArea   activity column | (world) | activity column
+##       │     └── BottomActionStack   bottom-anchored (V05): PLAY · LEVEL N (+ StatusLabel pill)
+##       └── AdBannerSlot        persistent 320x50 banner area scaled to the width, empty
+##                               SDK seam, collapsed by the No Ads entitlement
+##
+## SB-TF-03 (owner 2026-11-18): no bottom nav and no win-streak strip; Robots / Ranks /
+## Collection live in Profile, Notifications in Settings, the Shop opens only from the HUD (+)
+## popups. The world columns hold small see-through ACTIVITY buttons (Rewarded Ads, Tasks,
+## Daily, one per active Event) that hide themselves when there is nothing left to do today.
 ##
 ## V05 (coordination/OWNER_M42_HOME_POLISH_V05.md): the world transform is a pure
 ## function of the viewport + safe area and the frozen V04 reference geometry, so HUD /
@@ -39,7 +43,6 @@ extends Control
 
 signal play_requested
 signal settings_requested
-signal nav_requested(id: String)
 signal shortcut_requested(id: String)
 ## V04: HUD (+) buttons — intent only (no price/product/transaction is implemented here).
 signal scrub_bucks_purchase_requested
@@ -70,6 +73,7 @@ const WorldService = preload("res://scripts/progression/world_service.gd")
 const HomeBadges = preload("res://scripts/ui/home/home_badges.gd")
 const HomeMicroFeel = preload("res://scripts/ui/feel/home_micro_feel.gd")
 const HomeRewardFlight = preload("res://scripts/ui/home/home_reward_flight.gd")
+const EventsV02Ui = preload("res://scripts/ui/events/events_v02_ui.gd")
 ## M42-C003 V03 pinned gesture frame set (HOME_ASSET_MANIFEST animation_sets).
 const HERO_ANIMATION_SET := "home_scrubby_gestures_v03"
 ## SB-HOME-VIDEO-2026-11-17: the owner Flow videos with Scrubby keyed out of the old park onto
@@ -83,26 +87,31 @@ const UiText = preload("res://scripts/ui/ui_text.gd")
 ## (automatic rewards / Collection).
 const LIVE_SHORTCUTS := ["gift_bar", "cards_exchange", "daily"]
 
-## V04: exactly four Home panels (left SHOP / COLLECTION, right TASKS / DAILY).
-const LEFT_SHORTCUTS := [["shop", "HOME_SC_SHOP"], ["collection", "HOME_SC_COLLECTION"]]
-const RIGHT_SHORTCUTS := [["tasks", "HOME_SC_TASKS"], ["daily", "HOME_SC_DAILY"]]
+## SB-TF-03: the fixed activity buttons (one Event button per active event follows them).
+const ACTIVITY_FIXED := [["rewarded_ads", "HOME_SC_REWARDED_ADS"], ["tasks", "HOME_SC_TASKS"], ["daily", "HOME_SC_DAILY"]]
+## Deterministic placement: the visible fixed buttons stack top-down in the LEFT column; the
+## visible Event buttons (first-active order of EventsV02Service.list()) fill the RIGHT column
+## first, then the free LEFT slots. At most ACTIVITY_PER_COLUMN per column, so ACTIVITY_MAX in
+## all (further events are not shown). Hidden buttons leave the column, so the rest close up.
+const ACTIVITY_PER_COLUMN := 4
+const ACTIVITY_MAX := 8
 ## SB-M44-031: Home entry -> feature id (owned by HomeBadges, which also derives SB-M44-013 NEW).
 const GATED_ENTRIES := HomeBadges.GATED_ENTRIES
-## Panel size system (one size for all four) and icon boxes. V03 drew each icon fitted
-## into ~206x164 inside its card; TASKS/DAILY keep that exact box, SHOP/COLLECTION are
-## enlarged 1.2x (owner V04 43-46). Icons stand on the label band and may rise above.
-const PANEL_SIZE := Vector2(210, 156)
-## V05 panel glass: body alpha / outline (owner target alpha 0.40-0.48, 2-3 px outline).
-const PANEL_ALPHA := 0.51   # V06 (0.50..0.52)
+## One panel size for every activity button. SB-TF-03 ("30% smaller"): 0.7x the V06 210x156
+## panel, the V03 206x164 icon box, its label band and font. Icons stand on the label band and
+## may rise above the panel.
+const PANEL_SCALE := 0.7
+const PANEL_SIZE := Vector2(147, 109)
+## SB-TF-03 panel glass: half the V06 body alpha 0.51 (outline and label stay opaque).
+const PANEL_ALPHA := 0.255
 const PANEL_BORDER := 3
 const V03_ICON_BOX := Vector2(206, 164)
-const ICON_SCALE := {"shop": 1.2, "collection": 1.2, "tasks": 1.0, "daily": 1.0, "rewarded_ads": 1.0}
+const PANEL_LABEL_BAND := 34   # 0.7 x 46, +2 so a 20 px label line still fits the 109 px panel
+const PANEL_FONT := 20
 const PANEL_EDGE_MARGIN := 26
-## Win Streak track positions 1..5+ (values are rendered live from WinStreakService).
-const TRACK_POSITIONS := 5
-## V06 ad slot reservation: 100 px at the 1080 px canonical width, scaled with width and
-## clamped 72..112. Explicit reservation only — never EXPAND/FILL, not a provider contract.
-const AD_SLOT_RATIO := 100.0 / 1080.0
+## SB-TF-03 banner area: the standard 320x50 banner scaled to the viewport width, clamped
+## 72..112. Explicit reservation only — never EXPAND/FILL, not a provider contract.
+const AD_SLOT_RATIO := 50.0 / 320.0
 const AD_SLOT_MIN_H := 72.0
 const AD_SLOT_MAX_H := 112.0
 
@@ -214,11 +223,9 @@ func set_art_binder(binder) -> void:
 		for n in e["nodes"]:
 			HomePresentationMap.apply(_nodes[n], String(e["slot"]), tex)
 	_nodes["ProfilePortrait"].remove_meta("binder_tex")   # M43-C008: re-captured by _render_values
-	for id in LEFT_SHORTCUTS + RIGHT_SHORTCUTS:
-		var b: UiShortcutButton = _nodes["Shortcut_" + id[0]]
+	for spec in ACTIVITY_FIXED:
+		var b: UiShortcutButton = _nodes[_activity_node(spec[0])]
 		b.set_icon_box(b.get_icon_box())
-	var ra: UiShortcutButton = _nodes["RewardedAdsButton"]
-	ra.set_icon_box(ra.get_icon_box())
 	_nodes["HomeScrubbyHero"].set_frames(_art.animation_set(HERO_ANIMATION_SET) if _art.has_method("animation_set") else {})
 	_nodes["HomeScrubbyHero"].set_video(_nodes["WorldStill"], _nodes["WorldVideo"], _art.video_set(HERO_VIDEO_SET) if _art.has_method("video_set") else {})
 	# The focus shade sits above the video layer, so it would dim the keyed Scrubby: video mode drops it.
@@ -336,6 +343,13 @@ func _build() -> void:
 		edge.flip_h = true
 		edge.visible = false
 		bg.add_child(_reg(edge))
+	# SB-TF-03: without the opaque bottom nav, the canvas may reach below the V04-locked world
+	# image (the banner area is shorter than the V04 reservation): the floor continues mirrored.
+	var below := HomeStyle.art("WorldEdgeBottom")
+	below.stretch_mode = TextureRect.STRETCH_SCALE
+	below.flip_v = true
+	below.visible = false
+	bg.add_child(_reg(below))
 	var chars := Control.new()
 	chars.name = "Layer_characters"
 	chars.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -428,31 +442,15 @@ func _build() -> void:
 		c.name = region
 		world.add_child(_reg(c))
 
-	# V05: PLAY -> track -> nav as ONE bottom-anchored stack directly above the ad slot;
-	# the world margin above absorbs all free height, so a shorter ad slot lowers the
-	# whole stack by exactly the released amount.
+	# V05: PLAY as ONE bottom-anchored stack directly above the ad slot; the world margin
+	# above absorbs all free height, so a shorter ad slot lowers the stack by exactly the
+	# released amount.
 	var stack := VBoxContainer.new()
 	stack.name = "BottomActionStack"
 	stack.size_flags_vertical = Control.SIZE_SHRINK_END
 	stack.add_theme_constant_override("separation", UiTokens.SPACE_MD)
 	actions.add_child(_reg(stack))
 	_build_play(stack)
-	var track := MarginContainer.new()
-	track.name = "WinStreakRewardTrack"
-	_side_margins(track, 22, 0, 0)
-	stack.add_child(_reg(track))
-
-	var nav := PanelContainer.new()
-	nav.name = "BottomNav"
-	var dock := HomeStyle.box(HomeStyle.NAVY, HomeStyle.GLOW, 0, 0, 14)
-	dock.border_width_top = 5
-	dock.corner_radius_top_left = 34
-	dock.corner_radius_top_right = 34
-	# Paints down through any bottom inset when the ad slot is collapsed (no world strip).
-	dock.expand_margin_bottom = 600
-	HomeStyle.pad(dock, 14, 14)
-	nav.add_theme_stylebox_override("panel", dock)
-	stack.add_child(_reg(nav))
 
 	var ad := PanelContainer.new()
 	ad.name = "AdBannerSlot"
@@ -470,11 +468,7 @@ func _build() -> void:
 
 	_build_hud(hud)
 	_build_gift_meter(gm)
-	_build_shortcuts(_nodes["LeftShortcutColumn"], LEFT_SHORTCUTS)
-	_build_shortcuts(_nodes["RightShortcutColumn"], RIGHT_SHORTCUTS)
-	_build_rewarded_ads_cta(_nodes["Shortcut_collection"])
-	_build_track(track)
-	_build_bottom_nav(nav)
+	_build_activity()
 
 static func _side_margins(m: MarginContainer, h: int, top: int, bottom: int) -> void:
 	m.add_theme_constant_override("margin_left", h)
@@ -490,8 +484,9 @@ func _reg(n: Control) -> Control:
 
 ## Narrow profile card: the larger portrait stands in FRONT of the approved frame with its
 ## visible bottom resting on the ring's inner bottom (frame side/bottom segments stay
-## visible) and pops out above the ring. Level badge + thick Bot Parts bar with the live
-## N/250 ratio centred inside. No top Settings/menu entry (bottom nav only).
+## visible) and pops out above the ring. Bot Parts icon badge + thick Bot Parts bar with the
+## live N/250 ratio centred inside. SB-TF-03: the Settings icon sits between the card and the
+## currency widgets (the only Settings entry on Home).
 const PROFILE_CARD_WIDTH_FRACTION := 0.50
 const AVATAR := 150.0
 ## HOME-034 ring inner bottom (fraction of the frame) and HOME-027 visible bbox rows
@@ -565,12 +560,16 @@ func _build_hud(hud: MarginContainer) -> void:
 	rank.custom_minimum_size = Vector2(74, 68)
 	rank.z_index = 1
 	lvl_row.add_child(_reg(rank))
-	var lvl := HomeStyle.label("", 28)
-	lvl.name = "ProfileLevel"
-	lvl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	lvl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	lvl.set_anchors_preset(Control.PRESET_FULL_RECT)
-	rank.add_child(_reg(lvl))
+	# SB-TF-03: the badge shows the Bot Parts icon (the approved art the reward flight uses),
+	# not the level (PLAY carries the level now).
+	var parts_icon := HomeStyle.art("ProfileBotPartsIcon")
+	parts_icon.texture = load(HomeRewardFlight.ICONS["bot_parts"])
+	parts_icon.set_anchors_preset(Control.PRESET_FULL_RECT)
+	parts_icon.offset_left = 12
+	parts_icon.offset_top = 10
+	parts_icon.offset_right = -12
+	parts_icon.offset_bottom = -12
+	rank.add_child(_reg(parts_icon))
 	var parts := UiProgressMeter.new("ProfileBotParts")
 	parts.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	parts.size_flags_vertical = Control.SIZE_SHRINK_CENTER
@@ -578,10 +577,14 @@ func _build_hud(hud: MarginContainer) -> void:
 	_center_caption_in_bar(parts, 28)
 	lvl_row.add_child(_reg(parts))
 
-	var spacer := Control.new()
-	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	row.add_child(spacer)
+	# SB-TF-03: Settings icon (former bottom-nav art) centred between the card and the currencies.
+	for i in range(2):
+		var spacer := Control.new()
+		spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		row.add_child(spacer)
+		if i == 0:
+			row.add_child(_reg(_build_settings_button()))
 
 	var right := VBoxContainer.new()
 	right.name = "HudCurrencies"
@@ -644,6 +647,25 @@ func _build_hud(hud: MarginContainer) -> void:
 	hcount.set_anchors_preset(Control.PRESET_FULL_RECT)
 	hcount.offset_top = -4
 	hicon.add_child(_reg(hcount))
+
+const SETTINGS_SIZE := 100.0
+func _build_settings_button() -> Button:
+	var b := Button.new()
+	b.name = "SettingsButton"
+	b.accessibility_name = UiText.t("SETTINGS_TITLE")
+	b.flat = true
+	b.custom_minimum_size = Vector2(SETTINGS_SIZE, SETTINGS_SIZE)
+	b.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	b.focus_mode = Control.FOCUS_ACCESSIBILITY
+	for st in ["normal", "hover", "pressed", "disabled", "focus"]:
+		b.add_theme_stylebox_override(st, StyleBoxEmpty.new())
+	var icon := HomeStyle.art("SettingsIcon")
+	icon.set_anchors_preset(Control.PRESET_FULL_RECT)
+	b.add_child(_reg(icon))
+	b.button_down.connect(func(): icon.modulate = Color(0.85, 0.85, 0.85))
+	b.button_up.connect(func(): icon.modulate = Color(1, 1, 1))
+	b.pressed.connect(func(): settings_requested.emit())
+	return b
 
 ## Currency widget geometry (1080x2160 reference px). V06: pill 84 -> 68 (-20%), icon
 ## unchanged (110), '+' glyph 52 px inside the pill's right end (centre PLUS_GLYPH_INSET +
@@ -848,6 +870,11 @@ func _layout_world() -> void:
 		edge.size = wb.size
 		edge.position = _world_offset + Vector2(-wb.size.x if side == "WorldEdgeLeft" else wb.size.x, 0.0)
 		edge.visible = ox > 0.5 and wb.texture != null
+	var below: TextureRect = _nodes["WorldEdgeBottom"]
+	below.texture = wb.texture
+	below.size = wb.size
+	below.position = Vector2(wb.position.x, wb.position.y + wb.size.y)
+	below.visible = below.position.y < canvas_h - 0.5 and wb.texture != null
 	# Scrubby: V04 safe-box fit x 1.15 (V05), scaled about the visible soles: centre X on
 	# the anchor, visible soles on the anchor Y.
 	var sc: TextureRect = _nodes["Art_scrubby"]
@@ -920,11 +947,10 @@ func _layout_area_label() -> void:
 ## that is not enough (short/wide screens), the column shifts inward just past the bot
 ## (panels stay clear of Scrubby's visible rect). The top margin stays fixed so enlarged
 ## icons never reach the Gift Meter. _apply_layout_mode restores the defaults on resize.
-const PANEL_GAP := 72
-## Clears the tallest pop-out (SHOP/COLLECTION icon box 197 px on a 110 px icon floor).
-const PANEL_TOP := 92
-## Clears the TASKS/DAILY pop-out (164 px icon on a 110 px floor = 54 px) between panels.
-const PANEL_GAP_MIN := 54
+## SB-TF-03: the V06 gaps x PANEL_SCALE (icon pop-out: a 115 px icon on a 77 px floor = 38 px).
+const PANEL_GAP := 50
+const PANEL_TOP := 64
+const PANEL_GAP_MIN := 38
 func _avoid_helper_bots() -> void:
 	for side in ["LeftShortcutColumn", "RightShortcutColumn"]:
 		var col: VBoxContainer = _nodes[side]
@@ -932,6 +958,8 @@ func _avoid_helper_bots() -> void:
 		var over := 0.0
 		var shift := 0.0
 		for b in col.get_children():
+			if not (b as Control).visible:
+				continue
 			var r: Rect2 = (b as Control).get_global_rect()
 			r.position -= global_position
 			for bot in _world["helper_bot_rects"]:
@@ -982,58 +1010,147 @@ func get_scrubby_canonical() -> Dictionary:
 
 # ------------------------------------------------------------ shortcuts ----
 
-func _build_shortcuts(column: VBoxContainer, specs: Array) -> void:
-	for spec in specs:
-		var b := UiShortcutButton.new(spec[0], UiText.t(spec[1]))
-		HomeStyle.style_light_panel(b, int(PANEL_SIZE.y) - UiShortcutButton.LABEL_BAND, PANEL_ALPHA, PANEL_BORDER)
-		b.add_theme_font_size_override("font_size", 28)
-		b.custom_minimum_size = PANEL_SIZE
-		# Panels hug the column's inner edge, so a widened column shifts them inward.
-		b.size_flags_horizontal = Control.SIZE_SHRINK_END if column.name == "LeftShortcutColumn" else Control.SIZE_SHRINK_BEGIN
-		b.set_icon_box(V03_ICON_BOX * float(ICON_SCALE[spec[0]]))
-		var id: String = spec[0]
-		b.pressed.connect(func(): _shortcut_pressed(id))
-		column.add_child(b)
-		_nodes["Shortcut_" + id] = b
-		_nodes["ShortcutIcon_" + id] = b.icon_rect
-
-## M43-C015R (SB-M43-R15-001; R15-004 visual remediation; owner F5 placement 2026-10-06): the
-## auxiliary REWARDED ADS entry. Same production shortcut grammar as SHOP / COLLECTION / TASKS /
-## DAILY: a UiShortcutButton with the canonical light glass panel (HomeStyle.style_light_panel),
-## icon box, live code-rendered label band and badge seam. Its icon is the owner-approved
-## HOME-122 art, bound only through HomeArtBinder / HomePresentationMap (no text baked in).
-## It is NOT a fifth primary panel: it is a child of Shortcut_collection (never a column slot),
-## hung one PANEL_GAP below COLLECTION and stretched to COLLECTION's exact width (owner: "under
-## Collection, same width as Collection and Shop"), so it moves with COLLECTION and hides with
-## the action layer under a modal. Intent only: shortcut_requested("rewarded_ads"); disabled
-## unless the app registered the destination.
-## At the full PANEL_SIZE (210x156) the code label "REWARDED ADS" fits one line in the standard
-## LABEL_BAND (a slightly smaller font than the one-word primaries), so the card is the exact
-## SHOP / COLLECTION panel.
-const REWARDED_ADS_LABEL_FONT := 24
-func _build_rewarded_ads_cta(collection: Control) -> void:
-	var b := UiShortcutButton.new("rewarded_ads", UiText.t("HOME_SC_REWARDED_ADS"))
-	b.name = "RewardedAdsButton"
-	HomeStyle.style_light_panel(b, int(PANEL_SIZE.y) - UiShortcutButton.LABEL_BAND, PANEL_ALPHA, PANEL_BORDER)
+## SB-TF-03 activity button: the UiShortcutButton glass panel (HomeStyle.style_light_panel) at
+## 0.7x size / icon box / label band / font and half the glass alpha. Intent only:
+## shortcut_requested(id) (an Event button: "event:<instance id>").
+func _make_activity_button(id: String, label: String) -> UiShortcutButton:
+	var b := UiShortcutButton.new(id, label)
+	b.label_band = PANEL_LABEL_BAND
+	HomeStyle.style_light_panel(b, int(PANEL_SIZE.y) - PANEL_LABEL_BAND, PANEL_ALPHA, PANEL_BORDER)
+	b.add_theme_font_size_override("font_size", PANEL_FONT)
 	b.autowrap_mode = TextServer.AUTOWRAP_OFF   # one line; never wraps under the icon
+	b.clip_text = true
+	b.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	b.custom_minimum_size = PANEL_SIZE
-	# Exactly COLLECTION's rect (= the SHOP / COLLECTION width), one PANEL_GAP below it.
-	b.anchor_left = 0.0
-	b.anchor_right = 1.0
-	b.anchor_top = 1.0
-	b.anchor_bottom = 1.0
-	b.offset_left = 0.0
-	b.offset_right = 0.0
-	b.offset_top = PANEL_GAP
-	b.offset_bottom = PANEL_GAP + PANEL_SIZE.y
-	b.set_icon_box(V03_ICON_BOX * float(ICON_SCALE["rewarded_ads"]))
-	b.disabled = true
-	b.pressed.connect(func():
-		if not b.disabled:
-			_shortcut_pressed("rewarded_ads"))
-	collection.add_child(_reg(b))
-	HomeStyle.fit_font(b, REWARDED_ADS_LABEL_FONT, PANEL_SIZE.x)   # SB-M49-022: longer locales shrink, never widen
-	_nodes["ShortcutIcon_rewarded_ads"] = b.icon_rect
+	b.set_icon_box(V03_ICON_BOX * PANEL_SCALE)
+	return b
+
+## Label fitted to the 0.7x panel: one line from PANEL_FONT down to PANEL_FONT_MIN (long locales /
+## event names); still wider at the floor, it wraps to two lines in the label band (never cut).
+const PANEL_FONT_MIN := 10
+func _fit_label(b: Button) -> void:
+	var avail: float = PANEL_SIZE.x - b.get_theme_stylebox("normal").get_minimum_size().x
+	var fs := PANEL_FONT
+	while fs > PANEL_FONT_MIN and b.get_theme_font("font").get_string_size(b.text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > avail:
+		fs -= 1
+	b.add_theme_font_size_override("font_size", fs)
+	var wide: bool = b.get_theme_font("font").get_string_size(b.text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > avail
+	b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART if wide else TextServer.AUTOWRAP_OFF
+	b.clip_text = not wide
+	b.text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING if wide else TextServer.OVERRUN_TRIM_ELLIPSIS
+	if wide:
+		var st: StyleBoxFlat = b.get_theme_stylebox("normal")
+		var lines := int(ceil(b.get_theme_font("font").get_multiline_string_size(b.text, HORIZONTAL_ALIGNMENT_CENTER, avail, fs, 2).y))
+		for state in ["normal", "hover", "pressed", "disabled"]:
+			(b.get_theme_stylebox(state) as StyleBoxFlat).content_margin_top = maxf(0.0, PANEL_SIZE.y - st.content_margin_bottom - lines)
+		b.label_band = int(PANEL_SIZE.y - st.content_margin_top)   # the icon stands on the taller label
+		b.set_icon_box(b.get_icon_box())
+
+## The node name of a fixed activity button (Rewarded Ads keeps its M43-C015R name).
+static func _activity_node(id: String) -> String:
+	return "RewardedAdsButton" if id == "rewarded_ads" else "Shortcut_" + id
+
+func _build_activity() -> void:
+	var col: VBoxContainer = _nodes["LeftShortcutColumn"]
+	for spec in ACTIVITY_FIXED:
+		var id: String = spec[0]
+		var b := _make_activity_button(id, UiText.t(spec[1]))
+		b.name = _activity_node(id)
+		b.size_flags_horizontal = Control.SIZE_SHRINK_END
+		if id == "rewarded_ads":
+			b.disabled = true   # until the app registers the destination
+		b.pressed.connect(func():
+			if not b.disabled:
+				_shortcut_pressed(id))
+		col.add_child(_reg(b))
+		_nodes["ShortcutIcon_" + id] = b.icon_rect
+		_fit_label(b)   # SB-M49-022: longer locales shrink, never widen
+
+## SB-TF-03 auto-hide: true when the fixed activity `id` has nothing left to do today (a day
+## rollover re-shows it). Locked entries keep their locked button.
+func _activity_done(id: String) -> bool:
+	if _app == null or _app.economy == null or _app.is_blocked or _locked(id):
+		return false
+	var e = _app.economy
+	match id:
+		"tasks":
+			if not "orders" in e or e.orders == null:
+				return false
+			for o in e.orders.orders():
+				if not o["claimed"]:
+					return false
+			return e.daily.all_tasks_bonus_claimed()
+		"daily":
+			return e.daily.claimed_today()
+		"rewarded_ads":
+			var rd = e.rewarded_daily
+			return rd != null and rd.is_configured() and rd.current_slot() > rd.SLOTS
+	return false
+
+## Active Event instances with a reward not yet claimed, first-active order ([] while locked).
+func _active_events() -> Array:
+	if _app == null or _app.economy == null or _app.is_blocked or not _app.feature_unlocked("events") or not "events_v02" in _app.economy:
+		return []
+	return _app.economy.events_v02.list().filter(func(v): return v["phase"] == "active" and (v["steps"] as Array).any(func(s): return not s["claimed"]))
+
+## Show / hide the activity buttons and lay them out (ACTIVITY_* placement rule). Event buttons
+## are created / freed only when the shown set changes.
+func _sync_activity() -> void:
+	var left: Array = []
+	for spec in ACTIVITY_FIXED:
+		var b: UiShortcutButton = _nodes[_activity_node(spec[0])]
+		b.visible = not _activity_done(spec[0])
+		if b.visible:
+			left.append(b)
+	var events := _active_events().slice(0, ACTIVITY_MAX - left.size())
+	var want := {}
+	for v in events:
+		want["Shortcut_event_" + String(v["id"])] = v
+	for n in _event_buttons.keys():
+		if not want.has(n):
+			var old: Node = _event_buttons[n]
+			if old.get_parent() != null:
+				old.get_parent().remove_child(old)
+			old.queue_free()
+			_event_buttons.erase(n)
+			_nodes.erase(n)
+	var right: Array = []
+	for n in want:
+		var v: Dictionary = want[n]
+		if not _event_buttons.has(n):
+			var eid := String(v["id"])
+			var b := _make_activity_button("event_" + eid, EventsV02Ui.title(eid))
+			b.set_icon_texture(EventsV02Ui.art_texture(EventsV02Ui.ICON % eid))
+			b.pressed.connect(func(): _shortcut_pressed("event:" + String(b.get_meta("iid"))))
+			_event_buttons[n] = b
+			_nodes[n] = b
+		var eb: UiShortcutButton = _event_buttons[n]
+		eb.set_meta("iid", String(v["iid"]))
+		var claim := int(v["claimable"])
+		eb.set_badge_text(str(claim) if claim > 0 else (UiText.t("HOME_BADGE_NEW") if HomeBadges.new_features(_app).has("events") else ""))
+		if right.size() < ACTIVITY_PER_COLUMN:
+			right.append(eb)
+		else:
+			left.append(eb)
+	for pair in [["LeftShortcutColumn", left], ["RightShortcutColumn", right]]:
+		var col: VBoxContainer = _nodes[pair[0]]
+		var i := 0
+		for b in pair[1]:
+			if b.get_parent() != col:
+				if b.get_parent() != null:
+					b.get_parent().remove_child(b)
+				col.add_child(b)
+				_fit_label(b)
+			b.size_flags_horizontal = Control.SIZE_SHRINK_END if pair[0] == "LeftShortcutColumn" else Control.SIZE_SHRINK_BEGIN
+			col.move_child(b, i)
+			i += 1
+
+## The activity buttons currently shown, per column (tests / evidence).
+func get_activity_layout() -> Dictionary:
+	var out := {}
+	for side in ["LeftShortcutColumn", "RightShortcutColumn"]:
+		out[side] = (_nodes[side] as Node).get_children().filter(func(b): return (b as Control).visible).map(func(b): return String(b.name))
+	return out
 
 # ------------------------------------------------------------- Play CTA ----
 
@@ -1114,152 +1231,7 @@ class PlayTriangle extends Control:
 		if what == NOTIFICATION_RESIZED:
 			queue_redraw()
 
-# ---------------------------------------------------- Win Streak track ----
-
-## V05 reward rail (master reward-track grammar): a shallow dark-blue rounded rail with
-## the progress line running through it; the HOME-086 streak badge stands in front of the
-## rail's left end; the five HOME-090..094 gifts are large reward objects standing on the
-## line and overhanging the rail top; ONLY the live value (1/5/10/25/100) sits centred
-## under each gift. Reached = full, current = gold value + glow, future = dimmed.
-const TRACK_H := 120.0   # = V04 track height, so released ad space maps 1:1 onto the stack
-const TRACK_RAIL_TOP := 38.0
-const TRACK_BADGE := 112.0
-const TRACK_GIFT := 82.0
-const TRACK_LINE_Y := 56.0
-func _build_track(track: MarginContainer) -> void:
-	var panel := Control.new()
-	panel.name = "TrackPanel"
-	panel.custom_minimum_size = Vector2(0, TRACK_H)
-	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	track.add_child(_reg(panel))
-	var rail := Panel.new()
-	rail.name = "TrackRail"
-	rail.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	rail.add_theme_stylebox_override("panel", HomeStyle.box(Color(0.035, 0.090, 0.230, 0.94), HomeStyle.GLOW, 3, 34, 8))
-	rail.set_anchors_preset(Control.PRESET_FULL_RECT)
-	rail.offset_left = TRACK_BADGE * 0.45
-	rail.offset_top = TRACK_RAIL_TOP
-	panel.add_child(_reg(rail))
-	var area := Control.new()
-	area.name = "TrackSteps"
-	area.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	area.set_anchors_preset(Control.PRESET_FULL_RECT)
-	area.offset_left = TRACK_BADGE + 6.0
-	area.offset_right = -10.0
-	panel.add_child(_reg(area))
-	var line := ProgressBar.new()
-	line.name = "TrackProgress"
-	line.show_percentage = false
-	line.max_value = TRACK_POSITIONS
-	line.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	HomeStyle.style_meter(line, Color(0.55, 0.95, 0.20), 14)
-	line.anchor_left = 0.1
-	line.anchor_right = 0.9
-	line.offset_top = TRACK_LINE_Y - 7.0
-	line.offset_bottom = TRACK_LINE_Y + 7.0
-	area.add_child(_reg(line))
-	var steps := HBoxContainer.new()
-	steps.set_anchors_preset(Control.PRESET_FULL_RECT)
-	steps.add_theme_constant_override("separation", 0)
-	steps.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	area.add_child(steps)
-	for i in range(TRACK_POSITIONS):
-		var col := VBoxContainer.new()
-		col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		col.add_theme_constant_override("separation", -8)
-		col.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		steps.add_child(col)
-		var gift := HomeStyle.art("TrackGift%d" % (i + 1))
-		gift.custom_minimum_size = Vector2(0, TRACK_GIFT)
-		col.add_child(_reg(gift))
-		var glow := Panel.new()
-		glow.name = "TrackGlow%d" % (i + 1)
-		glow.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		glow.show_behind_parent = true
-		var gsb := StyleBoxFlat.new()
-		gsb.bg_color = Color(1.0, 0.85, 0.25, 0.30)
-		gsb.set_corner_radius_all(46)
-		gsb.shadow_color = Color(1.0, 0.80, 0.20, 0.65)
-		gsb.shadow_size = 18
-		glow.add_theme_stylebox_override("panel", gsb)
-		glow.set_anchors_preset(Control.PRESET_CENTER)
-		glow.offset_left = -40
-		glow.offset_right = 40
-		glow.offset_top = -40
-		glow.offset_bottom = 40
-		glow.visible = false
-		gift.add_child(_reg(glow))
-		var value := HomeStyle.label("", 30)
-		value.name = "TrackStep%d" % (i + 1)
-		value.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		col.add_child(_reg(value))
-	var badge := HomeStyle.art("TrackBadge")
-	badge.set_anchors_preset(Control.PRESET_CENTER_LEFT)
-	badge.offset_left = 0
-	badge.offset_right = TRACK_BADGE
-	badge.offset_top = -TRACK_BADGE * 0.5 + 8.0
-	badge.offset_bottom = TRACK_BADGE * 0.5 + 8.0
-	panel.add_child(_reg(badge))
-	var streak := HomeStyle.label("", 38)
-	streak.name = "TrackStreakValue"
-	streak.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	streak.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	streak.set_anchors_preset(Control.PRESET_FULL_RECT)
-	streak.offset_top = 10
-	badge.add_child(_reg(streak))
-
-# ----------------------------------------------------------- bottom nav ----
-
-## Bottom navigation dock — the ONLY Settings entry on Home. Only HOME and SETTINGS have
-## V1 destinations; the other tabs are shown disabled (later milestones) — never faked.
-func _build_bottom_nav(nav: PanelContainer) -> void:
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 8)
-	nav.add_child(row)
-	for spec in [["events", "HOME_NAV_EVENTS"], ["robots", "HOME_NAV_ROBOTS"], ["home", "HOME_NAV_HOME"], ["leaderboard", "HOME_NAV_LEADERBOARD"], ["settings", "HOME_NAV_SETTINGS"]]:
-		var b := Button.new()
-		var id: String = spec[0]
-		b.name = "SettingsButton" if id == "settings" else "Nav_" + id
-		b.text = UiText.t(spec[1])
-		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		b.custom_minimum_size = Vector2(0, 150)
-		b.add_theme_font_size_override("font_size", 26)
-		b.focus_mode = Control.FOCUS_ACCESSIBILITY
-		HomeStyle.style_nav_button(b, id == "home")
-		for st in ["normal", "hover", "pressed", "disabled"]:
-			var sb: StyleBoxFlat = b.get_theme_stylebox(st)
-			sb.content_margin_top = 96
-		var icon := HomeStyle.art("NavIcon_" + id)
-		icon.set_anchors_preset(Control.PRESET_CENTER_TOP)
-		icon.offset_left = -44
-		icon.offset_right = 44
-		icon.offset_top = 6
-		icon.offset_bottom = 94
-		b.add_child(_reg(icon))
-		match id:
-			"settings":
-				b.pressed.connect(func(): settings_requested.emit())
-			"home":
-				b.toggle_mode = true
-				b.button_pressed = true
-				b.disabled = true   # already here
-			"robots":
-				pass   # M43-C008: real ROBOTS destination (app root opens it on nav_requested)
-			_:
-				b.disabled = true
-				b.tooltip_text = UiText.t("HOME_COMING_LATER")
-		b.pressed.connect(func():
-			if not _locked(id):
-				_mark_visited(id)
-				nav_requested.emit(id))
-		row.add_child(b)
-		_nodes["Nav_" + id] = b
-		# M43-C010 (SB-M43-134): one attention count per tab, from HomeBadges.
-		b.add_child(_reg(_badge_label("NavBadge_" + id)))
-		# SB-M50-015: a locked tab says "LV N" in text (not only the dimmed plate), like the booster bar.
-		var lock := _badge_label("NavLock_" + id)
-		lock.add_theme_stylebox_override("normal", HomeStyle.box(HomeStyle.NAVY, HomeStyle.EDGE_DIM, 3, 18, 0))
-		b.add_child(_reg(lock))
+# ---------------------------------------------------------------- badges ----
 
 ## Red top-right count pill (hidden until it has text).
 func _badge_label(n: String) -> Label:
@@ -1281,9 +1253,9 @@ func _badge_label(n: String) -> Label:
 
 # ------------------------------------------------------------ ad slot ----
 
-## V04 persistent ad slot below the nav. Empty integration seam: a future ad SDK view is
-## attached to get_ad_mount(); a future No-Ads entitlement collapses the slot with
-## set_ad_slot_enabled(false). No provider, no fake content.
+## SB-TF-03 persistent banner area below PLAY. Empty integration seam: the ad SDK view is
+## attached to get_ad_mount(); the No Ads entitlement (AdService.allowed("banner") false, wired
+## by main.gd) collapses it with set_ad_slot_enabled(false). No fake content.
 func set_ad_slot_enabled(enabled: bool) -> void:
 	_ad_slot_enabled = enabled
 	(_nodes["AdBannerSlot"] as Control).visible = enabled
@@ -1325,7 +1297,7 @@ func get_layout_mode() -> int:
 ## (the app root passes "settings") is open, the single HomeActionLayer and the HUD (+)
 ## buttons are hidden (not drawn; no pointer/keyboard input). The ActionHost keeps its
 ## layout slot, so closing restores exactly the previous Home.
-const MODAL_HIDDEN := ["HomeActionLayer", "ScrubBucksPlus", "HeartsPlus", "GiftMeterButton", "ProfileButton"]
+const MODAL_HIDDEN := ["HomeActionLayer", "ScrubBucksPlus", "HeartsPlus", "GiftMeterButton", "ProfileButton", "SettingsButton"]
 func set_modal_active(source: String, active: bool) -> void:
 	if active:
 		_external_modals[source] = true
@@ -1374,8 +1346,7 @@ func refresh() -> void:
 	# F012: only a VISIBLE render is compared (a hidden refresh keeps the last seen baseline).
 	if is_visible_in_tree():
 		_micro.observe(_vm, {"frontier": _nodes["HomeJourneyStrip"] if _nodes["HomeJourneyStrip"].visible else play,
-			"bot_parts": _nodes["ProfileBotParts"],
-			"win_streak": _nodes["TrackGift%d" % clampi(int(_vm.get("win_streak", 1)), 1, TRACK_POSITIONS)]})
+			"bot_parts": _nodes["ProfileBotParts"]})
 
 func _render_values() -> void:
 	_vm = HomeViewModel.build(_app)
@@ -1393,7 +1364,6 @@ func _render_values() -> void:
 		pr.texture = load(RobotRoster.asset(active, "portrait"))
 	else:
 		pr.texture = pr.get_meta("binder_tex")
-	(_nodes["ProfileLevel"] as Label).text = UiText.num(_vm["level"])
 	var w := WorldService.world_for_level(int(_vm["level"]))
 	# Owner 2026-11-17: the title is the current world's name (same source as the world ceremony).
 	_set_area_text("HomeAreaTitle", UiText.t("HOME_AREA_WORLD", [UiText.caps(UiText.data("WORLD_NAME_%d" % int(w["number"]), String(w["name"])))]) if not w.is_empty() else "")
@@ -1428,35 +1398,20 @@ func _render_values() -> void:
 	var gbadge: Label = _nodes["GiftClaimableBadge"]
 	gbadge.text = str(_vm["gift_claimable"])
 	gbadge.visible = _vm["gift_claimable"] > 0
-	(_nodes["TrackStreakValue"] as Label).text = UiText.num(_vm["win_streak"])
-	(_nodes["TrackProgress"] as ProgressBar).value = clampi(_vm["win_streak"], 0, TRACK_POSITIONS)
-	for step in _vm["win_streak_track"]:
-		var value: Label = _nodes["TrackStep%d" % step["position"]]
-		value.text = UiText.num(step["sb"])
-		value.add_theme_color_override("font_color", HomeStyle.GOLD if step["current"] else HomeStyle.TEXT)
-		value.modulate.a = 1.0 if step["reached"] or step["current"] else 0.6
-		var gift: Control = _nodes["TrackGift%d" % step["position"]]
-		gift.modulate = Color(1, 1, 1, 1) if step["reached"] or step["current"] else Color(0.72, 0.78, 0.92, 0.80)
-		(_nodes["TrackGlow%d" % step["position"]] as Control).visible = step["current"]
-	# SB-M44-031: a locked entry is disabled, names its unlock level and carries no badge.
-	for nid in ["robots", "events", "leaderboard"]:
-		var nb: Button = _nodes["Nav_" + nid]
-		var served: bool = nid == "robots" or _app_nav.has(nid)
-		nb.disabled = _locked(nid) or not served
-		nb.tooltip_text = _unlock_text(nid) if _locked(nid) else ("" if served else UiText.t("HOME_COMING_LATER"))
-		nb.accessibility_description = nb.tooltip_text
-		var lock: Label = _nodes["NavLock_" + nid]
-		lock.visible = _locked(nid)
-		lock.text = UiText.t("BOOSTER_LOCKED_LEVEL", [_app.feature_unlock_level(GATED_ENTRIES[nid])]) if lock.visible else ""
 	# SB-M42-024: Daily badge = 1 when today's login reward is claimable.
 	var counts := {"daily": 0 if _vm["daily_claimed_today"] or _locked("daily") else 1}
-	# M43-C010 (SB-M43-134): Tasks / Collection shortcuts + ROBOTS / EVENTS tabs.
+	# M43-C010 (SB-M43-134): Tasks shortcut; SB-TF-03: the profile card carries the Profile
+	# destinations' attention (claimable achievements + unseen robots + new collection cards).
 	if "orders" in _app.economy and _app.economy.orders != null:
 		var bd := HomeBadges.compute(_app)
-		for cid in ["tasks", "collection", "robots", "events"]:
-			counts[cid] = 0 if _locked(cid) else int(bd[cid])
+		counts["tasks"] = 0 if _locked("tasks") else int(bd["tasks"])
+		var profile_n: int = int(bd["achievements"])
+		for cid in ["robots", "collection"]:
+			profile_n += 0 if _locked(cid) else int(bd[cid])
 		var pb: Label = _nodes["ProfileBadge"]
-		pb.text = str(int(bd["achievements"])) if int(bd["achievements"]) > 0 else ""
+		# SB-M44-013: a newly unlocked Profile destination shows NEW here until visited there.
+		var fresh_profile: bool = HomeBadges.new_features(_app).any(func(f): return ["robots", "collection", "leaderboard"].has(f))
+		pb.text = str(profile_n) if profile_n > 0 else (UiText.t("HOME_BADGE_NEW") if fresh_profile else "")
 		pb.visible = not pb.text.is_empty()
 		# M47-TOUCH-R01: red "1" while the next sequential Rewarded Ads reward is actionable (only
 		# when the app serves that destination).
@@ -1466,18 +1421,15 @@ func _render_values() -> void:
 	var badge_text := func(bid: String) -> String:
 		var c := int(counts.get(bid, 0))
 		return str(c) if c > 0 else (UiText.t("HOME_BADGE_NEW") if fresh.has(bid) else "")
-	for sid in ["shop", "collection", "tasks", "daily"]:
+	for sid in ["tasks", "daily"]:
 		(_nodes["Shortcut_" + sid] as UiShortcutButton).set_badge_text(badge_text.call(sid))
-	for nid in ["robots", "events", "leaderboard"]:
-		var nl: Label = _nodes["NavBadge_" + nid]
-		nl.text = badge_text.call(nid)
-		nl.visible = not nl.text.is_empty() and not (_nodes["Nav_" + nid] as Button).disabled
-	for id in LEFT_SHORTCUTS + RIGHT_SHORTCUTS:
-		var sc: Button = _nodes["Shortcut_" + id[0]]
-		sc.disabled = _locked(id[0]) or not (LIVE_SHORTCUTS.has(id[0]) or _app_shortcuts.has(id[0]))
-		sc.tooltip_text = _unlock_text(id[0]) if _locked(id[0]) else ""
+	for sid in ["tasks", "daily"]:
+		var sc: Button = _nodes["Shortcut_" + sid]
+		sc.disabled = _locked(sid) or not (LIVE_SHORTCUTS.has(sid) or _app_shortcuts.has(sid))
+		sc.tooltip_text = _unlock_text(sid) if _locked(sid) else ""
 		sc.accessibility_description = sc.tooltip_text
 	(_nodes["RewardedAdsButton"] as Button).disabled = not _app_shortcuts.has("rewarded_ads")
+	_sync_activity()
 	for pid in _popups:
 		if (_popups[pid] as Control).visible:
 			_render_popup(pid)
@@ -1488,22 +1440,17 @@ func _render_values() -> void:
 ## M43: shortcuts the app root opens as app-level destinations (set by main.gd). A standalone
 ## Home (tests / tools without the app root) keeps its M42 popups.
 var _app_shortcuts: Array = []
-var _app_nav: Array = []
+## SB-TF-03: node name -> the live Event activity button.
+var _event_buttons: Dictionary = {}
 
 ## SB-M44-031: true while the Home entry `id` is behind the owner unlock table.
 func _locked(id: String) -> bool:
+	if id.begins_with("event:"):
+		id = "events"
 	return GATED_ENTRIES.has(id) and _app != null and not _app.feature_unlocked(GATED_ENTRIES[id])
 
 func _unlock_text(id: String) -> String:
 	return UiText.t("HOME_UNLOCKS_AT_LEVEL", [_app.feature_unlock_level(GATED_ENTRIES[id])])
-
-func set_app_nav(ids: Array) -> void:
-	_app_nav = ids.duplicate()
-	for id in ids:
-		if _nodes.has("Nav_" + id):
-			(_nodes["Nav_" + id] as Button).disabled = false
-			(_nodes["Nav_" + id] as Button).tooltip_text = ""
-	refresh()
 
 func set_app_shortcuts(ids: Array) -> void:
 	_app_shortcuts = ids.duplicate()
@@ -1512,7 +1459,7 @@ func set_app_shortcuts(ids: Array) -> void:
 func _shortcut_pressed(id: String) -> void:
 	if _locked(id):
 		return
-	_mark_visited(id)
+	_mark_visited("events" if id.begins_with("event:") else id)
 	shortcut_requested.emit(id)
 	if not _app_shortcuts.has(id):
 		open_popup(id)
@@ -1679,9 +1626,6 @@ func show_hud_value(kind: String, v: float) -> void:
 			var gm := GiftProgressModel.build(n, int(_vm["gift_cycle_max"]))
 			gm["cycle_max"] = gnext
 			(_nodes["GiftTickOverlay"] as GiftTickOverlay).set_model(gm, [], _app.effects.is_reduced())
-		"win_streak":
-			(_nodes["TrackStreakValue"] as Label).text = UiText.num(n)
-			(_nodes["TrackProgress"] as ProgressBar).value = clampi(n, 0, TRACK_POSITIONS)
 
 ## Home hidden (PLAY, route change): a running flight lands its final state at once.
 func _notification(what: int) -> void:
@@ -1694,15 +1638,25 @@ func get_micro_feel():
 func get_view_model() -> Dictionary:
 	return _vm.duplicate(true)
 
-## SB-M42-003: the ONE CTA launches only the canonical progression frontier. The button
-## reads PLAY; the live subtitle carries the frontier: no completed level -> "LEVEL N";
-## otherwise "CONTINUE · LEVEL N". A frontier without catalog content is shown honestly
-## and disabled (no fallback, no picker).
+## SB-M42-003: the ONE CTA launches only the canonical progression frontier. SB-TF-03: the
+## button reads "PLAY · LEVEL N" (N = the level PLAY launches), font-fitted to the button; the
+## live subtitle still carries the frontier: no completed level -> "LEVEL N"; otherwise
+## "CONTINUE · LEVEL N". A frontier without catalog content is shown honestly and disabled
+## (no fallback, no picker).
+const PLAY_FONT := 76
+const PLAY_FONT_MIN := 30
 func _render_play(play: Button, status: Label) -> void:
 	_launch = GameplayLaunchResolver.resolve(_app)
 	var level := int(_launch.get("level", _app.progression.current_level()))
 	var first_time: bool = _app.progression.completed_count() == 0
-	play.text = UiText.t("HOME_PLAY")
+	var text := UiText.t("HOME_PLAY_LEVEL", [level])
+	if play.text != text:
+		var avail: float = PLAY_SIZE.x - play.get_theme_stylebox("normal").get_minimum_size().x - 2.0 * play.get_theme_constant("outline_size")
+		var fs := PLAY_FONT
+		while fs > PLAY_FONT_MIN and play.get_theme_font("font").get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > avail:
+			fs -= 1
+		play.add_theme_font_size_override("font_size", fs)   # before the text: never a wider frame
+		play.text = text
 	(_nodes["PlaySubtitle"] as Label).text = UiText.t("HOME_START_LEVEL", [level]) if first_time else UiText.t("HOME_CONTINUE_LEVEL", [level])
 	if _launch.get("ok", false):
 		play.disabled = false

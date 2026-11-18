@@ -139,20 +139,20 @@ func _home_matches(b: Dictionary) -> bool:
 # ------------------------------------------------------------------ 029 ----
 
 func _m029() -> void:
-	print("[029 BottomNav transitions + modal stack]")
+	print("[029 Home entry transitions + modal stack (SB-TF-03: no BottomNav)]")
 	_reset_clock()
 	await _boot()
 	var h = _root.get_home()
 	var stack = _root.get_modal_stack()
 	var got := {}
-	for id in ["events", "robots", "leaderboard"]:
-		var b: Button = h.get_region("Nav_" + id)
+	for id in ["ProfileButton", "Shortcut_tasks", "Shortcut_daily"]:
+		var b: Button = h.get_region(id)
 		b.pressed.emit()
 		b.pressed.emit()
 		await _settle()
 		got[id] = stack.ids()
 		_ok(_root.handle_back() == "close_modal" and stack.depth() == 0, "back closes the %s destination" % id)
-	_ok(got == {"events": ["events"], "robots": ["robots"], "leaderboard": ["ranks"]} and _nav() == R.HOME, "double tap on each tab: exactly one destination %s" % str(got))
+	_ok(got == {"ProfileButton": ["profile"], "Shortcut_tasks": ["tasks"], "Shortcut_daily": ["daily_login"]} and _nav() == R.HOME, "double tap on each Home entry: exactly one destination %s" % str(got))
 	_complete("m029_tab_double_tap_one")
 
 	(h.get_region("ProfileButton") as Button).pressed.emit()
@@ -171,7 +171,7 @@ func _m029() -> void:
 	_ok(_nav() == R.HOME and stack.depth() == 0, "back on a bare Home: Home stays, nothing opens")
 	_complete("m029_modal_lifo_back")
 
-	(h.get_region("Nav_settings") as Button).pressed.emit()
+	(h.get_region("SettingsButton") as Button).pressed.emit()
 	await _settle()
 	var open: bool = _root.get_navigation().is_settings_open()
 	_root.handle_back()

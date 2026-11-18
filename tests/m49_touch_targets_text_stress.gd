@@ -5,7 +5,7 @@ extends SceneTree
 ##   t00 English: the t02 checks hold; text overhanging its parent here is the approved design
 ##       (corner badges, price tags) and is the only overhang t02 / t03 accept
 ##   t01 every visible interactive control (BaseButton, Slider, supply front HitArea) on Home +
-##       BottomNav, gameplay HUD (Pause, 2x, supply, boosters incl. locked plates), Pause popup,
+##       Settings icon / activity buttons (SB-TF-03), gameplay HUD (Pause, 2x, supply, boosters incl. locked plates), Pause popup,
 ##       Results WON / LOST, Shop, Daily, Tasks, Gift bar, Collection, Robots, Events, Ranks,
 ##       Profile, Help, Life and Settings is >= 88x88 design px and overlaps no other one; Home +
 ##       gameplay are measured again on a save WITHOUT the test unlock (real locked entries/plates)
@@ -94,7 +94,9 @@ func _matrix(tag: String, check: Callable) -> void:
 		_report(phys, lv, "home", check.call(_root.get_home(), []))
 		if tag == "t00":
 			var ra: int = _root.get_home().get_region("RewardedAdsButton").get_theme_font_size("font_size")
-			_ok(ra == 24, "%s: English REWARDED ADS keeps its 24 px font (%d)" % [str(phys), ra])
+			var rab: Button = _root.get_home().get_region("RewardedAdsButton")
+			var fits: bool = rab.get_theme_font("font").get_string_size(rab.text, HORIZONTAL_ALIGNMENT_LEFT, -1, ra).x <= rab.size.x - rab.get_theme_stylebox("normal").get_minimum_size().x + 0.5
+			_ok(ra <= 20 and ra >= 12 and fits, "%s: English REWARDED ADS fitted on one line inside the SB-TF-03 0.7x panel (20 px floor 12; %d)" % [str(phys), ra])
 		for d in POPUPS:
 			var top = await _open(d)
 			if top == null:
@@ -167,8 +169,10 @@ func _fronts(s) -> Array:
 func _open(d: String):
 	var stack = _root.get_modal_stack()
 	match d:
-		"leaderboard":
-			_root._on_home_nav("leaderboard")
+		"leaderboard":   # SB-TF-03: RANKS lives in Profile
+			_root._on_home_shortcut("profile")
+			await _frames(2)
+			stack.top()._on_action("ranks")
 		"settings":
 			_root.open_settings()
 			await _frames(4)

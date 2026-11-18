@@ -45,7 +45,8 @@ const REPORT_MD := "res://docs/RELEASE_GATES.md"
 const T0 := 1790000000
 const BOOSTERS := ["plus_one_slot", "random", "selector", "tornado"]
 ## ModalStack popup id -> ui_surface_registry id where they differ (Booster Acquire is booster_<id>).
-const POPUP_ALIAS := {"daily_login": "daily"}
+## SB-TF-03: an Event activity button opens its details (the walkthrough on top at the first visit).
+const POPUP_ALIAS := {"daily_login": "daily", "event_details": "event_detail", "event_tutorial": "event_detail"}
 ## Copy that must never ship (whole words, case-insensitive) in the English table.
 const PLACEHOLDER := "\\b(placeholder|dummy|lorem|ipsum|todo|tbd|fixme|xxx|test copy)\\b"
 ## Shipping script roots that must not reach the developer debug harness.
@@ -122,13 +123,28 @@ func _g001() -> void:
 		await _reset_home()
 	print("    home buttons -> %s" % str(reached))
 	_check(g, "home_buttons", dead.is_empty() and names.size() >= 10, "%d enabled Home buttons pressed, each opened a surface: %s; dead %s" % [names.size(), _sorted_keys(reached), str(dead)])
+	# SB-TF-03: Robots / Ranks / Collection are Profile buttons; MORE IN SHOP sits in the Hearts popup.
 	var tabs_off: Array = []
-	for id in ["events", "robots", "leaderboard"]:
-		var nb: Button = home.get_region("Nav_" + id)
-		if nb.disabled:
+	var profile_landed := {}
+	for id in ["robots", "ranks", "collection"]:
+		home.get_region("ProfileButton").pressed.emit()
+		await _frames(3)
+		var pb: Button = ms.top().get_action_button(id) if ms.top() != null else null
+		if pb == null or pb.disabled:
 			tabs_off.append(id)
-	var home_tab_current: bool = home.get_region("Nav_home").disabled and home.get_region("Nav_home").button_pressed
-	_check(g, "nav_tabs_live", tabs_off.is_empty(), "with every feature unlocked no BottomNav tab is disabled / COMING LATER %s" % str(tabs_off))
+		else:
+			ms.top()._on_action(id)
+			await _frames(3)
+			profile_landed[id] = _destination()
+		await _reset_home()
+	home.get_region("HeartsPlus").pressed.emit()
+	await _frames(3)
+	if ms.top() != null:
+		ms.top()._on_action("shop")
+		await _frames(3)
+	var life_shop := _destination()
+	await _reset_home()
+	_check(g, "nav_tabs_live", tabs_off.is_empty(), "with every feature unlocked no Profile destination (ROBOTS / RANKS / COLLECTION) is blocked %s" % str(tabs_off))
 	var links: Dictionary = {}
 	var dead_links: Array = []
 	for d in NotificationPolicy.DESTINATIONS:
@@ -211,13 +227,16 @@ func _g001() -> void:
 	for d in reached:
 		landed[reached[d]] = d
 	var boosters_landed: Array = BOOSTERS.map(func(b): return hud.get("booster_" + b, ""))
-	var observed := {"home.shortcut_shop": landed.get("Shortcut_shop"), "home.shortcut_collection": landed.get("Shortcut_collection"),
-		"home.shortcut_tasks": landed.get("Shortcut_tasks"), "home.shortcut_daily": landed.get("Shortcut_daily"),
+	var event_landed = null
+	for k in landed:
+		if String(k).begins_with("Shortcut_event_"):
+			event_landed = landed[k]
+	var observed := {"home.shortcut_tasks": landed.get("Shortcut_tasks"), "home.shortcut_daily": landed.get("Shortcut_daily"),
 		"home.scrub_bucks_plus": landed.get("ScrubBucksPlus"), "home.heart_plus": landed.get("HeartsPlus"),
 		"home.gift_meter": landed.get("GiftMeterButton"), "home.rewarded_ads": landed.get("RewardedAdsButton"), "home.play": landed.get("PlayButton"),
-		"home.profile": landed.get("ProfileButton"), "bottom_nav.events": landed.get("Nav_events"), "bottom_nav.robots": landed.get("Nav_robots"),
-		"bottom_nav.home": "home" if home_tab_current else null,   # the current tab ("already here")
-		"bottom_nav.ranks": landed.get("Nav_leaderboard"), "bottom_nav.settings": landed.get("SettingsButton"),
+		"home.profile": landed.get("ProfileButton"), "home.settings": landed.get("SettingsButton"), "home.event": event_landed,
+		"profile.robots": profile_landed.get("robots"), "profile.ranks": profile_landed.get("ranks"), "profile.collection": profile_landed.get("collection"),
+		"life.more_in_shop": life_shop,
 		"gameplay.pause": hud.get("pause"), "gameplay.speed_no_entitlement": hud.get("speed"),
 		"gameplay.booster_no_charge": boosters_landed[0] if boosters_landed.all(func(x): return x == boosters_landed[0]) else null,
 		"attempt.zero_hearts": zero,
@@ -461,7 +480,9 @@ func _g004() -> void:
 	_check(g, "no_provider", prov != null and prov.get_script() == AdProvider and e.ads.get_provider() == prov and not prov.is_available("rewarded_heart"),
 		"ad provider (banner / interstitial / rewarded) is the production default null AdProvider (no SDK): every placement unavailable")
 	var snap := [e.wallet.scrub_bucks(), e.hearts.hearts()]
-	home.get_region("Shortcut_shop").pressed.emit()
+	home.get_region("HeartsPlus").pressed.emit()   # SB-TF-03: the Shop opens from the (+) popups
+	await _frames(3)
+	ms.top()._on_action("shop")
 	await _frames(3)
 	var shop = ms.top()
 	var shop_ok: bool = shop != null and String(shop.popup_id) == "shop"
@@ -542,22 +563,36 @@ func _g005() -> void:
 		var home = _root.get_home()
 		var ms = _root.get_modal_stack()
 		var row := {"level": app.progression.current_level()}
-		for pair in [["events", "Nav_events", "events"], ["ranks", "Nav_leaderboard", "leaderboard"]]:
-			var nb: Button = home.get_region(pair[1])
-			nb.pressed.emit()
+		# SB-TF-03: Events = per-event Home activity buttons; Ranks = the Profile RANKS button.
+		var evb: Array = home.find_children("Shortcut_event_*", "", true, false)
+		var ev_open := false
+		if not evb.is_empty():
+			(evb[0] as Button).pressed.emit()
 			await _frames(3)
-			row[pair[0]] = [app.feature_unlocked(pair[0]), not nb.disabled, ms.depth() > 0 and String(ms.top().popup_id) == pair[0]]
+			ev_open = ms.ids().has("event_details")
 			ms.clear("test")
 			await _frames(1)
+		row["events"] = [app.feature_unlocked("events"), not evb.is_empty(), ev_open]
+		home.get_region("ProfileButton").pressed.emit()
+		await _frames(3)
+		var rb: Button = ms.top().get_action_button("ranks")
+		var rb_live: bool = not rb.disabled
+		ms.top()._on_action("ranks")
+		await _frames(3)
+		row["ranks"] = [app.feature_unlocked("ranks"), rb_live, ms.depth() > 0 and String(ms.top().popup_id) == "ranks"]
+		ms.clear("test")
+		await _frames(1)
 		row["events_link"] = _root.open_deep_link("events")
 		ms.clear("test")
 		edges[frontier] = row
 	var ok: bool = edges[29]["events"] == [false, false, false] and edges[29]["events_link"] == "home" and edges[30]["events"] == [true, true, true] and edges[30]["events_link"] == "events" \
 		and edges[39]["ranks"] == [false, false, false] and edges[40]["ranks"] == [true, true, true] and edges[29]["level"] == 29
-	_check(g, "unlock_edges", ok, "frontier 29/30/39/40 [unlocked, tab enabled, tap opens]: %s" % str(edges))
+	_check(g, "unlock_edges", ok, "frontier 29/30/39/40 [unlocked, entry live (Event buttons / Profile RANKS), tap opens]: %s" % str(edges))
 	_check(g, "ranks_metric", PersonalRank.METRIC == "campaign_levels_cleared", "Ranks count only cleared campaign levels (PersonalRank.METRIC %s): nothing bought with money or boosters counts" % PersonalRank.METRIC)
 	await _boot("g005_ranks", _tmp[_tmp.size() - 1])
-	_root.get_home().get_region("Nav_leaderboard").pressed.emit()
+	_root.get_home().get_region("ProfileButton").pressed.emit()
+	await _frames(3)
+	_root.get_modal_stack().top()._on_action("ranks")
 	await _frames(3)
 	var rp = _root.get_modal_stack().top()
 	var two_tables: bool = rp != null and rp.find_child("AllTime*", true, false) != null and rp.find_child("Weekly*", true, false) != null

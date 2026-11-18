@@ -24,6 +24,8 @@ signal language_changed(code: String)
 signal credits_requested
 ## SB-M58-008: the PRIVACY popup (analytics consent + policy summary) was requested (the app root opens it).
 signal privacy_requested
+## SB-TF-03: the NOTIFICATIONS popup (moved here from Profile) was requested (the app root opens it).
+signal notifications_requested
 
 const BasePopup = preload("res://scripts/ui/popup/base_popup.gd")
 const HomeStyle = preload("res://scripts/ui/home/home_style.gd")
@@ -53,6 +55,7 @@ var _lang_buttons: Dictionary = {}   ## language code -> Button
 var _help: Button
 var _credits: Button
 var _privacy: Button
+var _notifications: Button
 var _status: Label
 var _cloud: Label
 var _built := false
@@ -240,6 +243,11 @@ func _build() -> void:
 		_lang_buttons[code] = b
 		lang_line.add_child(b)
 	list.add_child(_card(lang_box))
+
+	# SB-TF-03: NOTIFICATIONS (reminder preferences, ProfileScreens.open_notifications).
+	_notifications = _make_row_button("NotificationsButton", UiText.t("NOTIFY_TITLE"))
+	_notifications.pressed.connect(func(): notifications_requested.emit())
+	list.add_child(_card(_notifications))
 
 	_status = Label.new()
 	_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -611,6 +619,9 @@ func get_language_button(code: String) -> Button:
 
 func get_credits_button() -> Button:
 	return _credits
+
+func get_notifications_button() -> Button:
+	return _notifications
 
 func get_privacy_button() -> Button:
 	return _privacy

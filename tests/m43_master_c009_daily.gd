@@ -57,7 +57,7 @@ func _t01() -> void:
 	var b: Button = _root.get_home().get_region("Shortcut_tasks")
 	_ok(not b.disabled, "TASKS panel live")
 	var h = _root.get_home()
-	_ok(not h.get_region("Shortcut_shop").disabled and not h.get_region("Shortcut_collection").disabled and not h.get_region("Shortcut_daily").disabled, "SHOP / COLLECTION / DAILY panels tappable in the real app (follow-up SB-M43-078 / 090)")
+	_ok(not h.get_region("Shortcut_daily").disabled and not h.get_region("RewardedAdsButton").disabled and h.get_region("Shortcut_shop") == null, "DAILY / REWARDED ADS activity buttons tappable in the real app; no SHOP / COLLECTION tiles (SB-TF-03)")
 	b.pressed.emit()
 	await _frames(2)
 	_ok(_top_id() == "tasks" and _root.get_home().get_popup("tasks") == null, "TASKS -> app-level Tasks (no Home placeholder)")

@@ -84,7 +84,7 @@ func _accounting(home) -> void:
 	var modes := {}
 	for row in acc:
 		modes[row["mode"]] = int(modes.get(row["mode"], 0)) + 1
-	_ok(modes == {"STATIC": 26, "WORLD_BAKED_RETIRED": 18, "OWNER_RETIRED": 10, "OWNER_DISABLED": 2}, "V04 + R01-V02 + R15-004 (HOME-122) + SB-HOME-BG (HOME-124; HOME-121/123 retired) + SB-HOME-VIDEO (HOME-125): 26 STATIC + 18 WORLD_BAKED_RETIRED + 10 OWNER_RETIRED (7 + HOME-120/121/123) + 2 OWNER_DISABLED (%s)" % str(modes))
+	_ok(modes == {"STATIC": 14, "WORLD_BAKED_RETIRED": 18, "OWNER_RETIRED": 22, "OWNER_DISABLED": 2}, "V04 + R01-V02 + R15-004 (HOME-122) + SB-HOME-BG (HOME-124; HOME-121/123 retired) + SB-HOME-VIDEO (HOME-125) + SB-TF-03 (Shop / Collection tiles, win-streak strip, 4 nav icons retired): 14 STATIC + 18 WORLD_BAKED_RETIRED + 22 OWNER_RETIRED (7 + HOME-120/121/123 + 12 SB-TF-03) + 2 OWNER_DISABLED (%s)" % str(modes))
 	_complete("accounting_covers_manifest")
 
 func _static_nodes(home) -> void:
@@ -109,8 +109,8 @@ func _inactive(home) -> void:
 			if not (row["nodes"] as Array).is_empty() or String(row["reason"]).is_empty():
 				bad.append(row["id"])
 	ids.sort()
-	var want := ["HOME-001", "HOME-002", "HOME-003", "HOME-004", "HOME-006", "HOME-007", "HOME-010", "HOME-011", "HOME-013", "HOME-014", "HOME-015", "HOME-016", "HOME-018", "HOME-019", "HOME-020", "HOME-021", "HOME-022", "HOME-023", "HOME-024", "HOME-031", "HOME-032", "HOME-062", "HOME-063", "HOME-066", "HOME-069", "HOME-078", "HOME-087", "HOME-120", "HOME-121", "HOME-123"]
-	_ok(ids == want, "retired/disabled set (V03 + V04 + R01-V02 HOME-120 + SB-HOME-BG HOME-121/123) %s" % str(ids))
+	var want := ["HOME-001", "HOME-002", "HOME-003", "HOME-004", "HOME-006", "HOME-007", "HOME-010", "HOME-011", "HOME-013", "HOME-014", "HOME-015", "HOME-016", "HOME-018", "HOME-019", "HOME-020", "HOME-021", "HOME-022", "HOME-023", "HOME-024", "HOME-031", "HOME-032", "HOME-062", "HOME-063", "HOME-064", "HOME-065", "HOME-066", "HOME-069", "HOME-078", "HOME-086", "HOME-087", "HOME-090", "HOME-091", "HOME-092", "HOME-093", "HOME-094", "HOME-101", "HOME-102", "HOME-103", "HOME-104", "HOME-120", "HOME-121", "HOME-123"]
+	_ok(ids == want, "retired/disabled set (V03 + V04 + R01-V02 HOME-120 + SB-HOME-BG HOME-121/123 + SB-TF-03 HOME-064/065/086/090..094/101..104) %s" % str(ids))
 	_ok(bad.is_empty(), "inactive rows have no presentation node and carry a reason %s" % str(bad))
 	var m = V.load_manifest()
 	var still_approved := 0
@@ -121,30 +121,29 @@ func _inactive(home) -> void:
 				still_approved += 1
 			elif a["status"] == "RETIRED_DELETED" and not FileAccess.file_exists("res://" + String(a["path"])):
 				deleted += 1
-	_ok(still_approved == 6 and deleted == 24, "retired/disabled entries keep their historical sha pins: 6 still APPROVED on disk, 24 RETIRED_DELETED with the file gone (SB-ASSET-PURGE-2026-11-17) (%d / %d)" % [still_approved, deleted])
+	_ok(still_approved == 18 and deleted == 24, "retired/disabled entries keep their historical sha pins: 18 still APPROVED on disk (6 + 12 SB-TF-03), 24 RETIRED_DELETED with the file gone (SB-ASSET-PURGE-2026-11-17) (%d / %d)" % [still_approved, deleted])
 	_complete("inactive_rows_present_nothing")
 
 func _labels(home) -> void:
 	print("[labels full]")
 	var bad: Array = []
-	for id in ["shop", "collection", "tasks", "daily"]:
-		var b: Button = home.get_region("Shortcut_" + id)
-		if b.clip_text or b.text_overrun_behavior != TextServer.OVERRUN_NO_TRIMMING or home.get_region("ShortcutIcon_" + id).texture == null:
-			bad.append(id)
-	_ok(bad.is_empty(), "shortcut panels: icon + untrimmed wrapping label %s" % str(bad))
-	_ok(home.get_region("Shortcut_shop").text == "SHOP" and home.get_region("Shortcut_collection").text == "COLLECTION" and home.get_region("Shortcut_tasks").text == "TASKS" and home.get_region("Shortcut_daily").text == "DAILY", "full live labels SHOP / COLLECTION / TASKS / DAILY")
+	# SB-TF-03: one-line labels font-fitted to the 0.7x panel (never trimmed in EN / TR).
+	for n in ["RewardedAdsButton", "Shortcut_tasks", "Shortcut_daily"]:
+		var b: Button = home.get_region(n)
+		var avail: float = b.size.x - b.get_theme_stylebox("normal").get_minimum_size().x
+		var w: float = b.get_theme_font("font").get_string_size(b.text, HORIZONTAL_ALIGNMENT_LEFT, -1, b.get_theme_font_size("font_size")).x
+		if w > avail + 0.5 or b.icon_rect.texture == null:
+			bad.append(n)
+	_ok(bad.is_empty(), "activity panels: icon + full one-line label inside the panel %s" % str(bad))
+	_ok(home.get_region("RewardedAdsButton").text == "REWARDED ADS" and home.get_region("Shortcut_tasks").text == "TASKS" and home.get_region("Shortcut_daily").text == "DAILY", "full live labels REWARDED ADS / TASKS / DAILY")
 	_complete("labels_full")
 
 func _nav(home) -> void:
-	print("[nav dock]")
-	var ok := true
-	for id in ["events", "robots", "home", "leaderboard", "settings"]:
-		var b: Button = home.get_region("Nav_" + id)
-		var icon: TextureRect = home.get_region("NavIcon_" + id)
-		ok = ok and icon.get_parent() == b and icon.texture != null and b.get_global_rect().encloses(icon.get_global_rect())
-	_ok(ok, "every nav tab shows its approved icon inside the tab")
-	_ok(home.get_region("Nav_home").button_pressed, "HOME tab is the selected state")
-	_ok(home.get_region("Nav_settings").name == "SettingsButton" and not home.get_region("Nav_settings").disabled, "SETTINGS tab live")
+	print("[nav dock -> SB-TF-03 top-HUD Settings icon, no dock]")
+	var b: Button = home.get_region("SettingsButton")
+	var icon: TextureRect = home.get_region("SettingsIcon")
+	_ok(home.get_region("BottomNav") == null and icon.get_parent() == b and icon.texture != null and b.get_global_rect().encloses(icon.get_global_rect()), "no bottom dock; the Settings icon shows its approved art inside its button")
+	_ok(not b.disabled and home.get_region("TopCurrencyHUD").is_ancestor_of(b), "SETTINGS icon live in the top HUD")
 	_complete("nav_dock")
 
 func _banner(home) -> void:
@@ -174,17 +173,15 @@ func _matrix() -> void:
 		var home = r[1]
 		var vp := Rect2(Vector2.ZERO, Vector2(size))
 		var bad: Array = []
-		var names: Array = ["PlayButton", "BottomNav", "TopCurrencyHUD", "GiftMeter", "WinStreakRewardTrack"]
-		for id in ["shop", "collection", "tasks", "daily"]:
-			names.append("Shortcut_" + id)
+		var names: Array = ["PlayButton", "SettingsButton", "TopCurrencyHUD", "GiftMeter", "AdBannerSlot", "RewardedAdsButton", "Shortcut_tasks", "Shortcut_daily"]
 		for n in names:
 			var c: Control = home.get_region(n)
 			if not vp.grow(0.5).encloses(c.get_global_rect()) or c.size.y < 88:
 				bad.append(n)
 		var play: Rect2 = home.get_region("PlayButton").get_global_rect()
-		for id in ["shop", "collection", "tasks", "daily"]:
-			if home.get_region("Shortcut_" + id).get_global_rect().intersects(play):
-				bad.append("overlap:" + id)
+		for n in ["RewardedAdsButton", "Shortcut_tasks", "Shortcut_daily"]:
+			if home.get_region(n).get_global_rect().intersects(play):
+				bad.append("overlap:" + n)
 		var sc := (home.get_region("Art_scrubby") as Control).get_global_rect()
 		if not home.get_region("Background").get_global_rect().encloses(sc):
 			bad.append("scrubby_outside_world")
@@ -206,7 +203,7 @@ func _unapproved() -> void:
 		for n in row["nodes"]:
 			any = any or n["texture"] != null
 	_ok(not any, "a binder that approves nothing leaves every presentation node without art (native fallback)")
-	_ok(home.get_region("PlayButton").text == UiText.t("HOME_PLAY") and home.get_region("ScrubBucksChip").value_label.text != "", "native controls still render live values without art")
+	_ok(home.get_region("PlayButton").text == UiText.t("HOME_PLAY_LEVEL", [1]) and home.get_region("ScrubBucksChip").value_label.text != "", "native controls still render live values without art")
 	r[0].queue_free()
 	await process_frame
 	_complete("unapproved_not_bound")

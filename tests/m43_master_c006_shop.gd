@@ -49,11 +49,14 @@ func _initialize() -> void:
 # ------------------------------------------------------------------ cases ----
 
 func _s01() -> void:
-	print("[s01 Home SHOP panel and SB + open the real Shop]")
+	print("[s01 SB + / Hearts + open the real Shop (SB-TF-03: no Home SHOP panel)]")
 	await _boot("s01")
-	(_root.get_home().get_region("Shortcut_shop") as Button).pressed.emit()
+	_ok(_root.get_home().get_region("Shortcut_shop") == null, "no Home SHOP panel")
+	_root.get_home().hearts_purchase_requested.emit()
 	await _frames(2)
-	_ok(_top_id() == "shop" and ShopScreen.of(_top()) != null, "SHOP panel -> Shop destination")
+	_tap("shop")
+	await _frames(2)
+	_ok(_top_id() == "shop" and ShopScreen.of(_top()) != null, "Hearts + -> MORE IN SHOP -> Shop destination")
 	_top().close("test")
 	await _frames(2)
 	_root.get_home().scrub_bucks_purchase_requested.emit()

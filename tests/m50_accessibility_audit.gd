@@ -302,7 +302,7 @@ func _a06() -> void:
 		UiText.locale = loc
 		var got := {}
 		ra.text = UiText.t("HOME_SC_REWARDED_ADS")
-		HomeStyle.fit_font(ra, HomeScreen.REWARDED_ADS_LABEL_FONT, HomeScreen.PANEL_SIZE.x)
+		HomeStyle.fit_font(ra, HomeScreen.PANEL_FONT, HomeScreen.PANEL_SIZE.x)
 		got[ra.text] = ra.get_theme_font_size("font_size")
 		lvl.text = UiText.t("RESULTS_LEVEL", [9999])
 		HomeStyle.fit_font(lvl, 22, GameplayScreen.PROFILE_LEVEL[2] - GameplayScreen.PROFILE_LEVEL[0])
@@ -310,7 +310,11 @@ func _a06() -> void:
 		price.text = UiText.t("BOOSTER_PRICE_SB", [UiText.num(9999)])
 		HomeStyle.fit_font(price, 20, price_w)
 		got[price.text] = price.get_theme_font_size("font_size")
-		_ok(got.values().all(func(v): return v >= FONT_FLOOR), "%s: REWARDED ADS / HUD level / booster Price stay >= %d px %s" % [loc, FONT_FLOOR, str(got)])
+		# SB-TF-03 (owner 2026-11-18): the activity buttons and their labels are 0.7x (24 -> 16.8 px), so the
+		# REWARDED ADS label floor is 16 px; the HUD level and booster price keep FONT_FLOOR.
+		var ra_px: int = got[ra.text]
+		got.erase(ra.text)
+		_ok(ra_px >= 16 and got.values().all(func(v): return v >= FONT_FLOOR), "%s: REWARDED ADS >= 16 px (%d), HUD level / booster Price stay >= %d px %s" % [loc, ra_px, FONT_FLOOR, str(got)])
 	UiText.locale = "en"
 	_free(b)
 	# fit_font itself keeps the 60% shrink for synthetic stress copy (m49 pseudo-locale), recorded.
@@ -436,21 +440,25 @@ func _a09() -> void:
 		var home = root.get_home()
 		_ok(UiText.locale == loc, "%s: the saved language is active" % loc)
 		var names := {}
-		for n in ["ProfileButton", "ScrubBucksPlus", "HeartsPlus", "GiftMeterButton"]:
+		for n in ["ProfileButton", "SettingsButton", "ScrubBucksPlus", "HeartsPlus", "GiftMeterButton"]:
 			names[n] = String(home.get_region(n).accessibility_name)
 		_ok(names.values().all(func(v): return not v.is_empty()) and names["HeartsPlus"] == UiText.t("A11Y_GET_HEARTS"), "%s: Home icon-only buttons are named %s" % [loc, str(names)])
 		var unfocus: Array = home.find_children("*", "BaseButton", true, false).filter(func(x): return x.focus_mode == Control.FOCUS_NONE).map(func(x): return x.name)
 		_ok(unfocus.is_empty(), "%s: every Home button takes screen-reader focus (FOCUS_ACCESSIBILITY) %s" % [loc, str(unfocus)])
 		var locks := {}
 		var lock_ok := true
-		for nid in ["robots", "events", "leaderboard"]:
-			var lvl: int = app.feature_unlock_level(HomeBadges.GATED_ENTRIES[nid])
-			var lab: Label = home.get_region("NavLock_" + nid)
-			var nb: Button = home.get_region("Nav_" + nid)
-			locks[nid] = lab.text
-			lock_ok = lock_ok and nb.disabled and lab.is_visible_in_tree() and lab.text == UiText.t("BOOSTER_LOCKED_LEVEL", [lvl]) \
-				and nb.accessibility_description == UiText.t("HOME_UNLOCKS_AT_LEVEL", [lvl])
-		_ok(lock_ok and not (home.get_region("NavLock_home") as Label).visible, "%s: locked tabs show their unlock level as text + description %s" % [loc, str(locks)])
+		# SB-TF-03: the gated destinations live in Profile (blocked button + unlock-level text).
+		root._on_home_shortcut("profile")
+		await _frames(2)
+		var prof = root.get_modal_stack().top()
+		for nid in ["robots", "ranks"]:
+			var lvl: int = app.feature_unlock_level(nid)
+			var nb: Button = prof.get_action_button(nid)
+			locks[nid] = nb.tooltip_text
+			lock_ok = lock_ok and nb.disabled and nb.tooltip_text == UiText.t("HOME_UNLOCKS_AT_LEVEL", [lvl]) and nb.accessibility_description == nb.tooltip_text
+		root.get_modal_stack().clear("test")
+		await _frames(2)
+		_ok(lock_ok, "%s: locked Profile entries state their unlock level as text + description %s" % [loc, str(locks)])
 		root.play_current_frontier()
 		await _frames(6)
 		var s = root.get_gameplay_host().get_screen()

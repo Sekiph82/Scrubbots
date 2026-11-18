@@ -10,7 +10,7 @@ extends RefCounted
 ##   delta (priority order)                  target (existing Home node)
 ##   frontier advanced (completed count up)  HomeJourneyStrip (PlayButton when the strip is hidden)
 ##   Bot Parts became unlockable (false->true) ProfileBotParts meter
-##   Win Streak value up                     current Win Streak track gift
+## (SB-TF-03: Home has no win-streak strip any more, so a streak change has no Home answer.)
 ##
 ## Coalescing: one reconciliation answers its dominant delta, plus at most ONE more serialized
 ## after the first pop ends (max two). The first observed render is the baseline (zero effect);
@@ -45,7 +45,7 @@ func has_baseline() -> bool:
 static func snapshot(vm: Dictionary) -> Dictionary:
 	if not bool(vm.get("ok", false)) or bool(vm.get("blocked", false)):
 		return {}
-	return {"completed": int(vm["completed_levels"]), "unlockable": bool(vm["robot_can_unlock"]), "streak": int(vm["win_streak"])}
+	return {"completed": int(vm["completed_levels"]), "unlockable": bool(vm["robot_can_unlock"])}
 
 ## Compare one visible render against the previous one. `targets`: kind -> Control. Returns the
 ## kinds answered (dominant first); [] for the baseline, an unchanged render or an unusable model.
@@ -62,8 +62,6 @@ func observe(vm: Dictionary, targets: Dictionary) -> Array:
 		kinds.append("frontier")
 	if s["unlockable"] and not prev["unlockable"]:
 		kinds.append("bot_parts")
-	if s["streak"] > prev["streak"]:
-		kinds.append("win_streak")
 	kinds = kinds.slice(0, MAX_EVENTS)
 	for i in range(kinds.size()):
 		var t = targets.get(kinds[i])
