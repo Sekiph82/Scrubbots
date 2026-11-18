@@ -120,9 +120,10 @@ func purchase(id: String) -> Dictionary:
 	if not c["ok"]:
 		return c
 	_pending[id] = true
+	_provider.last_error = ""
 	if not _provider.purchase(id, Callable(self, "deliver")):
 		_pending.erase(id)
-		return {"ok": false, "reason": "provider_refused"}
+		return {"ok": false, "reason": "provider_refused", "error": String(_provider.last_error)}
 	return {"ok": true, "product_id": id}
 
 ## Provider callback (also used for unfinished purchases the store re-delivers at launch).
@@ -136,6 +137,8 @@ func deliver(r: Dictionary) -> Dictionary:
 		out = {"ok": false, "reason": "unknown_product"}
 	elif outcome != PURCHASED:
 		out = {"ok": false, "reason": outcome if not outcome.is_empty() else "failed"}
+		if not String(r.get("error", "")).is_empty():
+			out["error"] = String(r["error"])   # SB-TF-01: the store's "<code>: <message>"
 	elif token.is_empty():
 		out = {"ok": false, "reason": "no_token"}
 	else:

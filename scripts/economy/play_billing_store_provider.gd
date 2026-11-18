@@ -14,6 +14,9 @@ extends "res://scripts/economy/store_provider.gd"
 ##   (nothing granted; Play sends PURCHASED later through on_purchase_updated).
 ##   USER_CANCELED -> "cancelled"; any other error -> "failed".
 ##   acknowledge(token, consume): SB pack -> consumePurchase; No Ads -> acknowledgePurchase.
+##   SB-TF-01: a failure carries "error" = "<response_code>: <debug_message>"; a refused
+##   purchase, a failed product query and unfetched_products are logged (STORE_ERROR /
+##   STORE_INVALID_IDS).
 
 const NATIVE := "GodotGooglePlayBilling"
 const INAPP := "inapp"
@@ -58,6 +61,7 @@ func purchase(product_id: String, deliver: Callable) -> bool:
 		return false
 	var r: Dictionary = _b.purchase(product_id, "", "", false)
 	if int(r.get("response_code", -1)) != RESPONSE_OK:
+		_diag("STORE_ERROR", product_id, int(r.get("response_code", -1)), String(r.get("debug_message", "")))
 		return false
 	_buying = product_id
 	_deliver = deliver
@@ -86,7 +90,13 @@ func _on_disconnected() -> void:
 	_b.startConnection()
 
 func _on_product_details(r: Dictionary) -> void:
-	if int(r.get("response_code", -1)) != RESPONSE_OK or not _prices_cb.is_valid():
+	if int(r.get("response_code", -1)) != RESPONSE_OK:
+		_diag("STORE_ERROR", "*", int(r.get("response_code", -1)), String(r.get("debug_message", "")))
+		return
+	var unfetched := PackedStringArray(Array(r.get("unfetched_products", [])).map(func(u): return String(u.get("product_id", ""))))
+	if not unfetched.is_empty():
+		_diag("STORE_INVALID_IDS", ",".join(unfetched), "", "unknown to Play Console")
+	if not _prices_cb.is_valid():
 		return
 	var prices := {}
 	for d in r.get("product_details", []):
@@ -124,8 +134,11 @@ func _on_purchase_updated(r: Dictionary) -> void:
 	if code == RESPONSE_OK:
 		for p in r.get("purchases", []):
 			_deliver_purchase(p)
+	elif code == USER_CANCELED and not id.is_empty():
+		_deliver.call({"product_id": id, "token": "", "outcome": "cancelled"})
 	elif not id.is_empty():
-		_deliver.call({"product_id": id, "token": "", "outcome": "cancelled" if code == USER_CANCELED else "failed"})
+		var err := _diag("STORE_ERROR", id, code, String(r.get("debug_message", "")))
+		_deliver.call({"product_id": id, "token": "", "outcome": "failed", "error": err})
 
 func _deliver_purchase(p: Dictionary) -> void:
 	var state := int(p.get("purchase_state", 0))

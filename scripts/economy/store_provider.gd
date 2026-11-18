@@ -16,6 +16,16 @@ extends RefCounted
 ##   restore(deliver) -> bool                   deliver.call([{"product_id", "token"}, ...]) =
 ##       the owned non-consumables.
 ##   acknowledge(token, consume)                called after the grant is saved (consume = SB pack).
+## SB-TF-01: a failed delivery may also carry "error" ("<code>: <message>" from the store);
+## last_error = the newest store diagnostic (refused purchase, failed / partial product query).
+
+var last_error := ""
+
+## One STORE_ERROR / STORE_INVALID_IDS device-log line; returns the "<code>: <message>" detail.
+func _diag(tag: String, product: String, code, msg: String) -> String:
+	print("%s product=%s code=%s msg=%s" % [tag, product, str(code), msg])
+	last_error = msg if str(code).is_empty() else "%s: %s" % [str(code), msg]
+	return last_error
 
 func is_available() -> bool:
 	return false

@@ -12,6 +12,10 @@ extends "res://scripts/economy/store_provider.gd"
 ##   interrupted purchase at the next launch; the transaction id is the purchase token.
 ##   purchase "ok" -> "purchased"; "error" -> "failed"; "progress" deferred (Ask to Buy) ->
 ##   "pending". restore() collects the "restore" events until "completed".
+##   SB-TF-01: the plugin's "error" text (+ "error_code" when present; the pinned plugin sends
+##   only SKError.localizedDescription) rides along as deliver "error"; a refused purchase
+##   (31 = product not loaded by StoreKit, 2 = payments disabled), a failed product query and
+##   every invalid_ids are logged; a failed product query is retried once.
 
 const NATIVE := "InAppStore"
 ## SKPaymentTransactionStateDeferred (the plugin's type_code).
@@ -23,6 +27,8 @@ var _prices_cb := Callable()
 var _restore_cb := Callable()
 var _restored: Array = []
 var _tx := {}   ## transaction id -> product id, until finished
+var _ids: Array = []
+var _info_retried := false
 
 ## backend: the plugin singleton; deliver: StoreService.deliver (unfinished purchases at launch).
 func _init(backend, deliver: Callable) -> void:
@@ -35,11 +41,16 @@ func is_available() -> bool:
 
 func query_products(ids: Array, deliver: Callable) -> bool:
 	_prices_cb = deliver
+	_ids = ids
+	_info_retried = false
 	return _b.request_product_info({"product_ids": PackedStringArray(ids)}) == OK
 
 func purchase(product_id: String, deliver: Callable) -> bool:
 	_deliver = deliver
-	return _b.purchase({"product_id": product_id}) == OK
+	var r: int = _b.purchase({"product_id": product_id})
+	if r != OK:
+		_diag("STORE_ERROR", product_id, r, "purchase refused")
+	return r == OK
 
 func restore(deliver: Callable) -> bool:
 	_restore_cb = deliver
@@ -62,7 +73,16 @@ func _on_event(e: Dictionary) -> void:
 	var id := String(e.get("product_id", ""))
 	match type:
 		"product_info":
-			if result == "ok" and _prices_cb.is_valid():
+			if result != "ok":
+				_diag("STORE_ERROR", "*", e.get("error_code", ""), String(e.get("error", result)))
+				if not _info_retried:
+					_info_retried = true
+					_b.request_product_info({"product_ids": PackedStringArray(_ids)})
+				return
+			var invalid: PackedStringArray = e.get("invalid_ids", PackedStringArray())
+			if not invalid.is_empty():
+				_diag("STORE_INVALID_IDS", ",".join(invalid), "", "unknown to App Store Connect")
+			if _prices_cb.is_valid():
 				var prices := {}
 				var ids: PackedStringArray = e.get("ids", PackedStringArray())
 				var texts: PackedStringArray = e.get("localized_prices", PackedStringArray())
@@ -75,7 +95,8 @@ func _on_event(e: Dictionary) -> void:
 				_tx[token] = id
 				_deliver.call({"product_id": id, "token": token, "outcome": "purchased"})
 			elif result == "error":
-				_deliver.call({"product_id": id, "token": "", "outcome": "failed"})
+				var err := _diag("STORE_ERROR", id, e.get("error_code", ""), String(e.get("error", "")))
+				_deliver.call({"product_id": id, "token": "", "outcome": "failed", "error": err})
 			elif result == "progress" and int(e.get("type_code", -1)) == STATE_DEFERRED:
 				_deliver.call({"product_id": id, "token": "", "outcome": "pending"})
 		"restore":

@@ -316,8 +316,13 @@ func _feedback(product: String, r: Dictionary) -> void:
 	var text := ""
 	if bool(r.get("ok", false)):
 		text = UiText.t("SHOP_BOUGHT", [_label_of(product)])
+	elif r.get("reason") == "pending" and product.begins_with("store:"):
+		text = UiText.t("SHOP_STORE_PENDING")
 	elif product.begins_with("store:"):
-		text = UiText.t("SHOP_STORE_PENDING" if r.get("reason") == "pending" else "SHOP_STORE_FAILED")
+		# SB-TF-01: the store's own "<code>: <message>". Only a native store (billing_ads build,
+		# TestFlight / internal testing) ever reports one; the null provider never does.
+		var err := String(r.get("error", ""))
+		text = UiText.t("SHOP_STORE_FAILED") if err.is_empty() else UiText.t("SHOP_STORE_FAILED_DETAIL", [err])
 	var fb = Popups.feedback({"ok": bool(r.get("ok", false)), "reason": String(r.get("reason", "failed")), "text": text})
 	if not _stack.push(fb):
 		fb.free()

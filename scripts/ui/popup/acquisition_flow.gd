@@ -402,6 +402,10 @@ func _refresh_booster(p, rebuild_targets: bool = false) -> void:
 	var rw_ok: bool = v["rewarded"].get("ok", false)
 	# Rewarded CTA only when the provider policy offers this booster placement.
 	p.set_action_visible("watch", not has_charge and rw_ok)
+	# SB-TF-01: no video loaded -> say so instead of a silently missing CTA (never over a result).
+	var status: Label = p.find_child("Status", true, false)
+	if not has_charge and v["rewarded"].get("reason", "") == "unavailable" and status.text.is_empty():
+		_status(p, UiText.t("REWARDED_UNAVAILABLE_NOTE"))
 	# M46 R06 HUD hold: once proven, use the owned charge (re-proof is a cache hit); a refusal
 	# leaves the popup open with its reason and nothing used.
 	if p.context.get("auto_use", false) and v["reason"] != "checking":

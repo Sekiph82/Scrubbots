@@ -6,6 +6,9 @@ extends SceneTree
 ## failure / pending grant nothing; launch re-delivery and restore; AdMob waits for UMP consent
 ## (+ ATT on iOS) before loading anything, a rewarded view grants once only after the earned
 ## reward, a failed view grants nothing, interstitial / banner follow AdService.
+## SB-TF-01: the store's error text / code reaches StoreService.resolved and the Shop failure
+## text; failed / partial product queries are logged with no price; failed ad loads retry with
+## a bounded backoff; an unavailable / failed rewarded video has a player-facing text.
 ##
 ## Run: godot --headless --path . -s res://tests/m57_native_providers.gd
 
@@ -17,11 +20,17 @@ const AdProvider = preload("res://scripts/economy/ad_provider.gd")
 const PlayBillingStoreProvider = preload("res://scripts/economy/play_billing_store_provider.gd")
 const AppStoreProvider = preload("res://scripts/economy/app_store_provider.gd")
 const AdmobAdProvider = preload("res://scripts/economy/admob_ad_provider.gd")
+const ShopScreen = preload("res://scripts/ui/shop/shop_screen.gd")
+const RewardedAdsScreen = preload("res://scripts/ui/daily/rewarded_ads_screen.gd")
+const RewardedGrantService = preload("res://scripts/economy/rewarded_grant_service.gd")
+const UiText = preload("res://scripts/ui/ui_text.gd")
 
 var EXPECTED_CASES := [
 	"n01_headless_null_providers", "n02_play_purchase_grants_once", "n03_play_cancel_fail_pending",
 	"n04_play_launch_and_restore", "n05_appstore_purchase_finish_restore", "n06_admob_consent_before_ads",
 	"n07_admob_rewarded_grants_once", "n08_admob_interstitial_banner", "n09_admob_real_ids_release_only",
+	"n10_store_error_detail_reaches_resolved", "n11_product_query_diagnostics", "n12_admob_load_retry_bounded",
+	"n13_rewarded_unavailable_text", "n14_shop_failure_detail_text",
 ]
 
 ## GodotGooglePlayBilling singleton double (method names + signals of plugin 3.3.0).
@@ -63,16 +72,24 @@ class FakeAppStore extends RefCounted:
 	var calls: Array = []
 	var events: Array = []
 	var auto_finish := true
+	var info_errors := 0                       ## next N product requests fail (SKRequest didFailWithError)
+	var invalid := PackedStringArray()         ## ids StoreKit reports in invalid_ids
+	var purchase_code := OK
 	func set_auto_finish_transaction(b: bool) -> void:
 		auto_finish = b
 	func request_product_info(p: Dictionary) -> int:
 		calls.append("info")
-		events.append({"type": "product_info", "result": "ok", "ids": p["product_ids"],
-			"localized_prices": PackedStringArray(Array(p["product_ids"]).map(func(_id): return "US$0.99"))})
+		if info_errors > 0:
+			info_errors -= 1
+			events.append({"type": "product_info", "result": "error", "error": "Cannot connect to iTunes Store"})
+			return OK
+		var ids := PackedStringArray(Array(p["product_ids"]).filter(func(id): return not invalid.has(id)))
+		events.append({"type": "product_info", "result": "ok", "ids": ids, "invalid_ids": invalid,
+			"localized_prices": PackedStringArray(Array(ids).map(func(_id): return "US$0.99"))})
 		return OK
 	func purchase(p: Dictionary) -> int:
 		calls.append("purchase:" + String(p["product_id"]))
-		return OK
+		return purchase_code
 	func restore_purchases() -> int:
 		calls.append("restore")
 		return OK
@@ -153,6 +170,20 @@ class FakeAdmob extends RefCounted:
 	func ads_calls() -> Array:
 		return calls.filter(func(c): return c.begins_with("load_banner") or c.begins_with("load_inter") or c.begins_with("load_rew") or c.begins_with("show_banner") or c.begins_with("show_inter") or c.begins_with("show_rew"))
 
+## godot-admob LoadAdError double (get_code / get_message).
+class FakeAdError extends RefCounted:
+	func get_code() -> int:
+		return 3
+	func get_message() -> String:
+		return "No fill."
+
+## ModalStack double for ShopScreen._feedback.
+class FakeStack extends RefCounted:
+	var pushed: Array = []
+	func push(p) -> bool:
+		pushed.append(p)
+		return true
+
 var _fail := 0
 var _completed: Dictionary = {}
 var _tmp: Array = []
@@ -168,6 +199,11 @@ func _initialize() -> void:
 	_n07()
 	_n08()
 	_n09()
+	_n10()
+	_n11()
+	_n12()
+	_n13()
+	_n14()
 	_cleanup()
 	_done()
 
@@ -356,9 +392,11 @@ func _n06() -> void:
 	_ok(n3.calls == ["consent_info", "initialize"], "consent info error -> SDK still initialized (it applies the stored consent)")
 	_complete("n06_admob_consent_before_ads")
 
-func _ready_admob(e) -> FakeAdmob:
+## `sched` collects the provider's [delay_s, callback] retry requests (fake timer).
+func _ready_admob(e, sched: Array = []) -> FakeAdmob:
 	var n := FakeAdmob.new()
 	var p := AdmobAdProvider.new(n, false)
+	p.schedule = func(d: float, cb: Callable): sched.append([d, cb])
 	e.ads.set_provider(p)
 	p.start()
 	n.consent = "NOT_REQUIRED"
@@ -369,7 +407,8 @@ func _ready_admob(e) -> FakeAdmob:
 func _n07() -> void:
 	print("[n07 AdMob rewarded: earned reward + close grants once; close without it / failure grant nothing]")
 	var e := EconomyServices.new()
-	var n := _ready_admob(e)
+	var sched: Array = []
+	var n := _ready_admob(e, sched)
 	_ok(not e.rewarded.is_available("booster:tornado"), "no rewarded loaded yet -> not offered")
 	n.rewarded_ad_loaded.emit(null, null)
 	_ok(e.rewarded.is_available("booster:tornado"), "loaded -> offered")
@@ -392,13 +431,14 @@ func _n07() -> void:
 	n.rewarded_ad_failed_to_show_full_screen_content.emit(null, null)
 	_ok(e.rewarded.result_for(s3["token"])["reason"] == "failed" and e.boosters.charges("tornado") == c0 + 1, "failed to show -> failed, nothing")
 	n.rewarded_ad_failed_to_load.emit(null, null)
-	_ok(not e.rewarded.is_available("booster:tornado") and n.calls[-1] == "load_rewarded", "load failure -> not offered, the next check reloads")
+	_ok(not e.rewarded.is_available("booster:tornado") and n.calls[-1] == "load_rewarded" and sched.size() == 1, "load failure -> not offered, one backoff reload scheduled")
 	_complete("n07_admob_rewarded_grants_once")
 
 func _n08() -> void:
 	print("[n08 AdMob interstitial / banner follow AdService]")
 	var e := EconomyServices.new()
-	var n := _ready_admob(e)
+	var sched: Array = []
+	var n := _ready_admob(e, sched)
 	for _i in range(5):
 		e.ads.on_play_finished()
 	_ok(not e.ads.try_interstitial() and e.ads.interstitial_due() and not n.calls.has("show_interstitial"), "due but not loaded -> not shown, stays due")
@@ -406,10 +446,13 @@ func _n08() -> void:
 	_ok(e.ads.try_interstitial() and n.calls[-1] == "show_interstitial" and not e.ads.interstitial_due(), "loaded -> shown at the transition, cadence restarts")
 	n.interstitial_ad_dismissed_full_screen_content.emit(null)
 	_ok(n.calls[-1] == "load_interstitial", "closed -> next one loading")
-	n.interstitial_ad_failed_to_load.emit(null, null)
+	n.interstitial_ad_failed_to_load.emit(null, FakeAdError.new())
+	var loads: int = n.calls.count("load_interstitial")
 	for _i in range(5):
 		e.ads.on_play_finished()
-	_ok(not e.ads.try_interstitial() and n.calls[-1] == "load_interstitial", "failed load -> retried at the next due transition")
+	_ok(not e.ads.try_interstitial() and n.calls.count("load_interstitial") == loads and sched.size() == 1 and sched[0][0] == 5.0, "failed load -> not shown; one 5 s backoff reload scheduled, no immediate reload")
+	sched[0][1].call()
+	_ok(n.calls.count("load_interstitial") == loads + 1, "backoff timer fires -> interstitial reloads")
 	_ok(n.calls.count("load_banner") == 1 and not n.calls.has("show_banner"), "banner requested once, not shown before it loads")
 	n.banner_ad_loaded.emit(null, null)
 	_ok(n.calls[-1] == "show_banner", "banner loaded -> shown")
@@ -438,7 +481,147 @@ func _n09() -> void:
 	var i := FakeAdmob.new()
 	AdmobAdProvider.new(i, true, path)
 	_ok(i.is_real and [i.ios_real_banner_id, i.ios_real_interstitial_id, i.ios_real_rewarded_id] == ["B", "I", "R"] and i.android_real_banner_id == "", "release file on iOS -> is_real + ios real unit ids")
+	var t := FakeAdmob.new()
+	AdmobAdProvider.new(t, true, "user://m57_native_absent_ids.gd")
+	_ok(not t.is_real and t.ios_real_rewarded_id == "", "ads_test_mode build (no ids file written) -> is_real never set, Google TEST units")
 	_complete("n09_admob_real_ids_release_only")
+
+func _n10() -> void:
+	print("[n10 SB-TF-01 store error text / code reaches StoreService.resolved; product purchasable again]")
+	var e := EconomyServices.new()
+	var b := FakeAppStore.new()
+	var p := AppStoreProvider.new(b, Callable(e.store, "deliver"))
+	e.store.set_provider(p)
+	e.store.refresh_prices()
+	p.poll()
+	var got: Array = []
+	e.store.resolved.connect(func(_id, r): got.append(r))
+	var sb0: int = e.wallet.scrub_bucks()
+	var n0: int = e.reward.applied_transaction_count()
+	_ok(e.store.purchase("scrubbucks_100")["ok"] and not e.store.can_purchase("scrubbucks_100")["ok"], "purchase sheet open -> product pending")
+	b.events.append({"type": "purchase", "result": "error", "product_id": "scrubbucks_100", "error": "Cannot connect to iTunes Store", "error_code": 0, "type_code": 2})
+	p.poll()
+	var r: Dictionary = got[-1] if not got.is_empty() else {}
+	_ok(r.get("ok") == false and r.get("reason") == "failed" and String(r.get("error", "")) == "0: Cannot connect to iTunes Store", "error event -> resolved ok=false, reason=failed, error='<code>: <message>' %s" % str(r))
+	_ok(e.wallet.scrub_bucks() == sb0 and e.reward.applied_transaction_count() == n0 and e.store.can_purchase("scrubbucks_100")["ok"], "nothing granted; _pending cleared -> purchasable again")
+	b.events.append({"type": "purchase", "result": "error", "product_id": "scrubbucks_100", "error": "Payment sheet failed"})
+	e.store.purchase("scrubbucks_100")
+	p.poll()
+	_ok(String(got[-1].get("error", "")) == "Payment sheet failed", "the pinned plugin sends no code -> error is the message alone")
+	b.purchase_code = ERR_INVALID_PARAMETER
+	var rr: Dictionary = e.store.purchase("scrubbucks_550")
+	_ok(rr["reason"] == "provider_refused" and String(rr.get("error", "")) == "%d: purchase refused" % ERR_INVALID_PARAMETER and e.store.can_purchase("scrubbucks_550")["ok"], "StoreKit refuses (product not loaded) -> provider_refused with the Error code, purchasable again")
+	var t := _play_store()
+	var pe = t[0]
+	var pb: FakePlay = t[1]
+	pb.connected.emit()
+	pe.store.refresh_prices()
+	var pg: Array = []
+	pe.store.resolved.connect(func(_id, x): pg.append(x))
+	pe.store.purchase("scrubbucks_100")
+	pb.on_purchase_updated.emit({"response_code": 6, "debug_message": "Server error"})
+	_ok(pg[-1]["reason"] == "failed" and pg[-1].get("error") == "6: Server error", "Play ERROR -> error '<response_code>: <debug_message>'")
+	pe.store.purchase("scrubbucks_100")
+	pb.on_purchase_updated.emit({"response_code": PlayBillingStoreProvider.USER_CANCELED, "debug_message": "User canceled"})
+	_ok(pg[-1]["reason"] == "cancelled" and not pg[-1].has("error"), "Play cancel unchanged (no error detail)")
+	_complete("n10_store_error_detail_reaches_resolved")
+
+func _n11() -> void:
+	print("[n11 SB-TF-01 product query diagnostics: invalid_ids / error logged, no price; one retry]")
+	var e := EconomyServices.new()
+	var b := FakeAppStore.new()
+	b.invalid = PackedStringArray(["scrubbucks_100"])
+	var p := AppStoreProvider.new(b, Callable(e.store, "deliver"))
+	e.store.set_provider(p)
+	e.store.refresh_prices()
+	p.poll()
+	_ok(e.store.price_text("scrubbucks_100") == "" and e.store.price_text("scrubbucks_550") == "US$0.99", "invalid id -> no price for it, the others priced")
+	_ok(p.last_error == "unknown to App Store Connect" and not e.store.can_purchase("scrubbucks_100")["ok"], "STORE_INVALID_IDS recorded (last_error); the unpriced product cannot be bought")
+	var e2 := EconomyServices.new()
+	var b2 := FakeAppStore.new()
+	b2.info_errors = 1
+	var p2 := AppStoreProvider.new(b2, Callable(e2.store, "deliver"))
+	e2.store.set_provider(p2)
+	e2.store.refresh_prices()
+	p2.poll()
+	_ok(p2.last_error == "Cannot connect to iTunes Store" and b2.calls.count("info") == 2, "product_info error -> STORE_ERROR recorded, retried once")
+	p2.poll()
+	_ok(e2.store.price_text("scrubbucks_100") == "US$0.99", "the retry prices the products")
+	var e3 := EconomyServices.new()
+	var b3 := FakeAppStore.new()
+	b3.info_errors = 5
+	var p3 := AppStoreProvider.new(b3, Callable(e3.store, "deliver"))
+	e3.store.set_provider(p3)
+	e3.store.refresh_prices()
+	p3.poll()
+	p3.poll()
+	p3.poll()
+	_ok(b3.calls.count("info") == 2 and e3.store.price_text("scrubbucks_100") == "", "repeated errors -> exactly one retry (no polling loop), still no price")
+	var t := _play_store()
+	t[1].connected.emit()
+	t[1].query_product_details_response.emit({"response_code": 0, "product_details": [], "unfetched_products": [{"product_id": "no_ads"}]})
+	_ok(t[0].store.get_provider().last_error == "unknown to Play Console", "Play unfetched_products -> STORE_INVALID_IDS recorded")
+	_complete("n11_product_query_diagnostics")
+
+func _n12() -> void:
+	print("[n12 SB-TF-01 AdMob load retry: 5 / 15 / 45 s, max 3 in a row, reset on a load]")
+	var e := EconomyServices.new()
+	var sched: Array = []
+	var n := _ready_admob(e, sched)
+	var loads := func(): return n.calls.count("load_rewarded")
+	for i in range(3):
+		n.rewarded_ad_failed_to_load.emit(null, FakeAdError.new())
+		_ok(not e.rewarded.is_available("heart") and sched.size() == i + 1, "failure %d -> not available, retry %d scheduled" % [i + 1, i + 1])
+		var l0: int = loads.call()
+		sched[-1][1].call()
+		_ok(loads.call() == l0 + 1, "retry %d timer -> one reload" % (i + 1))
+	_ok(sched.map(func(s): return s[0]) == [5.0, 15.0, 45.0], "increasing delays 5 / 15 / 45 s")
+	n.rewarded_ad_failed_to_load.emit(null, FakeAdError.new())
+	_ok(sched.size() == 3, "4th failure in a row -> no further automatic retry")
+	var l1: int = loads.call()
+	_ok(not e.rewarded.is_available("heart") and loads.call() == l1 + 1, "after the cap: the next availability check reloads lazily (as before)")
+	n.rewarded_ad_loaded.emit(null, null)
+	_ok(e.rewarded.get_provider().is_available("x"), "loaded -> is_available true")
+	n.rewarded_ad_failed_to_load.emit(null, FakeAdError.new())
+	_ok(sched.size() == 4 and sched[-1][0] == 5.0, "counter reset by the load -> next failure retries at 5 s again")
+	_complete("n12_admob_load_retry_bounded")
+
+func _n13() -> void:
+	print("[n13 SB-TF-01 rewarded unavailable / failed -> player-facing text]")
+	var e := EconomyServices.new()
+	var n := _ready_admob(e)
+	n.rewarded_ad_failed_to_load.emit(null, FakeAdError.new())
+	var r: Dictionary = e.rewarded.start(RewardedGrantService.booster_product("tornado"))
+	_ok(not r["ok"] and r["reason"] == "unavailable", "no video loaded -> start refused with reason unavailable")
+	_ok(RewardedAdsScreen._reason_text(r["reason"]) == UiText.t("REWARDED_UNAVAILABLE_NOTE") and not UiText.t("REWARDED_UNAVAILABLE_NOTE").is_empty(), "Rewarded Ads screen shows REWARDED_UNAVAILABLE_NOTE")
+	_ok(RewardedAdsScreen._reason_text("failed") == UiText.t("REWARDED_NO_GRANT", [UiText.t("REWARDED_REASON_FAILED")]), "failed show -> REWARDED_NO_GRANT + REWARDED_REASON_FAILED")
+	var src := FileAccess.get_file_as_string("res://scripts/ui/popup/acquisition_flow.gd")
+	_ok(src.contains('_status(p, UiText.t("REWARDED_UNAVAILABLE_NOTE"))') and src.count("REWARDED_UNAVAILABLE_NOTE") >= 3, "Heart / Need a Hand / booster popups carry the unavailable note (booster CTA no longer silently hidden)")
+	_complete("n13_rewarded_unavailable_text")
+
+func _n14() -> void:
+	print("[n14 SB-TF-01 Shop failure text: store detail appended when present, plain otherwise (EN + TR)]")
+	var s = ShopScreen.new()
+	var st := FakeStack.new()
+	s._stack = st
+	s._economy = EconomyServices.new()
+	var body := func(i: int) -> String: return (st.pushed[i].get_content().get_node("Body") as Label).text
+	s._feedback("store:scrubbucks_100", {"ok": false, "reason": "failed", "error": "0: Cannot connect to iTunes Store"})
+	_ok(body.call(0) == "The purchase didn't go through. (0: Cannot connect to iTunes Store)", "EN detail: %s" % body.call(0))
+	s._feedback("store:scrubbucks_100", {"ok": false, "reason": "failed"})
+	_ok(body.call(1) == UiText.t("SHOP_STORE_FAILED") and not body.call(1).contains("("), "empty detail -> plain SHOP_STORE_FAILED")
+	s._feedback("store:scrubbucks_100", {"ok": false, "reason": "pending", "error": "x"})
+	_ok(body.call(2) == UiText.t("SHOP_STORE_PENDING"), "pending unchanged")
+	UiText.locale = "tr"
+	s._feedback("store:scrubbucks_100", {"ok": false, "reason": "provider_refused", "error": "2: purchase refused"})
+	s._feedback("store:scrubbucks_100", {"ok": false, "reason": "failed", "error": ""})
+	var tr3: String = body.call(3)
+	var tr4: String = body.call(4)
+	UiText.locale = "en"
+	_ok(tr3 == "Satın alma tamamlanmadı. (2: purchase refused)" and tr4 == "Satın alma tamamlanmadı.", "TR detail + TR plain")
+	for fb in st.pushed:
+		fb.free()
+	_complete("n14_shop_failure_detail_text")
 
 # ------------------------------------------------------------------ helpers ----
 

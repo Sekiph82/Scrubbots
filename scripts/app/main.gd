@@ -1103,6 +1103,7 @@ func _install_native_providers(economy) -> void:
 		poll.process_mode = Node.PROCESS_MODE_ALWAYS
 		poll.timeout.connect(store.poll)
 		add_child(poll)
+	economy.store.refresh_prices()   # SB-TF-01: prices load once at launch, again when the Shop opens
 	if Engine.has_singleton(AdmobAdProvider.NATIVE) and ResourceLoader.exists(AdmobAdProvider.NODE_SCRIPT):
 		var node: Node = load(AdmobAdProvider.NODE_SCRIPT).new()
 		var ads = AdmobAdProvider.new(node)

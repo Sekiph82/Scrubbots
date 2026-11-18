@@ -20,6 +20,12 @@ extends "res://scripts/economy/ad_provider.gd"
 ##   rewarded request/deliver   "completed" + verified only when the SDK reported the earned
 ##                              reward before the ad closed; closed without it = "cancelled";
 ##                              failed to show = "failed" (RewardedGrantService grants only the first)
+##
+## SB-TF-01 diagnostics + load retry: every failed load logs ADS_LOAD_FAILED kind code msg and,
+## up to RETRY_DELAYS.size() times in a row, schedules one reload (5 s, 15 s, 45 s) through
+## `schedule` (a SceneTree timer; tests inject a fake). A successful load resets the count;
+## after the cap the ad reloads lazily on the next is_available / due interstitial, as before.
+## ADS_INIT_DONE after the SDK init; consent / ATT failures are logged and still initialize.
 
 const NATIVE := "AdmobPlugin"
 const NODE_SCRIPT := "res://addons/AdmobPlugin/Admob.gd"
@@ -27,15 +33,20 @@ const NODE_SCRIPT := "res://addons/AdmobPlugin/Admob.gd"
 const REAL_IDS := "res://addons/AdmobPlugin/scrubbots_real_ids.gd"
 ## LoadAdRequest.AdPosition.BOTTOM of the plugin.
 const POSITION_BOTTOM := 1
+const RETRY_DELAYS := [5.0, 15.0, 45.0]
 
 var _n
 var _ios := false
 var _sdk_ready := false
 var _want_banner := false
 var _banner_loaded := false
-var _interstitial := "none"   ## none | loading | ready
-var _rewarded := "none"       ## none | loading | ready
+var _interstitial := "none"   ## none | loading | retry | ready
+var _rewarded := "none"       ## none | loading | retry | ready
 var _rw := {}                 ## the open rewarded view: {token, deliver, earned}
+var _retries := {"interstitial": 0, "rewarded": 0}   ## consecutive automatic reloads
+## schedule.call(delay_s, callback): one deferred call (default: a SceneTree timer).
+var schedule := func(delay: float, cb: Callable) -> void:
+	(Engine.get_main_loop() as SceneTree).create_timer(delay).timeout.connect(cb)
 
 ## node: an Admob node (not yet in the tree); ios: request ATT after consent.
 func _init(node, ios: bool = OS.has_feature("ios"), real_ids: String = REAL_IDS) -> void:
@@ -50,20 +61,20 @@ func _init(node, ios: bool = OS.has_feature("ios"), real_ids: String = REAL_IDS)
 	_n.set("banner_anchor_to_safe_area", true)
 	_n.set("remove_interstitial_ads_after_displayed", true)
 	_n.connect("consent_info_updated", _on_consent_info)
-	_n.connect("consent_info_update_failed", _after_consent.unbind(1))
+	_n.connect("consent_info_update_failed", _on_consent_failed.bind("info"))
 	_n.connect("consent_form_loaded", func(): _n.show_consent_form())
-	_n.connect("consent_form_failed_to_load", _after_consent.unbind(1))
-	_n.connect("consent_form_dismissed", _after_consent.unbind(1))
+	_n.connect("consent_form_failed_to_load", _on_consent_failed.bind("form"))
+	_n.connect("consent_form_dismissed", _on_consent_dismissed)
 	_n.connect("tracking_authorization_granted", _init_sdk)
-	_n.connect("tracking_authorization_denied", _init_sdk)
+	_n.connect("tracking_authorization_denied", _on_att_denied)
 	_n.connect("initialization_completed", _on_initialized.unbind(1))
 	_n.connect("banner_ad_loaded", _on_banner_loaded.unbind(2))
-	_n.connect("interstitial_ad_loaded", func(_a, _r): _interstitial = "ready")
-	_n.connect("interstitial_ad_failed_to_load", func(_a, _e): _interstitial = "none")
+	_n.connect("interstitial_ad_loaded", func(_a, _r): _on_loaded("interstitial"))
+	_n.connect("interstitial_ad_failed_to_load", func(_a, e): _on_load_failed("interstitial", e))
 	_n.connect("interstitial_ad_failed_to_show_full_screen_content", func(_a, _e): _load_interstitial())
 	_n.connect("interstitial_ad_dismissed_full_screen_content", _load_interstitial.unbind(1))
-	_n.connect("rewarded_ad_loaded", func(_a, _r): _rewarded = "ready")
-	_n.connect("rewarded_ad_failed_to_load", func(_a, _e): _rewarded = "none")
+	_n.connect("rewarded_ad_loaded", func(_a, _r): _on_loaded("rewarded"))
+	_n.connect("rewarded_ad_failed_to_load", func(_a, e): _on_load_failed("rewarded", e))
 	_n.connect("rewarded_ad_user_earned_reward", func(_a, _r): if not _rw.is_empty(): _rw["earned"] = true)
 	_n.connect("rewarded_ad_dismissed_full_screen_content", _on_rewarded_closed.bind("").unbind(1))
 	_n.connect("rewarded_ad_failed_to_show_full_screen_content", _on_rewarded_closed.bind("failed").unbind(2))
@@ -82,11 +93,26 @@ func _on_consent_info() -> void:
 	else:
 		_after_consent()
 
+func _on_consent_failed(e, step: String) -> void:
+	print("ADS_CONSENT_FAILED step=%s %s" % [step, _err(e)])
+	_after_consent()
+
+## The plugin always passes a FormError; an empty message = a normal close.
+func _on_consent_dismissed(e) -> void:
+	if e != null and e.has_method("get_message") and not String(e.get_message()).is_empty():
+		_on_consent_failed(e, "dismissed")
+	else:
+		_after_consent()
+
 func _after_consent() -> void:
 	if _ios:
 		_n.request_tracking_authorization()
 	else:
 		_init_sdk()
+
+func _on_att_denied() -> void:
+	print("ADS_ATT_DENIED")
+	_init_sdk()
 
 func _init_sdk() -> void:
 	if not _sdk_ready:
@@ -94,6 +120,7 @@ func _init_sdk() -> void:
 
 func _on_initialized() -> void:
 	_sdk_ready = true
+	print("ADS_INIT_DONE test_units=%s" % str(not bool(_n.get("is_real"))))
 	_load_interstitial()
 	_load_rewarded()
 	set_banner(_want_banner)
@@ -160,3 +187,37 @@ func _on_rewarded_closed(failure: String) -> void:
 func _load_rewarded() -> void:
 	_rewarded = "loading"
 	_n.load_rewarded_ad()
+
+# ------------------------------------------------------------- load retry ----
+
+func _on_loaded(kind: String) -> void:
+	_retries[kind] = 0
+	_set_state(kind, "ready")
+
+func _on_load_failed(kind: String, e) -> void:
+	print("ADS_LOAD_FAILED kind=%s %s" % [kind, _err(e)])
+	var n: int = _retries[kind]
+	if n >= RETRY_DELAYS.size():
+		_set_state(kind, "none")
+		return
+	_retries[kind] = n + 1
+	_set_state(kind, "retry")
+	schedule.call(RETRY_DELAYS[n], _retry.bind(kind))
+
+func _retry(kind: String) -> void:
+	if kind == "rewarded" and _rewarded == "retry":
+		_load_rewarded()
+	elif kind == "interstitial" and _interstitial == "retry":
+		_load_interstitial()
+
+func _set_state(kind: String, s: String) -> void:
+	if kind == "rewarded":
+		_rewarded = s
+	else:
+		_interstitial = s
+
+## "code=<n> msg=<text>" of a godot-admob AdError / LoadAdError / FormError (null-safe).
+static func _err(e) -> String:
+	if e == null or not e.has_method("get_code"):
+		return "code=? msg=?"
+	return "code=%s msg=%s" % [str(e.get_code()), String(e.get_message())]
