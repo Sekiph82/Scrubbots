@@ -76,7 +76,10 @@ name: Android Family First10 APK
 # SB-M57-012/013 + SB-M43-081/084 real-money store seam (null provider default, MockProvider grants once per token, No Ads, restore): + m57_store_products (exact 9/9 guard).
 # SB-M44-027 Robots 5-stage assembly visual (50/100/150/200/250 Bot Parts, shader reveal of the next robot's portrait): + m44_robot_assembly_stages (exact 4/4 guard).
 # SB-M57-001..011 ad seam (null provider default, interstitial every 5 finished plays between levels, No Ads keeps rewarded, rewarded grants only on completion, saved play counter): + m57_ads_cadence (exact 6/6 guard).
-# SB-M57-014..016 / 022 real Play Billing / StoreKit / AdMob providers (fake native backends; input billing_ads adds the plugins, also to aab_release; release builds take the real AdMob ids from secrets): + m57_native_providers (exact 9/9 guard).
+# SB-M57-014..016 / 022 real Play Billing / StoreKit / AdMob providers (fake native backends; input billing_ads adds the plugins, also to aab_release): + m57_native_providers (exact guard).
+# SB-TF-01 store error detail (STORE_ERROR / STORE_INVALID_IDS), bounded AdMob load retry, rewarded unavailable text; input
+#   ads_test_mode (default true) = Google TEST ad units for every build, real ids from secrets only with
+#   ads_test_mode=false + release: m57_native_providers guard now exact 14/14.
 # SB-M43-152..157 / SB-M49-030 / SB-M54-031 cloud save seam (null provider default, mock provider: header round trip, conflict choice, no double grant, failures never touch the local save, conflict screen fit): + m54_cloud_save_seam (exact 7/7 guard).
 # SB-M49-029 (mock part) ad / store return transitions (TEST-ONLY overlay providers: focus out/in, pause/resume, resize + safe-area change while up; completed / cancelled / failed; Shop buy + restore, Need a Hand, Continue interstitial, Rewarded Ads, Life): + m49_ad_store_return_layout (exact 6/6 guard).
 # SB-PHONE-2026-11-12-D board background BG01 under the board rect, no board cell under the baked frame (L20/L30/59x59 at 720x1520, 1080x2400, 1170x2532): + board_bg01_backdrop (exact 4/4 guard).
@@ -119,6 +122,10 @@ on:
         description: "SB-M57-014..016/022: include Google Play Billing + AdMob (Google TEST ad ids) plugins (Gradle build). Off = the APK as before."
         type: boolean
         default: false
+      ads_test_mode:
+        description: "SB-TF-01 (billing_ads): true = Google TEST ad units (internal testing). false = real AdMob ids from secrets (release only, public release)."
+        type: boolean
+        default: true
 
 permissions:
   contents: read
@@ -477,10 +484,10 @@ jobs:
           else
             echo "M57-ADS verdict=FAIL (exact 6/6 summary missing)" | tee -a "$S"; fail=1
           fi
-          if grep -qxF 'M57 native providers evidence: PASS (9/9 cases, 0 fail)' validate_logs/m57_native_providers.log 2>/dev/null; then
-            echo "M57-NATIVE verdict=PASS (9/9)" | tee -a "$S"
+          if grep -qxF 'M57 native providers evidence: PASS (14/14 cases, 0 fail)' validate_logs/m57_native_providers.log 2>/dev/null; then
+            echo "M57-NATIVE verdict=PASS (14/14)" | tee -a "$S"
           else
-            echo "M57-NATIVE verdict=FAIL (exact 9/9 summary missing)" | tee -a "$S"; fail=1
+            echo "M57-NATIVE verdict=FAIL (exact 14/14 summary missing)" | tee -a "$S"; fail=1
           fi
           if grep -qxF 'M54 cloud save seam: PASS (7/7 cases, 0 fail)' validate_logs/m54_cloud_save_seam.log 2>/dev/null; then
             echo "M54-CLOUD verdict=PASS (7/7)" | tee -a "$S"
@@ -716,19 +723,22 @@ jobs:
           ADMOB_BANNER_ID: ${{ secrets.ADMOB_ANDROID_BANNER_ID }}
           ADMOB_INTERSTITIAL_ID: ${{ secrets.ADMOB_ANDROID_INTERSTITIAL_ID }}
           ADMOB_REWARDED_ID: ${{ secrets.ADMOB_ANDROID_REWARDED_ID }}
+          ADS_TEST_MODE: ${{ inputs.ads_test_mode }}
         run: |
+          [ "$ADS_TEST_MODE" = true ] || [ "$BUILD_TYPE" = release ] || { echo "::error::ads_test_mode=false (real AdMob ids) needs build_type release"; exit 1; }
           curl -fsSL -o "$RUNNER_TEMP/billing.zip" https://github.com/godot-sdk-integrations/godot-google-play-billing/releases/download/3.3.0/godot-google-play-billing.zip
           curl -fsSL -o "$RUNNER_TEMP/admob.zip" https://github.com/godot-sdk-integrations/godot-admob/releases/download/v7.0/AdmobPlugin-Multi-v7.0.zip
           echo "20d75623d6f337f08d8283c83098b73678d5f575e39247af5a8eb80588b18568  $RUNNER_TEMP/billing.zip" | sha256sum -c -
           echo "d96e1734b889434c0a77f0bafe2f09f4cdb9e5b518b9d6809757b251a17cf8a2  $RUNNER_TEMP/admob.zip" | sha256sum -c -
           unzip -q "$RUNNER_TEMP/billing.zip" -d addons
           unzip -q "$RUNNER_TEMP/admob.zip" -d "$RUNNER_TEMP/admob" && cp -R "$RUNNER_TEMP/admob/res/addons/." addons/
-          # Debug / test builds: Google's sample app id + TEST units (AdMob invalid-traffic policy).
-          # Release: the real ids from GitHub Secrets, written only into this workspace, never echoed.
+          # ads_test_mode (default, every debug / internal-testing build): Google's sample app id + TEST units
+          # (AdMob invalid-traffic policy; a new unpublished app gets no real fill). ads_test_mode=false + release:
+          # the real ids from GitHub Secrets, written only into this workspace, never echoed.
           REAL=false; APP_ID="ca-app-pub-3940256099942544~3347511713"
-          if [ "$BUILD_TYPE" = release ]; then
+          if [ "$ADS_TEST_MODE" != true ] && [ "$BUILD_TYPE" = release ]; then
             for v in ADMOB_APP_ID ADMOB_BANNER_ID ADMOB_INTERSTITIAL_ID ADMOB_REWARDED_ID; do
-              [ -n "${!v}" ] || { echo "::error::release billing_ads build needs GitHub Secret ${v/ADMOB_/ADMOB_ANDROID_}"; exit 1; }
+              [ -n "${!v}" ] || { echo "::error::ads_test_mode=false release build needs GitHub Secret ${v/ADMOB_/ADMOB_ANDROID_}"; exit 1; }
             done
             REAL=true; APP_ID="$ADMOB_APP_ID"
             printf 'const IDS := {"banner": "%s", "interstitial": "%s", "rewarded": "%s"}\n' \
@@ -820,6 +830,8 @@ jobs:
 
       - name: Play Billing + AdMob inside the APK (input billing_ads)
         if: ${{ inputs.billing_ads }}
+        env:
+          ADS_TEST_MODE: ${{ inputs.ads_test_mode }}
         run: |
           grep -q 'addons/AdmobPlugin/plugin.cfg' project.godot
           # Kept out of out/ (uploaded): a release manifest holds the real app id.
@@ -828,11 +840,15 @@ jobs:
           for k in GodotGooglePlayBilling AdmobPlugin com.android.vending.BILLING com.google.android.gms.ads.APPLICATION_ID; do
             grep -qF "$k" "$M" || { echo "::error::APK manifest lacks $k"; exit 1; }
           done
-          # Google's sample app id in every debug build, never in a release build.
+          # Google's sample app id in every ads_test_mode build; the real one only with ads_test_mode=false + release.
+          if [ "$ADS_TEST_MODE" != true ] && [ "$BUILD_TYPE" = release ]; then ADS_MODE=real; else ADS_MODE=test; fi
+          if [ "$ADS_MODE" = test ] && [ -e addons/AdmobPlugin/scrubbots_real_ids.gd ]; then
+            echo "::error::ads_mode=test but addons/AdmobPlugin/scrubbots_real_ids.gd exists"; exit 1
+          fi
           if grep -qF 'ca-app-pub-3940256099942544~3347511713' "$M"; then TEST_ID=yes; else TEST_ID=no; fi
-          if [ "$BUILD_TYPE" = release ]; then [ "$TEST_ID" = no ]; else [ "$TEST_ID" = yes ]; fi \
-            || { echo "::error::AdMob app id: build_type=$BUILD_TYPE but Google test id present=$TEST_ID"; exit 1; }
-          echo "billing_ads manifest check PASS (build_type=$BUILD_TYPE, Google test app id=$TEST_ID)" | tee out/billing_ads_check.txt
+          if [ "$ADS_MODE" = real ]; then [ "$TEST_ID" = no ]; else [ "$TEST_ID" = yes ]; fi \
+            || { echo "::error::AdMob app id: ads_mode=$ADS_MODE but Google test id present=$TEST_ID"; exit 1; }
+          echo "billing_ads manifest check PASS (build_type=$BUILD_TYPE, ads_mode=$ADS_MODE, Google test app id=$TEST_ID)" | tee out/billing_ads_check.txt
 
       - name: APK signature / metadata / hash
         run: |

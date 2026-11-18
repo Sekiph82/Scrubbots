@@ -109,14 +109,42 @@ gh workflow run android-family-first10.yml -f mode=apk_only -f build_type=debug 
 gh workflow run ios-ipa.yml -f build_type=debug -f billing_ads=true
 ```
 
-Real AdMob ids: a `billing_ads` build with `build_type=release` (`aab_release`, release APK, iOS
-release) reads the GitHub Secrets `ADMOB_{ANDROID,IOS}_{APP,BANNER,INTERSTITIAL,REWARDED}_ID` and
-fails when any of its platform's four is missing. It writes them only into the CI workspace
-(`android_export.cfg` / `ios_export.cfg` with `is_real=true`, and
-`addons/AdmobPlugin/scrubbots_real_ids.gd`, which `AdmobAdProvider` loads to switch the node to the
-real units). Nothing is printed; the post-build check only asserts that the Google sample app id is
-absent, and a scrub step replaces the real app id in the uploaded logs. Every debug / test build keeps
-Google's TEST ids (AdMob invalid-traffic policy) and the check fails if a debug build lacks them.
+Ads test mode (SB-TF-01): both workflows take a boolean input `ads_test_mode` (default `true`). With
+`ads_test_mode=true` every `billing_ads` build, debug or release, including TestFlight uploads and Play
+internal testing, uses Google's sample AdMob app id and TEST ad units (`is_real=false`, no
+`scrubbots_real_ids.gd`), so ads fill on test devices (a new, unpublished app gets little or no real
+fill, and AdMob forbids testers clicking real ads). Real ids are only for an explicit public release:
+
+```
+gh workflow run ios-ipa.yml -f build_type=release -f billing_ads=true -f ads_test_mode=false
+```
+
+`ads_test_mode=false` with `build_type=debug` fails at once with `::error::`. The post-build check
+prints `ads_mode=test|real` and fails if test mode produced a real id file or a real app id.
+
+Real AdMob ids: a `billing_ads` build with `ads_test_mode=false` and `build_type=release`
+(`aab_release`, release APK, iOS release) reads the GitHub Secrets
+`ADMOB_{ANDROID,IOS}_{APP,BANNER,INTERSTITIAL,REWARDED}_ID` and fails when any of its platform's four is
+missing. It writes them only into the CI workspace (`android_export.cfg` / `ios_export.cfg` with
+`is_real=true`, and `addons/AdmobPlugin/scrubbots_real_ids.gd`, which `AdmobAdProvider` loads to switch
+the node to the real units). Nothing is printed; the post-build check only asserts that the Google
+sample app id is absent, and a scrub step replaces the real app id in the uploaded logs.
+
+Diagnosing a store or ad failure on a device (SB-TF-01): the providers print one line per problem
+to the device log (Xcode > Devices > Open Console, or Console.app filtered on the app; Android
+`adb logcat | grep -E "STORE_|ADS_"`):
+
+- `STORE_ERROR product=<id> code=<code> msg=<message>`: a failed purchase (the StoreKit
+  `SKError.localizedDescription`; the pinned inappstore plugin sends no numeric code, so `code` is
+  empty there; Play sends `response_code` + `debug_message`), a refused purchase (`code=31` = StoreKit
+  has not loaded that product, `code=2` = payments disabled on the device) or a failed product query
+  (`product=*`; retried once).
+- `STORE_INVALID_IDS product=<ids>`: product ids the store does not know (check App Store Connect /
+  Play Console ids and the Paid Apps agreement); those products show no price and cannot be bought.
+- `ADS_INIT_DONE test_units=<bool>`, `ADS_LOAD_FAILED kind=<rewarded|interstitial> code=<n> msg=<..>`
+  (reloads after 5 s, 15 s, 45 s, then on the next request), `ADS_CONSENT_FAILED`, `ADS_ATT_DENIED`.
+
+The Shop's failure text also shows the store's detail: "The purchase didn't go through. (<code>: <message>)".
 
 Owner steps before real money: the
 Play merchant profile, the App Store Paid Apps agreement, and the six products of
