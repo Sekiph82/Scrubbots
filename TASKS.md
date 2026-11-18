@@ -6,7 +6,7 @@ Completed items and older status history: docs/migration/legacy-task-trackers/TA
 
 ## Autonomous Queue
 <!-- Maintained by the factory loop (CLAUDE.md §0D). One row per item: `- READY|OWNER|DONE <TASK-ID> — <one line>`. First READY row is next. -->
-- READY SB-TF-01 — owner 2026-11-18: purchases fail on TestFlight + ads never show (test ad ids on internal builds, no-ad message). Detail: section Owner TestFlight Feedback + Redesign 2026-11-18.
+- DONE SB-TF-01 — owner 2026-11-18 TestFlight: purchases fail + ads never show. DONE factory 180: code ad3a7be3 (store error surfaced + logged, product query retry, ads_test_mode default true so internal/TestFlight builds use Google test ads, AdMob load retry, rewarded-unavailable note). LOCAL_PASS m57_native_providers 14/14, m57_store_products 9/9. CLAUDE_PEER_REVIEW PASS. Device check pending next build. Evidence coordination/sessions/FACTORY/180-tf01-purchase-ads/.
 - READY SB-TF-02 — owner 2026-11-18: bigger boosters, slot pickable right after pop ends, Scrubbot 2.4->3.0, no Details button, intro locks input, auto speed 3x. Detail: section Owner TestFlight Feedback + Redesign 2026-11-18.
 - READY SB-TF-03 — owner 2026-11-18: Home/Profile redesign: no bottom nav, banner, Profile hosts Robots/Ranks/Collection, Settings icon, smaller see-through auto-hiding activity buttons, part-icon badge, new wave video. Detail: section Owner TestFlight Feedback + Redesign 2026-11-18.
 - READY SB-TF-04 — owner 2026-11-18: gameplay layout: bottom banner, boosters up, smaller caution sign, bigger Scrubby, bubble behind slots, brighter floor. Detail: section Owner TestFlight Feedback + Redesign 2026-11-18.
