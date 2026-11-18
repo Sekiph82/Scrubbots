@@ -13,6 +13,7 @@ Completed items and older status history: docs/migration/legacy-task-trackers/TA
 - READY SB-TF-05 — owner 2026-11-18: shared reward reveal (all at once, 1.5 s hold, then fly) for every reward source + rewarded x2 Scrub Bucks on win. Detail: section Owner TestFlight Feedback + Redesign 2026-11-18.
 - READY SB-TF-06 — owner 2026-11-18: tornado booster video from the button to the board. Detail: section Owner TestFlight Feedback + Redesign 2026-11-18.
 - READY SB-TF-07 — owner 2026-11-18: event +1 rewarded ad, App Open ad (L20+, 1/day), interstitial none before L10 then every 4. Detail: section Owner TestFlight Feedback + Redesign 2026-11-18.
+- READY SB-TF-08 — owner 2026-11-18: Achievements list opens with earned achievements on top (claimable first, then claimed, then in progress); Collection gets a "Read all" button that marks every unread new card as seen at once (badges clear). Detail: section Owner TestFlight Feedback + Redesign 2026-11-18.
 - DONE SB-IOS-TESTFLIGHT-2026-11-18 — owner 2026-11-18: iOS on TestFlight + iOS IAPs ready. DONE factory 178: code 1a8b7c83 (opt-in testflight_upload in ios-ipa.yml, ITSAppUsesNonExemptEncryption=false). CI 44195307315 UPLOAD SUCCEEDED, build 0.1.0 (24) in internal group; 6 IAPs READY_TO_SUBMIT. CLAUDE_PEER_REVIEW PASS. Evidence coordination/sessions/FACTORY/178-testflight/.
 - DONE SB-STORE-PRICES-2026-11-18 — owner 2026-11-18: Scrub Bucks packs 0.99/1.99/2.99/4.99/9.99 USD (100/550/1200/2600/7000), no_ads unchanged 4.99. Play Console one-time products created and repriced by Claude in Chrome; store_products_v1.json reference_usd updated (metadata only, never displayed). License testers = ScrubBots testers list.
 - DONE SB-AAB-SIZE-2026-11-17 — AAB 396 MB > Play 200 MB limit. DONE factory 176: code 0dfd19ba (lossy WebP for large UI art, pixel art lossless; keyed videos q5). PCK 347.8 -> 122.7 MB, debug APK 513.6 -> 178.1 MB (CI 44121919624). CLAUDE_PEER_REVIEW PASS. Evidence coordination/sessions/FACTORY/176-aab-size/.
@@ -273,6 +274,10 @@ Completed items and older status history: docs/migration/legacy-task-trackers/TA
   - App Open ad: after level 20 only, at most once per day, never on install day, after the opening video.
   - Interstitial: none before level 10, then every 4 finished plays (was 5).
   - No Ads removes App Open + interstitial; rewarded ads stay. Record as an owner economy amendment (coordination doc + config).
+
+- [ ] SB-TF-08 — Achievements order + Collection Read all (owner 2026-11-18).
+  - Achievements screen: earned achievements at the top (claimable rewards first, then already claimed, then in progress), order inside each group unchanged.
+  - Collection: a "Read all" / "Tümünü oku" button, shown only when unread new cards exist, marks all of them seen in one tap; the Collection new-card badges (Profile button, card markers) clear.
 
 ## Owner Polish 2026-10-31
 <!-- Owner phone playtest of all 30 levels (all WON, "oyun akici"); queued as SB-POLISH-001..011 in the Autonomous Queue. -->
