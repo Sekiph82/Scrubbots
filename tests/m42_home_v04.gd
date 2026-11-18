@@ -92,7 +92,9 @@ func _initialize() -> void:
 func _home(size: Vector2i, tag: String, insets := [0, 0, 0, 0]) -> Array:
 	var p := "user://m42_v04_%s_%d.save" % [tag, Time.get_ticks_usec()]
 	_tmp.append(p)
-	var app = AppState.new(p)
+	# Frozen clock: Heart regen / 2x windows are wall-clock state; a real clock could tick them between
+	# two economy snapshots of one case (currency_hud "economy untouched" was flaky).
+	var app = AppState.new(p, func(): return 1790000000, func(): return 20000)
 	var sub := SubViewport.new()
 	sub.size = size
 	sub.disable_3d = true
@@ -338,7 +340,7 @@ func _play(home) -> void:
 	_ok(absf(play.get_global_rect().get_center().x - vp.x * 0.5) < 1.0, "PLAY centred (%.1f)" % play.get_global_rect().get_center().x)
 	_ok(absf(play.size.x - V03_PLAY.x) < 1.0 and play.size.y >= V03_PLAY.y and play.size.y <= V03_PLAY.y + 10.0, "V03 Play size kept (%s)" % str(play.size))
 	_ok(home.get_region("PlayTriangle") != null and not (home.get_region("PlayTriangle") is TextureRect), "native white triangle kept")
-	_ok(play.text == UiText.t("HOME_PLAY_LEVEL", [1]) and home.get_region("PlaySubtitle").text == UiText.t("HOME_START_LEVEL", [1]), "live PLAY + frontier subtitle")
+	_ok(play.text == UiText.t("HOME_PLAY_LEVEL", [1]) and home.get_region("PlaySubtitle") == null, "live PLAY · LEVEL 1, no second level line (SB-TF-03)")
 	_ok(not _drawn_paths(home).has(_paths["HOME-078"]), "HOME-078 stays retired")
 	var status: Label = home.get_region("StatusLabel")
 	_ok(status.get_parent() == play, "status pill floats on the CTA (never resizes the track row)")

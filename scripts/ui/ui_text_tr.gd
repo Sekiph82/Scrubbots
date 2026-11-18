@@ -11,8 +11,6 @@ extends RefCounted
 const TR := {
 	"HOME_PLAY": "OYNA",
 	"HOME_PLAY_LEVEL": "OYNA · LEVEL %d",
-	"HOME_CONTINUE_LEVEL": "DEVAM · BÖLÜM %d",
-	"HOME_START_LEVEL": "BÖLÜM %d",
 	"HOME_RATIO": "%s/%s",
 	"HOME_PLAYER_NAME_DEFAULT": "Scrubby",
 	"HOME_AREA_TITLE": "FISILTILI PARK",

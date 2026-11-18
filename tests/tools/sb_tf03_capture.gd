@@ -1,5 +1,5 @@
 extends SceneTree
-## SB-TF-03 owner captures: Home EN, Home TR and Profile at a phone viewport, on the real app
+## SB-TF-03 owner captures: Home and Profile, EN and TR, at a phone viewport, on the real app
 ## root (main.tscn) with a temp save (never the canonical one). Fixture: every feature unlocked
 ## (test seam), 4 active events (injected list) so both activity columns hold >= 3 buttons, and
 ## one owned card not yet viewed (new-card badge). Needs a rendering driver (no --headless):
@@ -57,10 +57,9 @@ func _initialize() -> void:
 		root.get_modal_stack().clear("capture")
 		await _frames(4)
 		_save(sub, "%s/home_%s.png" % [out_dir, loc])
-		if loc == "en":
-			(home.get_region("ProfileButton") as Button).pressed.emit()
-			await _frames(12)
-			_save(sub, "%s/profile.png" % out_dir)
+		(home.get_region("ProfileButton") as Button).pressed.emit()
+		await _frames(12)
+		_save(sub, "%s/profile%s.png" % [out_dir, "" if loc == "en" else "_tr"])
 		root.free()
 		sub.free()
 		await _frames(2)

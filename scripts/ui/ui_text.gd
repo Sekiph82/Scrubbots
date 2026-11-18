@@ -19,8 +19,6 @@ static var locale := "en"
 const EN := {
 	"HOME_PLAY": "PLAY",
 	"HOME_PLAY_LEVEL": "PLAY · LEVEL %d",
-	"HOME_CONTINUE_LEVEL": "CONTINUE · LEVEL %d",
-	"HOME_START_LEVEL": "LEVEL %d",
 	"HOME_RATIO": "%s/%s",
 	"HOME_PLAYER_NAME_DEFAULT": "Scrubby",
 	"HOME_AREA_TITLE": "WHISPERING PARK",

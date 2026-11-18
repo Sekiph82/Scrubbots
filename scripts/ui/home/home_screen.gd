@@ -1154,8 +1154,9 @@ func get_activity_layout() -> Dictionary:
 
 # ------------------------------------------------------------- Play CTA ----
 
-## Centred standalone CTA (V03 size): live PLAY, native white triangle, compact live
-## frontier subtitle. The status pill floats just above the button (no layout change).
+## Centred standalone CTA (V03 size): live "PLAY · LEVEL N", native white triangle (SB-TF-03:
+## the level lives in the label, no second subtitle line). The status pill floats just above the
+## button (no layout change).
 const PLAY_SIZE := Vector2(470, 150)
 const JOURNEY_SIZE := Vector2(720, 84)   ## V02 owner remediation: larger (V01 560x58)
 const JOURNEY_GAP := 6.0
@@ -1171,7 +1172,7 @@ func _build_play(parent: VBoxContainer) -> void:
 	HomeStyle.style_play_label_navy(play)
 	for st in ["normal", "hover", "pressed", "disabled"]:
 		var sb: StyleBoxFlat = play.get_theme_stylebox(st)
-		sb.content_margin_bottom = 40
+		sb.content_margin_bottom = 22   # one centred line above the bottom bevel
 		sb.content_margin_right = 96
 		sb.content_margin_left = 24
 	play.pressed.connect(func():
@@ -1183,17 +1184,9 @@ func _build_play(parent: VBoxContainer) -> void:
 	tri.set_anchors_preset(Control.PRESET_CENTER_RIGHT)
 	tri.offset_left = -104
 	tri.offset_right = -46
-	tri.offset_top = -46
-	tri.offset_bottom = 12
+	tri.offset_top = -38
+	tri.offset_bottom = 20
 	play.add_child(_reg(tri))
-	var sub := HomeStyle.label("", 28, HomeStyle.SUBTITLE, 8)
-	sub.name = "PlaySubtitle"
-	sub.add_theme_color_override("font_outline_color", HomeStyle.GREEN_EDGE)
-	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	sub.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
-	sub.offset_top = -54
-	sub.offset_bottom = -16
-	play.add_child(_reg(sub))
 	var status := HomeStyle.label("", 24)
 	status.name = "StatusLabel"
 	status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -1335,7 +1328,6 @@ func refresh() -> void:
 	elif _app.is_blocked:
 		play.disabled = true
 		status.text = UiText.t("HOME_SAVE_BLOCKED")
-		(_nodes["PlaySubtitle"] as Label).text = ""
 	else:
 		_render_play(play, status)
 	status.visible = not status.text.is_empty()
@@ -1639,16 +1631,14 @@ func get_view_model() -> Dictionary:
 	return _vm.duplicate(true)
 
 ## SB-M42-003: the ONE CTA launches only the canonical progression frontier. SB-TF-03: the
-## button reads "PLAY · LEVEL N" (N = the level PLAY launches), font-fitted to the button; the
-## live subtitle still carries the frontier: no completed level -> "LEVEL N"; otherwise
-## "CONTINUE · LEVEL N". A frontier without catalog content is shown honestly and disabled
-## (no fallback, no picker).
+## button reads "PLAY · LEVEL N" (N = the level PLAY launches), font-fitted to the button (the
+## former "LEVEL N" / "CONTINUE · LEVEL N" subtitle is gone). A frontier without catalog content
+## is shown honestly and disabled (no fallback, no picker).
 const PLAY_FONT := 76
 const PLAY_FONT_MIN := 30
 func _render_play(play: Button, status: Label) -> void:
 	_launch = GameplayLaunchResolver.resolve(_app)
 	var level := int(_launch.get("level", _app.progression.current_level()))
-	var first_time: bool = _app.progression.completed_count() == 0
 	var text := UiText.t("HOME_PLAY_LEVEL", [level])
 	if play.text != text:
 		var avail: float = PLAY_SIZE.x - play.get_theme_stylebox("normal").get_minimum_size().x - 2.0 * play.get_theme_constant("outline_size")
@@ -1657,7 +1647,6 @@ func _render_play(play: Button, status: Label) -> void:
 			fs -= 1
 		play.add_theme_font_size_override("font_size", fs)   # before the text: never a wider frame
 		play.text = text
-	(_nodes["PlaySubtitle"] as Label).text = UiText.t("HOME_START_LEVEL", [level]) if first_time else UiText.t("HOME_CONTINUE_LEVEL", [level])
 	if _launch.get("ok", false):
 		play.disabled = false
 		status.text = ""

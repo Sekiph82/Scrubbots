@@ -17,6 +17,7 @@ const CollectionScreen = preload("res://scripts/ui/collection/collection_screen.
 const EventsV02Ui = preload("res://scripts/ui/events/events_v02_ui.gd")
 const UiText = preload("res://scripts/ui/ui_text.gd")
 const UiTextTr = preload("res://scripts/ui/ui_text_tr.gd")
+const ProfileScreens = preload("res://scripts/ui/profile/profile_screens.gd")
 
 ## Events service with an injected list() (phases / claimed steps the schedule cannot produce on demand).
 class FakeEvents extends "res://scripts/economy/events_v02_service.gd":
@@ -238,6 +239,7 @@ func _t08() -> void:
 	var n := int(h.get_launch_preview()["level"])
 	var play: Button = h.get_region("PlayButton")
 	_ok(n == 7 and play.text == UiText.t("HOME_PLAY_LEVEL", [n]) and play.text == "PLAY · LEVEL 7", "EN PLAY text '%s'" % play.text)
+	_ok(h.get_region("PlaySubtitle") == null and play.find_children("*", "Label", true, false).filter(func(l): return l.visible and l.text.contains(str(n))).is_empty(), "the level shows once: no second LEVEL line under PLAY")
 	_ok(_fits(play), "EN text fits the PLAY button (font %d)" % play.get_theme_font_size("font_size"))
 	for big in [123, 4321]:
 		app.progression.debug_set_current_level(big)
@@ -261,6 +263,7 @@ func _t09() -> void:
 	await _frames(2)
 	var p = _top()
 	_ok(_top_id() == "profile" and p.get_action_button("notifications") == null, "Profile open, no Notifications action")
+	_ok(_dest_unfit(p).is_empty(), "EN ROBOTS / RANKS / COLLECTION labels fit their buttons (clear of the badge) %s" % str(_dest_unfit(p)))
 	var opened := {}
 	for id in ["robots", "ranks", "collection"]:
 		var b: Button = p.get_action_button(id)
@@ -271,6 +274,14 @@ func _t09() -> void:
 		_top().close()
 		await _frames(2)
 	_ok(opened == {"robots": "robots", "ranks": "ranks", "collection": "collection"} and _top_id() == "profile", "they open Robots / Ranks / Collection album %s" % str(opened))
+	_root.get_modal_stack().clear("test")
+	await _frames(2)
+	UiText.locale = "tr"
+	(_home().get_region("ProfileButton") as Button).pressed.emit()
+	await _frames(3)
+	var tr_p = _top()
+	_ok(tr_p.get_action_button("collection").text == UiText.caps(UiText.t("PROFILE_COLLECTION")) and _dest_unfit(tr_p).is_empty(), "TR %s labels fit their buttons %s" % [str(DEST_IDS.map(func(i): return tr_p.get_action_button(i).text)), str(_dest_unfit(tr_p))])
+	UiText.locale = "en"
 	_root.get_modal_stack().clear("test")
 	await _frames(2)
 	_root.open_settings()
@@ -302,6 +313,7 @@ func _t10() -> void:
 	await _frames(2)
 	var badge: Label = _top().get_action_button("collection").get_node("CollectionBadge")
 	_ok(badge.visible and badge.text == "1", "Profile COLLECTION button badge 1")
+	_ok(_dest_unfit(_top()).is_empty() and _top().get_action_button("collection").get_global_rect().encloses(badge.get_global_rect()), "with the badge shown every label still fits, badge inside the button %s" % str(_dest_unfit(_top())))
 	_tap("collection")
 	await _frames(2)
 	_ok(_top_id() == "collection", "album open")
@@ -353,6 +365,17 @@ func _t11() -> void:
 	_complete("t11_hearts_shop")
 
 # ---------------------------------------------------------------- helpers ----
+
+const DEST_IDS := ["robots", "ranks", "collection"]
+## Profile destination buttons whose label (at its font) is wider than the room beside the badge.
+func _dest_unfit(p) -> Array:
+	var bad: Array = []
+	for id in DEST_IDS:
+		var b: Button = p.get_action_button(id)
+		var w: float = b.get_theme_font("font").get_string_size(b.text, HORIZONTAL_ALIGNMENT_LEFT, -1, b.get_theme_font_size("font_size")).x
+		if w > ProfileScreens.destination_text_width(b) + 0.5:
+			bad.append("%s %.0f>%.0f" % [b.text, w, ProfileScreens.destination_text_width(b)])
+	return bad
 
 func _view(id: String, phase: String, all_claimed: bool) -> Dictionary:
 	return {"iid": id + ":1", "id": id, "phase": phase, "claimable": 0,

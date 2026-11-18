@@ -148,8 +148,7 @@ func _continue_cta_frontier() -> void:
 	var root = await _boot_main(path)
 	var home = root.get_home()
 	var play: Button = home.get_region("PlayButton")
-	var sub_text: String = home.get_region("PlaySubtitle").text
-	_ok(play.text == "PLAY · LEVEL 2" and sub_text == "CONTINUE · LEVEL 2", "CTA shows PLAY · LEVEL 2 + live subtitle CONTINUE · LEVEL 2 (%s / %s)" % [play.text, sub_text])
+	_ok(play.text == "PLAY · LEVEL 2" and home.get_region("PlaySubtitle") == null, "CTA shows PLAY · LEVEL 2, no second level line (SB-TF-03) (%s)" % play.text)
 	# M52-C001: Level 2 (Apple) now exists — no coming-soon state at frontier 2.
 	_ok(not play.disabled and String(home.get_region("StatusLabel").text).find("coming soon") == -1, "frontier 2 has real content: enabled, no coming-soon message")
 	_shutdown(root)
@@ -162,7 +161,7 @@ func _continue_cta_frontier() -> void:
 	var root11 = await _boot_main(path11)
 	var home11 = root11.get_home()
 	var play11: Button = home11.get_region("PlayButton")
-	_ok(home11.get_region("PlaySubtitle").text == "CONTINUE · LEVEL 201", "subtitle reflects real frontier 201")
+	_ok(home11.get_region("PlayButton").text == "PLAY · LEVEL 201", "PLAY reflects the real frontier 201")
 	_ok(play11.disabled and String(home11.get_region("StatusLabel").text).find("coming soon") != -1, "frontier without content: disabled + honest message")
 	play11.pressed.emit()
 	var r: Dictionary = root11.play_current_frontier()
@@ -688,7 +687,7 @@ func _localization_seam() -> void:
 	TranslationServer.set_locale(prev_locale)
 	TranslationServer.remove_translation(tr)
 	home.refresh()
-	_ok(home.get_region("PlayButton").text.begins_with("PLAY · LEVEL ") and UiText.t("HOME_CONTINUE_LEVEL", [3]) == "CONTINUE · LEVEL 3", "English fallback restored")
+	_ok(home.get_region("PlayButton").text.begins_with("PLAY · LEVEL ") and UiText.t("HOME_PLAY_LEVEL", [3]) == "PLAY · LEVEL 3", "English fallback restored")
 	_ok(UiText.num(1234567) == "1,234,567" and UiText.num(-5000) == "-5,000" and UiText.num(0) == "0", "number formatting seam")
 	sub.free()
 	_complete("localization_seam")

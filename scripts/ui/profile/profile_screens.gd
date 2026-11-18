@@ -109,13 +109,18 @@ static func open_profile(stack, app, ceremonies = null, open_packs: Callable = C
 		if not app.feature_unlocked(feature):
 			b.tooltip_text = UiText.t("HOME_UNLOCKS_AT_LEVEL", [app.feature_unlock_level(feature)])
 			b.accessibility_description = b.tooltip_text
-		HomeStyle.fit_on_resize(b, UiTokens.FONT_BUTTON)   # three per row: long locales shrink, never widen
+		# Three per row: equal shares (the text never widens a button); _fit_destinations shrinks the
+		# font so the label clears the corner badge.
+		b.clip_text = true
+		b.autowrap_mode = TextServer.AUTOWRAP_OFF
+		b.resized.connect(func(): _fit_destinations(p))
 		var badge := UiShortcutButton.make_badge()
 		badge.name = String(d[2])
-		badge.offset_left = -UiShortcutButton.BADGE_SIZE - 4   # inside the button's top-right corner
+		badge.offset_left = -DEST_BADGE - 4   # a compact pill inside the button's top-right corner
 		badge.offset_right = -4
 		badge.offset_top = 4
-		badge.offset_bottom = UiShortcutButton.BADGE_SIZE + 4
+		badge.offset_bottom = DEST_BADGE + 4
+		badge.add_theme_font_size_override("font_size", 22)
 		b.add_child(badge)
 	_render_destination_badges(p, app)
 	p.add_action("close", UiText.t("SHOP_CLOSE"), "secondary", true)
@@ -163,6 +168,35 @@ static func _render_destination_badges(p: BasePopup, app) -> void:
 		var n: int = int(counts.get(_entry(d[0]), 0)) if app.feature_unlocked(d[0]) else 0
 		badge.text = str(n) if n > 0 else (UiText.t("HOME_BADGE_NEW") if fresh.has(_entry(d[0])) else "")
 		badge.visible = not badge.text.is_empty()
+	_fit_destinations(p)
+
+const DEST_FONT_MIN := 16
+const DEST_BADGE := 40
+## Width a destination button's label may use: the content width, less the corner badge while it
+## is shown (the label then aligns left, away from the badge).
+static func destination_text_width(b: Button) -> float:
+	var badge: Control = null
+	for d in DESTINATIONS:
+		badge = b.get_node_or_null(String(d[2])) if badge == null else badge
+	var w: float = b.size.x - b.get_theme_stylebox("normal").get_minimum_size().x
+	if badge != null and badge.visible:
+		w -= DEST_BADGE + 4.0
+	return w
+
+## One font for the ROBOTS / RANKS / COLLECTION row: the largest (FONT_BUTTON down to DEST_FONT_MIN)
+## at which every label fits destination_text_width (long locales / badges never clip a label).
+static func _fit_destinations(p: BasePopup) -> void:
+	var buttons: Array = DESTINATIONS.map(func(d): return p.get_action_button(d[0])).filter(func(b): return b != null)
+	if buttons.is_empty() or (buttons[0] as Button).size.x <= 0.0:
+		return
+	var fs := UiTokens.FONT_BUTTON
+	while fs > DEST_FONT_MIN and buttons.any(func(b): return b.get_theme_font("font").get_string_size(b.text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > destination_text_width(b)):
+		fs -= 1
+	for b in buttons:
+		if (b as Button).get_theme_font_size("font_size") != fs:
+			(b as Button).add_theme_font_size_override("font_size", fs)
+		var shown: bool = destination_text_width(b) < b.size.x - b.get_theme_stylebox("normal").get_minimum_size().x
+		(b as Button).alignment = HORIZONTAL_ALIGNMENT_LEFT if shown else HORIZONTAL_ALIGNMENT_CENTER
 
 ## Blue hero card: active robot portrait in the round HUD frame, its name, the campaign level
 ## badge and the same Bot Parts meter as the Home top HUD (next 250-part robot, never XP).
