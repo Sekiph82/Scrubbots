@@ -340,8 +340,13 @@ static func _tile(p: BasePopup, e, cid: String, cache) -> Control:
 	cnt.name = "Count"
 	tile.add_child(cnt)
 	if owned > 0:
-		var b := p.add_action("card:" + cid, UiText.t("COLLECTION_DETAILS"), "secondary", false, "", tile)
-		b.custom_minimum_size = Vector2(0, UiTokens.TOUCH_MIN)
+		# SB-TF-02 (owner 2026-11-18): no separate Details button; the card face itself is the
+		# invisible full-face tap target for the same card:<id> action.
+		var b := p.add_action("card:" + cid, "", "secondary", false, "", face)
+		b.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		b.accessibility_name = "%s, %s" % [String(cat["name"]), UiText.t("COLLECTION_DETAILS")]
+		for st in ["normal", "hover", "pressed", "disabled", "focus"]:
+			b.add_theme_stylebox_override(st, StyleBoxEmpty.new())
 	_fill_tile(tile, e, cid)
 	return tile
 

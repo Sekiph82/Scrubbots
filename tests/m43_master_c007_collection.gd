@@ -108,6 +108,20 @@ func _k03() -> void:
 	var st0 = p2.find_child("Tile_s2_c0", true, false).find_child("State", true, false)
 	var st4 = p2.find_child("Tile_s2_c4", true, false).find_child("State", true, false)
 	_ok(st0.visible and st0.get_node("Text").text == "EXTRAS x2" and not st4.visible, "reopened: no NEW; 3 copies -> EXTRAS x2; single copy no badge")
+	# SB-TF-02 (owner 2026-11-18): no "Details" button; the owned card face is the tap target.
+	var details := UiText.t("COLLECTION_DETAILS")
+	_ok(p2.find_children("*", "Button", true, false).filter(func(b): return b.text == details).is_empty(), "set screen with owned cards has no '%s' button" % details)
+	var t0b = p2.find_child("Tile_s2_c0", true, false)
+	var face_btns: Array = t0b.get_node("Face").find_children("*", "Button", false, false)
+	var unowned_btns: Array = p2.find_child("Tile_s2_c1", true, false).find_children("*", "Button", true, false)
+	_ok(face_btns.size() == 1 and face_btns[0].get_global_rect().is_equal_approx(t0b.get_node("Face").get_global_rect()) and face_btns[0].text == ""
+		and face_btns[0].accessibility_name.contains(details) and face_btns[0].focus_mode != Control.FOCUS_NONE and unowned_btns.is_empty(),
+		"owned card face = one full-face, focusable, named tap target; unowned card has none")
+	face_btns[0].pressed.emit()
+	await _frames(2)
+	_ok(_top_id() == "collection_card" and String(_top().context["card_id"]) == "s2_c0", "tapping the card opens its details")
+	_tap("back")
+	await _frames(2)
 	_complete("k03_set_detail_states")
 
 func _k04() -> void:
