@@ -6,6 +6,13 @@ Completed items and older status history: docs/migration/legacy-task-trackers/TA
 
 ## Autonomous Queue
 <!-- Maintained by the factory loop (CLAUDE.md §0D). One row per item: `- READY|OWNER|DONE <TASK-ID> — <one line>`. First READY row is next. -->
+- READY SB-TF-01 — owner 2026-11-18: purchases fail on TestFlight + ads never show (test ad ids on internal builds, no-ad message). Detail: section Owner TestFlight Feedback + Redesign 2026-11-18.
+- READY SB-TF-02 — owner 2026-11-18: bigger boosters, slot pickable right after pop ends, Scrubbot 2.4->3.0, no Details button, intro locks input, auto speed 3x. Detail: section Owner TestFlight Feedback + Redesign 2026-11-18.
+- READY SB-TF-03 — owner 2026-11-18: Home/Profile redesign: no bottom nav, banner, Profile hosts Robots/Ranks/Collection, Settings icon, smaller see-through auto-hiding activity buttons, part-icon badge, new wave video. Detail: section Owner TestFlight Feedback + Redesign 2026-11-18.
+- READY SB-TF-04 — owner 2026-11-18: gameplay layout: bottom banner, boosters up, smaller caution sign, bigger Scrubby, bubble behind slots, brighter floor. Detail: section Owner TestFlight Feedback + Redesign 2026-11-18.
+- READY SB-TF-05 — owner 2026-11-18: shared reward reveal (all at once, 1.5 s hold, then fly) for every reward source + rewarded x2 Scrub Bucks on win. Detail: section Owner TestFlight Feedback + Redesign 2026-11-18.
+- READY SB-TF-06 — owner 2026-11-18: tornado booster video from the button to the board. Detail: section Owner TestFlight Feedback + Redesign 2026-11-18.
+- READY SB-TF-07 — owner 2026-11-18: event +1 rewarded ad, App Open ad (L20+, 1/day), interstitial none before L10 then every 4. Detail: section Owner TestFlight Feedback + Redesign 2026-11-18.
 - DONE SB-IOS-TESTFLIGHT-2026-11-18 — owner 2026-11-18: iOS on TestFlight + iOS IAPs ready. DONE factory 178: code 1a8b7c83 (opt-in testflight_upload in ios-ipa.yml, ITSAppUsesNonExemptEncryption=false). CI 44195307315 UPLOAD SUCCEEDED, build 0.1.0 (24) in internal group; 6 IAPs READY_TO_SUBMIT. CLAUDE_PEER_REVIEW PASS. Evidence coordination/sessions/FACTORY/178-testflight/.
 - DONE SB-STORE-PRICES-2026-11-18 — owner 2026-11-18: Scrub Bucks packs 0.99/1.99/2.99/4.99/9.99 USD (100/550/1200/2600/7000), no_ads unchanged 4.99. Play Console one-time products created and repriced by Claude in Chrome; store_products_v1.json reference_usd updated (metadata only, never displayed). License testers = ScrubBots testers list.
 - DONE SB-AAB-SIZE-2026-11-17 — AAB 396 MB > Play 200 MB limit. DONE factory 176: code 0dfd19ba (lossy WebP for large UI art, pixel art lossless; keyed videos q5). PCK 347.8 -> 122.7 MB, debug APK 513.6 -> 178.1 MB (CI 44121919624). CLAUDE_PEER_REVIEW PASS. Evidence coordination/sessions/FACTORY/176-aab-size/.
@@ -231,6 +238,41 @@ Completed items and older status history: docs/migration/legacy-task-trackers/TA
 
 ## Questions for Şekip
 <!-- One line per question the loop truly cannot decide (CLAUDE.md §0D.5). Empty = nothing needed. -->
+
+## Owner TestFlight Feedback + Redesign 2026-11-18
+<!-- Owner TestFlight build 0.1.0 (24) feedback (8 items, fetched via ASC API into factory/jobs/179-testflight-feedback/) plus the owner's Home/Profile/Gameplay redesign and ad decisions, all stated in chat 2026-11-18. Queued as SB-TF-01..07 in the Autonomous Queue, in this order. Owner: "durmadan kodlamaya basla ve hepsini bitir". APK/IPA builds only with owner OK, batched. -->
+- [ ] SB-TF-01 — Purchases + ads on TestFlight/internal builds.
+  - (5) "The purchase didn't go through" on TestFlight: check sandbox account, IAP state, log the StoreKit error code, fix the integration bug if any.
+  - (6) Ads do not show: internal/TestFlight builds use Google test ad ids (or registered test devices) so ads fill before store release; real ids stay for the public release. When no ad is available the player sees a short message instead of nothing.
+- [ ] SB-TF-02 — Small gameplay fixes.
+  - (1) Booster icons bigger. The slot batch-finish pop plays to its END, then the slot is IMMEDIATELY pickable from Supply (hold == the real effect length, no extra wait; feedback "olmuyor").
+  - (2) Scrubbot size: BODY_SPAN_CELLS 2.4 -> 3.0 (about +25%), board-resolution independence kept; m28_c002_c002_r01_visual, m32_c002_board_independent_size, m32_c002_size_snapshot updated.
+  - (7) Collection cards: remove the "Details" button; tapping a card opens its details.
+  - (8) Level intro animation: no selection (slot/supply/booster) while it plays.
+  - (27) Free automatic endgame speed-up after the last Supply batch goes to the slots: 2x -> 3x. The paid/manual 2x stays 2x.
+- [ ] SB-TF-03 — Home + Profile redesign.
+  - Bottom nav removed entirely (Home button gone); a persistent banner ad area takes its place.
+  - Robots opens from Profile's Robots button. Ranks: new button in Profile. Collection moves into Profile with a new-card badge on its button (same screen as before). Notifications moves from Profile into Settings. Settings becomes an icon between the Profile card and the Scrub Bucks/Hearts chips.
+  - Home Shop tile removed; Shop opens only from the Scrub Bucks / Hearts "+"; the Hearts popup gets the same "More in Shop" button as the Scrub Bucks popup.
+  - Remaining Home activity buttons (Rewarded Ads, Tasks, Daily, one button per active Event): 30% smaller than today, up to 4 stacked on the left and 4 on the right, button backgrounds 50% transparent. Each hides when done/inactive and comes back when active again (Tasks after all 4 claimed until the next day; Rewarded Ads, Daily same idea; an Event when all its rewards are claimed).
+  - Win-streak / reward-track strip above the nav removed.
+  - Profile card: the badge next to the Bot Parts bar shows a robot-part icon instead of the player level; the level moves onto PLAY ("PLAY · LEVEL N" / "OYNA · LEVEL N").
+  - Home wave video replaced: the current keyed wave shows two brushes. New owner source Downloads/Robot_Scrubby_waving_hello_640858a4.mp4 (magenta drifts #FB02FC -> ~#EB28D7: key per frame from sampled background), same size/position as the other Home videos.
+- [ ] SB-TF-04 — Gameplay layout.
+  - Same banner area as Home at the bottom. Boosters move higher and grow.
+  - Caution Wet Floor sign + bucket 25% smaller, beside the Supply area; with 5 Supply columns the columns may overlap it (old no-overlap rule waived by owner).
+  - Shell Scrubby art 25% bigger. Speech bubble behind the slots and Supply; "LET'S CLEAN THIS MESS" + its sub-line repositioned so nothing covers them, same text.
+  - (4) Board floor brighter, like the rail glow (owner picks from 3-4 tones shown side by side).
+- [ ] SB-TF-05 — All reward flights + x2 Scrub Bucks ad.
+  - One shared reward-reveal: every reward appears at once, holds 1.5 s, then flies to its target; all buttons locked until the flight ends. Sources: level win, Tasks, Daily, Gift meter, Events, Rewarded Ads, Shop purchases, collection sets. Card packs start from this screen (card grows, then the pack-opening video).
+  - Rewarded "Watch ad, x2" button during the 1.5 s hold after a win: doubles only the Scrub Bucks on a verified completed view; no ad / skipped -> normal reward, flight starts at once.
+- [ ] SB-TF-06 — Tornado booster video.
+  - Owner source Downloads/Blue_tornado_spinning_and_growing_6bafdac1.mp4 (black background): trim the idle first ~0.5 s, play additively from the Tornado booster button to the board centre; the purged colour's real cells spiral into the growing tornado by code; quick spin-collapse + burst after the video; old vector arms/rings removed; Reduced Effects -> no video.
+- [ ] SB-TF-07 — New ad placements (owner picked 2026-11-18).
+  - Event progress: rewarded "Watch ad, +1 progress" on each active event screen, once per event per day.
+  - App Open ad: after level 20 only, at most once per day, never on install day, after the opening video.
+  - Interstitial: none before level 10, then every 4 finished plays (was 5).
+  - No Ads removes App Open + interstitial; rewarded ads stay. Record as an owner economy amendment (coordination doc + config).
 
 ## Owner Polish 2026-10-31
 <!-- Owner phone playtest of all 30 levels (all WON, "oyun akici"); queued as SB-POLISH-001..011 in the Autonomous Queue. -->
