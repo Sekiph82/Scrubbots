@@ -438,6 +438,8 @@ No premium gem/star currency is authorized.
 
 Real-money IAP, ads, rewarded ads, subscriptions and cash pricing remain separate M57 Monetization decisions. Scrub Bucks are not cash-out value and are not real-world money.
 
+Amendment, owner 2026-11-18 (SB-TF-05): rewarded x2 Scrub Bucks after a level win. During the win's reward reveal a rewarded video may be offered; it doubles only that win's Scrub Bucks (the committed receipt's `wallet_delta.scrub_bucks`, streak bonus included; Bot Parts, Gift Meter, cards and streak unchanged); once per win (deterministic tx `win_double:<receipt key>`); granted only on a verified completed view (`RewardedGrantService`, outcome `completed` and `verified == true`). No free manual speed 2x is introduced - the section 7 speed 2x is unrelated. No new price, cap or cooldown.
+
 ## 13. Home UI semantic migration
 
 The owner-approved Home composition remains the visual reference, but these semantics replace old placeholder concepts:

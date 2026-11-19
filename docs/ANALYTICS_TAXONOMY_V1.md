@@ -63,7 +63,7 @@ Definitions:
 | `launch_failed` | 009 | `main.gd` `launch_gameplay` refusals | reason (APP_BLOCKED, CONTENT_MISSING, CATALOG_INVALID, LEVEL_DISABLED, BUILD_FAILED) |
 | `ad_offer_shown` | 010 | `AcquisitionFlow` Life / Booster / Need a Hand popup opened | placement, available (provider + product state allow a video now) |
 | `ad_request` | 010 | `AcquisitionFlow._start_rewarded`, `RewardedAdsScreen._watch` (player accepted the offer) | product (heart, booster_<id>, daily_slot), ok, reason (refusal reason) |
-| `ad_result` | 010 | `AppState` on `RewardedGrantService.resolved` (once per token; late duplicates are not resolved again) | product, outcome (granted = verified completion committed; cancelled, skipped, failed, timeout, unverified, already_full, duplicate) |
+| `ad_result` | 010 | `AppState` on `RewardedGrantService.resolved` (once per token; late duplicates are not resolved again) | product (heart, booster_<id>, daily_slot, win_double = SB-TF-05 win x2), outcome (granted = verified completion committed; cancelled, skipped, failed, timeout, unverified, already_full, duplicate) |
 | `notify_toggle` | 012 | `ProfileScreens.open_notifications` | category (all or one reminder category), on |
 | `notification_prompt` | 012 | explainer popup shown / Allow / Not now; `main.gd` on `SceneTree.on_request_permissions_result` | step (explainer_shown, allowed, declined, os_granted, os_denied) |
 | `deep_link_open` | 012 | `main.gd` `open_deep_link` | dest (the destination actually opened) |

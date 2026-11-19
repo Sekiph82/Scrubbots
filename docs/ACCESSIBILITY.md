@@ -90,7 +90,7 @@ a ceremony. Each row's REDUCED arm is tested by the suite in `REDUCED_LEDGER`
 | five_slot_strip.gd, batch_slot_view.gd | WAITING slot pulse | static tile at full alpha |
 | results_screen.gd (LOST / ERROR only) | lose robot video | still pose |
 | win_overlay.gd | level-complete win video (or victory pose motion) + WIN confetti, then Home | keyed still for 1.0 s, then Home |
-| home_reward_flight.gd | reward icons fly into the Home HUD, counters count up | final HUD values at once, no flight |
+| reward_reveal.gd (SB-TF-05, every reward source) | rewards appear together, hold 1.5 s, icons fly into the Home HUD, counters count up, a card pack grows | same appear + 1.5 s hold, then final HUD values at once, no flight / growth |
 | reveal_sequencer.gd | stepped reveal | exact final state immediately |
 | meta_ceremonies.gd, ceremony_presenter.gd | turning glow, hero motion, set / gift / region videos | static glow and art, same labels and values |
 | standard_pack_ceremony.gd, premium_pack_ceremony.gd, pack_presenter.gd | opening video, drop / shake / rays / confetti (48 / 90) / card flip | short version: no drop, shake, particles, burst, flip or spin; same cards and taps |
