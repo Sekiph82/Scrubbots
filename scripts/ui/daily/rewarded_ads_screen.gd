@@ -22,6 +22,10 @@ const UiText = preload("res://scripts/ui/ui_text.gd")
 const SLOTS := 5
 const CTA_SIZE := Vector2(220, 96)
 const UI_TIMEOUT_S := 30.0
+## SB-TF-13: the provider loads the next video only after one closes, so the screen re-reads the
+## live slot states every AD_POLL_S while open (a newly loaded video is offered in place; the
+## daily track and its caps stay RewardedDailyService truth).
+const AD_POLL_S := 1.0
 
 static func open(stack, app, ui_timeout_s: float = UI_TIMEOUT_S) -> BasePopup:
 	var p := BasePopup.new("rewarded_ads")
@@ -49,6 +53,14 @@ static func open(stack, app, ui_timeout_s: float = UI_TIMEOUT_S) -> BasePopup:
 		elif id.begins_with("slot:"):
 			_watch(p, app, int(id.substr(5)), ui_timeout_s))
 	refresh(p, app)
+	var poll := Timer.new()
+	poll.name = "AdPoll"
+	poll.wait_time = AD_POLL_S
+	poll.autostart = true
+	poll.timeout.connect(func():
+		if p.is_open() and not p.is_busy():
+			refresh(p, app))
+	p.add_child(poll)
 	if not stack.push(p):
 		p.free()
 		return null
