@@ -6,6 +6,7 @@ Completed items and older status history: docs/migration/legacy-task-trackers/TA
 
 ## Autonomous Queue
 <!-- Maintained by the factory loop (CLAUDE.md §0D). One row per item: `- READY|OWNER|DONE <TASK-ID> — <one line>`. First READY row is next. -->
+- DONE SB-TF-11 — SB-TF-11 — Home Daily button removed; consecutive-login rewards open from Profile Login Days card (badge when unclaimed), claim path unchanged; LOCAL_PASS sb_tf11 6/6 + CLAUDE_PEER_REVIEW.
 - DONE SB-TF-10 — SB-TF-10 — Board floor = rail-glow blue #0068D8 (owner pick, contrast floor waived), booster row centred under Supply; LOCAL_PASS 12 suites + CLAUDE_PEER_REVIEW.
 - DONE SB-TF-09 — SB-TF-09 — Fixed 5 pre-existing failing suites on main (Spark plugin-name guard in events_v02_service, m22_025 booster count 9, m22_028 lossy card thumbs); LOCAL_PASS + CLAUDE_PEER_REVIEW.
 - DONE SB-TF-08 — Achievements open earned-first (claimable, claimed, in progress; catalogue order inside); Collection READ ALL / TUMUNU OKU marks all owned unread cards seen in one durable save, badges clear (factory 188, peer review PASS)
