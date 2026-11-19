@@ -1,12 +1,13 @@
 {
  "schema": "scrubbots.events.v02.tutorials",
  "version": 1,
- "note": "SB-TF-12: per-event coach-mark steps (copied from the owner's Events PNG tutorials/<event>/steps.json without the reference png), native title text, theme accent and the key props the native screen places. Targets: hero, board, team, ranking, map, progress, rewards, timer, start_button.",
+ "note": "SB-TF-12: per-event coach-mark steps (copied from the owner's Events PNG tutorials/<event>/steps.json without the reference png), native title text, theme accent and the key props the native screen places. Targets: hero, board, team, ranking, map, progress, rewards, timer, start_button. Colours: accent = the title ribbon colour, panel = the dominant panel fill sampled from that event's reference storyboards (tutorial_01..03); rims are gold.",
  "events": {
   "clean_team_treasure": {
    "title_en": "Clean Team Treasure",
    "title_tr": "Temiz Ekip Hazinesi",
    "accent": "#1f7a78",
+   "panel": "#0c8484",
    "props": [
     "treasure_chest_locked",
     "team_badge"
@@ -74,6 +75,7 @@
    "title_en": "Color Scrub Rush",
    "title_tr": "Renkli Temizlik Koşusu",
    "accent": "#7b3fd1",
+   "panel": "#6c9ce4",
    "props": [],
    "steps": [
     {
@@ -130,6 +132,7 @@
    "title_en": "First Brush Race",
    "title_tr": "İlk Fırça Yarışı",
    "accent": "#1d8a8a",
+   "panel": "#0c9c9c",
    "props": [
     "first_try_medal",
     "brand_flags_pair"
@@ -197,6 +200,7 @@
    "title_en": "Golden Brush Championship",
    "title_tr": "Altın Fırça Şampiyonası",
    "accent": "#1d3fa0",
+   "panel": "#3c6c84",
    "props": [
     "golden_brush_trophy",
     "bracket_crown"
@@ -280,6 +284,7 @@
    "title_en": "Lost Card Rescue",
    "title_tr": "Kayıp Kart Kurtarma",
    "accent": "#5b2a9e",
+   "panel": "#3c0cb4",
    "props": [
     "card_pack_glow",
     "card_fan"
@@ -339,6 +344,7 @@
    "title_en": "Master Cleaner Quest",
    "title_tr": "Usta Temizlikçi Görevi",
    "accent": "#2f7d5c",
+   "panel": "#3c0cb4",
    "props": [
     "quest_map",
     "big_chest",
@@ -415,6 +421,7 @@
    "title_en": "Mega Stain Cleanup",
    "title_tr": "Mega Leke Temizliği",
    "accent": "#6a3cc8",
+   "panel": "#540cb4",
    "props": [
     "giant_stain_wall",
     "team_badge"
@@ -482,6 +489,7 @@
    "title_en": "Mystery Scrubbox Hunt",
    "title_tr": "Gizemli Temizlik Kutusu Avı",
    "accent": "#2d6a3e",
+   "panel": "#6c3c84",
    "props": [
     "flower_arch_chest",
     "treasure_map"
@@ -549,6 +557,7 @@
    "title_en": "Perfect First Clean",
    "title_tr": "İlk Seferde Kusursuz Temizlik",
    "accent": "#2a6fdb",
+   "panel": "#0c849c",
    "props": [
     "first_try_flag_badge",
     "crown"
@@ -608,6 +617,7 @@
    "title_en": "Pure Scrub Challenge",
    "title_tr": "Saf Temizlik Mücadelesi",
    "accent": "#2b8cc4",
+   "panel": "#0c9ccc",
    "props": [
     "no_booster_badge",
     "chest_purple"
@@ -667,6 +677,7 @@
    "title_en": "Robot Parts Recovery",
    "title_tr": "Robot Parçalarını Kurtarma",
    "accent": "#1f3f8a",
+   "panel": "#0c246c",
    "props": [
     "part_gear",
     "part_nut",
@@ -727,6 +738,7 @@
    "title_en": "Scrub Relay",
    "title_tr": "Temizlik Bayrak Yarışı",
    "accent": "#6b3fa0",
+   "panel": "#0c6c84",
    "props": [
     "relay_flag_brush",
     "team_badge"
@@ -802,6 +814,7 @@
    "title_en": "Scrub Season Pass",
    "title_tr": "Temizlik Sezon Bileti",
    "accent": "#22348c",
+   "panel": "#0c54cc",
    "props": [
     "star_arch"
    ],
@@ -876,6 +889,7 @@
    "title_en": "Scrub Sprint",
    "title_tr": "Scrub Sprint",
    "accent": "#c23a3a",
+   "panel": "#3c549c",
    "props": [
     "trophy_cup",
     "checkered_flags_pair"
@@ -943,6 +957,7 @@
    "title_en": "Scrub Squad Tournament",
    "title_tr": "Temizlik Ekibi Turnuvası",
    "accent": "#5a2fa0",
+   "panel": "#24246c",
    "props": [
     "potion_bottle",
     "pennants"
@@ -1026,6 +1041,7 @@
    "title_en": "ScrubBots Royale",
    "title_tr": "ScrubBots Royale",
    "accent": "#0f3a6a",
+   "panel": "#0c6c6c",
    "props": [
     "trophy_laurel",
     "crown"
@@ -1117,6 +1133,7 @@
    "title_en": "Scrubby's Cleanup Workshop",
    "title_tr": "Scrubby'nin Temizlik Atölyesi",
    "accent": "#6b2fa8",
+   "panel": "#0c3c6c",
    "props": [
     "brush_icon"
    ],
@@ -1175,6 +1192,7 @@
    "title_en": "Scrubby's Rescue Mission",
    "title_tr": "Scrubby'nin Kurtarma Görevi",
    "accent": "#2a8a6a",
+   "panel": "#6c54cc",
    "props": [
     "story_node_arch",
     "story_node_leaf",
@@ -1251,6 +1269,7 @@
    "title_en": "Seasonal Scrub Festival",
    "title_tr": "Mevsimlik Temizlik Festivali",
    "accent": "#d0601c",
+   "panel": "#24546c",
    "props": [
     "season_pumpkin",
     "season_snowflake",
@@ -1319,6 +1338,7 @@
    "title_en": "Sparkling Streak",
    "title_tr": "Işıltılı Seri",
    "accent": "#2f8a3a",
+   "panel": "#0c6c3c",
    "props": [
     "winding_path",
     "checkpoint_flag"
@@ -1386,6 +1406,7 @@
    "title_en": "Stain Busters",
    "title_tr": "Leke Avcıları",
    "accent": "#5f3fb0",
+   "panel": "#0c5484",
    "props": [
     "target_ring"
    ],
@@ -1444,6 +1465,7 @@
    "title_en": "Weekly Cleanup Challenge",
    "title_tr": "Haftalık Temizlik Mücadelesi",
    "accent": "#c43a7a",
+   "panel": "#0c5484",
    "props": [
     "tent",
     "trophy_cup"
@@ -1503,6 +1525,7 @@
    "title_en": "Weekly Scrub League",
    "title_tr": "Haftalık Temizlik Ligi",
    "accent": "#5a3aa8",
+   "panel": "#0c2484",
    "props": [
     "ranking_star",
     "participants_badge"
@@ -1570,6 +1593,7 @@
    "title_en": "World Cleanup Cup",
    "title_tr": "Dünya Temizlik Kupası",
    "accent": "#1f5fbf",
+   "panel": "#3c549c",
    "props": [
     "cup_globe",
     "flags_pair"
