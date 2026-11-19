@@ -217,18 +217,19 @@ func _reduced_effects() -> void:
 	_shutdown(root)
 	_complete("reduced_effects")
 
-## SB-M57-001: the 5th play's interstitial waits for Home PLAY; never between the win and Home.
+## SB-M57-001 / SB-TF-07: the 4th play's (level >= 10) interstitial waits for Home PLAY; never between the win and Home.
 func _no_interstitial_before_home() -> void:
 	print("[interstitial only at Home PLAY]")
 	var root = await _boot_main(_uniq("ads"), 1)
 	var app = root.get_app_state()
+	app.progression.import_snapshot({"schema": "scrubbots.progression.v1", "current_level": 10, "completed": range(1, 10)})
 	var ads := MockAds.new()
 	app.economy.ads.set_provider(ads)
-	for _i in range(4):
-		app.economy.ads.on_play_finished()
+	for _i in range(3):
+		app.economy.ads.on_play_finished(10)
 	var h = await _play(root)
 	_drain(h)
-	_ok(app.economy.ads.interstitial_due() and ads.interstitials.is_empty(), "5th play finished: due, nothing shown during the win animation")
+	_ok(app.economy.ads.interstitial_due() and ads.interstitials.is_empty(), "4th play at level 10 finished: due, nothing shown during the win animation")
 	root.handle_back()
 	_ok(root.get_navigation().current() == R.HOME and ads.interstitials.is_empty(), "nothing shown on the way Home")
 	await _frames(2)

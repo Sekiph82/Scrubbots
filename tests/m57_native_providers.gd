@@ -9,6 +9,9 @@ extends SceneTree
 ## SB-TF-01: the store's error text / code reaches StoreService.resolved and the Shop failure
 ## text; failed / partial product queries are logged with no price; failed ad loads retry with
 ## a bounded backoff; an unavailable / failed rewarded video has a player-facing text.
+## SB-TF-07: the App Open ad (plugin v7.0 load_app_open_ad / show_app_open_ad + app_open_ad_*
+## signals) loads only after the SDK is ready, is single use and reloads after it closes, retries
+## a failed load at 5 s, uses the TEST unit unless the release ids file carries an app_open id.
 ##
 ## Run: godot --headless --path . -s res://tests/m57_native_providers.gd
 
@@ -120,6 +123,10 @@ class FakeAdmob extends RefCounted:
 	signal rewarded_ad_user_earned_reward(a, r)
 	signal rewarded_ad_dismissed_full_screen_content(a)
 	signal rewarded_ad_failed_to_show_full_screen_content(a, e)
+	signal app_open_ad_loaded(a, r)
+	signal app_open_ad_failed_to_load(a, e)
+	signal app_open_ad_failed_to_show_full_screen_content(a, e)
+	signal app_open_ad_dismissed_full_screen_content(a)
 	class Consent:
 		var s := ""
 		func to_status_string() -> String:
@@ -132,6 +139,10 @@ class FakeAdmob extends RefCounted:
 	var ios_real_banner_id := ""
 	var ios_real_interstitial_id := ""
 	var ios_real_rewarded_id := ""
+	var android_real_app_open_id := ""
+	var ios_real_app_open_id := ""
+	var android_debug_app_open_id := "ca-app-pub-3940256099942544/9257395921"   ## plugin v7.0 demo unit
+	var auto_show_on_resume := true
 	var banner_anchor_to_safe_area := false
 	var remove_interstitial_ads_after_displayed := false
 	var consent := "REQUIRED"
@@ -167,6 +178,10 @@ class FakeAdmob extends RefCounted:
 		calls.append("load_rewarded")
 	func show_rewarded_ad() -> void:
 		calls.append("show_rewarded")
+	func load_app_open_ad() -> void:
+		calls.append("load_app_open")
+	func show_app_open_ad() -> void:
+		calls.append("show_app_open")
 	func ads_calls() -> Array:
 		return calls.filter(func(c): return c.begins_with("load_banner") or c.begins_with("load_inter") or c.begins_with("load_rew") or c.begins_with("show_banner") or c.begins_with("show_inter") or c.begins_with("show_rew"))
 
@@ -380,6 +395,7 @@ func _n06() -> void:
 	_ok(n.calls[-1] == "initialize", "ATT answered (denied) -> initialize")
 	n.initialization_completed.emit(null)
 	_ok(n.calls.has("load_interstitial") and n.calls.has("load_rewarded") and n.calls.has("load_banner"), "SDK ready -> loads interstitial, rewarded and the wanted banner")
+	_ok(n.calls.count("load_app_open") == 1 and n.calls.find("load_app_open") > n.calls.find("initialize") and not n.auto_show_on_resume, "SB-TF-07: App Open loaded once, only after the SDK init; never auto-shown on resume")
 	var n2 := FakeAdmob.new()
 	n2.consent = "OBTAINED"
 	var p2 := AdmobAdProvider.new(n2, false)
@@ -440,7 +456,7 @@ func _n08() -> void:
 	var sched: Array = []
 	var n := _ready_admob(e, sched)
 	for _i in range(5):
-		e.ads.on_play_finished()
+		e.ads.on_play_finished(10)
 	_ok(not e.ads.try_interstitial() and e.ads.interstitial_due() and not n.calls.has("show_interstitial"), "due but not loaded -> not shown, stays due")
 	n.interstitial_ad_loaded.emit(null, null)
 	_ok(e.ads.try_interstitial() and n.calls[-1] == "show_interstitial" and not e.ads.interstitial_due(), "loaded -> shown at the transition, cadence restarts")
@@ -449,7 +465,7 @@ func _n08() -> void:
 	n.interstitial_ad_failed_to_load.emit(null, FakeAdError.new())
 	var loads: int = n.calls.count("load_interstitial")
 	for _i in range(5):
-		e.ads.on_play_finished()
+		e.ads.on_play_finished(10)
 	_ok(not e.ads.try_interstitial() and n.calls.count("load_interstitial") == loads and sched.size() == 1 and sched[0][0] == 5.0, "failed load -> not shown; one 5 s backoff reload scheduled, no immediate reload")
 	sched[0][1].call()
 	_ok(n.calls.count("load_interstitial") == loads + 1, "backoff timer fires -> interstitial reloads")
@@ -460,9 +476,30 @@ func _n08() -> void:
 	e.ads.update_banner()
 	_ok(n.calls[-1] == "hide_banner", "No Ads -> banner hidden")
 	for _i in range(10):
-		e.ads.on_play_finished()
+		e.ads.on_play_finished(10)
 	n.interstitial_ad_loaded.emit(null, null)
 	_ok(not e.ads.try_interstitial() and n.calls.count("show_interstitial") == 1, "No Ads -> no interstitial even when one is loaded")
+	# SB-TF-07 App Open through the same provider.
+	var a := FakeAdmob.new()
+	var ap := AdmobAdProvider.new(a, false)
+	var asched: Array = []
+	ap.schedule = func(d: float, cb: Callable): asched.append([d, cb])
+	_ok(not ap.show_app_open("app_open_launch") and not a.calls.has("load_app_open"), "App Open before the SDK: not shown, nothing loaded")
+	ap.start()
+	a.consent = "NOT_REQUIRED"
+	a.consent_info_updated.emit()
+	a.initialization_completed.emit(null)
+	_ok(not ap.show_app_open("app_open_launch") and not a.calls.has("show_app_open"), "SDK ready, App Open still loading -> false")
+	a.app_open_ad_loaded.emit(null, null)
+	_ok(ap.show_app_open("app_open_launch") and a.calls[-1] == "show_app_open", "loaded -> show_app_open_ad, true")
+	_ok(not ap.show_app_open("app_open_launch") and a.calls.count("show_app_open") == 1, "single use: a second show before a reload -> false")
+	var l0: int = a.calls.count("load_app_open")
+	a.app_open_ad_dismissed_full_screen_content.emit(null)
+	_ok(a.calls.count("load_app_open") == l0 + 1, "closed -> the next App Open loading")
+	a.app_open_ad_failed_to_load.emit(null, FakeAdError.new())
+	_ok(asched.size() == 1 and asched[0][0] == 5.0 and not ap.show_app_open("app_open_launch"), "failed App Open load -> one 5 s backoff reload, not shown")
+	asched[0][1].call()
+	_ok(a.calls.count("load_app_open") == l0 + 2, "backoff timer fires -> App Open reloads")
 	_complete("n08_admob_interstitial_banner")
 
 func _n09() -> void:
@@ -484,6 +521,24 @@ func _n09() -> void:
 	var t := FakeAdmob.new()
 	AdmobAdProvider.new(t, true, "user://m57_native_absent_ids.gd")
 	_ok(not t.is_real and t.ios_real_rewarded_id == "", "ads_test_mode build (no ids file written) -> is_real never set, Google TEST units")
+	_ok(not n.is_real and n.android_real_app_open_id == "" and n.android_debug_app_open_id == "ca-app-pub-3940256099942544/9257395921", "SB-TF-07: test build -> App Open from the Google TEST unit")
+	var ao := FakeAdmob.new()
+	var aop := AdmobAdProvider.new(ao, false, path)
+	aop.start()
+	ao.consent = "NOT_REQUIRED"
+	ao.consent_info_updated.emit()
+	ao.initialization_completed.emit(null)
+	_ok(ao.is_real and ao.android_real_app_open_id == "" and not ao.calls.has("load_app_open") and not aop.show_app_open("app_open_launch") and not ao.calls.has("load_app_open"),
+		"real-id build without an app_open id -> App Open never loaded or shown")
+	_ok(FileAccess.get_file_as_string("res://scripts/economy/admob_ad_provider.gd").contains('print("ADS_APP_OPEN_NO_ID")'), "that build logs ADS_APP_OPEN_NO_ID")
+	var path2 := "user://m57_native_real_ids_ao_%d.gd" % Time.get_ticks_usec()
+	_tmp.append(path2)
+	var f2 := FileAccess.open(path2, FileAccess.WRITE)
+	f2.store_string('const IDS := {"banner": "B", "interstitial": "I", "rewarded": "R", "app_open": "O"}')
+	f2.close()
+	var ar := FakeAdmob.new()
+	AdmobAdProvider.new(ar, true, path2)
+	_ok(ar.is_real and ar.ios_real_app_open_id == "O" and ar.android_real_app_open_id == "", "release file with app_open on iOS -> ios real App Open id")
 	_complete("n09_admob_real_ids_release_only")
 
 func _n10() -> void:

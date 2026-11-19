@@ -1,7 +1,8 @@
 extends SceneTree
 ## SB-M57-001..011 (provider-independent part, owner 2026-10-22) — AdService over the AdProvider
 ## seam with a MockProvider (no SDK, no network): the shipping null provider shows nothing; an
-## interstitial is due on every 5th finished play (win or loss) and is shown only at the real
+## interstitial is due on every 4th finished play (win or loss) from level 10 (SB-TF-07,
+## data/config/ad_placements_v1.json; none before level 10) and is shown only at the real
 ## app's next attempt start (Home PLAY after a win, Results Retry after a loss), never mid-level; No Ads removes the banner and
 ## interstitials but not rewarded; a rewarded video grants only on a verified completed view
 ## (through RewardedGrantService), never on cancel / skip / fail; the play counter is saved.
@@ -16,7 +17,7 @@ const AdProvider = preload("res://scripts/economy/ad_provider.gd")
 const StoreService = preload("res://scripts/economy/store_service.gd")
 
 var EXPECTED_CASES := [
-	"a01_null_provider", "a02_every_fifth_play", "a03_app_win_lose_between_levels",
+	"a01_null_provider", "a02_every_fourth_play_from_level_10", "a03_app_win_lose_between_levels",
 	"a04_no_ads_banner_interstitial_only", "a05_rewarded_completion_only", "a06_counter_persisted",
 ]
 
@@ -77,40 +78,43 @@ func _a01() -> void:
 	var e := EconomyServices.new()
 	var ads = e.ads
 	_ok(ads.get_provider().get_script() == AdProvider and e.rewarded.get_provider() == ads.get_provider(), "default = null AdProvider, the same object RewardedGrantService uses")
-	for _i in range(5):
-		ads.on_play_finished()
-	_ok(ads.interstitial_due() and not ads.try_interstitial() and ads.interstitial_due(), "5 plays: due, null provider shows nothing, stays due")
+	for _i in range(4):
+		ads.on_play_finished(10)
+	_ok(ads.interstitial_due() and not ads.try_interstitial() and ads.interstitial_due(), "4 plays at level 10: due, null provider shows nothing, stays due")
 	_ok(not e.rewarded.is_available("heart") and not e.rewarded.is_available("booster:tornado"), "no rewarded video offered")
 	_complete("a01_null_provider")
 
 func _a02() -> void:
-	print("[a02 interstitial every 5th play]")
+	print("[a02 interstitial every 4th play from level 10]")
 	var e := EconomyServices.new()
 	var m := MockProvider.new()
 	e.ads.set_provider(m)
+	for _i in range(9):
+		e.ads.on_play_finished(9)
+	_ok(not e.ads.interstitial_due() and not e.ads.try_interstitial() and e.ads.plays() == 9, "9 plays below level 10: counted, never due")
 	var shown: Array = []
-	for play in range(1, 16):
-		e.ads.on_play_finished()
+	for play in range(1, 13):
+		e.ads.on_play_finished(10)
 		if e.ads.try_interstitial():
 			shown.append(play)
-	_ok(shown == [5, 10, 15] and m.interstitials.size() == 3, "plays 1-4 none, 5 / 10 / 15 shown %s" % str(shown))
+	_ok(shown == [4, 8, 12] and m.interstitials.size() == 3, "from level 10: plays 1-3 none, 4 / 8 / 12 shown %s" % str(shown))
 	_ok(m.interstitials[0] == "interstitial_between_levels" and not e.ads.try_interstitial(), "between-levels placement; a second try after a shown ad is refused")
 	m.fill = false
-	for _i in range(5):
-		e.ads.on_play_finished()
+	for _i in range(4):
+		e.ads.on_play_finished(11)
 	_ok(not e.ads.try_interstitial() and e.ads.interstitial_due(), "no fill: not shown, still due")
 	m.fill = true
-	e.ads.on_play_finished()
+	e.ads.on_play_finished(11)
 	_ok(e.ads.try_interstitial() and not e.ads.interstitial_due(), "next transition shows it, cadence restarts")
-	_complete("a02_every_fifth_play")
+	_complete("a02_every_fourth_play_from_level_10")
 
 func _a03() -> void:
 	print("[a03 real app: win and lose each count; the ad only at the next attempt start]")
-	await _boot(_tmp_path("a03"), 2)
+	await _boot(_tmp_path("a03"), 10)
 	var m := MockProvider.new()
 	_eco().ads.set_provider(m)
 	await _start(_root.play_current_frontier().get("ok", false))
-	var plan := [&"LOST", &"WON", &"LOST", &"WON", &"LOST"]
+	var plan := [&"LOST", &"WON", &"WON", &"LOST"]
 	var mid_level_shown := 0
 	for i in range(plan.size()):
 		mid_level_shown += m.interstitials.size()
@@ -122,17 +126,17 @@ func _a03() -> void:
 			_root.get_modal_stack().clear("t")
 			await _settle()
 			await _start(_home_play() if plan[i] == &"WON" else _root.retry_from_results())
-	_ok(mid_level_shown == 0 and m.interstitials.is_empty(), "5th play finished: nothing shown during gameplay or at the terminal")
+	_ok(mid_level_shown == 0 and m.interstitials.is_empty(), "4th play (level >= 10) finished: nothing shown during gameplay or at the terminal")
 	_eco().hearts.import_snapshot({"hearts": 5, "anchor": int(Time.get_unix_time_from_system())})
 	_root.get_modal_stack().clear("t")
 	await _settle()
 	await _start(_root.retry_from_results())
-	_ok(m.interstitials.size() == 1, "Results -> Retry after play 5: one interstitial")
+	_ok(m.interstitials.size() == 1, "Results -> Retry after play 4: one interstitial")
 	await _terminal(&"WON")
 	_root.get_modal_stack().clear("t")
 	await _settle()
 	await _start(_home_play())
-	_ok(m.interstitials.size() == 1 and _eco().ads.plays() == 6, "play 6 -> Home -> PLAY: no second interstitial")
+	_ok(m.interstitials.size() == 1 and _eco().ads.plays() == 5, "play 5 -> Home -> PLAY: no second interstitial")
 	var c0: int = _eco().boosters.charges("tornado")
 	_ok(_app().actions.start_rewarded("booster:tornado")["ok"], "app facade starts a rewarded video through the shared provider")
 	m.finish("cancelled")
@@ -155,8 +159,8 @@ func _a04() -> void:
 	e.ads.update_banner()
 	_ok(m.banner[-1] == false, "banner hidden")
 	for _i in range(10):
-		e.ads.on_play_finished()
-	_ok(not e.ads.interstitial_due() and not e.ads.try_interstitial() and m.interstitials.is_empty(), "10 plays: no interstitial")
+		e.ads.on_play_finished(10)
+	_ok(not e.ads.interstitial_due() and not e.ads.try_interstitial() and m.interstitials.is_empty(), "10 plays at level 10: no interstitial")
 	_ok(e.ads.allowed("rewarded") and e.rewarded.start("booster:tornado")["ok"] and m.requests.size() == 1, "rewarded still offered and started")
 	var c0: int = e.boosters.charges("tornado")
 	_ok(m.finish("completed")["ok"] and e.boosters.charges("tornado") == c0 + 1, "completed rewarded view still grants with No Ads")
@@ -181,7 +185,7 @@ func _a05() -> void:
 	_ok(ok["ok"] and e.boosters.charges("selector") == c0 + 1 and e.reward.already_applied("rewarded:" + String(ok["token"])), "verified completion -> +1 charge under rewarded:<token>")
 	_ok(not m.finish("completed")["ok"] and e.boosters.charges("selector") == c0 + 1, "duplicate completion callback grants nothing")
 	e.ads._store = DenyStore.new()
-	e.ads.on_play_finished()
+	e.ads.on_play_finished(10)
 	_ok(not e.ads.allowed("rewarded") and not e.ads.interstitial_due() and not e.ads.try_interstitial(), "every decision asks the store seam (a store that denies all -> nothing)")
 	_complete("a05_rewarded_completion_only")
 
@@ -190,22 +194,25 @@ func _a06() -> void:
 	var e := EconomyServices.new()
 	e.ads.set_provider(MockProvider.new())
 	for _i in range(7):
-		e.ads.on_play_finished()
+		e.ads.on_play_finished(10)
 	e.ads.try_interstitial()
 	var snap: Dictionary = e.snapshot()
-	_ok(snap["ads"] == {"plays": 7, "last_interstitial": 7}, "economy snapshot section ads %s" % str(snap["ads"]))
+	_ok(snap["ads"] == {"plays": 7, "last_interstitial": 7, "first_day": -1, "app_open_day": -1}, "economy snapshot section ads %s" % str(snap["ads"]))
 	var e2 := EconomyServices.new()
 	_ok(e2.import_snapshot(JSON.parse_string(JSON.stringify(snap))) and e2.ads.plays() == 7 and not e2.ads.interstitial_due(), "JSON round trip keeps plays + last shown")
 	var old: Dictionary = snap.duplicate(true)
 	old.erase("ads")
 	var e3 := EconomyServices.new()
 	_ok(e3.import_snapshot(old) and e3.ads.plays() == 0, "a pre-ads save (no section) imports with 0 plays")
-	for bad in [{"plays": -1, "last_interstitial": 0}, {"plays": 2, "last_interstitial": 3}, {"plays": 1.5, "last_interstitial": 0}, {"plays": 3}]:
+	old["ads"] = {"plays": 3, "last_interstitial": 1}
+	_ok(e3.import_snapshot(old) and e3.ads.plays() == 3 and e3.ads.first_day() == -1 and e3.ads.app_open_day() == -1, "a pre-SB-TF-07 section {plays, last_interstitial} imports, new days -1")
+	for bad in [{"plays": -1, "last_interstitial": 0}, {"plays": 2, "last_interstitial": 3}, {"plays": 1.5, "last_interstitial": 0}, {"plays": 3},
+			{"plays": 3, "last_interstitial": 0, "first_day": -2}, {"plays": 3, "last_interstitial": 0, "app_open_day": "4"}]:
 		var s: Dictionary = snap.duplicate(true)
 		s["ads"] = bad
 		_ok(not e2.import_snapshot(s) and e2.ads.plays() == 7, "malformed %s fails closed (state unchanged)" % str(bad))
 	var path := _tmp_path("a06")
-	await _boot(path, 2)
+	await _boot(path, 10)
 	await _start(_root.play_current_frontier().get("ok", false))
 	await _terminal(&"LOST")
 	_ok(_eco().ads.plays() == 1, "real LOST -> 1 play")

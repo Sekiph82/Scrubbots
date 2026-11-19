@@ -18,6 +18,7 @@ const AppState = preload("res://scripts/app/app_state.gd")
 const AnalyticsService = preload("res://scripts/app/analytics_service.gd")
 const NavigationController = preload("res://scripts/app/navigation_controller.gd")
 const ProviderDouble = preload("res://tests/support/rewarded_provider_double.gd")
+const AdProvider = preload("res://scripts/economy/ad_provider.gd")
 const RewardedAdsScreen = preload("res://scripts/ui/daily/rewarded_ads_screen.gd")
 const ProfileScreens = preload("res://scripts/ui/profile/profile_screens.gd")
 const NotificationPermission = preload("res://scripts/economy/notification_permission.gd")
@@ -202,8 +203,8 @@ func _config_schema() -> void:
 				bad.append("%s.%s fallback" % [ev, k])
 	_ok(bad.is_empty(), "every param is int/bool/enum/enum_list, no forbidden (PII) name, enums + fallbacks resolve: %s" % str(bad))
 	var want: Array = ["SB-M56-002", "SB-M56-003", "SB-M56-004", "SB-M56-005", "SB-M56-006", "SB-M56-007", "SB-M56-008", "SB-M56-009", "SB-M56-010", "SB-M56-011", "SB-M56-012",
-		"SB-M56-018", "SB-M56-020", "SB-M56-021", "SB-M56-022"]
-	_ok(tasks.keys().size() == want.size() and want.all(func(t): return tasks.has(t)), "events cover SB-M56-002..012 + 018..022 (019 extends pack_opened; 017 retired): %s" % str(tasks.keys()))
+		"SB-M56-018", "SB-M56-020", "SB-M56-021", "SB-M56-022", "SB-TF-07"]
+	_ok(tasks.keys().size() == want.size() and want.all(func(t): return tasks.has(t)), "events cover SB-M56-002..012 + 018..022 (019 extends pack_opened; 017 retired) + SB-TF-07 ad_placement: %s" % str(tasks.keys()))
 	_ok(not types.has("string"), "no free-text param type exists")
 	var tax_doc := FileAccess.get_file_as_string("res://" + String(_cfg["doc"]))
 	var inv_doc := FileAccess.get_file_as_string("res://docs/PRIVACY_DATA_INVENTORY.md")
@@ -615,6 +616,11 @@ func _tour_ads() -> void:
 	await _settle()
 	_root.get_modal_stack().clear("t")
 	_eco().hearts.import_snapshot({"hearts": 5, "anchor": _now[0]})
+	# SB-TF-07: a due interstitial (4 plays from level 10) the null provider cannot fill.
+	_eco().ads.set_provider(AdProvider.new())
+	for _i in range(4):
+		_eco().ads.on_play_finished(10)
+	_root._between_levels_ad()
 
 ## 012: REMINDERS ON -> explainer -> Allow -> OS answer; one category toggled.
 func _tour_notifications() -> void:
@@ -701,6 +707,7 @@ func _ads_store_events() -> void:
 	_ok(_params("ad_result") == [{"product": "heart", "outcome": "cancelled"}, {"product": "daily_slot", "outcome": "granted"}],
 		"cancelled heart (late duplicate ignored) + verified daily slot granted: %s" % str(_params("ad_result")))
 	_ok(_params("economy_source").any(func(p): return p["source"] == "rewarded_daily"), "Rewarded Ads daily grants -> source rewarded_daily")
+	_ok(_params("ad_placement") == [{"placement": "interstitial", "shown": false, "reason": "no_fill"}], "SB-TF-07 due interstitial, no fill -> ad_placement: %s" % str(_params("ad_placement")))
 	_eco().rewarded.set_provider(null)
 	_eco().hearts.import_snapshot({"hearts": 4, "anchor": _now[0]})
 	_root.open_life("t")
