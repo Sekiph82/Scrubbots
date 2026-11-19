@@ -86,6 +86,14 @@ static func open(stack, app, iid: String) -> BasePopup:
 	var skip := p.add_action("tut_close", "X", "secondary", true, "", coach)
 	EventsV02Ui._round_button(skip, Color(0.85, 0.16, 0.18), UiText.t("POPUP_CLOSE"))
 	coach.skip = skip
+	# SB-TF-13: one X only. The tutorial X takes the details X's place (end of its TopBar) and the
+	# details X hides until the walkthrough closes; Continue + step pill stay above the banner.
+	coach.top_bar = d.find_child("TopBar", true, false)
+	coach.app = app
+	d.set_action_visible("close", false)
+	p.tree_exited.connect(func():
+		if is_instance_valid(d):
+			d.set_action_visible("close", true))
 	p.action_selected.connect(func(aid, _c):
 		if aid != "tut_next":
 			return
@@ -141,6 +149,8 @@ class Coach extends Control:
 	var headers: Array = []   ## section header / title labels the bubble must never cover
 	var hole := Rect2()
 	var skip: Button
+	var top_bar: Control   ## the details TopBar: the skip X sits where the details X was
+	var app   ## AppState: banner reservation (HomeStyle.banner_reserve)
 	var _focus: Panel
 	var _scroll := false
 	var _tween: Tween = null
@@ -191,7 +201,7 @@ class Coach extends Control:
 		var r := target.get_global_rect()
 		r.position -= global_position
 		var bh: float = (get_node("Bubble") as Control).get_combined_minimum_size().y
-		if r != hole or skip.size.x <= 0.0 or not is_equal_approx(bh, (get_node("Bubble") as Control).size.y):
+		if r != hole or skip.size.x <= 0.0 or skip.position != _skip_at() or not is_equal_approx(bh, (get_node("Bubble") as Control).size.y):
 			hole = r
 			_place()
 			queue_redraw()
@@ -211,7 +221,7 @@ class Coach extends Control:
 		var ctrl: Control = get_node("Controls")
 		var cs := ctrl.get_combined_minimum_size()
 		ctrl.size = cs
-		var bottom := h - cs.y - 60.0
+		var bottom := h - cs.y - _bottom_reserve() - UiTokens.SPACE_LG
 		var ctrl_y := bottom if hole.end.y + 20.0 < bottom else safe_top
 		ctrl.position = Vector2((w - cs.x) / 2.0, ctrl_y)
 		var lo := safe_top if ctrl_y > safe_top else ctrl_y + cs.y + 20.0   # free band for the bubble
@@ -232,7 +242,19 @@ class Coach extends Control:
 		var tx := clampf(hole.get_center().x - bubble.position.x, 80.0, BUBBLE_W - 80.0)
 		for tip in [up_tip, down_tip]:
 			(tip.get_child(0) as Polygon2D).position.x = tx
-		skip.position = Vector2(w - skip.size.x - 24.0, 24.0)
+		skip.position = _skip_at()
+
+	## Top-right corner of the details TopBar (coach space), where the details X stands.
+	func _skip_at() -> Vector2:
+		if top_bar == null or not is_instance_valid(top_bar):
+			return Vector2(size.x - skip.size.x - 24.0, 24.0)
+		var r := top_bar.get_global_rect()
+		return Vector2(r.end.x - skip.size.x, r.position.y) - global_position
+
+	## Safe bottom inset of the popup + the banner reservation (viewport px).
+	func _bottom_reserve() -> float:
+		var safe = (get_parent() as BasePopup).get_safe_root()
+		return float(safe.get_applied_margins()[3]) + HomeStyle.banner_reserve(app, size.x)
 
 	## Header / title label rects (coach space) currently on screen.
 	func header_rects() -> Array:

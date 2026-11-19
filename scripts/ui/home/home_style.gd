@@ -201,6 +201,12 @@ const AD_SLOT_MAX_H := 112.0
 static func ad_slot_height(viewport_width: float) -> float:
 	return clampf(viewport_width * AD_SLOT_RATIO, AD_SLOT_MIN_H, AD_SLOT_MAX_H)
 
+## SB-TF-13: the height a full-screen surface keeps free above the safe bottom for the provider
+## banner (the same reservation as Home / gameplay; 0 under No Ads).
+static func banner_reserve(app, viewport_width: float) -> float:
+	var on: bool = app != null and app.economy != null and app.economy.ads.allowed("banner")
+	return ad_slot_height(viewport_width) if on else 0.0
+
 static func ad_banner() -> PanelContainer:
 	var ad := PanelContainer.new()
 	ad.name = "AdBannerSlot"

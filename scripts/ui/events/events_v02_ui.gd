@@ -354,11 +354,19 @@ static func open_details(stack, app, iid: String, auto_tutorial := true) -> Base
 	gap.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	top.add_child(gap)
 	_round_button(p.add_action("close", "X", "secondary", true, "", top), Color(0.85, 0.16, 0.18), UiText.t("POPUP_CLOSE"))
-	var start := VBoxContainer.new()   # the green area; refresh_details keeps it last
+	# SB-TF-13: the green area is pinned under the scroll and the screen ends above the banner
+	# (HomeStyle.banner_reserve), so JOIN / WATCH AD are never under the ad.
+	var start := VBoxContainer.new()
 	start.name = "StartArea"
 	start.set_meta("coach", "start_button")
 	start.add_theme_constant_override("separation", UiTokens.SPACE_SM)
-	list.add_child(start)
+	start.custom_minimum_size.x = WIDTH
+	start.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	screen.add_child(start)
+	var ad_gap := Control.new()
+	ad_gap.name = "BannerGap"
+	ad_gap.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	screen.add_child(ad_gap)
 	style_go(p.add_action("join", UiText.t("EV2_JOIN"), "primary", false, "", start))
 	p.add_action("ad", UiText.t("EV2_WATCH_AD"), "secondary", false, "", start)
 	var joined := _label("Joined", "", 30, HomeStyle.TEXT)
@@ -382,6 +390,15 @@ static func open_details(stack, app, iid: String, auto_tutorial := true) -> Base
 	if not stack.push(p):
 		p.free()
 		return null
+	_fit_banner_gap(p, app)
+	var poll := Timer.new()   # SB-TF-13: WATCH AD appears in place once the next video has loaded
+	poll.name = "AdPoll"
+	poll.wait_time = 1.0
+	poll.autostart = true
+	poll.timeout.connect(func():
+		if p.is_open() and not p.is_busy() and String(p.get_meta("ad_token", "")).is_empty():
+			p.set_action_visible("ad", app.actions.event_ad_available(iid)))
+	p.add_child(poll)
 	var on_resolved := func(token: String, _product: String, _r: Dictionary):
 		if is_instance_valid(p) and token == String(p.get_meta("ad_token", "")):
 			p.set_meta("ad_token", "")
@@ -470,6 +487,13 @@ static func target(p: Control, key: String) -> Control:
 			return c
 	return null
 
+## Bottom gap = the banner reservation plus a little air (the screen's safe bottom is already kept).
+static func _fit_banner_gap(p: BasePopup, app) -> void:
+	var gap: Control = p.find_child("BannerGap", true, false)
+	if gap != null and p.is_inside_tree():
+		var r := HomeStyle.banner_reserve(app, p.get_viewport_rect().size.x)
+		gap.custom_minimum_size.y = r + UiTokens.SPACE_LG if r > 0.0 else UiTokens.SPACE_SM
+
 static func refresh_details(p: BasePopup, app) -> void:
 	var ev = app.economy.events_v02
 	var v: Dictionary = ev.view(String(p.get_meta("iid")))
@@ -533,7 +557,7 @@ static func refresh_details(p: BasePopup, app) -> void:
 		list.add_child(_map(v, pc))
 	list.add_child(_progress(v, pc, app))
 	list.add_child(_rewards(p, stash, v, pc, app))
-	list.move_child(start, list.get_child_count() - 1)
+	_fit_banner_gap(p, app)
 	p.set_action_visible("join", v["phase"] == "active" and not v["joined"])
 	p.set_action_blocked("join", app.is_blocked)
 	p.set_action_visible("ad", app.actions.event_ad_available(String(v["iid"])))
@@ -638,7 +662,8 @@ static func _board(v: Dictionary, a: Color) -> PanelContainer:
 	box.add_child(gain)
 	return s
 
-## The real level, half of its artwork cleaned (CLEARED cells show BG01 through).
+## The real level, its whole artwork ACTIVE (SB-TF-13: the old half-cleaned preview left the top
+## rows BG01 and read as a cut-off image), centred, nearest-neighbour, aspect kept.
 static func board_view(side: float) -> Control:   ## BG01 panel holding the "Board" renderer
 	var r = LevelLoader.load_from_path(LEVEL)
 	if not r.is_ok():
@@ -646,12 +671,6 @@ static func board_view(side: float) -> Control:   ## BG01 panel holding the "Boa
 		none.name = "Board"
 		return none
 	var board = BoardState.from_level_data(r.level_data)
-	var half: int = board.get_artwork_cell_count() / 2
-	var n := 0
-	for i in range(board.get_cell_count()):
-		if n < half and not board.is_void(i):
-			board.set_cell_state(i, BoardState.CellState.CLEARED)
-			n += 1
 	var view = BoardRenderer.new()
 	view.name = "Board"
 	view.configure(board, r.level_data.palette, Vector2(side, side))
