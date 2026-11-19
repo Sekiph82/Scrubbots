@@ -1,0 +1,1645 @@
+{
+ "schema": "scrubbots.events.v02.tutorials",
+ "version": 1,
+ "note": "SB-TF-12: per-event coach-mark steps (copied from the owner's Events PNG tutorials/<event>/steps.json without the reference png), native title text, theme accent and the key props the native screen places. Targets: hero, board, team, ranking, map, progress, rewards, timer, start_button.",
+ "events": {
+  "clean_team_treasure": {
+   "title_en": "Clean Team Treasure",
+   "title_tr": "Temiz Ekip Hazinesi",
+   "accent": "#1f7a78",
+   "props": [
+    "treasure_chest_locked",
+    "team_badge"
+   ],
+   "steps": [
+    {
+     "step": 1,
+     "target": "hero",
+     "bubble_tr": "On kişilik temizlik ekibi ortak hazine için birlikte ilerler.",
+     "bubble_en": "A ten-player cleaning team works together toward a shared treasure.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 2,
+     "target": "board",
+     "bubble_tr": "Normal seviyelerde kazanmak takım puanı kazandırır.",
+     "bubble_en": "Winning normal levels earns team points.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 3,
+     "target": "team",
+     "bubble_tr": "Senin ve takım üyelerinin katkıları ortak hazineye eklenir.",
+     "bubble_en": "Your contributions and those of your teammates are added to the shared treasure.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 4,
+     "target": "progress",
+     "bubble_tr": "Toplanan takım puanı hazine yolunda ilerleme sağlar.",
+     "bubble_en": "Collected team points advance the treasure track.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 5,
+     "target": "rewards",
+     "bubble_tr": "Takım hedefe ulaştığında ortak sandığın kilidi açılır.",
+     "bubble_en": "The shared chest unlocks when the team reaches its goal.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 6,
+     "target": "timer",
+     "bubble_tr": "Yalnızca normal seviye galibiyetleri katkı sağlar; kalan süreyi burada izlersin.",
+     "bubble_en": "Only normal-level wins count; check the remaining time here.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 7,
+     "target": "start_button",
+     "bubble_tr": "Hazırsan takım hazinesi etkinliğine katıl.",
+     "bubble_en": "Join the team treasure event when you are ready.",
+     "button_tr": "Başla",
+     "button_en": "Start"
+    }
+   ]
+  },
+  "color_scrub_rush": {
+   "title_en": "Color Scrub Rush",
+   "title_tr": "Renkli Temizlik Koşusu",
+   "accent": "#7b3fd1",
+   "props": [],
+   "steps": [
+    {
+     "step": 1,
+     "target": "hero",
+     "bubble_tr": "Renkli piksel temizliğine hoş geldin!",
+     "bubble_en": "Welcome to Color Scrub Rush!",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 2,
+     "target": "board",
+     "bubble_tr": "Normal oyundaki renkli pikselleri temizle.",
+     "bubble_en": "Clean colored pixels during normal gameplay.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 3,
+     "target": "progress",
+     "bubble_tr": "Bir renk temizlendikçe ilgili sayaç dolar.",
+     "bubble_en": "Each color you clean fills its matching counter.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 4,
+     "target": "progress",
+     "bubble_tr": "Her rengin sayacı ayrı ilerler.",
+     "bubble_en": "Each color has its own counter.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 5,
+     "target": "progress",
+     "bubble_tr": "Hedef eşiğine ulaşan renk tamamlanır.",
+     "bubble_en": "A color is complete when it reaches its target.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 6,
+     "target": "rewards",
+     "bubble_tr": "Renk hedeflerini tamamla, etkinlik ödüllerine ulaş.",
+     "bubble_en": "Complete the color goals to earn event rewards.",
+     "button_tr": "Başla",
+     "button_en": "Start"
+    }
+   ]
+  },
+  "first_brush_race": {
+   "title_en": "First Brush Race",
+   "title_tr": "İlk Fırça Yarışı",
+   "accent": "#1d8a8a",
+   "props": [
+    "first_try_medal",
+    "brand_flags_pair"
+   ],
+   "steps": [
+    {
+     "step": 1,
+     "target": "hero",
+     "bubble_tr": "İlk Fırça Yarışı’na hoş geldin!",
+     "bubble_en": "Welcome to First Brush Race!",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 2,
+     "target": "board",
+     "bubble_tr": "İlk denemeni normal seviyede yap.",
+     "bubble_en": "Play a normal level for your first attempt.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 3,
+     "target": "progress",
+     "bubble_tr": "İlk denemede kazanırsan sayaç bir artar.",
+     "bubble_en": "Win on your first try to increase the counter.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 4,
+     "target": "progress",
+     "bubble_tr": "İlk denemede kazanamazsan etkinlik ilerlemesi artmaz.",
+     "bubble_en": "If you do not win on your first try, event progress does not increase.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 5,
+     "target": "rewards",
+     "bubble_tr": "Hedef galibiyet basamağına ulaşınca ödül açılır.",
+     "bubble_en": "Reach a win milestone to unlock a reward.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 6,
+     "target": "progress",
+     "bubble_tr": "Yalnızca ilk denemede kazandığın seviyeler ilerleme sağlar.",
+     "bubble_en": "Only levels won on the first try count toward progress.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 7,
+     "target": "start_button",
+     "bubble_tr": "Ödülleri incele, sonra yarışa başla!",
+     "bubble_en": "Review the rewards, then start the race!",
+     "button_tr": "Başla",
+     "button_en": "Start"
+    }
+   ]
+  },
+  "golden_brush_championship": {
+   "title_en": "Golden Brush Championship",
+   "title_tr": "Altın Fırça Şampiyonası",
+   "accent": "#1d3fa0",
+   "props": [
+    "golden_brush_trophy",
+    "bracket_crown"
+   ],
+   "steps": [
+    {
+     "step": 1,
+     "target": "hero",
+     "bubble_tr": "Üç turda ilerle, Altın Fırça kupasına ulaş!",
+     "bubble_en": "Advance through three rounds to reach the Golden Brush Cup!",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 2,
+     "target": "team",
+     "bubble_tr": "Turnuva sekiz katılımcıyla başlar.",
+     "bubble_en": "The tournament starts with eight participants.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 3,
+     "target": "progress",
+     "bubble_tr": "Çeyrek finali geçenler yarı finale ilerler.",
+     "bubble_en": "Quarter-final winners advance to the semi-finals.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 4,
+     "target": "board",
+     "bubble_tr": "Yeni bir seviyeyi temizlemek tur sonucuna katkı sağlar.",
+     "bubble_en": "Clearing a new level contributes to the round result.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 5,
+     "target": "progress",
+     "bubble_tr": "Tur sonucu belli olunca yarı final eşleşmeleri görünür.",
+     "bubble_en": "Semi-final matchups appear when the round result is decided.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 6,
+     "target": "progress",
+     "bubble_tr": "Yarı finalin kazananları büyük finale çıkar.",
+     "bubble_en": "Semi-final winners move on to the grand final.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 7,
+     "target": "progress",
+     "bubble_tr": "Final eşleşmesi şampiyonu belirler.",
+     "bubble_en": "The final matchup decides the champion.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 8,
+     "target": "timer",
+     "bubble_tr": "Etkinlik süresini gör, tur ödüllerini incele.",
+     "bubble_en": "Check the event timer and review the round rewards.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 9,
+     "target": "start_button",
+     "bubble_tr": "Hazırsan turnuvaya katıl.",
+     "bubble_en": "Join the tournament when you are ready.",
+     "button_tr": "Başla",
+     "button_en": "Start"
+    }
+   ]
+  },
+  "lost_card_rescue": {
+   "title_en": "Lost Card Rescue",
+   "title_tr": "Kayıp Kart Kurtarma",
+   "accent": "#5b2a9e",
+   "props": [
+    "card_pack_glow",
+    "card_fan"
+   ],
+   "steps": [
+    {
+     "step": 1,
+     "target": "hero",
+     "bubble_tr": "Kayıp kart paketleri etkinliğin ana ödüllerindendir.",
+     "bubble_en": "Lost card packs are among the event’s main rewards.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 2,
+     "target": "progress",
+     "bubble_tr": "Normal seviyeyi kazanınca etkinlik puanı kazanırsın.",
+     "bubble_en": "Win a normal level to earn event points.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 3,
+     "target": "progress",
+     "bubble_tr": "Kart paketi ilerlemesini bu göstergede takip et.",
+     "bubble_en": "Track card-pack progress on this meter.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 4,
+     "target": "rewards",
+     "bubble_tr": "Kart paketi ödülü açılınca kartların görünür.",
+     "bubble_en": "Your cards appear when a card-pack reward unlocks.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 5,
+     "target": "rewards",
+     "bubble_tr": "Açılan kartlar mevcut koleksiyonunla uyumludur.",
+     "bubble_en": "Unlocked cards fit into your existing collection.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 6,
+     "target": "start_button",
+     "bubble_tr": "Etkinlik süresi içinde hazır olduğunda başla.",
+     "bubble_en": "Start when you are ready while the event is active.",
+     "button_tr": "Başla",
+     "button_en": "Start"
+    }
+   ]
+  },
+  "master_cleaner_quest": {
+   "title_en": "Master Cleaner Quest",
+   "title_tr": "Usta Temizlikçi Görevi",
+   "accent": "#2f7d5c",
+   "props": [
+    "quest_map",
+    "big_chest",
+    "compass"
+   ],
+   "steps": [
+    {
+     "step": 1,
+     "target": "hero",
+     "bubble_tr": "Master Cleaner Quest’e hoş geldin! Bağlı etkinlik hedefleri ana göreve katkı sağlar.",
+     "bubble_en": "Welcome to Master Cleaner Quest! Linked event goals contribute to the main quest.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 2,
+     "target": "progress",
+     "bubble_tr": "Bağlı etkinliklerin her birinin ayrı hedefi ve ilerleme çubuğu var.",
+     "bubble_en": "Each linked event has its own goal and progress bar.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 3,
+     "target": "progress",
+     "bubble_tr": "Tamamlanan bağlı etkinlik hedefi ana göreve katkı sağlar.",
+     "bubble_en": "Completing a linked event goal contributes to the main quest.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 4,
+     "target": "progress",
+     "bubble_tr": "Diğer bağlı etkinliğin hedefi de ayrı tamamlanır.",
+     "bubble_en": "The other linked event goal is completed separately.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 5,
+     "target": "map",
+     "bubble_tr": "Bağlı hedeflerden gelen katkılar ana görev yolunda birleşir.",
+     "bubble_en": "Progress from linked goals comes together on the main quest path.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 6,
+     "target": "rewards",
+     "bubble_tr": "Bağlı hedeflerden biri eksikken Büyük Sandık kilitli kalır.",
+     "bubble_en": "The Grand Chest stays locked while a linked goal is incomplete.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 7,
+     "target": "rewards",
+     "bubble_tr": "Ana görev tamamlanınca Büyük Sandık açılır.",
+     "bubble_en": "The Grand Chest opens when the main quest is complete.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 8,
+     "target": "map",
+     "bubble_tr": "İlgili etkinliğe gitmek için haritadaki simgeyi seç.",
+     "bubble_en": "Select an icon on the map to open its event.",
+     "button_tr": "Başla",
+     "button_en": "Start"
+    }
+   ]
+  },
+  "mega_stain_cleanup": {
+   "title_en": "Mega Stain Cleanup",
+   "title_tr": "Mega Leke Temizliği",
+   "accent": "#6a3cc8",
+   "props": [
+    "giant_stain_wall",
+    "team_badge"
+   ],
+   "steps": [
+    {
+     "step": 1,
+     "target": "hero",
+     "bubble_tr": "Yirmi kişilik temizlik ekibi ortak dev leke hedefi için ilerler.",
+     "bubble_en": "A twenty-player cleaning team works toward a shared giant-stain goal.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 2,
+     "target": "progress",
+     "bubble_tr": "Dev leke göstergesi ortak temizleme hedefini gösterir.",
+     "bubble_en": "The giant-stain meter shows the shared cleaning goal.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 3,
+     "target": "board",
+     "bubble_tr": "İlerleme, normal seviyede temizlenen aktif piksellerden gelir.",
+     "bubble_en": "Progress comes from active pixels cleaned in normal levels.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 4,
+     "target": "progress",
+     "bubble_tr": "Takım katkıları arttıkça dev leke göstergesi azalır.",
+     "bubble_en": "As the team contributes, the giant-stain meter gets smaller.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 5,
+     "target": "board",
+     "bubble_tr": "Dev leke etkinlik hedefidir; temizlik normal seviyelerde yapılır.",
+     "bubble_en": "The giant stain is the event goal; cleaning happens in normal levels.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 6,
+     "target": "rewards",
+     "bubble_tr": "Etkinlik hedefi tamamlanınca takım ödülü açılır.",
+     "bubble_en": "The team reward unlocks when the event goal is complete.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 7,
+     "target": "start_button",
+     "bubble_tr": "Hazırsan takım temizliğine katıl!",
+     "bubble_en": "Join the team cleanup when you are ready!",
+     "button_tr": "Başla",
+     "button_en": "Start"
+    }
+   ]
+  },
+  "mystery_scrubbox_hunt": {
+   "title_en": "Mystery Scrubbox Hunt",
+   "title_tr": "Gizemli Temizlik Kutusu Avı",
+   "accent": "#2d6a3e",
+   "props": [
+    "flower_arch_chest",
+    "treasure_map"
+   ],
+   "steps": [
+    {
+     "step": 1,
+     "target": "hero",
+     "bubble_tr": "Gizemli ScrubBox sandıkları seni bekliyor!",
+     "bubble_en": "Mystery ScrubBox chests are waiting for you!",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 2,
+     "target": "board",
+     "bubble_tr": "Normal temizlik seviyelerini tamamlayarak ilerle.",
+     "bubble_en": "Progress by completing normal cleaning levels.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 3,
+     "target": "progress",
+     "bubble_tr": "İlk ScrubBox için ilerleme burada görünür.",
+     "bubble_en": "Your progress toward the first ScrubBox appears here.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 4,
+     "target": "rewards",
+     "bubble_tr": "İlerleme tamamlanınca ScrubBox ödülü açılır.",
+     "bubble_en": "The ScrubBox reward unlocks when the progress goal is complete.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 5,
+     "target": "rewards",
+     "bubble_tr": "İlerleyen basamakta özel ScrubBox sandığı görünür.",
+     "bubble_en": "A special ScrubBox chest appears at a later milestone.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 6,
+     "target": "rewards",
+     "bubble_tr": "Açılan ScrubBox mevcut etkinlik ödülünü verir.",
+     "bubble_en": "An unlocked ScrubBox grants the current event reward.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 7,
+     "target": "start_button",
+     "bubble_tr": "Etkinlik süresini kontrol et ve hazırsan başla.",
+     "bubble_en": "Check the event timer and start when you are ready.",
+     "button_tr": "Başla",
+     "button_en": "Start"
+    }
+   ]
+  },
+  "perfect_first_clean": {
+   "title_en": "Perfect First Clean",
+   "title_tr": "İlk Seferde Kusursuz Temizlik",
+   "accent": "#2a6fdb",
+   "props": [
+    "first_try_flag_badge",
+    "crown"
+   ],
+   "steps": [
+    {
+     "step": 1,
+     "target": "hero",
+     "bubble_tr": "Yeni seviyeleri ilk denemede kazan ve kusursuz temizlik rozetine ulaş.",
+     "bubble_en": "Win new levels on your first try to earn the perfect-clean badge.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 2,
+     "target": "board",
+     "bubble_tr": "Normal seviyede ilk deneme işareti görünür.",
+     "bubble_en": "The first-try marker appears on a normal level.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 3,
+     "target": "progress",
+     "bubble_tr": "İlk deneme galibiyeti ilerlemeyi bir artırır.",
+     "bubble_en": "A first-try win increases progress by one.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 4,
+     "target": "progress",
+     "bubble_tr": "İlk deneme kaybı etkinlikte ilerleme sağlamaz.",
+     "bubble_en": "A first-try loss does not add event progress.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 5,
+     "target": "rewards",
+     "bubble_tr": "Ödüller üç, beş ve on ilk-deneme galibiyetinde açılır. Süre dolmadan hedefini tamamla.",
+     "bubble_en": "Rewards unlock at three, five, and ten first-try wins. Reach your goal before time runs out.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 6,
+     "target": "start_button",
+     "bubble_tr": "Hazırsan etkinliğe devam etmek için başla.",
+     "bubble_en": "Start the event when you are ready.",
+     "button_tr": "Başla",
+     "button_en": "Start"
+    }
+   ]
+  },
+  "pure_scrub_challenge": {
+   "title_en": "Pure Scrub Challenge",
+   "title_tr": "Saf Temizlik Mücadelesi",
+   "accent": "#2b8cc4",
+   "props": [
+    "no_booster_badge",
+    "chest_purple"
+   ],
+   "steps": [
+    {
+     "step": 1,
+     "target": "hero",
+     "bubble_tr": "Booster kullanmadan kazandığın uygun seviyeler ödül yolunda ilerler.",
+     "bubble_en": "Eligible wins without boosters advance the reward track.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 2,
+     "target": "board",
+     "bubble_tr": "Normal temizlik tahtasında boostersız kazanılan seviyeler sayılır.",
+     "bubble_en": "Only normal cleaning levels won without boosters count.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 3,
+     "target": "progress",
+     "bubble_tr": "Booster kullanmadan kazanmak ilerlemene bir ekler.",
+     "bubble_en": "A win without boosters adds one to your progress.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 4,
+     "target": "board",
+     "bubble_tr": "Bir booster kullanılırsa bu galibiyet etkinlik ilerlemesine sayılmaz.",
+     "bubble_en": "If you use a booster, that win does not count toward event progress.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 5,
+     "target": "rewards",
+     "bubble_tr": "Booster kullanmadan kazanılan galibiyetler ödül eşiklerine ilerletir.",
+     "bubble_en": "Booster-free wins move you toward the reward milestones.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 6,
+     "target": "start_button",
+     "bubble_tr": "Süre dolmadan meydan okumaya katıl.",
+     "bubble_en": "Join the challenge before time runs out.",
+     "button_tr": "Başla",
+     "button_en": "Start"
+    }
+   ]
+  },
+  "robot_parts_recovery": {
+   "title_en": "Robot Parts Recovery",
+   "title_tr": "Robot Parçalarını Kurtarma",
+   "accent": "#1f3f8a",
+   "props": [
+    "part_gear",
+    "part_nut",
+    "part_pipe"
+   ],
+   "steps": [
+    {
+     "step": 1,
+     "target": "hero",
+     "bubble_tr": "Kayıp parçaları bulma etkinliğine hoş geldin!",
+     "bubble_en": "Welcome to the Robot Parts Recovery event!",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 2,
+     "target": "progress",
+     "bubble_tr": "Normal seviyeyi tamamlayınca parça kurtarma ilerlemesi artar.",
+     "bubble_en": "Complete a normal level to increase parts-recovery progress.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 3,
+     "target": "progress",
+     "bubble_tr": "Seviye tamamlandıkça parça kurtarma göstergesi ilerler.",
+     "bubble_en": "The parts-recovery meter advances as you complete levels.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 4,
+     "target": "rewards",
+     "bubble_tr": "Kazandığın parça ödülü güvende kalır.",
+     "bubble_en": "Parts rewards you earn are kept safe.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 5,
+     "target": "rewards",
+     "bubble_tr": "Parça kurtarma hedefini ödül yolunda takip et.",
+     "bubble_en": "Track your parts-recovery goal on the reward path.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 6,
+     "target": "start_button",
+     "bubble_tr": "Etkinlik süresi içinde hazır olduğunda başla.",
+     "bubble_en": "Start when you are ready while the event is active.",
+     "button_tr": "Başla",
+     "button_en": "Start"
+    }
+   ]
+  },
+  "scrub_relay": {
+   "title_en": "Scrub Relay",
+   "title_tr": "Temizlik Bayrak Yarışı",
+   "accent": "#6b3fa0",
+   "props": [
+    "relay_flag_brush",
+    "team_badge"
+   ],
+   "steps": [
+    {
+     "step": 1,
+     "target": "hero",
+     "bubble_tr": "Beş kişilik temizlik ekibi etaplarda sırayla ilerler.",
+     "bubble_en": "A five-player cleaning team advances through stages in turn.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 2,
+     "target": "team",
+     "bubble_tr": "Açılış etabında Scrubby aktif takım üyesidir.",
+     "bubble_en": "Scrubby is the active team member in the opening stage.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 3,
+     "target": "progress",
+     "bubble_tr": "Normal seviye galibiyeti sıradaki etap ilerlemesini artırır.",
+     "bubble_en": "A normal-level win advances the next stage.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 4,
+     "target": "progress",
+     "bubble_tr": "Temizlik bayrağı sıradaki etaba geçer; takım galibiyetleri ilerlemeyi kaydeder.",
+     "bubble_en": "The cleaning flag moves to the next stage; team wins record progress.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 5,
+     "target": "team",
+     "bubble_tr": "Takım üyelerinin tamamlamaları ortak etap ilerlemesine eklenir.",
+     "bubble_en": "Team members’ completions add to shared stage progress.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 6,
+     "target": "progress",
+     "bubble_tr": "Etap yolu tamamlandığında takım bitişe ulaşır.",
+     "bubble_en": "The team reaches the finish when the stage path is complete.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 7,
+     "target": "rewards",
+     "bubble_tr": "Etkinlik sonunda kazanan ekip ve ödül durumu görünür.",
+     "bubble_en": "The winning team and reward status appear at the end of the event.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 8,
+     "target": "start_button",
+     "bubble_tr": "Ödül durumunu gözden geçir ve etkinliğe katıl.",
+     "bubble_en": "Review the reward status and join the event.",
+     "button_tr": "Başla",
+     "button_en": "Start"
+    }
+   ]
+  },
+  "scrub_season_pass": {
+   "title_en": "Scrub Season Pass",
+   "title_tr": "Temizlik Sezon Bileti",
+   "accent": "#22348c",
+   "props": [
+    "star_arch"
+   ],
+   "steps": [
+    {
+     "step": 1,
+     "target": "hero",
+     "bubble_tr": "Ücretsiz sezon ödül yoluna hoş geldin!",
+     "bubble_en": "Welcome to the free season reward track!",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 2,
+     "target": "progress",
+     "bubble_tr": "Bölümlere ayrılmış sezon yolu etkinlik süresi boyunca açıktır.",
+     "bubble_en": "The season track is divided into sections and remains open during the event.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 3,
+     "target": "progress",
+     "bubble_tr": "Normal seviyeyi kazanınca sezon yolu ilerler.",
+     "bubble_en": "Win a normal level to advance the season track.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 4,
+     "target": "progress",
+     "bubble_tr": "Sezon yolundaki sıradaki ödül basamağına ilerle.",
+     "bubble_en": "Advance toward the next reward milestone on the season track.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 5,
+     "target": "progress",
+     "bubble_tr": "Normal seviye galibiyetleri sezon puanı kazandırır.",
+     "bubble_en": "Winning normal levels earns season points.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 6,
+     "target": "rewards",
+     "bubble_tr": "Sezon puanları ödül yolundaki basamakları açar.",
+     "bubble_en": "Season points unlock milestones on the reward track.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 7,
+     "target": "rewards",
+     "bubble_tr": "Bu sezon yolu ücretsizdir; ücretli bir yol yoktur.",
+     "bubble_en": "This season track is free; there is no paid track.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 8,
+     "target": "start_button",
+     "bubble_tr": "Ödül yoluna devam etmek için başla.",
+     "bubble_en": "Start to continue along the reward track.",
+     "button_tr": "Başla",
+     "button_en": "Start"
+    }
+   ]
+  },
+  "scrub_sprint": {
+   "title_en": "Scrub Sprint",
+   "title_tr": "Scrub Sprint",
+   "accent": "#c23a3a",
+   "props": [
+    "trophy_cup",
+    "checkered_flags_pair"
+   ],
+   "steps": [
+    {
+     "step": 1,
+     "target": "hero",
+     "bubble_tr": "Yeni seviyeleri tamamla ve bitiş çizgisine ulaş!",
+     "bubble_en": "Complete new levels and reach the finish line!",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 2,
+     "target": "team",
+     "bubble_tr": "Yarışta diğer katılımcılar da ilerler.",
+     "bubble_en": "Other participants progress in the race too.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 3,
+     "target": "progress",
+     "bubble_tr": "Hedefin on beş yeni seviyeyi tamamlamak.",
+     "bubble_en": "Your goal is to complete fifteen new levels.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 4,
+     "target": "progress",
+     "bubble_tr": "Normal seviyeyi kazanınca pistte bir basamak ilerlersin.",
+     "bubble_en": "Win a normal level to move one step along the track.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 5,
+     "target": "ranking",
+     "bubble_tr": "İlerlemeni yarış katılımcılarıyla karşılaştır.",
+     "bubble_en": "Compare your progress with the other racers.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 6,
+     "target": "ranking",
+     "bubble_tr": "Bitiş çizgisine ilk ulaşan yarışı kazanır.",
+     "bubble_en": "The first to reach the finish line wins the race.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 7,
+     "target": "start_button",
+     "bubble_tr": "Ödülleri incele, etkinlik süresini gör ve başla.",
+     "bubble_en": "Review the rewards, check the event timer, and start.",
+     "button_tr": "Başla",
+     "button_en": "Start"
+    }
+   ]
+  },
+  "scrub_squad_tournament": {
+   "title_en": "Scrub Squad Tournament",
+   "title_tr": "Temizlik Ekibi Turnuvası",
+   "accent": "#5a2fa0",
+   "props": [
+    "potion_bottle",
+    "pennants"
+   ],
+   "steps": [
+    {
+     "step": 1,
+     "target": "hero",
+     "bubble_tr": "Bu etkinlikte on kişilik temizlik takımının galibiyetleri ortak puana katkı sağlar.",
+     "bubble_en": "In this event, wins by your ten-player cleaning team add to a shared score.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 2,
+     "target": "team",
+     "bubble_tr": "Takım üyeleri etkinlik boyunca ortak puana katkı sağlar.",
+     "bubble_en": "Team members contribute to the shared score throughout the event.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 3,
+     "target": "ranking",
+     "bubble_tr": "Takımının toplam puanı diğer takımın toplam puanıyla karşılaştırılır.",
+     "bubble_en": "Your team’s total score is compared with the other team’s score.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 4,
+     "target": "progress",
+     "bubble_tr": "Normal seviyeyi kazandığında uygun galibiyet takım puanına eklenir.",
+     "bubble_en": "Winning a normal level adds an eligible win to the team score.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 5,
+     "target": "team",
+     "bubble_tr": "Normal seviye galibiyetlerin kişisel takım katkını gösterir.",
+     "bubble_en": "Your normal-level wins show your personal team contribution.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 6,
+     "target": "team",
+     "bubble_tr": "Takımındaki diğer üyeler de kendi katkılarını ekler.",
+     "bubble_en": "Other members of your team add their own contributions.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 7,
+     "target": "ranking",
+     "bubble_tr": "Sıralama, karşılaşma boyunca biriken takım puanlarına göre belirlenir.",
+     "bubble_en": "Rankings are based on team points earned during the match.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 8,
+     "target": "rewards",
+     "bubble_tr": "Karşılaşma sonunda daha yüksek toplam takım puanı ödülleri kazandırır.",
+     "bubble_en": "The higher team score earns rewards at the end of the match.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 9,
+     "target": "start_button",
+     "bubble_tr": "Süre dolmadan devam et ve takım etkinliğine katıl.",
+     "bubble_en": "Continue and join the team event before time runs out.",
+     "button_tr": "Başla",
+     "button_en": "Start"
+    }
+   ]
+  },
+  "scrubbots_royale": {
+   "title_en": "ScrubBots Royale",
+   "title_tr": "ScrubBots Royale",
+   "accent": "#0f3a6a",
+   "props": [
+    "trophy_laurel",
+    "crown"
+   ],
+   "steps": [
+    {
+     "step": 1,
+     "target": "hero",
+     "bubble_tr": "Yüz katılımcılı, beş aşamalı temizlik turnuvasında son aşamaya ulaş!",
+     "bubble_en": "Reach the final stage of a five-stage cleaning tournament with one hundred participants!",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 2,
+     "target": "board",
+     "bubble_tr": "Normal piksel temizliğinde yeni bir seviyeyi ilk denemede tamamla.",
+     "bubble_en": "Complete a new level of normal pixel cleaning on your first try.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 3,
+     "target": "progress",
+     "bubble_tr": "Uygun ilk-deneme galibiyetleri ilerlemeye eklenir.",
+     "bubble_en": "Eligible first-try wins add to your progress.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 4,
+     "target": "progress",
+     "bubble_tr": "Beş aşama boyunca eleme yolunda ilerle.",
+     "bubble_en": "Advance through the elimination path across five stages.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 5,
+     "target": "progress",
+     "bubble_tr": "Aşama hedefi tamamlanınca sıradaki aşamaya geç.",
+     "bubble_en": "Complete a stage goal to move to the next stage.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 6,
+     "target": "progress",
+     "bubble_tr": "İlk-deneme galibiyetleri ilerleme çubuğunda görünür.",
+     "bubble_en": "First-try wins appear on the progress bar.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 7,
+     "target": "progress",
+     "bubble_tr": "Beşinci aşama turnuvanın son aşamasıdır.",
+     "bubble_en": "The fifth stage is the tournament’s final stage.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 8,
+     "target": "rewards",
+     "bubble_tr": "Etkinlik ilerlemesini ve ödülleri buradan takip et.",
+     "bubble_en": "Track event progress and rewards here.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 9,
+     "target": "timer",
+     "bubble_tr": "Etkinlik süresini üst bölümden kontrol et.",
+     "bubble_en": "Check the event timer at the top.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 10,
+     "target": "start_button",
+     "bubble_tr": "Hazırsan turnuvaya katıl.",
+     "bubble_en": "Join the tournament when you are ready.",
+     "button_tr": "Başla",
+     "button_en": "Start"
+    }
+   ]
+  },
+  "scrubbys_cleanup_workshop": {
+   "title_en": "Scrubby's Cleanup Workshop",
+   "title_tr": "Scrubby'nin Temizlik Atölyesi",
+   "accent": "#6b2fa8",
+   "props": [
+    "brush_icon"
+   ],
+   "steps": [
+    {
+     "step": 1,
+     "target": "hero",
+     "bubble_tr": "Scrubby’nin temizlik atölyesine hoş geldin!",
+     "bubble_en": "Welcome to Scrubby’s Cleanup Workshop!",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 2,
+     "target": "progress",
+     "bubble_tr": "Bu ekran atölye ödül ilerlemesini gösterir.",
+     "bubble_en": "This screen shows workshop reward progress.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 3,
+     "target": "progress",
+     "bubble_tr": "Normal seviyeyi kazanınca atölye yolunda ilerlersin.",
+     "bubble_en": "Win a normal level to advance along the workshop track.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 4,
+     "target": "rewards",
+     "bubble_tr": "Açılan ödül simgeleri burada görünür.",
+     "bubble_en": "Unlocked reward icons appear here.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 5,
+     "target": "rewards",
+     "bubble_tr": "Ödül teslimi atölye ekranında gösterilir.",
+     "bubble_en": "Reward delivery is shown on the workshop screen.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 6,
+     "target": "start_button",
+     "bubble_tr": "Etkinlik süresi dolmadan atölyeye katıl.",
+     "bubble_en": "Join the workshop before the event ends.",
+     "button_tr": "Başla",
+     "button_en": "Start"
+    }
+   ]
+  },
+  "scrubbys_rescue_mission": {
+   "title_en": "Scrubby's Rescue Mission",
+   "title_tr": "Scrubby'nin Kurtarma Görevi",
+   "accent": "#2a8a6a",
+   "props": [
+    "story_node_arch",
+    "story_node_leaf",
+    "story_node_waterfall"
+   ],
+   "steps": [
+    {
+     "step": 1,
+     "target": "hero",
+     "bubble_tr": "Scrubby’nin kurtarma hikâyesine hoş geldin!",
+     "bubble_en": "Welcome to Scrubby’s rescue story!",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 2,
+     "target": "map",
+     "bubble_tr": "Atlas’ın kurtarılma hikâyesini takip et.",
+     "bubble_en": "Follow Atlas’s rescue story.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 3,
+     "target": "progress",
+     "bubble_tr": "Normal seviyeyi kazandığında hikâye ilerler.",
+     "bubble_en": "Win a normal level to advance the story.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 4,
+     "target": "map",
+     "bubble_tr": "İlk hikâye basamağı açılır.",
+     "bubble_en": "The first story milestone unlocks.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 5,
+     "target": "map",
+     "bubble_tr": "Sonraki kurtarma kilometre taşı hikâyeyi ilerletir.",
+     "bubble_en": "The next rescue milestone moves the story forward.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 6,
+     "target": "board",
+     "bubble_tr": "Kurtarma için mini oyun yok; normal seviyeleri oyna.",
+     "bubble_en": "There is no rescue mini-game; play normal levels.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 7,
+     "target": "progress",
+     "bubble_tr": "Atlas güvende; kurtarma hikâyesi tamamlandı!",
+     "bubble_en": "Atlas is safe; the rescue story is complete!",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 8,
+     "target": "start_button",
+     "bubble_tr": "Hikâye basamaklarını tamamla, etkinlik ödüllerine ulaş.",
+     "bubble_en": "Complete the story milestones to earn event rewards.",
+     "button_tr": "Başla",
+     "button_en": "Start"
+    }
+   ]
+  },
+  "seasonal_scrub_festival": {
+   "title_en": "Seasonal Scrub Festival",
+   "title_tr": "Mevsimlik Temizlik Festivali",
+   "accent": "#d0601c",
+   "props": [
+    "season_pumpkin",
+    "season_snowflake",
+    "season_sun"
+   ],
+   "steps": [
+    {
+     "step": 1,
+     "target": "hero",
+     "bubble_tr": "Mevsim temalı Scrub Festival’e hoş geldin!",
+     "bubble_en": "Welcome to the seasonal Scrub Festival!",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 2,
+     "target": "hero",
+     "bubble_tr": "Festival rozeti mevsim temasını gösterir.",
+     "bubble_en": "The festival badge shows the seasonal theme.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 3,
+     "target": "board",
+     "bubble_tr": "Normal seviyeleri temizleyerek festivale katıl.",
+     "bubble_en": "Join the festival by cleaning normal levels.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 4,
+     "target": "progress",
+     "bubble_tr": "Festival hedefi tamamlandıkça puan yolunda ilerlersin.",
+     "bubble_en": "Complete festival goals to advance along the points track.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 5,
+     "target": "timer",
+     "bubble_tr": "Festival dönemini etkinlik takviminden takip et.",
+     "bubble_en": "Follow the festival period on the event calendar.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 6,
+     "target": "rewards",
+     "bubble_tr": "Mevsimlik ödüllerini burada görüntüleyebilirsin.",
+     "bubble_en": "View your seasonal rewards here.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 7,
+     "target": "start_button",
+     "bubble_tr": "Hazırsan festival etkinliğine katıl.",
+     "bubble_en": "Join the festival event when you are ready.",
+     "button_tr": "Başla",
+     "button_en": "Start"
+    }
+   ]
+  },
+  "sparkling_streak": {
+   "title_en": "Sparkling Streak",
+   "title_tr": "Işıltılı Seri",
+   "accent": "#2f8a3a",
+   "props": [
+    "winding_path",
+    "checkpoint_flag"
+   ],
+   "steps": [
+    {
+     "step": 1,
+     "target": "hero",
+     "bubble_tr": "Art arda normal seviye galibiyetleriyle üç, beş, yedi ve on eşiklerine ilerle.",
+     "bubble_en": "Win consecutive normal levels to reach the three, five, seven, and ten milestones.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 2,
+     "target": "progress",
+     "bubble_tr": "Normal seviyeyi kazanmak serine bir yıldız ekler.",
+     "bubble_en": "Win a normal level to add a star to your streak.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 3,
+     "target": "rewards",
+     "bubble_tr": "Ödül kontrol noktaları üç, beş, yedi ve on galibiyettedir.",
+     "bubble_en": "Reward checkpoints are at three, five, seven, and ten wins.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 4,
+     "target": "progress",
+     "bubble_tr": "Üç ardışık galibiyet ilk kontrol noktasını tamamlar.",
+     "bubble_en": "Three consecutive wins complete the first checkpoint.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 5,
+     "target": "progress",
+     "bubble_tr": "Bir kayıp, seri ilerlemesini son kontrol noktasına döndürür.",
+     "bubble_en": "A loss resets streak progress to the last checkpoint.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 6,
+     "target": "progress",
+     "bubble_tr": "Seri gerilese de ana seviye ilerlemen korunur.",
+     "bubble_en": "Your main level progress stays safe even if your streak drops.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 7,
+     "target": "start_button",
+     "bubble_tr": "Kontrol noktası ödüllerini incele ve başlamak için devam et.",
+     "bubble_en": "Review checkpoint rewards, then continue to start.",
+     "button_tr": "Başla",
+     "button_en": "Start"
+    }
+   ]
+  },
+  "stain_busters": {
+   "title_en": "Stain Busters",
+   "title_tr": "Leke Avcıları",
+   "accent": "#5f3fb0",
+   "props": [
+    "target_ring"
+   ],
+   "steps": [
+    {
+     "step": 1,
+     "target": "hero",
+     "bubble_tr": "Büyük lekeyi temizle; aktif pikseller hedef sayacına eklenir.",
+     "bubble_en": "Clean the giant stain; active pixels count toward the goal meter.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 2,
+     "target": "progress",
+     "bubble_tr": "İlerleme, normal oyunda gerçekten temizlenen aktif piksellerden gelir.",
+     "bubble_en": "Progress comes from active pixels actually cleaned during normal play.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 3,
+     "target": "progress",
+     "bubble_tr": "Her normal temizlik galibiyeti temizlenen aktif pikselleri sayaca ekler.",
+     "bubble_en": "Each normal cleaning win adds cleaned active pixels to the meter.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 4,
+     "target": "board",
+     "bubble_tr": "Arka plan ve Void pikseller sayılmaz; yalnızca aktif pikseller ilerleme sağlar.",
+     "bubble_en": "Background and Void pixels do not count; only active pixels add progress.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 5,
+     "target": "rewards",
+     "bubble_tr": "İlerlemen etkinlik ödüllerinin mevcut eşiklerine katkı sağlar.",
+     "bubble_en": "Your progress contributes to the current event reward milestones.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 6,
+     "target": "start_button",
+     "bubble_tr": "Süre dolmadan etkinliğe katıl.",
+     "bubble_en": "Join the event before time runs out.",
+     "button_tr": "Başla",
+     "button_en": "Start"
+    }
+   ]
+  },
+  "weekly_cleanup_challenge": {
+   "title_en": "Weekly Cleanup Challenge",
+   "title_tr": "Haftalık Temizlik Mücadelesi",
+   "accent": "#c43a7a",
+   "props": [
+    "tent",
+    "trophy_cup"
+   ],
+   "steps": [
+    {
+     "step": 1,
+     "target": "hero",
+     "bubble_tr": "Haftalık hedefler üç, yedi, on iki ve yirmi yeni seviye galibiyetidir.",
+     "bubble_en": "Weekly goals are three, seven, twelve, and twenty new-level wins.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 2,
+     "target": "progress",
+     "bubble_tr": "Yeni normal seviyedeki galibiyet sayacı bir artırır.",
+     "bubble_en": "A win on a new normal level increases the counter by one.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 3,
+     "target": "rewards",
+     "bubble_tr": "Ödüller üç, yedi, on iki ve yirmi galibiyette açılır.",
+     "bubble_en": "Rewards unlock at three, seven, twelve, and twenty wins.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 4,
+     "target": "progress",
+     "bubble_tr": "Üç galibiyet ilk ödülü açar; sıradaki eşik yedidir.",
+     "bubble_en": "Three wins unlock the first reward; the next milestone is seven.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 5,
+     "target": "rewards",
+     "bubble_tr": "Açılan ödülünü ödül alanından al; diğerleri eşiklerinde açılır.",
+     "bubble_en": "Claim unlocked rewards in the reward area; the others unlock at their milestones.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 6,
+     "target": "start_button",
+     "bubble_tr": "Haftalık süre dolmadan ilerle ve başla.",
+     "bubble_en": "Make progress and start before the weekly timer ends.",
+     "button_tr": "Başla",
+     "button_en": "Start"
+    }
+   ]
+  },
+  "weekly_scrub_league": {
+   "title_en": "Weekly Scrub League",
+   "title_tr": "Haftalık Temizlik Ligi",
+   "accent": "#5a3aa8",
+   "props": [
+    "ranking_star",
+    "participants_badge"
+   ],
+   "steps": [
+    {
+     "step": 1,
+     "target": "hero",
+     "bubble_tr": "Haftalık ligde yirmi katılımcı aynı sıralama tablosunda yer alır.",
+     "bubble_en": "Twenty participants appear on the same weekly league leaderboard.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 2,
+     "target": "ranking",
+     "bubble_tr": "Sarı satır senin lig ilerlemeni gösterir.",
+     "bubble_en": "The yellow row shows your league progress.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 3,
+     "target": "progress",
+     "bubble_tr": "Yeni normal seviyelerde temizlediğin aktif pikseller lig puanına eklenir.",
+     "bubble_en": "Active pixels cleaned in new normal levels add league points.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 4,
+     "target": "progress",
+     "bubble_tr": "Temizlikte kaldırılan gerçek aktif pikseller lig puanı oluşturur.",
+     "bubble_en": "Actual active pixels removed by cleaning create league points.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 5,
+     "target": "ranking",
+     "bubble_tr": "Temizleme puanın arttıkça lig sıralaman değişebilir.",
+     "bubble_en": "Your league rank can change as your cleaning score increases.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 6,
+     "target": "timer",
+     "bubble_tr": "Haftalık süre bitince yeni dönem başlar ve sıralama yenilenir.",
+     "bubble_en": "A new period starts and the rankings reset when the weekly timer ends.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 7,
+     "target": "start_button",
+     "bubble_tr": "Haftalık lig ödüllerini gör ve katılmak için başla.",
+     "bubble_en": "View weekly league rewards and start to join.",
+     "button_tr": "Başla",
+     "button_en": "Start"
+    }
+   ]
+  },
+  "world_cleanup_cup": {
+   "title_en": "World Cleanup Cup",
+   "title_tr": "Dünya Temizlik Kupası",
+   "accent": "#1f5fbf",
+   "props": [
+    "cup_globe",
+    "flags_pair"
+   ],
+   "steps": [
+    {
+     "step": 1,
+     "target": "hero",
+     "bubble_tr": "Kendi temizlik skorunla kupa ilerlemeni geliştir.",
+     "bubble_en": "Build your cup progress with your own cleaning score.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 2,
+     "target": "hero",
+     "bubble_tr": "Bu etkinlikte gerçek çevrimiçi liderlik tablosu yoktur.",
+     "bubble_en": "This event does not have a real online leaderboard.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 3,
+     "target": "map",
+     "bubble_tr": "Kıtalar ve işaretler kupa haritasını gösterir.",
+     "bubble_en": "Continents and markers show the cup map.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 4,
+     "target": "board",
+     "bubble_tr": "Normal seviyede temizlik skorun oluşur.",
+     "bubble_en": "Your cleaning score is earned in normal levels.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 5,
+     "target": "progress",
+     "bubble_tr": "Temizlik skorun kişisel kupa ilerlemene eklenir.",
+     "bubble_en": "Your cleaning score adds to your personal cup progress.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 6,
+     "target": "progress",
+     "bubble_tr": "İlerleme çubuğu kupa yolundaki gelişimini gösterir.",
+     "bubble_en": "The progress bar shows your advancement on the cup path.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 7,
+     "target": "rewards",
+     "bubble_tr": "Kupa ilerlemeni tamamla, etkinlik ödülüne ulaş.",
+     "bubble_en": "Complete your cup progress to reach the event reward.",
+     "button_tr": "Devam",
+     "button_en": "Continue"
+    },
+    {
+     "step": 8,
+     "target": "start_button",
+     "bubble_tr": "Hazırsan kupaya ulaşmak için temizliğe başla!",
+     "bubble_en": "Start cleaning to reach the cup when you are ready!",
+     "button_tr": "Başla",
+     "button_en": "Start"
+    }
+   ]
+  }
+ }
+}
