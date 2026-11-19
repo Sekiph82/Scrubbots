@@ -26,7 +26,7 @@
     "amount": ["0", "1_10", "11_50", "51_100", "101_500", "501_1000", "1001_5000", "gt_5000"],
     "currency": ["scrub_bucks", "bot_parts"],
     "rarity": ["COMMON", "RARE", "EPIC", "LEGENDARY"],
-    "ad_product": ["heart", "booster_plus_one_slot", "booster_random", "booster_selector", "booster_tornado", "daily_slot", "other"],
+    "ad_product": ["heart", "booster_plus_one_slot", "booster_random", "booster_selector", "booster_tornado", "daily_slot", "win_double", "other"],
     "screen": ["opening", "home", "gameplay", "results", "settings", "help", "robots", "events", "leaderboard", "shop", "collection", "tasks", "daily", "rewarded_ads", "gift_bar", "profile", "other"]
   },
   "events": {

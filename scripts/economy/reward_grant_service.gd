@@ -89,6 +89,12 @@ func current_tx() -> String:
 func applied_ids() -> Array:
 	return _applied.keys()
 
+## SB-TF-05: read-only copy of what tx `tx_id` applied this session ({} = unknown / not applied
+## here); the reward reveal shows a committed grant from it, never a recomputed one.
+func applied_rewards(tx_id: String) -> Dictionary:
+	var r = _applied.get(tx_id, {})
+	return (r as Dictionary).duplicate() if typeof(r) == TYPE_DICTIONARY else {}
+
 func applied_transaction_count() -> int:
 	return _applied.size()
 

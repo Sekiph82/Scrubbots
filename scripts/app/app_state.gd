@@ -195,7 +195,8 @@ func _on_reward_granted(tx_id: String) -> void:
 
 ## SB-M56-010: rewarded video result (granted = verified completion committed).
 func _on_rewarded_resolved(_token: String, product: String, r: Dictionary) -> void:
-	analytics.track("ad_result", {"product": "daily_slot" if product.begins_with("daily_slot:") else product.replace(":", "_"),
+	var p := "daily_slot" if product.begins_with("daily_slot:") else "win_double" if product.begins_with("win_double:") else product.replace(":", "_")
+	analytics.track("ad_result", {"product": p,
 		"outcome": "granted" if bool(r.get("ok", false)) else String(r.get("reason", ""))})
 
 ## SB-M56-008: robot unlock / equip (roster order 1..10).

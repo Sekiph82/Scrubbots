@@ -146,6 +146,8 @@ const TR := {
 	"RADS_RESETS": "Her gün yeni ödüller.",
 	"RADS_GRANTED": "Alındı: %s",
 	"RADS_LOCKED_NOTE": "Cihaz tarihin son ödülünden daha eski. Tarih yetişince ödüller geri gelir.",
+	# SB-TF-05: the win reward reveal's rewarded x2 Scrub Bucks button.
+	"REVEAL_WATCH_X2": "REKLAM İZLE · x2",
 	"REWARDED_FREE": "BEDAVA",
 	"REWARDED_UNAVAILABLE": "VİDEO YOK",
 	"REWARDED_UNAVAILABLE_NOTE": "Şu an bedava video yok.",

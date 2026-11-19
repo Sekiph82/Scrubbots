@@ -53,6 +53,8 @@ const WinOverlay = preload("res://scripts/ui/win_overlay.gd")
 const PlayBillingStoreProvider = preload("res://scripts/economy/play_billing_store_provider.gd")
 const AppStoreProvider = preload("res://scripts/economy/app_store_provider.gd")
 const AdmobAdProvider = preload("res://scripts/economy/admob_ad_provider.gd")
+const RewardReveal = preload("res://scripts/ui/components/reward_reveal.gd")
+const RewardedGrantService = preload("res://scripts/economy/rewarded_grant_service.gd")
 ## M44: coachmark refresh cadence (presentation poll; not per frame).
 const COACH_TICK_S := 0.2
 ## M44 peer-review D1: step copy (L2 booster lines run the host's solver-backed legality
@@ -63,6 +65,13 @@ const COACH_COPY_REFRESH_MS := 2000
 ## activity buttons, Gift Meter and profile card; shop / collection / robots / events stay for
 ## deep links, and an Event activity button sends "event:<instance id>".
 const APP_SHORTCUTS := ["shop", "collection", "tasks", "daily", "gift_bar", "profile", "rewarded_ads"]
+## SB-TF-05: committed facade claims / purchases -> their reward reveal source.
+const REVEAL_ACTIONS := {
+	"claim_daily_task": "tasks", "claim_daily_all_tasks": "tasks", "claim_daily_login": "daily",
+	"claim_gift": "gift_meter", "claim_event_milestone": "events", "claim_first_try": "events",
+	"claim_event_reward": "events", "claim_rewarded_daily": "rewarded_ads", "claim_achievement": "achievements",
+	"buy_heart": "shop", "refill_hearts": "shop", "buy_booster_charge": "shop",
+}
 
 ## Test-only boot seams, read once when the root enters the tree. Production
 ## leaves them unset (canonical save path, system clock, OS local calendar).
@@ -132,6 +141,9 @@ var win_animation_enabled := false
 var _win_overlay = null
 ## The first-win contextual tip waits on the Home a win landed on (until Home is left).
 var _win_tip := false
+## SB-TF-05: every request_reward_reveal call [source, key, shown] (evidence / tests).
+var reveal_log: Array = []
+var _reveal_seq := 0
 
 func _enter_tree() -> void:
 	_boot()
@@ -166,7 +178,7 @@ func _ready() -> void:
 	set_momentum_config(ResultsMomentum.load_config())
 	_home.settings_requested.connect(open_settings)
 	_home.play_requested.connect(play_current_frontier)
-	# SB-PHONE-2026-11-12-E: the win's ceremonies / packs / tip wait for its reward flight.
+	# SB-PHONE-2026-11-12-E / SB-TF-05: ceremonies / packs / tip wait for every reward reveal.
 	_home.reward_flight_finished.connect(func(_k):
 		request_home_ceremonies()
 		request_earned_packs()
@@ -257,6 +269,12 @@ func _ready() -> void:
 		app_state.economy.rewarded.resolved.connect(func(_t, _p, r):
 			if bool(r.get("ok", false)):
 				request_earned_packs())
+	# SB-TF-05: every committed reward source reaches the ONE shared reveal (request_reward_reveal).
+	if app_state != null and app_state.economy != null:
+		app_state.actions.action_committed.connect(_reveal_action)
+		app_state.economy.rewarded.resolved.connect(_reveal_rewarded)
+		app_state.economy.store.resolved.connect(_reveal_store)
+		app_state.economy.reward.granted.connect(_reveal_collection)
 	nav.route_changed.connect(_on_route_changed)
 	_build_coachmarks()
 	_start_remote_content()
@@ -346,15 +364,71 @@ func _on_route_changed(_from: int, to: int, _payload: Dictionary) -> void:
 	refresh_coachmark()
 
 ## SB-PHONE-2026-11-12-E (owner 2026-11-12): a WON lands on Home (via "win", the host's committed
-## receipt in the payload). Home flies that receipt's rewards into the HUD; the committed
+## receipt in the payload). Home reveals that receipt's rewards (SB-TF-05: hold 1.5 s with the
+## rewarded x2 offer, then the flight into the HUD); the committed
 ## ceremony events (Gift milestone, set, Master, robot, feature) and earned packs wait for the
 ## flight, then open through the usual Home drain. Presentation only: the economy granted and
 ## saved inside the host terminal; a relaunch boots Home without a payload, so nothing replays.
 func _start_win_rewards(payload: Dictionary) -> void:
 	_track_win_journey(payload)
 	_win_tip = true
-	_home.play_reward_flight(payload.get("receipt", {}), "win:a%d:L%d" % [int(payload.get("attempt", 0)), int(payload.get("level", 0))])
+	var key := "win:a%d:L%d" % [int(payload.get("attempt", 0)), int(payload.get("level", 0))]
+	reveal_log.append(["win", key, _home.play_reward_flight(payload.get("receipt", {}), key)])
 	refresh_coachmark()
+
+## SB-TF-05: the ONE entry for every non-win reward source. `rewards` = what the source's
+## committed result granted ({resource: amount}, never recomputed). Shown on Home only (another
+## route already shows the live values); presentation only.
+func request_reward_reveal(source: String, rewards: Dictionary, key: String) -> bool:
+	if _home == null or nav == null or nav.current() != NavigationController.Route.HOME:
+		return false
+	_home.refresh()   # the HUD's final values (the claim may have happened under a popup)
+	var shown: bool = _home.reveal_rewards(RewardReveal.entries_for(rewards, _home.get_view_model()), key)
+	reveal_log.append([source, key, shown])
+	return shown
+
+func _reveal_key(source: String, id: String) -> String:
+	_reveal_seq += 1
+	return "%s:%s" % [source, id if not id.is_empty() else str(_reveal_seq)]
+
+func _reveal_action(action: String, r: Dictionary) -> void:
+	if not REVEAL_ACTIONS.has(action):
+		return
+	var rewards = r.get("reward", {})
+	match action:
+		"claim_daily_task":
+			rewards = {"scrub_bucks": int(r.get("sb", 0))}
+		"claim_daily_all_tasks":
+			rewards = {"random_any_booster_charges": int(r.get("random_any_booster_charges", 0))}
+		"claim_gift":
+			rewards = r.get("rewards", {})
+		"buy_heart":
+			rewards = {"hearts": 1}
+		"refill_hearts":
+			rewards = {"hearts": int(r.get("added", 0))}
+		"buy_booster_charge":
+			rewards = {"booster_charge_" + String(r.get("booster", "")): 1}
+	if typeof(rewards) == TYPE_DICTIONARY:
+		request_reward_reveal(REVEAL_ACTIONS[action], rewards, _reveal_key(action, String(r.get("tx", r.get("occurrence_id", "")))))
+
+## Verified rewarded grants (Heart / booster / Rewarded Ads daily slots). The win x2 shows inside
+## the win's own reveal.
+func _reveal_rewarded(token: String, product: String, r: Dictionary) -> void:
+	if not bool(r.get("ok", false)) or product.begins_with(RewardedGrantService.WIN_DOUBLE_PREFIX):
+		return
+	var tx := String(r.get("tx", ""))
+	var rewards: Dictionary = app_state.economy.reward.applied_rewards(tx) if not tx.is_empty() else RewardedGrantService.rewards_for(product)
+	request_reward_reveal("rewarded_ads", rewards, _reveal_key("rewarded", token))
+
+## Real-money Shop purchases (Scrub Bucks packs; No Ads shows nothing).
+func _reveal_store(product_id: String, r: Dictionary) -> void:
+	if bool(r.get("ok", false)) and product_id != "no_ads":
+		request_reward_reveal("shop", {"scrub_bucks": app_state.economy.store.scrub_bucks_of(product_id)}, _reveal_key("store", String(r.get("token", ""))))
+
+## Collection set / Master completion rewards (granted wherever the completing card landed).
+func _reveal_collection(tx: String) -> void:
+	if tx.begins_with("collection_set:") or tx == "collection_master":
+		request_reward_reveal("collection", app_state.economy.reward.applied_rewards(tx), _reveal_key("collection", tx))
 
 ## M43-C004: on the Fail surface of a due third failure, Need a Hand opens on the ONE
 ## ModalStack over Fail. The host decided the offer inside its latched terminal (after the
@@ -450,7 +524,7 @@ func _drain_home_ceremonies() -> void:
 	if ceremonies == null or nav == null or nav.current() != NavigationController.Route.HOME or nav.is_settings_open():
 		return
 	if _home.is_reward_flight_running():
-		return   # SB-PHONE-2026-11-12-E: the win's rewards land first (reward_flight_finished drains)
+		return   # SB-PHONE-2026-11-12-E / SB-TF-05: the rewards land first (reward_flight_finished drains)
 	if _modals != null and _modals.depth() > 0:
 		return
 	# Quiet Home order: pending meta ceremonies, then earned packs (FIFO), then the comeback summary.
@@ -1050,7 +1124,7 @@ func flush_lifecycle(reason: String) -> Dictionary:
 ## M43-C002: any ModalStack popup takes back first; mid-level exit after the first
 ## action is available only through Pause -> Home with its loss confirmation.
 func handle_back() -> String:
-	# SB-HOME-FLIGHT-LOCK-2026-11-17: Home ignores Back until the win's reward flight has landed.
+	# SB-HOME-FLIGHT-LOCK-2026-11-17 / SB-TF-05: Home ignores Back until a reward reveal has landed.
 	if nav.current() == NavigationController.Route.HOME and _home != null and _home.is_reward_flight_running():
 		return "none"
 	# M43-C002 (SB-M43-026): an open popup consumes back first (top only, never leaks).

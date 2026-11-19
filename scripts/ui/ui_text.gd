@@ -157,6 +157,8 @@ const EN := {
 	"RADS_RESETS": "New rewards every day.",
 	"RADS_GRANTED": "Collected: %s",
 	"RADS_LOCKED_NOTE": "Your device date is earlier than your last reward. Rewards return when it catches up.",
+	# SB-TF-05: the win reward reveal's rewarded x2 Scrub Bucks button.
+	"REVEAL_WATCH_X2": "WATCH AD · x2",
 	"REWARDED_FREE": "FREE",
 	"REWARDED_UNAVAILABLE": "NO VIDEO",
 	"REWARDED_UNAVAILABLE_NOTE": "Free videos aren't available right now.",

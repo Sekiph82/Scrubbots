@@ -120,7 +120,7 @@ func purchase_full_refill() -> Dictionary:
 		return {"ok": false, "reason": "insufficient_sb"}
 	_hearts = _max
 	_anchor = _now()
-	return {"ok": true, "hearts": _hearts, "spent": cost}
+	return {"ok": true, "hearts": _hearts, "spent": cost, "added": missing}
 
 func snapshot() -> Dictionary:
 	# Persist hearts + anchor as absolute wall-clock so relaunch continues regen.

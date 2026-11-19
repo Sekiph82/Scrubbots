@@ -6,9 +6,13 @@ extends RefCounted
 ## RewardGrantService under tx id "rewarded:<token>", whose applied-tx set is persisted by
 ## the M40 save, so a duplicate / late / relaunched callback can never re-grant.
 ##
-## Products (owner-approved V1 only; no rewarded 2x):
+## Products (owner-approved V1 + the owner 2026-11-18 win x2):
 ##   "heart"              +1 Heart (fails closed if Hearts are full at commit time)
 ##   "booster:<id>"       +1 charge of one of the four canonical boosters
+##   "win_double:<key>"   SB-TF-05: the won level's receipt Scrub Bucks once more (x2 of that
+##                        win's SB only), placement "rewarded_win_double", committed under the
+##                        DETERMINISTIC id "win_double:<receipt key>" (key = win:a<attempt>:L<level>),
+##                        so a second request, a duplicate / late / relaunched callback grants nothing
 ##
 ## Flow: start(product) -> provider.request(...) -> resolve(token, result) exactly once.
 ## Only outcome "completed" with verified == true commits. Cancel / skip / fail / timeout /
@@ -36,6 +40,8 @@ const DAILY_PRODUCT_PREFIX := "daily_slot:"
 const DAILY_TX_PREFIX := "daily_rewarded:"
 const COMPLETED := "completed"
 const TX_PREFIX := "rewarded:"
+const WIN_DOUBLE_PREFIX := "win_double:"
+const WIN_DOUBLE_PLACEMENT := "rewarded_win_double"
 ## Reward resources registered on RewardGrantService by EconomyServices.
 const RES_HEART := "rewarded_heart"
 const RES_BOOSTER_PREFIX := "booster_charge_"
@@ -74,6 +80,8 @@ static func booster_product(id: String) -> String:
 
 ## Logical placement key handed to the provider (M57 maps it to a real placement id).
 static func placement(product: String) -> String:
+	if product.begins_with(WIN_DOUBLE_PREFIX):
+		return WIN_DOUBLE_PLACEMENT
 	return "rewarded_" + product.replace(":", "_")
 
 static func rewards_for(product: String) -> Dictionary:
@@ -115,20 +123,52 @@ func start_daily_slot(day: int, slot: int, rewards: Dictionary, token: String = 
 		return c
 	if rewards.is_empty():
 		return {"ok": false, "reason": "unknown_product"}
-	var product := daily_product(slot)
 	if token.is_empty():
 		_seq += 1
 		token = "rw_daily_%d_%d_%d" % [slot, int(Time.get_unix_time_from_system()), _seq]
+	return _request_grant(daily_product(slot), token, daily_tx(day, slot), rewards)
+
+## One provider request whose verified completion grants `rewards` under the deterministic `tx`.
+func _request_grant(product: String, token: String, tx: String, rewards: Dictionary) -> Dictionary:
 	if _pending.has(token) or _closed.has(token) or _reward.already_applied(TX_PREFIX + token):
 		return {"ok": false, "reason": "duplicate_token"}
 	_pending[token] = product
-	_grants[token] = {"tx": daily_tx(day, slot), "rewards": rewards.duplicate(true)}
+	_grants[token] = {"tx": tx, "rewards": rewards.duplicate(true)}
 	if not _provider.request(placement(product), token, Callable(self, "resolve")):
 		_pending.erase(token)
 		_grants.erase(token)
 		_closed[token] = {"ok": false, "reason": "provider_refused", "product": product, "token": token}
 		return {"ok": false, "reason": "provider_refused"}
-	return {"ok": true, "token": token, "product": product, "tx": daily_tx(day, slot)}
+	return {"ok": true, "token": token, "product": product, "tx": tx}
+
+static func win_double_tx(receipt_key: String) -> String:
+	return WIN_DOUBLE_PREFIX + receipt_key
+
+## SB-TF-05: may the x2 for the win `receipt_key` be offered right now (not yet granted, an ad
+## ready, none pending)?
+func can_start_win_double(receipt_key: String) -> Dictionary:
+	if receipt_key.is_empty():
+		return {"ok": false, "reason": "unknown_product"}
+	if _reward.already_applied(win_double_tx(receipt_key)):
+		return {"ok": false, "reason": "already_claimed"}
+	if _provider == null or not _provider.is_available(WIN_DOUBLE_PLACEMENT):
+		return {"ok": false, "reason": "unavailable"}
+	if _pending.values().has(win_double_tx(receipt_key)):
+		return {"ok": false, "reason": "pending"}
+	return {"ok": true}
+
+## Begin the win x2 video: a verified completion grants exactly `scrub_bucks` (the receipt's
+## wallet_delta.scrub_bucks) once under win_double:<receipt_key>.
+func start_win_double(receipt_key: String, scrub_bucks: int, token: String = "") -> Dictionary:
+	var c := can_start_win_double(receipt_key)
+	if not c["ok"]:
+		return c
+	if scrub_bucks <= 0:
+		return {"ok": false, "reason": "unknown_product"}
+	if token.is_empty():
+		_seq += 1
+		token = "rw_win_double_%d_%d" % [int(Time.get_unix_time_from_system()), _seq]
+	return _request_grant(win_double_tx(receipt_key), token, win_double_tx(receipt_key), {"scrub_bucks": scrub_bucks})
 
 ## May this product be offered right now (provider policy + product state)?
 func can_start(product: String) -> Dictionary:

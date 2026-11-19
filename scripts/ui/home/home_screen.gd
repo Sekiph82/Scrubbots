@@ -47,7 +47,7 @@ signal shortcut_requested(id: String)
 ## V04: HUD (+) buttons — intent only (no price/product/transaction is implemented here).
 signal scrub_bucks_purchase_requested
 signal hearts_purchase_requested
-## SB-PHONE-2026-11-12-E: a win's reward flight ended (or landed at once under Reduced Effects).
+## SB-PHONE-2026-11-12-E / SB-TF-05: a reward reveal (win or any other source) ended.
 signal reward_flight_finished(key: String)
 
 const UiTokens = preload("res://scripts/ui/ui_tokens.gd")
@@ -73,6 +73,7 @@ const WorldService = preload("res://scripts/progression/world_service.gd")
 const HomeBadges = preload("res://scripts/ui/home/home_badges.gd")
 const HomeMicroFeel = preload("res://scripts/ui/feel/home_micro_feel.gd")
 const HomeRewardFlight = preload("res://scripts/ui/home/home_reward_flight.gd")
+const RewardReveal = preload("res://scripts/ui/components/reward_reveal.gd")
 const EventsV02Ui = preload("res://scripts/ui/events/events_v02_ui.gd")
 ## M42-C003 V03 pinned gesture frame set (HOME_ASSET_MANIFEST animation_sets).
 const HERO_ANIMATION_SET := "home_scrubby_gestures_v03"
@@ -169,12 +170,12 @@ var _ad_slot_enabled := true
 var _momentum_cfg: Dictionary = {}
 ## M43-C005F-PHASE4 (F012): ephemeral state-change micro feel (presentation only, never saved).
 var _micro = HomeMicroFeel.new()
-## SB-PHONE-2026-11-12-E: a win's committed rewards flying into the HUD (presentation only).
+## SB-TF-05: the shared RewardReveal (every committed reward flies into the HUD; presentation only).
 var _flight = null
 var _feel_adapter = null
 
 func _ready() -> void:
-	_flight = HomeRewardFlight.new(self)
+	_flight = RewardReveal.new(self)
 	_flight.completed.connect(func(k): reward_flight_finished.emit(k))
 	_flight.bind_feel(_feel_adapter)
 	_build()
@@ -1575,14 +1576,58 @@ func set_feedback(adapter) -> void:
 	if _flight != null:
 		_flight.bind_feel(adapter)
 
-# ------------------------------------------------- SB-PHONE-2026-11-12-E reward flight --
+# ------------------------------------------------- SB-TF-05 shared reward reveal --
 
-## Fly one win's committed rewards (its TerminalRewardReceipt) into the HUD, once per `key`.
-## False = not built, already played, or nothing to show. Reduced Effects lands at once.
+## Reveal one win's committed rewards (its TerminalRewardReceipt) once per `key`: all appear,
+## hold 1.5 s (with the rewarded x2 button when an ad is ready), then fly into the HUD.
+## False = not built, already played, or nothing to show.
 func play_reward_flight(receipt: Dictionary, key: String) -> bool:
 	if not _built or _flight == null:
 		return false
-	return _flight.play(receipt, key, _app != null and "effects" in _app and _app.effects != null and _app.effects.is_reduced())
+	var opts := {"reduced": _reduced()}
+	if _app != null and _app.actions != null and _app.actions.win_double_available(key, receipt):
+		opts["double"] = {"request": _start_win_double.bind(key, receipt), "abandon": _abandon_win_double}
+	return _flight.show_rewards(HomeRewardFlight.plan(receipt, _vm), key, opts)
+
+## Reveal a committed non-win reward (Tasks, Daily, Gift, Events, Rewarded Ads, Shop, sets).
+func reveal_rewards(entries: Array, key: String) -> bool:
+	if not _built or _flight == null:
+		return false
+	return _flight.show_rewards(entries, key, {"reduced": _reduced()})
+
+func _reduced() -> bool:
+	return _app != null and "effects" in _app and _app.effects != null and _app.effects.is_reduced()
+
+var _double_token := ""
+var _double_done := Callable()
+
+## x2 tap: start the rewarded video through the facade; `done(granted)` reports the verified
+## result (synchronous providers resolve inside start, the rest through `resolved`).
+func _start_win_double(done: Callable, key: String, receipt: Dictionary) -> void:
+	var r: Dictionary = _app.actions.start_win_double(key, receipt)
+	if not bool(r.get("ok", false)):
+		done.call(false)
+		return
+	var res: Dictionary = _app.economy.rewarded.result_for(String(r["token"]))
+	if not res.is_empty():
+		done.call(bool(res.get("ok", false)))
+		return
+	_double_token = String(r["token"])
+	_double_done = done
+	if not _app.economy.rewarded.resolved.is_connected(_on_double_resolved):
+		_app.economy.rewarded.resolved.connect(_on_double_resolved)
+
+func _on_double_resolved(token: String, _product: String, r: Dictionary) -> void:
+	if token != _double_token or _double_token.is_empty():
+		return
+	_double_token = ""
+	if _double_done.is_valid():
+		_double_done.call(bool(r.get("ok", false)))
+	_double_done = Callable()
+
+func _abandon_win_double() -> void:
+	if not _double_token.is_empty():
+		_app.actions.abandon_rewarded(_double_token)
 
 func is_reward_flight_running() -> bool:
 	return _flight != null and _flight.is_running()

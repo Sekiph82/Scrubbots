@@ -106,7 +106,9 @@ func buy_booster_charge(id: String) -> Dictionary:
 	var lk := _locked("buy_booster_charge", id)
 	if not lk.is_empty():
 		return lk
-	return _finish("buy_booster_charge", _economy.boosters.buy_charge(id))
+	var r: Dictionary = _economy.boosters.buy_charge(id)
+	r["booster"] = id   # presentation identity copied from the input (SB-TF-05 reward reveal)
+	return _finish("buy_booster_charge", r)
 
 func _booster_done(action: String, r: Dictionary) -> Dictionary:
 	if r.get("ok", false):
@@ -158,6 +160,32 @@ func start_rewarded_daily(slot: int, token: String = "") -> Dictionary:
 	var r: Dictionary = _economy.rewarded_daily.start_ad(slot, token)
 	r["action"] = "start_rewarded_daily"
 	return r
+
+## SB-TF-05 (owner 2026-11-18): the rewarded x2 on a level win. Offered while the win's reward
+## reveal holds, only when the committed receipt is a WON with Scrub Bucks and an ad is ready
+## (No Ads keeps rewarded videos). A verified completion grants the receipt's
+## wallet_delta.scrub_bucks once more under win_double:<receipt_key> (commit + save inside
+## RewardedGrantService.resolve); never twice for one win.
+func win_double_available(receipt_key: String, receipt: Dictionary) -> bool:
+	return _win_double_sb(receipt) > 0 and _economy.ads.allowed("rewarded") 		and bool(_economy.rewarded.can_start_win_double(receipt_key).get("ok", false))
+
+func start_win_double(receipt_key: String, receipt: Dictionary, token: String = "") -> Dictionary:
+	if not _economy.ads.allowed("rewarded"):
+		return {"ok": false, "action": "start_win_double", "reason": "ads_disallowed"}
+	if _win_double_sb(receipt) <= 0:
+		return {"ok": false, "action": "start_win_double", "reason": "unknown_product"}
+	var r: Dictionary = _economy.rewarded.start_win_double(receipt_key, _win_double_sb(receipt), token)
+	r["action"] = "start_win_double"
+	return r
+
+## UI safety timeout: close a pending rewarded request as a non-grant (a late callback is a duplicate).
+func abandon_rewarded(token: String) -> Dictionary:
+	return _economy.rewarded.abandon(token)
+
+static func _win_double_sb(receipt: Dictionary) -> int:
+	if String(receipt.get("status", "")) != "WON":
+		return 0
+	return int((receipt.get("wallet_delta", {}) as Dictionary).get("scrub_bucks", 0))
 
 # ------------------------------------------------------------ claims ----
 
