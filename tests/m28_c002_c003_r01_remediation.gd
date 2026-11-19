@@ -718,13 +718,13 @@ func _home() -> void:
 	_ok(bgnode.get_child(0) == wb or bgnode.get_child(0).name == "WorldBackground", "H2 the background is the bottom-most world layer")
 	_complete("h02_no_stale_background")
 	# Live UI intact.
-	var names := ["PlayButton", "RewardedAdsButton", "Shortcut_tasks", "Shortcut_daily", "SettingsButton", "ProfileButton", "GiftMeter", "ScrubBucksChip"]
+	var names := ["PlayButton", "RewardedAdsButton", "Shortcut_tasks", "SettingsButton", "ProfileButton", "GiftMeter", "ScrubBucksChip"]
 	var missing: Array = []
 	for n in names:
 		if home.get_region(n) == null:
 			missing.append(n)
 	var play: Button = home.get_region("PlayButton")
-	_ok(missing.is_empty() and play != null and not play.disabled and home.get_region("Art_scrubby").texture != null, "H3 PLAY, 3 activity buttons, Settings icon, profile card, Gift Meter, currency chip and Scrubby are live native nodes (SB-TF-03) %s" % str(missing))
+	_ok(missing.is_empty() and play != null and not play.disabled and home.get_region("Art_scrubby").texture != null, "H3 PLAY, 2 activity buttons, Settings icon, profile card, Gift Meter, currency chip and Scrubby are live native nodes (SB-TF-03) %s" % str(missing))
 	var baked_ui := 0
 	for p in drawn:
 		if String(p).find("play_button") != -1 and String(p) != "res://assets/ui/final/home/play_cta/play_button_frame.png":

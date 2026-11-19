@@ -224,7 +224,7 @@ func _components_viewport_matrix() -> void:
 					small.append(String(b.name))
 				if not safe.grow(0.5).encloses(r):
 					outside.append(String(b.name))
-			_ok(home.find_children("*", "BaseButton", true, false).size() >= 9, "%s: >= 9 live buttons measured (SB-TF-03: 3 activity + PLAY + Settings + 2 HUD (+) + profile + Gift Meter)" % tag)
+			_ok(home.find_children("*", "BaseButton", true, false).size() >= 8, "%s: >= 8 live buttons measured (SB-TF-03 / SB-TF-11: 2 activity + PLAY + Settings + 2 HUD (+) + profile + Gift Meter)" % tag)
 			_ok(small.is_empty(), "%s: every button >= 88x88 %s" % [tag, str(small)])
 			_ok(outside.is_empty(), "%s: every button inside safe area %s" % [tag, str(outside)])
 			var prev_end := -1.0
@@ -250,7 +250,7 @@ func _components_viewport_matrix() -> void:
 	sub2.add_child(h2)
 	h2.bind(app)
 	await process_frame
-	_ok(h2.get_region("ScrubBucksChip").value_label is Label and h2.get_region("GiftMeterBar").bar is ProgressBar and h2.get_region("Shortcut_daily") is Button, "live Label / native ProgressBar / Button components")
+	_ok(h2.get_region("ScrubBucksChip").value_label is Label and h2.get_region("GiftMeterBar").bar is ProgressBar and h2.get_region("Shortcut_tasks") is Button, "live Label / native ProgressBar / Button components")
 	sub2.free()
 	_complete("components_viewport_matrix")
 
@@ -311,6 +311,7 @@ func _shortcut_columns_responsive() -> void:
 	_complete("shortcut_columns_responsive")
 
 const LocalCalendar = preload("res://scripts/economy/local_calendar.gd")
+const HomeBadges = preload("res://scripts/ui/home/home_badges.gd")
 var _now := 1790000000
 
 ## SB-M42-015: every Home value is a live projection of canonical services; Home never
@@ -376,11 +377,11 @@ func _approved_art_only() -> void:
 	for row in rows:
 		if not HomePresentationMap.INACTIVE_MODES.has(row["mode"]):
 			active += 1
-	_ok(rows.size() == 56 and active == 14 and bound == 14 and home.get_region("ScrubBucksChip").icon.texture != null, "production manifest (owner-approved, R15-004 + HOME-122 + SB-POLISH-009 HOME-123 + SB-HOME-BG HOME-124 + SB-HOME-VIDEO HOME-125 keyed still, HOME-121/123 retired): SB-TF-03 nav / track / Shop + Collection tiles retired): 56 entries accounted, 14 active entries presented (%d bound), retired/disabled entries present nothing" % bound)
+	_ok(rows.size() == 56 and active == 13 and bound == 13 and home.get_region("ScrubBucksChip").icon.texture != null, "production manifest (owner-approved, R15-004 + HOME-122 + SB-POLISH-009 HOME-123 + SB-HOME-BG HOME-124 + SB-HOME-VIDEO HOME-125 keyed still, HOME-121/123 retired): SB-TF-03 nav / track / Shop + Collection tiles, SB-TF-11 Daily button retired): 56 entries accounted, 13 active entries presented (%d bound), retired/disabled entries present nothing" % bound)
 	# Un-approval simulation on an in-memory manifest copy (repo manifest untouched):
 	# entries that are not APPROVED keep native placeholders.
 	var m = V.load_manifest()
-	var keep := ["home_background_plaza", "scrubby_home_pose", "icon_currency_scrub_bucks", "icon_shortcut_daily"]
+	var keep := ["home_background_plaza", "scrubby_home_pose", "icon_currency_scrub_bucks", "icon_shortcut_tasks"]
 	for a in m["assets"]:
 		if a["kind"] == "ART" and not keep.has(a["slug"]) and a["id"] != "HOME-087":
 			a["status"] = "PLANNED"
@@ -389,7 +390,7 @@ func _approved_art_only() -> void:
 	await process_frame
 	_ok(home.get_region("WorldBackground").texture != null and home.get_region("Art_scrubby").texture != null, "approved world + Scrubby bind to their nodes")
 	_ok(home.get_region("ProfilePortrait").texture == null and home.get_region("SettingsIcon").texture == null, "unapproved art stays empty")
-	_ok(home.get_region("ScrubBucksChip").icon.texture != null and home.get_region("ShortcutIcon_daily").texture != null and home.get_region("ShortcutIcon_tasks").texture == null, "approved icons bind; unapproved do not")
+	_ok(home.get_region("ScrubBucksChip").icon.texture != null and home.get_region("ShortcutIcon_tasks").texture != null and home.get_region("ShortcutIcon_rewarded_ads").texture == null, "approved icons bind; unapproved do not")
 	home.set_art_binder(HomeArtBinder.new())
 	await process_frame
 	var outside: Array = []
@@ -613,10 +614,9 @@ func _daily_presentation() -> void:
 	await process_frame
 	var d = app.economy.daily
 	var w = app.economy.wallet
-	var sc = home.get_region("Shortcut_daily")
-	_ok(not sc.disabled and sc.badge.visible, "Daily shortcut live, claimable badge on a fresh day")
-	sc.pressed.emit()
-	var popup = home.get_popup("daily")
+	# SB-TF-11: no Home Daily button (Profile Login Days opens the app Daily); the Home popup seam stays.
+	_ok(home.get_region("Shortcut_daily") == null and int(HomeBadges.compute(app)["daily"]) == 1, "no Daily shortcut; claimable on a fresh day")
+	var popup = home.open_popup("daily")
 	_ok(popup.get_row_count() == 5, "5-day cycle rows")
 	var btn = popup.get_action_button("login")
 	_ok(btn != null and not btn.disabled, "CLAIM offered for today's day 1")
@@ -626,11 +626,11 @@ func _daily_presentation() -> void:
 	btn.pressed.emit()
 	home.refresh()
 	_ok(w.scrub_bucks() == sb0 + int(d.login_reward_for(1).get("scrub_bucks", 0)) and d.claimed_today() and d.streak() == 1, "claim grants day-1 reward via canonical service")
-	_ok(not sc.badge.visible and popup.get_action_button("login") == null and popup.find_child("Rows", true, false).get_child(0).get_child(0).text.find("CLAIMED TODAY") != -1, "claimed state shown, no second CLAIM")
+	_ok(int(HomeBadges.compute(app)["daily"]) == 0 and popup.get_action_button("login") == null and popup.find_child("Rows", true, false).get_child(0).get_child(0).text.find("CLAIMED TODAY") != -1, "claimed state shown, no second CLAIM")
 	_ok(not app.actions.claim_daily_login().get("ok", true) and w.scrub_bucks() == sb0 + 100, "same-day second claim refused")
 	_now += 86400
 	home.refresh()
-	_ok(sc.badge.visible and d.next_claim_cycle_day() == 2 and popup.get_action_button("login") != null, "next local day: day 2 claimable")
+	_ok(int(HomeBadges.compute(app)["daily"]) == 1 and d.next_claim_cycle_day() == 2 and popup.get_action_button("login") != null, "next local day: day 2 claimable")
 	popup.get_action_button("login").pressed.emit()
 	_ok(d.streak() == 2 and d.claimed_today(), "consecutive login streak 2")
 	_now += 86400 * 3

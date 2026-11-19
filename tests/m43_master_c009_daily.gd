@@ -57,7 +57,7 @@ func _t01() -> void:
 	var b: Button = _root.get_home().get_region("Shortcut_tasks")
 	_ok(not b.disabled, "TASKS panel live")
 	var h = _root.get_home()
-	_ok(not h.get_region("Shortcut_daily").disabled and not h.get_region("RewardedAdsButton").disabled and h.get_region("Shortcut_shop") == null, "DAILY / REWARDED ADS activity buttons tappable in the real app; no SHOP / COLLECTION tiles (SB-TF-03)")
+	_ok(not h.get_region("RewardedAdsButton").disabled and h.get_region("Shortcut_shop") == null and h.get_region("Shortcut_daily") == null, "REWARDED ADS activity button tappable in the real app; no SHOP / COLLECTION tiles (SB-TF-03), no DAILY (SB-TF-11)")
 	b.pressed.emit()
 	await _frames(2)
 	_ok(_top_id() == "tasks" and _root.get_home().get_popup("tasks") == null, "TASKS -> app-level Tasks (no Home placeholder)")
@@ -158,13 +158,15 @@ func _t05() -> void:
 	_complete("t05_scrubbox_all_three_once")
 
 func _t06() -> void:
-	print("[t06 DAILY destination: consecutive count, D1..D5 states and canonical rewards]")
+	print("[t06 DAILY destination (Profile Login Days, SB-TF-11): consecutive count, D1..D5 states and canonical rewards]")
 	await _boot("t06")
 	var d = _eco().daily
-	(_root.get_home().get_region("Shortcut_daily") as Button).pressed.emit()
+	(_root.get_home().get_region("ProfileButton") as Button).pressed.emit()
+	await _frames(2)
+	(_top().find_child("LoginDaysButton", true, false) as Button).pressed.emit()
 	await _frames(2)
 	var p = _top()
-	_ok(_top_id() == "daily_login" and _root.get_home().get_popup("daily") == null, "DAILY -> app-level Daily")
+	_ok(_top_id() == "daily_login" and _root.get_home().get_popup("daily") == null, "Profile Login Days -> app-level Daily")
 	var rewards_ok := true
 	for day in range(1, 6):
 		rewards_ok = rewards_ok and _txt_in(p, "Day_%d" % day, "RewardText") == UiText.reward_text(d.login_reward_for(day))

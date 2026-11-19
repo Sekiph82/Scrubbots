@@ -56,4 +56,6 @@ The owner reference is art direction, not literal economic semantics. Production
 
 SB-TF-03 (owner 2026-11-18) Home layout: no bottom navigation (its Settings art is the top-HUD Settings icon), no Shop / Collection tiles (Shop via the HUD (+) popups, Collection in Profile), no win-streak strip, a Bot Parts icon instead of the level on the profile card and PLAY · LEVEL N. The retired art keeps its manifest entries; `scripts/ui/home/home_presentation_map.gd` marks it OWNER_RETIRED.
 
+SB-TF-11 (owner 2026-11-19): no Home DAILY activity button and no first-Home Daily tip; the Daily login rewards open from Profile's Login Days card (claimable badge there and on the Home profile card). HOME-067 `icon_shortcut_daily` is OWNER_RETIRED on Home (the art stays for the Daily feature-unlock ceremony).
+
 Do not generate art that reintroduces Star currency or Event Points.

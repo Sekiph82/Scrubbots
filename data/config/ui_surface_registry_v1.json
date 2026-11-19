@@ -51,10 +51,6 @@
       "destination": "tasks"
     },
     {
-      "source": "home.shortcut_daily",
-      "destination": "daily"
-    },
-    {
       "source": "home.scrub_bucks_plus",
       "destination": "popup:scrub_bucks",
       "context": "currency_acquisition"
@@ -98,6 +94,10 @@
     {
       "source": "profile.collection",
       "destination": "collection"
+    },
+    {
+      "source": "profile.login_days",
+      "destination": "daily"
     },
     {
       "source": "life.more_in_shop",

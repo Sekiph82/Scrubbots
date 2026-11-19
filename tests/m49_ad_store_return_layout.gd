@@ -29,7 +29,7 @@ const NOTCH: Array = RespMatrix.NOTCH
 const OVERLAY_INSETS := [132, 0, 96, 40]
 const SIZES := [[Vector2i(720, 1280), true], [Vector2i(1080, 2160), false], [Vector2i(1170, 2532), true]]
 const OUTCOMES := ["cancelled", "failed", "completed"]
-const HOME_REGIONS := ["PlayButton", "Shortcut_shop", "Shortcut_collection", "Shortcut_tasks", "Shortcut_daily",
+const HOME_REGIONS := ["PlayButton", "Shortcut_shop", "Shortcut_collection", "Shortcut_tasks",
 	"BottomNav", "TopCurrencyHUD", "GiftMeter", "AdBannerSlot"]
 const BOOSTERS0 := {"plus_one_slot": 0, "random": 0, "selector": 0, "tornado": 0}
 

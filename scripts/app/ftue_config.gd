@@ -21,9 +21,9 @@ const VERSION := 1
 ## Owner V03: the entire compulsory tutorial fits L1..L3 at most.
 const OWNER_MAX_TUTORIAL_LEVEL := 3
 const SURFACES := ["home", "gameplay"]
-const TARGETS := ["", "shortcut:daily", "shortcut:tasks", "play", "supply_front", "supply_preview", "slots", "board", "boosters", "speed", "results_retry"]
-const WHEN := ["daily_claimable", "tasks_claimable"]
-const COMPLETE_ON := ["shortcut:daily", "shortcut:tasks", "play", "supply_placed"]
+const TARGETS := ["", "shortcut:tasks", "play", "supply_front", "supply_preview", "slots", "board", "boosters", "speed", "results_retry"]
+const WHEN := ["tasks_claimable"]
+const COMPLETE_ON := ["shortcut:tasks", "play", "supply_placed"]
 const TRIGGERS := ["slot_waiting", "result_won", "result_lost"]
 
 static func load_config(path: String = PATH) -> Dictionary:

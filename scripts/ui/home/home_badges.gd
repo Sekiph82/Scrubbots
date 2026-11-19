@@ -5,7 +5,8 @@ extends RefCounted
 ## profile card and the Profile destinations (SB-TF-03 moved Robots / Ranks / Collection there).
 ## Each surface gets a single count derived from canonical state (never stored, never pushed):
 ##   tasks       finished-but-unclaimed orders + an openable ScrubBox
-##   daily       1 while today's login reward is claimable
+##   daily       1 while today's login reward is claimable (SB-TF-11: drawn on the Home profile
+##               card and Profile's Login Days card; no Home Daily button)
 ##   gift_bar    queued Gift Meter milestones to claim
 ##   robots      unlocked-but-unseen robots + 1 when the next robot can be unlocked
 ##   collection  owned cards not yet viewed in the album

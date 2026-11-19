@@ -262,7 +262,7 @@ func _input_locked_during_flight() -> void:
 	var home = root.get_home()
 	_ok(home.get_reward_flight().get_layer() == null and not home.is_reward_flight_running(), "normal Home entry: no lock layer")
 	_ok(not home.play_reward_flight({}, "lock:empty") and not home.play_reward_flight({"status": "WON"}, "lock:won_empty") and home.get_reward_flight().get_layer() == null, "empty receipt: no flight, no lock")
-	var names := ["PlayButton", "Shortcut_daily", "ProfileButton"]
+	var names := ["PlayButton", "Shortcut_tasks", "ProfileButton"]
 	var hits := {}
 	for n in names:
 		hits[n] = 0
@@ -305,14 +305,14 @@ func _input_locked_during_flight() -> void:
 			want.append(int(e["from"]) + int(e["n"]) * j / k)
 		_ok(b.landed == want and (e["to"] == e["from"] or int(want[-1]) == int(e["to"])), "%s: counter per arrival %s, final %d" % [e["kind"], str(b.landed), int(e["to"])])
 	_ok(_chip(home) == UiText.num(int(plan[0]["to"])), "SB chip lands exactly on %d" % int(plan[0]["to"]))
-	for n in ["ProfileButton", "Shortcut_daily"]:
+	for n in ["ProfileButton", "Shortcut_tasks"]:
 		if not (home.get_region(n) as Button).disabled:
 			await _tap(home.get_region(n))
 			root.get_modal_stack().clear("test")
 			home.close_top_popup()
 			if nav.current() != R.HOME:
 				nav.back(false)
-	_ok(hits["ProfileButton"] + hits["Shortcut_daily"] >= 1, "profile card / activity button respond after the flight %s" % str(hits))
+	_ok(hits["ProfileButton"] + hits["Shortcut_tasks"] >= 1, "profile card / activity button respond after the flight %s" % str(hits))
 	await _frames(2)
 	await _tap(home.get_region("PlayButton"))
 	_ok(hits["PlayButton"] == 1 and nav.current() == R.GAMEPLAY, "PLAY works after the flight")

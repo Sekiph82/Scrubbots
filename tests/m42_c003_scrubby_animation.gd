@@ -27,7 +27,7 @@ const DURATION := {"wave": [1.0, 1.5], "bow": [1.0, 1.6], "turn": [1.2, 1.8], "f
 const SOURCE_FAMILY := {"wave": "wave", "bow": "bow", "turn": "turn_look", "full_turn": "full_turn"}
 ## Hard blockers (live functional UI). Helper bots are warning-only (owner V03).
 const HARD := ["TopCurrencyHUD", "GiftMeter", "PlayButton", "SettingsButton",
-	"RewardedAdsButton", "Shortcut_tasks", "Shortcut_daily"]
+	"RewardedAdsButton", "Shortcut_tasks"]
 const DT := 1.0 / 60.0
 ## SB-ASSET-PURGE-2026-11-17: the park-baked v1 set was deleted; the video seam runs on the keyed set.
 const VIDEO_SET_ID := "home_scrubby_videos_keyed_v2"
@@ -671,7 +671,7 @@ func _buttons() -> void:
 		for g in COUNTS:
 			hero.start_gesture(g)
 			_run(hero, 0.6)   # mid-gesture
-			for n in ["PlayButton", "RewardedAdsButton", "Shortcut_tasks", "Shortcut_daily", "SettingsButton", "ScrubBucksPlus", "HeartsPlus"]:
+			for n in ["PlayButton", "RewardedAdsButton", "Shortcut_tasks", "SettingsButton", "ScrubBucksPlus", "HeartsPlus"]:
 				var mv := InputEventMouseMotion.new()
 				mv.position = _local(home, n).get_center()
 				mv.global_position = mv.position
@@ -682,7 +682,7 @@ func _buttons() -> void:
 				top_ok = top_ok and hov != null and (hov == ctl or ctl.is_ancestor_of(hov))
 			_run(hero, 2.0)
 		hero.start_gesture("wave")
-		for n in ["PlayButton", "Shortcut_daily", "SettingsButton"]:
+		for n in ["PlayButton", "SettingsButton"]:
 			for pressed in [true, false]:
 				var e := InputEventMouseButton.new()
 				e.button_index = MOUSE_BUTTON_LEFT
@@ -693,7 +693,7 @@ func _buttons() -> void:
 				await process_frame
 			home.close_top_popup()
 		_ok(top_ok, "%s every live control stays the top hit during all 4 gestures" % str(vp))
-		_ok(got == ["play", "daily", "settings"], "%s Play / DAILY / Settings fire immediately mid-gesture %s" % [str(vp), str(got)])
+		_ok(got == ["play", "settings"], "%s Play / Settings fire immediately mid-gesture %s" % [str(vp), str(got)])
 		sub.free()
 		await process_frame
 	_complete("buttons_usable")

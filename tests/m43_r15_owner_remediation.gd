@@ -269,7 +269,7 @@ func _r10() -> void:
 	var home = _root.get_home()
 	var cta: Button = home.get_region("RewardedAdsButton")
 	_ok(cta != null and not cta.disabled and cta.get_parent() == home.get_region("LeftShortcutColumn"), "REWARDED ADS CTA live, an activity button in the left column (SB-TF-03)")
-	_ok(_names(home.get_region("LeftShortcutColumn")).slice(0, 3) == ["RewardedAdsButton", "Shortcut_tasks", "Shortcut_daily"] and home.get_region("Shortcut_shop") == null and home.get_region("Shortcut_collection") == null, "SB-TF-03 activity order Rewarded Ads, Tasks, Daily; no Shop / Collection tiles")
+	_ok(_names(home.get_region("LeftShortcutColumn")).slice(0, 2) == ["RewardedAdsButton", "Shortcut_tasks"] and home.get_region("Shortcut_shop") == null and home.get_region("Shortcut_collection") == null, "SB-TF-03 activity order Rewarded Ads, Tasks (SB-TF-11: no Daily); no Shop / Collection tiles")
 	cta.pressed.emit()
 	await _frames(2)
 	var p = _root.get_modal_stack().top()
@@ -343,7 +343,7 @@ func _r11() -> void:
 		var cta: Rect2 = home.get_region("RewardedAdsButton").get_global_rect()
 		var vp := Rect2(Vector2.ZERO, Vector2(lv))
 		var others := {}
-		for n in ["PlayButton", "GiftMeter", "AdBannerSlot", "Shortcut_daily", "Shortcut_tasks", "TopCurrencyHUD"]:
+		for n in ["PlayButton", "GiftMeter", "AdBannerSlot", "Shortcut_tasks", "TopCurrencyHUD"]:
 			others[n] = (home.get_region(n) as Control).get_global_rect()
 		var strip: Control = home.get_region("HomeJourneyStrip")
 		others["HomeJourneyStrip"] = strip.get_global_rect()
@@ -361,7 +361,7 @@ func _r11() -> void:
 				hits.append("helper_bot")
 		_ok(vp.encloses(cta) and vp.encloses(icon) and hits.is_empty() and cta.size.y >= 88.0 - 0.5, "%s (logical %s): card %s + icon inside viewport, >= 88 px, no overlap %s" % [phys, lv, cta, hits])
 		var col: Rect2 = others["Shortcut_tasks"]
-		_ok(cta.size.is_equal_approx(col.size) and cta.size.is_equal_approx(others["Shortcut_daily"].size) and is_equal_approx(cta.position.x, col.position.x) and cta.end.y < col.position.y, "%s: SB-TF-03 placement - top of the left column, same size / x as TASKS and DAILY (%s vs %s)" % [phys, cta, col])
+		_ok(cta.size.is_equal_approx(col.size) and is_equal_approx(cta.position.x, col.position.x) and cta.end.y < col.position.y, "%s: SB-TF-03 placement - top of the left column, same size / x as TASKS (%s vs %s)" % [phys, cta, col])
 		var opaque := _scrubby_opaque_in(home, [cta, icon])
 		_ok(opaque == 0, "%s: no opaque Scrubby pose pixel under the card or icon (%d)" % [phys, opaque])
 	_complete("r11_home_cta_geometry")
@@ -394,11 +394,11 @@ func _r12() -> void:
 	await _boot("r12")
 	var home = _root.get_home()
 	var ra: Button = home.get_region("RewardedAdsButton")
-	var daily: Button = home.get_region("Shortcut_daily")
-	_ok(ra.get_script() == daily.get_script() and ra.get_parent() == daily.get_parent() and ra.find_children("*", "", true, false).all(func(c): return not String(c.name).contains("Triangle")), "same UiShortcutButton component, in the activity column with DAILY; no native play triangle")
+	var daily: Button = home.get_region("Shortcut_tasks")   # SB-TF-11: the remaining fixed activity button
+	_ok(ra.get_script() == daily.get_script() and ra.get_parent() == daily.get_parent() and ra.find_children("*", "", true, false).all(func(c): return not String(c.name).contains("Triangle")), "same UiShortcutButton component, in the activity column with TASKS; no native play triangle")
 	var a_sb: StyleBoxFlat = ra.get_theme_stylebox("normal")
 	var d_sb: StyleBoxFlat = daily.get_theme_stylebox("normal")
-	_ok(a_sb.bg_color == d_sb.bg_color and a_sb.border_color == d_sb.border_color and a_sb.bg_color != Color(0.337, 0.769, 0.169), "same cyan/blue light glass panel as DAILY (green CTA body gone)")
+	_ok(a_sb.bg_color == d_sb.bg_color and a_sb.border_color == d_sb.border_color and a_sb.bg_color != Color(0.337, 0.769, 0.169), "same cyan/blue light glass panel as TASKS (green CTA body gone)")
 	var fnt: Font = ra.get_theme_font("font")
 	var tw: float = fnt.get_string_size(ra.text, HORIZONTAL_ALIGNMENT_LEFT, -1, ra.get_theme_font_size("font_size")).x
 	var nsb: StyleBox = ra.get_theme_stylebox("normal")
@@ -509,7 +509,7 @@ func _open_daily(tag: String, size: Vector2i = Vector2i(1080, 2160), claimed := 
 	_root.get_modal_stack().clear("test")
 	if claimed:
 		_root.get_app_state().actions.claim_daily_login()
-	(_root.get_home().get_region("Shortcut_daily") as Button).pressed.emit()
+	_root._on_home_shortcut("daily")   # SB-TF-11: the Daily destination (Profile Login Days / deep link)
 	await _frames(3)
 	return _root.get_modal_stack().top()
 

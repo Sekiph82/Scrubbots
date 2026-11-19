@@ -137,6 +137,15 @@ func _g001() -> void:
 			await _frames(3)
 			profile_landed[id] = _destination()
 		await _reset_home()
+	# SB-TF-11: the Daily login rewards open from Profile's Login Days card.
+	home.get_region("ProfileButton").pressed.emit()
+	await _frames(3)
+	var ld: Button = ms.top().find_child("LoginDaysButton", true, false) if ms.top() != null else null
+	if ld != null and not ld.disabled:
+		ld.pressed.emit()
+		await _frames(3)
+		profile_landed["login_days"] = _destination()
+	await _reset_home()
 	home.get_region("HeartsPlus").pressed.emit()
 	await _frames(3)
 	if ms.top() != null:
@@ -231,11 +240,12 @@ func _g001() -> void:
 	for k in landed:
 		if String(k).begins_with("Shortcut_event_"):
 			event_landed = landed[k]
-	var observed := {"home.shortcut_tasks": landed.get("Shortcut_tasks"), "home.shortcut_daily": landed.get("Shortcut_daily"),
+	var observed := {"home.shortcut_tasks": landed.get("Shortcut_tasks"),
 		"home.scrub_bucks_plus": landed.get("ScrubBucksPlus"), "home.heart_plus": landed.get("HeartsPlus"),
 		"home.gift_meter": landed.get("GiftMeterButton"), "home.rewarded_ads": landed.get("RewardedAdsButton"), "home.play": landed.get("PlayButton"),
 		"home.profile": landed.get("ProfileButton"), "home.settings": landed.get("SettingsButton"), "home.event": event_landed,
 		"profile.robots": profile_landed.get("robots"), "profile.ranks": profile_landed.get("ranks"), "profile.collection": profile_landed.get("collection"),
+		"profile.login_days": profile_landed.get("login_days"),
 		"life.more_in_shop": life_shop,
 		"gameplay.pause": hud.get("pause"), "gameplay.speed_no_entitlement": hud.get("speed"),
 		"gameplay.booster_no_charge": boosters_landed[0] if boosters_landed.all(func(x): return x == boosters_landed[0]) else null,
@@ -364,8 +374,8 @@ func _g003() -> void:
 	_root.refresh_coachmark()
 	var cm = _root.get_coachmarks()
 	_check(g, "first_home", nav.current() == NavigationController.Route.HOME and app.economy.ftue.is_new_profile() and app.progression.current_level() == 1
-		and cm.get_step_id() == "home_daily" and not AppStateScript.test_unlock_all,
-		"fresh profile boots to Home at L1 with the first-Home DAILY tip (route %s, step %s)" % [nav.route_name(), cm.get_step_id()])
+		and cm.get_step_id() == "home_tasks" and not AppStateScript.test_unlock_all,
+		"fresh profile boots to Home at L1 with the first-Home TASKS tip (SB-TF-11: no Daily tip; route %s, step %s)" % [nav.route_name(), cm.get_step_id()])
 	var sb0: int = app.economy.wallet.scrub_bucks()
 	home.get_region("Shortcut_tasks").pressed.emit()
 	await _frames(3)

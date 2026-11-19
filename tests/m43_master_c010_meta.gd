@@ -168,7 +168,8 @@ func _m04() -> void:
 	var h = _root.get_home()
 	h.refresh()
 	var pb: Label = h.get_region("ProfileBadge")
-	_ok(pb.visible and pb.text == "3", "Home profile card shows the claimable badge '%s'" % pb.text)
+	var want_pb := 3 + int(HomeBadges.compute(a)["daily"])   # SB-TF-11: + today's login reward
+	_ok(pb.visible and pb.text == str(want_pb), "Home profile card shows the claimable badge '%s' (3 achievements + daily)" % pb.text)
 	var sb0: int = e.wallet.scrub_bucks()
 	var p = ProfileScreens.open_achievements(_root.get_modal_stack(), a)
 	await _frames(2)
@@ -407,7 +408,7 @@ func _m10() -> void:
 	b = HomeBadges.compute(a)
 	_ok(b["tasks"] == 1 and b["gift_bar"] == 4 and b["robots"] == 1 and b["collection"] == 1, "tasks / gift / robots / collection %s" % str(b))
 	var h = _root.get_home()
-	_ok(h.get_region("Shortcut_tasks").badge.visible and h.get_region("ProfileBadge").visible and h.get_region("ProfileBadge").text == str(int(b["robots"]) + int(b["collection"]) + int(b["achievements"])), "badges rendered on Home: Tasks + the profile card (robots + collection + achievements, SB-TF-03) '%s'" % h.get_region("ProfileBadge").text)
+	_ok(h.get_region("Shortcut_tasks").badge.visible and h.get_region("ProfileBadge").visible and h.get_region("ProfileBadge").text == str(int(b["robots"]) + int(b["collection"]) + int(b["achievements"]) + int(b["daily"])), "badges rendered on Home: Tasks + the profile card (robots + collection + achievements, SB-TF-03; + daily, SB-TF-11) '%s'" % h.get_region("ProfileBadge").text)
 	a.actions.claim_daily_task(0)
 	a.actions.claim_daily_login()
 	a.actions.claim_rewarded_daily_free()   # slot 1 claimed; slot 2 needs an ad and no provider -> not actionable

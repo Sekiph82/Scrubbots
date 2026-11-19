@@ -268,10 +268,10 @@ func _names(c: Node) -> Array:
 
 func _panels(home) -> void:
 	print("[four panels -> SB-TF-03 activity buttons]")
-	_ok(_names(home.get_region("LeftShortcutColumn")) == ["RewardedAdsButton", "Shortcut_tasks", "Shortcut_daily"], "left = REWARDED ADS, TASKS, DAILY")
+	_ok(_names(home.get_region("LeftShortcutColumn")) == ["RewardedAdsButton", "Shortcut_tasks"], "left = REWARDED ADS, TASKS (SB-TF-11: Daily lives on Profile Login Days)")
 	_ok(_names(home.get_region("RightShortcutColumn")).is_empty(), "right = the Event buttons (none on a standalone L1 Home)")
 	var all: Array = home.find_children("Shortcut_*", "Button", true, false)
-	_ok(all.size() == 2 and home.get_region("RewardedAdsButton") != null, "exactly three activity buttons, no Shop / Collection tile (%d + Rewarded Ads)" % all.size())
+	_ok(all.size() == 1 and home.get_region("RewardedAdsButton") != null, "exactly two activity buttons, no Shop / Collection tile (%d + Rewarded Ads)" % all.size())
 	var gone: Array = []
 	for id in ["win_streak", "gift_bar", "no_ads", "cards_exchange", "shop", "collection"]:
 		if home.get_region("Shortcut_" + id) != null:
@@ -279,20 +279,20 @@ func _panels(home) -> void:
 	_ok(gone.is_empty(), "WIN STREAK / GIFTS / NO ADS / CARDS EXCHANGE / SHOP / COLLECTION panels removed %s" % str(gone))
 	var app = home.get_app_state()
 	_ok(app.economy.gift != null and app.economy.exchange != null and app.economy.streak != null, "their services still exist")
-	_ok(not home.get_region("Shortcut_daily").disabled and home.get_region("Shortcut_tasks").disabled and home.get_region("RewardedAdsButton").disabled, "standalone Home: DAILY live; TASKS / REWARDED ADS wait for the app root destinations")
+	_ok(home.get_region("Shortcut_tasks").disabled and home.get_region("RewardedAdsButton").disabled, "standalone Home: TASKS / REWARDED ADS wait for the app root destinations")
 	_complete("four_panels")
 
 func _icons(home) -> void:
 	print("[panel icons]")
 	var d: Dictionary = {}
-	for id in ["rewarded_ads", "tasks", "daily"]:
+	for id in ["rewarded_ads", "tasks"]:
 		var b = home.get_region("RewardedAdsButton" if id == "rewarded_ads" else "Shortcut_" + id)
 		var tex: Texture2D = home.get_region("ShortcutIcon_" + id).texture
 		var a := float(tex.get_width()) / float(tex.get_height())
 		var box := V03_ICON_BOX * 0.7
 		var v03 := Vector2(box.y * a, box.y) if box.y * a <= box.x else Vector2(box.x, box.x / a)
 		d[id] = {"now": b.get_icon_draw_size(), "v03": v03, "rect": home.get_region("ShortcutIcon_" + id).size}
-	_ok(d["rewarded_ads"]["now"].is_equal_approx(d["rewarded_ads"]["v03"]) and d["tasks"]["now"].is_equal_approx(d["tasks"]["v03"]) and d["daily"]["now"].is_equal_approx(d["daily"]["v03"]), "SB-TF-03: icons at 0.7x the V03 box (%s / %s / %s)" % [str(d["rewarded_ads"]), str(d["tasks"]), str(d["daily"])])
+	_ok(d["rewarded_ads"]["now"].is_equal_approx(d["rewarded_ads"]["v03"]) and d["tasks"]["now"].is_equal_approx(d["tasks"]["v03"]), "SB-TF-03: icons at 0.7x the V03 box (%s / %s)" % [str(d["rewarded_ads"]), str(d["tasks"])])
 	var ok := true
 	for id in d:
 		ok = ok and (d[id]["rect"] as Vector2).is_equal_approx(d[id]["now"])
@@ -305,7 +305,7 @@ func _panel_style(home) -> void:
 	var sizes := {}
 	var alpha_ok := true
 	var margin_ok := true
-	for n in ["RewardedAdsButton", "Shortcut_tasks", "Shortcut_daily"]:
+	for n in ["RewardedAdsButton", "Shortcut_tasks"]:
 		var b: Button = home.get_region(n)
 		sizes[b.size] = true
 		var sb := b.get_theme_stylebox("normal") as StyleBoxFlat
@@ -322,7 +322,7 @@ func _panel_style(home) -> void:
 	# texels only; a panel must never cover an opaque hero pixel.
 	var img: Image = (home.get_region("Art_scrubby") as TextureRect).texture.get_image()
 	var hit: Array = []
-	for id in ["RewardedAdsButton", "Shortcut_tasks", "Shortcut_daily"]:
+	for id in ["RewardedAdsButton", "Shortcut_tasks"]:
 		var r: Rect2 = home.get_region(id).get_global_rect()
 		if int(C002.opaque_in(img, sc, r)["px"]) > 0:
 			hit.append(id)
@@ -512,7 +512,7 @@ func _matrix() -> void:
 			var sc: TextureRect = home.get_region("Art_scrubby")
 			if absf(sc.position.y + HomeScreenScript.SCRUBBY_FEET_Y * c["k"] * t["scale"] - feet_screen) > 0.5:
 				bad.append("feet_off_anchor")
-			for id in ["rewarded_ads", "tasks", "daily"]:
+			for id in ["rewarded_ads", "tasks"]:
 				var pr: Rect2 = home.get_region("RewardedAdsButton" if id == "rewarded_ads" else "Shortcut_" + id).get_global_rect()
 				for bot in home.get_world()["helper_bot_rects"]:
 					if pr.intersects(Rect2(home.world_to_screen(bot.position), bot.size * t["scale"])):
@@ -535,7 +535,7 @@ func _matrix() -> void:
 				al = Rect2()
 			elif al.size.x < 200.0 or al.size.y < 40.0:
 				bad.append("area_label_too_small")
-			for n in ["TopCurrencyHUD", "ProfileCard", "GiftMeter", "PlayButton", "RewardedAdsButton", "Shortcut_tasks", "Shortcut_daily"]:
+			for n in ["TopCurrencyHUD", "ProfileCard", "GiftMeter", "PlayButton", "RewardedAdsButton", "Shortcut_tasks"]:
 				if al.intersects(home.get_region(n).get_global_rect()):
 					bad.append("area_label_over_" + n)
 			if al.intersects(hero_r):

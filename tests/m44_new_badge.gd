@@ -148,8 +148,7 @@ func _home_ui() -> void:
 	_ok(home.get_region("Shortcut_shop") == null and HomeBadges.new_features(a).has("shop"), "L8: SHOP is new but has no Home tile (SB-TF-03: Shop opens from the (+) popups)")
 	var pb: Label = home.get_region("ProfileBadge")
 	_ok(pb.text != new_text, "L8: no Profile destination is new yet -> no NEW on the profile card ('%s' = achievement count only)" % pb.text)
-	var daily = home.get_region("Shortcut_daily")
-	_ok(daily.badge.visible and daily.badge.text == "1", "L8: DAILY count 1 (login claimable) wins over NEW, text '%s'" % daily.badge.text)
+	_ok(home.get_region("Shortcut_daily") == null and int(HomeBadges.compute(a)["daily"]) == 1, "L8: no Home DAILY button; the claimable login reward counts on the profile card (SB-TF-11)")
 	var tasks = home.get_region("Shortcut_tasks")
 	_ok(not tasks.badge.visible, "L8: locked TASKS shows no badge")
 	home._shortcut_pressed("tasks")
@@ -159,7 +158,7 @@ func _home_ui() -> void:
 	_ok(not a.economy.meta_ui.is_seen("feature_visited:robots") and not a.economy.meta_ui.is_seen("feature_visited:events"), "locked ROBOTS / EVENTS: press never marks")
 	_walk_to(a, 20)
 	home.refresh()
-	var cnt := int(HomeBadges.compute(a)["achievements"]) + int(HomeBadges.compute(a)["robots"]) + int(HomeBadges.compute(a)["collection"])
+	var cnt := int(HomeBadges.compute(a)["achievements"]) + int(HomeBadges.compute(a)["robots"]) + int(HomeBadges.compute(a)["collection"]) + int(HomeBadges.compute(a)["daily"])
 	_ok(HomeBadges.new_features(a).has("collection") and pb.visible and pb.text == (str(cnt) if cnt > 0 else new_text), "L20: COLLECTION newly unlocked -> profile card shows NEW, a real count wins ('%s')" % pb.text)
 	var p = await _profile(a)
 	var cb: Label = p.get_action_button("collection").get_node("CollectionBadge")
@@ -171,7 +170,7 @@ func _home_ui() -> void:
 	home.refresh()
 	_ok(pb.text != new_text and not HomeBadges.new_features(a).has("collection"), "profile card NEW cleared ('%s')" % pb.text)
 	home._shortcut_pressed("daily")
-	_ok(daily.badge.text == "1" and a.economy.meta_ui.is_seen("feature_visited:daily"), "DAILY press marks visited; its count badge stays")
+	_ok(int(HomeBadges.compute(a)["daily"]) == 1 and a.economy.meta_ui.is_seen("feature_visited:daily"), "DAILY entry marks visited; its count stays")
 	_walk_to(a, 30)
 	home.refresh()
 	var bd := HomeBadges.compute(a)
@@ -179,7 +178,8 @@ func _home_ui() -> void:
 	var rb: Label = p.get_action_button("robots").get_node("RobotsBadge")
 	var want: String = str(int(bd["robots"])) if int(bd["robots"]) > 0 else new_text
 	_ok(rb.visible and rb.text == want, "L30: Profile ROBOTS shows '%s'" % rb.text)
-	_ok(pb.visible and pb.text == (str(int(bd["robots"]) + int(bd["achievements"])) if int(bd["robots"]) + int(bd["achievements"]) > 0 else new_text), "L30: profile card shows the count or NEW ('%s')" % pb.text)
+	var pn := int(bd["robots"]) + int(bd["achievements"]) + int(bd["daily"])   # SB-TF-11: + today's login reward
+	_ok(pb.visible and pb.text == (str(pn) if pn > 0 else new_text), "L30: profile card shows the count or NEW ('%s')" % pb.text)
 	p._on_action("robots")
 	_ok(a.economy.meta_ui.is_seen(HomeBadges.visited_key("robots")), "Profile ROBOTS press: visited")
 	var ev: Array = home.find_children("Shortcut_event_*", "", true, false)
@@ -200,7 +200,7 @@ func _home_ui() -> void:
 	p = await _profile(a)
 	_ok(not p.get_action_button("ranks").get_node("RanksBadge").visible, "reopened Profile: RANKS NEW hidden")
 	var h2 = await _home(AppState.new(_path("home_est")))
-	_ok(["tasks", "daily"].all(func(s): return not h2.get_region("Shortcut_" + s).badge.visible or h2.get_region("Shortcut_" + s).badge.text != new_text) and h2.get_region("ProfileBadge").text != new_text, "established profile Home: no NEW pill")
+	_ok(["tasks"].all(func(s): return not h2.get_region("Shortcut_" + s).badge.visible or h2.get_region("Shortcut_" + s).badge.text != new_text) and h2.get_region("ProfileBadge").text != new_text, "established profile Home: no NEW pill")
 	_complete("home_ui")
 
 # ------------------------------------------------------------------ helpers ----

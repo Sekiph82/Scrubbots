@@ -235,7 +235,7 @@ func _t10() -> void:
 	h.refresh()
 	await _frames(2)
 	var bd := HomeBadges.compute(app)
-	var rest := int(bd["achievements"]) + int(bd["robots"])
+	var rest := int(bd["achievements"]) + int(bd["robots"]) + int(bd["daily"])   # SB-TF-11: + today's login reward
 	var pb: Label = h.get_region("ProfileBadge")
 	_ok(int(bd["collection"]) == 3 and pb.visible and pb.text == str(rest + 3), "Home profile badge counts 3 cards (%s)" % pb.text)
 	(h.get_region("ProfileButton") as Button).pressed.emit()

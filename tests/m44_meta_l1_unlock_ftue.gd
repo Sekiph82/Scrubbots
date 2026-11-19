@@ -57,7 +57,7 @@ func _initialize() -> void:
 	_done()
 
 func _first_home() -> void:
-	print("[first Home L1: required meta open, Robots / Events / Ranks locked, Daily coach]")
+	print("[first Home L1: required meta open, Robots / Events / Ranks locked, Tasks coach]")
 	await _boot("home")
 	var app = _root.get_app_state()
 	var home = _root.get_home()
@@ -65,10 +65,10 @@ func _first_home() -> void:
 	_ok(L1_OPEN.all(func(id): return app.feature_unlocked(id)), "L1 unlocked: %s" % str(L1_OPEN))
 	_ok(["robots", "events", "ranks"] + BOOSTERS == (["robots", "events", "ranks"] + BOOSTERS).filter(func(id): return not app.feature_unlocked(id)), "L1 locked: robots / events / ranks / four boosters")
 	var sc_ok := true
-	for n in ["Shortcut_daily", "Shortcut_tasks", "RewardedAdsButton"]:
+	for n in ["Shortcut_tasks", "RewardedAdsButton"]:
 		var b: Button = home.get_region(n)
 		sc_ok = sc_ok and not b.disabled and b.tooltip_text == ""
-	_ok(sc_ok, "DAILY / TASKS / REWARDED ADS enabled, no lock text")
+	_ok(sc_ok, "TASKS / REWARDED ADS enabled, no lock text (SB-TF-11: Daily is Profile Login Days)")
 	(home.get_region("ProfileButton") as Button).pressed.emit()
 	await _frames(2)
 	var prof = _root.get_modal_stack().top()
@@ -84,11 +84,7 @@ func _first_home() -> void:
 	_ok(int(bd["daily"]) == 1 and int(bd["tasks"]) == 1, "Daily + Welcome task badges live at L1 %s" % str(bd))
 	_root.refresh_coachmark()
 	var cm = _root.get_coachmarks()
-	_ok(cm.get_step_id() == "home_daily" and cm.get_target() == home.get_region("Shortcut_daily").get_global_rect(), "first-Home coach: DAILY tip on the real panel at L1")
-	app.actions.claim_daily_login()
-	_root.get_home().get_reward_flight().finish()   # SB-TF-05: the claim's reward reveal lands (coach tips wait for it)
-	_root.refresh_coachmark()
-	_ok(cm.get_step_id() == "home_tasks" and cm.get_target() == home.get_region("Shortcut_tasks").get_global_rect(), "then the TASKS (Welcome) tip on the real panel")
+	_ok(cm.get_step_id() == "home_tasks" and cm.get_target() == home.get_region("Shortcut_tasks").get_global_rect(), "first-Home coach: the TASKS (Welcome) tip on the real panel at L1 (SB-TF-11: no Daily tip)")
 	_complete("first_home_l1_meta_open")
 
 func _gate_bypass() -> void:

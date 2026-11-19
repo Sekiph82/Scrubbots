@@ -5,6 +5,8 @@ extends RefCounted
 ##   - PROFILE (SB-M43-124, R10-006/007; SB-M43-125-REBUILD master v01): hero card (active
 ##     robot, level badge, Bot Parts meter), stat tiles (level, cleared, Collection, robots,
 ##     achievements, login days) and a Personal Bests table (current vs own best; self only);
+##     SB-TF-11: the Login Days card opens the Daily login-reward ladder (DailyScreens) and
+##     carries a badge while today's reward is unclaimed;
 ##   - ACHIEVEMENTS (SB-M43-126; SB-M43-127-REBUILD master v01; SB-POLISH-007): summary banner and
 ##     a data-driven card list (tier badge, name, description, reward, COMPLETED / CLAIM / bar);
 ##   - EVENTS (SB-M43-128/129, R10-001..005): configured Weekly Cleaning Events (window,
@@ -31,6 +33,7 @@ const MetaCeremonies = preload("res://scripts/ui/ceremony/meta_ceremonies.gd")
 const RobotsScreen = preload("res://scripts/ui/robots/robots_screen.gd")
 const CollectionScreen = preload("res://scripts/ui/collection/collection_screen.gd")
 const UiShortcutButton = preload("res://scripts/ui/components/ui_shortcut_button.gd")
+const DailyScreens = preload("res://scripts/ui/daily/daily_screens.gd")
 
 # ---------------------------------------------------------------- PROFILE ----
 
@@ -70,6 +73,7 @@ static func open_profile(stack, app, ceremonies = null, open_packs: Callable = C
 		["LoginDays", "daily/daily_login_calendar.png", UiText.t("PROFILE_LOGIN_DAYS"), UiText.num(int(e.daily.display_streak()))],
 	]:
 		grid.add_child(_tile(t[0], t[1], t[2], t[3], UiText.num(level) if t[0] == "Level" else ""))
+	_login_days_entry(stack, app, p, grid.get_node("LoginDays"))
 	var r = e.records
 	var card := PanelContainer.new()
 	card.name = "ProfileBests"
@@ -197,6 +201,40 @@ static func _fit_destinations(p: BasePopup) -> void:
 			(b as Button).add_theme_font_size_override("font_size", fs)
 		var shown: bool = destination_text_width(b) < b.size.x - b.get_theme_stylebox("normal").get_minimum_size().x
 		(b as Button).alignment = HORIZONTAL_ALIGNMENT_LEFT if shown else HORIZONTAL_ALIGNMENT_CENTER
+
+## SB-TF-11: the Login Days card is the Daily login-reward entry: a see-through button over the
+## card opens the existing ladder (claims go through the facade there) and a corner badge shows
+## while today's reward is claimable; both refresh when the ladder closes. Gated like Daily.
+static func _login_days_entry(stack, app, p: BasePopup, tile: Control) -> void:
+	var b := Button.new()
+	b.name = "LoginDaysButton"
+	b.flat = true
+	b.focus_mode = Control.FOCUS_ALL
+	b.disabled = not app.feature_unlocked("daily")
+	b.tooltip_text = UiText.t("DAILY_TITLE") if not b.disabled else UiText.t("HOME_UNLOCKS_AT_LEVEL", [app.feature_unlock_level("daily")])
+	b.accessibility_name = "%s, %s" % [UiText.t("PROFILE_LOGIN_DAYS"), UiText.t("DAILY_TITLE")]
+	b.accessibility_description = b.tooltip_text
+	tile.add_child(b)
+	var badge := UiShortcutButton.make_badge()
+	badge.name = "LoginDaysBadge"
+	badge.text = "1"
+	badge.offset_top = 0
+	badge.offset_bottom = UiShortcutButton.BADGE_SIZE
+	badge.offset_right = 0
+	badge.offset_left = -UiShortcutButton.BADGE_SIZE
+	b.add_child(badge)
+	var render := func():
+		(tile.find_child("Value", true, false) as Label).text = UiText.num(int(app.economy.daily.display_streak()))
+		badge.visible = not b.disabled and not app.economy.daily.claimed_today()
+	render.call()
+	b.pressed.connect(func():
+		if stack.top() != p:
+			return   # one ladder per tap (double taps / another popup on top)
+		var d = DailyScreens.open_daily(stack, app)
+		if d != null:
+			d.closed.connect(func(_x):
+				if is_instance_valid(p):
+					render.call(), CONNECT_ONE_SHOT))
 
 ## Blue hero card: active robot portrait in the round HUD frame, its name, the campaign level
 ## badge and the same Bot Parts meter as the Home top HUD (next 250-part robot, never XP).

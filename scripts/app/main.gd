@@ -799,8 +799,6 @@ func _coach_want(trigger = null) -> Dictionary:
 ## legal Supply front right now — the tip never points at an illegal input).
 func _coach_target(target: String, step: Dictionary, host) -> Rect2:
 	match target:
-		"shortcut:daily":
-			return _vis_rect(_home.get_region("Shortcut_daily"))
 		"shortcut:tasks":
 			return _vis_rect(_home.get_region("Shortcut_tasks"))
 		"play":

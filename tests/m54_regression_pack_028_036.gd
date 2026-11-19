@@ -125,16 +125,17 @@ func _badges() -> Dictionary:
 
 func _home_texts() -> Dictionary:
 	var h = _root.get_home()
-	return {"tasks": h.get_region("Shortcut_tasks").badge.text, "daily": h.get_region("Shortcut_daily").badge.text}
+	return {"tasks": h.get_region("Shortcut_tasks").badge.text, "profile": h.get_region("ProfileBadge").text}
 
-## Tasks / Daily shortcut pills show exactly the HomeBadges count (hidden at 0).
+## The Tasks pill shows exactly the HomeBadges count (hidden at 0); SB-TF-11: Daily has no Home
+## button, its count rides on the profile card with the Profile destinations' counts.
 func _home_matches(b: Dictionary) -> bool:
 	var h = _root.get_home()
-	for id in ["tasks", "daily"]:
-		var l: Label = h.get_region("Shortcut_" + id).badge
-		if l.text != (str(b[id]) if b[id] > 0 else "") or l.visible != (b[id] > 0):
-			return false
-	return true
+	var l: Label = h.get_region("Shortcut_tasks").badge
+	if l.text != (str(b["tasks"]) if b["tasks"] > 0 else "") or l.visible != (b["tasks"] > 0):
+		return false
+	var n: int = b["achievements"] + b["robots"] + b["collection"] + b["daily"]
+	return (h.get_region("ProfileBadge") as Label).text == (str(n) if n > 0 else "")
 
 # ------------------------------------------------------------------ 029 ----
 
@@ -145,14 +146,14 @@ func _m029() -> void:
 	var h = _root.get_home()
 	var stack = _root.get_modal_stack()
 	var got := {}
-	for id in ["ProfileButton", "Shortcut_tasks", "Shortcut_daily"]:
+	for id in ["ProfileButton", "Shortcut_tasks"]:
 		var b: Button = h.get_region(id)
 		b.pressed.emit()
 		b.pressed.emit()
 		await _settle()
 		got[id] = stack.ids()
 		_ok(_root.handle_back() == "close_modal" and stack.depth() == 0, "back closes the %s destination" % id)
-	_ok(got == {"ProfileButton": ["profile"], "Shortcut_tasks": ["tasks"], "Shortcut_daily": ["daily_login"]} and _nav() == R.HOME, "double tap on each Home entry: exactly one destination %s" % str(got))
+	_ok(got == {"ProfileButton": ["profile"], "Shortcut_tasks": ["tasks"]} and _nav() == R.HOME, "double tap on each Home entry: exactly one destination %s" % str(got))
 	_complete("m029_tab_double_tap_one")
 
 	(h.get_region("ProfileButton") as Button).pressed.emit()

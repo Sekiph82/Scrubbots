@@ -84,7 +84,7 @@ func _accounting(home) -> void:
 	var modes := {}
 	for row in acc:
 		modes[row["mode"]] = int(modes.get(row["mode"], 0)) + 1
-	_ok(modes == {"STATIC": 14, "WORLD_BAKED_RETIRED": 18, "OWNER_RETIRED": 22, "OWNER_DISABLED": 2}, "V04 + R01-V02 + R15-004 (HOME-122) + SB-HOME-BG (HOME-124; HOME-121/123 retired) + SB-HOME-VIDEO (HOME-125) + SB-TF-03 (Shop / Collection tiles, win-streak strip, 4 nav icons retired): 14 STATIC + 18 WORLD_BAKED_RETIRED + 22 OWNER_RETIRED (7 + HOME-120/121/123 + 12 SB-TF-03) + 2 OWNER_DISABLED (%s)" % str(modes))
+	_ok(modes == {"STATIC": 13, "WORLD_BAKED_RETIRED": 18, "OWNER_RETIRED": 23, "OWNER_DISABLED": 2}, "V04 + R01-V02 + R15-004 (HOME-122) + SB-HOME-BG (HOME-124; HOME-121/123 retired) + SB-HOME-VIDEO (HOME-125) + SB-TF-03 (Shop / Collection tiles, win-streak strip, 4 nav icons retired) + SB-TF-11 (Daily button, HOME-067): 13 STATIC + 18 WORLD_BAKED_RETIRED + 23 OWNER_RETIRED (7 + HOME-120/121/123 + 12 SB-TF-03 + 1 SB-TF-11) + 2 OWNER_DISABLED (%s)" % str(modes))
 	_complete("accounting_covers_manifest")
 
 func _static_nodes(home) -> void:
@@ -109,8 +109,8 @@ func _inactive(home) -> void:
 			if not (row["nodes"] as Array).is_empty() or String(row["reason"]).is_empty():
 				bad.append(row["id"])
 	ids.sort()
-	var want := ["HOME-001", "HOME-002", "HOME-003", "HOME-004", "HOME-006", "HOME-007", "HOME-010", "HOME-011", "HOME-013", "HOME-014", "HOME-015", "HOME-016", "HOME-018", "HOME-019", "HOME-020", "HOME-021", "HOME-022", "HOME-023", "HOME-024", "HOME-031", "HOME-032", "HOME-062", "HOME-063", "HOME-064", "HOME-065", "HOME-066", "HOME-069", "HOME-078", "HOME-086", "HOME-087", "HOME-090", "HOME-091", "HOME-092", "HOME-093", "HOME-094", "HOME-101", "HOME-102", "HOME-103", "HOME-104", "HOME-120", "HOME-121", "HOME-123"]
-	_ok(ids == want, "retired/disabled set (V03 + V04 + R01-V02 HOME-120 + SB-HOME-BG HOME-121/123 + SB-TF-03 HOME-064/065/086/090..094/101..104) %s" % str(ids))
+	var want := ["HOME-001", "HOME-002", "HOME-003", "HOME-004", "HOME-006", "HOME-007", "HOME-010", "HOME-011", "HOME-013", "HOME-014", "HOME-015", "HOME-016", "HOME-018", "HOME-019", "HOME-020", "HOME-021", "HOME-022", "HOME-023", "HOME-024", "HOME-031", "HOME-032", "HOME-062", "HOME-063", "HOME-064", "HOME-065", "HOME-066", "HOME-067", "HOME-069", "HOME-078", "HOME-086", "HOME-087", "HOME-090", "HOME-091", "HOME-092", "HOME-093", "HOME-094", "HOME-101", "HOME-102", "HOME-103", "HOME-104", "HOME-120", "HOME-121", "HOME-123"]
+	_ok(ids == want, "retired/disabled set (V03 + V04 + R01-V02 HOME-120 + SB-HOME-BG HOME-121/123 + SB-TF-03 HOME-064/065/086/090..094/101..104 + SB-TF-11 HOME-067) %s" % str(ids))
 	_ok(bad.is_empty(), "inactive rows have no presentation node and carry a reason %s" % str(bad))
 	var m = V.load_manifest()
 	var still_approved := 0
@@ -121,21 +121,21 @@ func _inactive(home) -> void:
 				still_approved += 1
 			elif a["status"] == "RETIRED_DELETED" and not FileAccess.file_exists("res://" + String(a["path"])):
 				deleted += 1
-	_ok(still_approved == 18 and deleted == 24, "retired/disabled entries keep their historical sha pins: 18 still APPROVED on disk (6 + 12 SB-TF-03), 24 RETIRED_DELETED with the file gone (SB-ASSET-PURGE-2026-11-17) (%d / %d)" % [still_approved, deleted])
+	_ok(still_approved == 19 and deleted == 24, "retired/disabled entries keep their historical sha pins: 19 still APPROVED on disk (6 + 12 SB-TF-03 + 1 SB-TF-11), 24 RETIRED_DELETED with the file gone (SB-ASSET-PURGE-2026-11-17) (%d / %d)" % [still_approved, deleted])
 	_complete("inactive_rows_present_nothing")
 
 func _labels(home) -> void:
 	print("[labels full]")
 	var bad: Array = []
 	# SB-TF-03: one-line labels font-fitted to the 0.7x panel (never trimmed in EN / TR).
-	for n in ["RewardedAdsButton", "Shortcut_tasks", "Shortcut_daily"]:
+	for n in ["RewardedAdsButton", "Shortcut_tasks"]:
 		var b: Button = home.get_region(n)
 		var avail: float = b.size.x - b.get_theme_stylebox("normal").get_minimum_size().x
 		var w: float = b.get_theme_font("font").get_string_size(b.text, HORIZONTAL_ALIGNMENT_LEFT, -1, b.get_theme_font_size("font_size")).x
 		if w > avail + 0.5 or b.icon_rect.texture == null:
 			bad.append(n)
 	_ok(bad.is_empty(), "activity panels: icon + full one-line label inside the panel %s" % str(bad))
-	_ok(home.get_region("RewardedAdsButton").text == "REWARDED ADS" and home.get_region("Shortcut_tasks").text == "TASKS" and home.get_region("Shortcut_daily").text == "DAILY", "full live labels REWARDED ADS / TASKS / DAILY")
+	_ok(home.get_region("RewardedAdsButton").text == "REWARDED ADS" and home.get_region("Shortcut_tasks").text == "TASKS", "full live labels REWARDED ADS / TASKS")
 	_complete("labels_full")
 
 func _nav(home) -> void:
@@ -173,13 +173,13 @@ func _matrix() -> void:
 		var home = r[1]
 		var vp := Rect2(Vector2.ZERO, Vector2(size))
 		var bad: Array = []
-		var names: Array = ["PlayButton", "SettingsButton", "TopCurrencyHUD", "GiftMeter", "AdBannerSlot", "RewardedAdsButton", "Shortcut_tasks", "Shortcut_daily"]
+		var names: Array = ["PlayButton", "SettingsButton", "TopCurrencyHUD", "GiftMeter", "AdBannerSlot", "RewardedAdsButton", "Shortcut_tasks"]
 		for n in names:
 			var c: Control = home.get_region(n)
 			if not vp.grow(0.5).encloses(c.get_global_rect()) or c.size.y < 88:
 				bad.append(n)
 		var play: Rect2 = home.get_region("PlayButton").get_global_rect()
-		for n in ["RewardedAdsButton", "Shortcut_tasks", "Shortcut_daily"]:
+		for n in ["RewardedAdsButton", "Shortcut_tasks"]:
 			if home.get_region(n).get_global_rect().intersects(play):
 				bad.append("overlap:" + n)
 		var sc := (home.get_region("Art_scrubby") as Control).get_global_rect()

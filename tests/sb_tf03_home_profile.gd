@@ -1,7 +1,8 @@
 extends SceneTree
 ## SB-TF-03 (owner 2026-11-18) — Home + Profile redesign: no bottom nav / Shop & Collection tiles /
 ## win-streak strip; Settings icon in the top HUD; persistent 320x50 banner area (No Ads collapses
-## it); 0.7x see-through activity buttons (Rewarded Ads, Tasks, Daily, one per active Event) in two
+## it); 0.7x see-through activity buttons (Rewarded Ads, Tasks, one per active Event; SB-TF-11 moved
+## Daily to Profile Login Days) in two
 ## columns of at most 4 that hide themselves when done; Bot Parts icon on the profile card badge;
 ## PLAY · LEVEL N; Profile hosts Robots / Ranks / Collection (+ new-card badge), Settings hosts
 ## Notifications; Hearts (+) popup hands off to the Shop.
@@ -124,7 +125,7 @@ func _t04() -> void:
 	await _boot("t04")
 	var h = _home()
 	var ok := true
-	for n in ["RewardedAdsButton", "Shortcut_tasks", "Shortcut_daily"]:
+	for n in ["RewardedAdsButton", "Shortcut_tasks"]:
 		var b: Button = h.get_region(n)
 		var sb: StyleBoxFlat = b.get_theme_stylebox("normal")
 		var one: bool = b.custom_minimum_size.distance_to(Vector2(147, 109)) <= 1.0 and absf(b.size.x - 147) <= 1.0 and absf(b.size.y - 109) <= 1.0 \
@@ -132,7 +133,7 @@ func _t04() -> void:
 		ok = ok and one
 		if not one:
 			print("    %s size %s min %s alpha %.3f border %.2f font %d" % [n, str(b.size), str(b.custom_minimum_size), sb.bg_color.a, sb.border_color.a, b.get_theme_font_size("font_size")])
-	_ok(ok, "Rewarded Ads / Tasks / Daily: 147x109 +-1, panel alpha 0.255 +-0.02, opaque border, font <= 20")
+	_ok(ok, "Rewarded Ads / Tasks: 147x109 +-1, panel alpha 0.255 +-0.02, opaque border, font <= 20")
 	_ok(HomeScreen.PANEL_SIZE == (Vector2(210, 156) * 0.7).round() and is_equal_approx(HomeScreen.PANEL_ALPHA, 0.51 * 0.5), "constants = 0.7 x V06 size, 0.5 x V06 alpha")
 	_complete("t04_activity_size_glass")
 
@@ -147,14 +148,18 @@ func _t05() -> void:
 	var left: Array = lay["LeftShortcutColumn"]
 	var right: Array = lay["RightShortcutColumn"]
 	_ok(left.size() <= 4 and right.size() <= 4 and left.size() + right.size() <= 8, "with 10 eligible: left %d, right %d (<= 4 each, <= 8)" % [left.size(), right.size()])
-	_ok(left.slice(0, 3) == ["RewardedAdsButton", "Shortcut_tasks", "Shortcut_daily"] and right.size() == 4 and right[0] == "Shortcut_event_ev_0" and left.size() == 4 and left[3] == "Shortcut_event_ev_4",
-		"fixed left top-down, events fill right first then the free left slot %s | %s" % [str(left), str(right)])
-	_ok(_home().get_region("Shortcut_event_ev_5") == null, "events beyond 8 buttons are not shown")
+	_ok(left.slice(0, 2) == ["RewardedAdsButton", "Shortcut_tasks"] and right.size() == 4 and right[0] == "Shortcut_event_ev_0" and left.size() == 4 and left.slice(2) == ["Shortcut_event_ev_4", "Shortcut_event_ev_5"],
+		"fixed left top-down, events fill right first then the free left slots %s | %s" % [str(left), str(right)])
+	_ok(_home().get_region("Shortcut_event_ev_6") == null, "events beyond 8 buttons are not shown")
 	_ok(_contiguous(), "every column contiguous (gaps <= PANEL_GAP)")
-	_eco().daily.claim_login()
+	var e = _eco()
+	for i in range(e.orders.orders().size()):
+		e.daily.mark_task_done(i)
+		e.daily.claim_task(i)
+	e.daily.claim_all_tasks_bonus()
 	await _frames(2)
 	lay = _home().get_activity_layout()
-	_ok(not (lay["LeftShortcutColumn"] as Array).has("Shortcut_daily") and _contiguous(), "Daily hidden -> the rest close up %s" % str(lay["LeftShortcutColumn"]))
+	_ok(not (lay["LeftShortcutColumn"] as Array).has("Shortcut_tasks") and _contiguous(), "Tasks hidden -> the rest close up %s" % str(lay["LeftShortcutColumn"]))
 	_complete("t05_activity_columns")
 
 func _t06() -> void:
@@ -162,7 +167,7 @@ func _t06() -> void:
 	await _boot("t06")
 	var h = _home()
 	var e = _eco()
-	_ok(_shown("Shortcut_tasks") and _shown("RewardedAdsButton") and _shown("Shortcut_daily"), "fresh day: Rewarded Ads, Tasks, Daily shown")
+	_ok(_shown("Shortcut_tasks") and _shown("RewardedAdsButton") and h.get_region("Shortcut_daily") == null, "fresh day: Rewarded Ads, Tasks shown; no Daily button (SB-TF-11)")
 	for i in range(e.orders.orders().size()):
 		e.daily.mark_task_done(i)
 		e.daily.claim_task(i)
@@ -176,14 +181,11 @@ func _t06() -> void:
 		e.reward.grant(rd.tx_id(rd.today(), slot), rd.reward_for(slot))
 	await _frames(2)
 	_ok(not _shown("RewardedAdsButton"), "every Rewarded Ads slot granted today -> Rewarded Ads hidden")
-	e.daily.claim_login()
-	await _frames(2)
-	_ok(e.daily.claimed_today() and not _shown("Shortcut_daily"), "daily.claimed_today() -> Daily hidden")
 	_day[0] += 1
 	_now[0] += 86400
 	h.refresh()
 	await _frames(2)
-	_ok(_shown("Shortcut_tasks") and _shown("RewardedAdsButton") and _shown("Shortcut_daily"), "next local day -> all three shown again")
+	_ok(_shown("Shortcut_tasks") and _shown("RewardedAdsButton"), "next local day -> both shown again")
 	_complete("t06_auto_hide")
 
 func _t07() -> void:
@@ -306,7 +308,7 @@ func _t10() -> void:
 	h.refresh()
 	await _frames(2)
 	var bd := HomeBadges.compute(app)
-	var rest := int(bd["achievements"]) + int(bd["robots"])
+	var rest := int(bd["achievements"]) + int(bd["robots"]) + int(bd["daily"])   # SB-TF-11: + today's login reward
 	var pb: Label = h.get_region("ProfileBadge")
 	_ok(int(bd["collection"]) == 1 and pb.visible and pb.text == str(rest + 1), "Home profile card badge counts the new card (%s)" % pb.text)
 	(h.get_region("ProfileButton") as Button).pressed.emit()

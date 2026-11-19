@@ -722,7 +722,7 @@ func _a03() -> void:
 	# Loop 1: Daily popup open -> X (back) twenty times, 40 ms apart (rapid tapping).
 	mf.played.clear()
 	for _i in range(20):
-		(_root.get_home().get_region("Shortcut_daily") as Button).pressed.emit()
+		_root._on_home_shortcut("daily")
 		await _frames(1)
 		ms[0] += 40
 		_top().get_close_button().pressed.emit()
@@ -735,7 +735,7 @@ func _a03() -> void:
 	# A genuinely different later action is heard (gap is short, not a permanent mute).
 	ms[0] += 2000
 	mf.played.clear()
-	(_root.get_home().get_region("Shortcut_daily") as Button).pressed.emit()
+	_root._on_home_shortcut("daily")
 	await _frames(1)
 	_ok(_moments(mf) == ["popup_open"], "after a pause the next open is heard %s" % str(mf.played))
 	# Loop 2: confirm + claim on the real Daily popup, then repeated claim taps.
@@ -760,7 +760,7 @@ func _a03() -> void:
 	ms[0] += 1000
 	_root.get_modal_stack().clear("clear")
 	await _frames(1)
-	(_root.get_home().get_region("Shortcut_daily") as Button).pressed.emit()
+	_root._on_home_shortcut("daily")
 	await _frames(2)
 	_ok(_moments(mf).count("reward") == 1 and buzz.size() == 1, "reopen after claim: nothing replays")
 	# Route change: stack cleared -> voice stopped, nothing queued, no later work.
@@ -795,7 +795,7 @@ func _a03() -> void:
 	buzz.clear()
 	for _i in range(5):
 		ms[0] += 1000
-		(_root.get_home().get_region("Shortcut_daily") as Button).pressed.emit()
+		_root._on_home_shortcut("daily")
 		await _frames(1)
 		_top().get_close_button().pressed.emit()
 		await _frames(1)

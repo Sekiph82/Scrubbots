@@ -28,8 +28,9 @@ extends Control
 ##
 ## SB-TF-03 (owner 2026-11-18): no bottom nav and no win-streak strip; Robots / Ranks /
 ## Collection live in Profile, Notifications in Settings, the Shop opens only from the HUD (+)
-## popups. The world columns hold small see-through ACTIVITY buttons (Rewarded Ads, Tasks,
-## Daily, one per active Event) that hide themselves when there is nothing left to do today.
+## popups. The world columns hold small see-through ACTIVITY buttons (Rewarded Ads, Tasks, one
+## per active Event) that hide themselves when there is nothing left to do today. SB-TF-11: the
+## Daily login rewards live on Profile's Login Days card (no Home Daily button).
 ##
 ## V05 (coordination/OWNER_M42_HOME_POLISH_V05.md): the world transform is a pure
 ## function of the viewport + safe area and the frozen V04 reference geometry, so HUD /
@@ -83,13 +84,13 @@ const HERO_VIDEO_SET := "home_scrubby_videos_keyed_v2"
 const CHROMA_KEY := preload("res://scripts/ui/feel/chroma_key_magenta.gdshader")
 const UiText = preload("res://scripts/ui/ui_text.gd")
 
-## Popups with a V1 Home destination. Only DAILY is a Home panel in V04; Gifts and Cards
-## Exchange popups remain reachable through open_popup() as seams for their owning flows
-## (automatic rewards / Collection).
+## Popups with a V1 Home destination. Gifts, Cards Exchange and (SB-TF-11, no Home button)
+## Daily popups remain reachable through open_popup() as seams for their owning flows
+## (automatic rewards / Collection / Profile Login Days).
 const LIVE_SHORTCUTS := ["gift_bar", "cards_exchange", "daily"]
 
 ## SB-TF-03: the fixed activity buttons (one Event button per active event follows them).
-const ACTIVITY_FIXED := [["rewarded_ads", "HOME_SC_REWARDED_ADS"], ["tasks", "HOME_SC_TASKS"], ["daily", "HOME_SC_DAILY"]]
+const ACTIVITY_FIXED := [["rewarded_ads", "HOME_SC_REWARDED_ADS"], ["tasks", "HOME_SC_TASKS"]]
 ## Deterministic placement: the visible fixed buttons stack top-down in the LEFT column; the
 ## visible Event buttons (first-active order of EventsV02Service.list()) fill the RIGHT column
 ## first, then the free LEFT slots. At most ACTIVITY_PER_COLUMN per column, so ACTIVITY_MAX in
@@ -1070,8 +1071,6 @@ func _activity_done(id: String) -> bool:
 				if not o["claimed"]:
 					return false
 			return e.daily.all_tasks_bonus_claimed()
-		"daily":
-			return e.daily.claimed_today()
 		"rewarded_ads":
 			var rd = e.rewarded_daily
 			return rd != null and rd.is_configured() and rd.current_slot() > rd.SLOTS
@@ -1380,15 +1379,15 @@ func _render_values() -> void:
 	var gbadge: Label = _nodes["GiftClaimableBadge"]
 	gbadge.text = str(_vm["gift_claimable"])
 	gbadge.visible = _vm["gift_claimable"] > 0
-	# SB-M42-024: Daily badge = 1 when today's login reward is claimable.
-	var counts := {"daily": 0 if _vm["daily_claimed_today"] or _locked("daily") else 1}
+	var counts := {}
 	# M43-C010 (SB-M43-134): Tasks shortcut; SB-TF-03: the profile card carries the Profile
-	# destinations' attention (claimable achievements + unseen robots + new collection cards).
+	# destinations' attention (claimable achievements + unseen robots + new collection cards;
+	# SB-TF-11: + today's claimable login reward on the Login Days card).
 	if "orders" in _app.economy and _app.economy.orders != null:
 		var bd := HomeBadges.compute(_app)
 		counts["tasks"] = 0 if _locked("tasks") else int(bd["tasks"])
 		var profile_n: int = int(bd["achievements"])
-		for cid in ["robots", "collection"]:
+		for cid in ["robots", "collection", "daily"]:
 			profile_n += 0 if _locked(cid) else int(bd[cid])
 		var pb: Label = _nodes["ProfileBadge"]
 		# SB-M44-013: a newly unlocked Profile destination shows NEW here until visited there.
@@ -1403,13 +1402,11 @@ func _render_values() -> void:
 	var badge_text := func(bid: String) -> String:
 		var c := int(counts.get(bid, 0))
 		return str(c) if c > 0 else (UiText.t("HOME_BADGE_NEW") if fresh.has(bid) else "")
-	for sid in ["tasks", "daily"]:
-		(_nodes["Shortcut_" + sid] as UiShortcutButton).set_badge_text(badge_text.call(sid))
-	for sid in ["tasks", "daily"]:
-		var sc: Button = _nodes["Shortcut_" + sid]
-		sc.disabled = _locked(sid) or not (LIVE_SHORTCUTS.has(sid) or _app_shortcuts.has(sid))
-		sc.tooltip_text = _unlock_text(sid) if _locked(sid) else ""
-		sc.accessibility_description = sc.tooltip_text
+	(_nodes["Shortcut_tasks"] as UiShortcutButton).set_badge_text(badge_text.call("tasks"))
+	var sc: Button = _nodes["Shortcut_tasks"]
+	sc.disabled = _locked("tasks") or not _app_shortcuts.has("tasks")
+	sc.tooltip_text = _unlock_text("tasks") if _locked("tasks") else ""
+	sc.accessibility_description = sc.tooltip_text
 	(_nodes["RewardedAdsButton"] as Button).disabled = not _app_shortcuts.has("rewarded_ads")
 	_sync_activity()
 	for pid in _popups:

@@ -76,8 +76,7 @@ func home_context() -> Dictionary:
 	if _app == null or _app.economy == null:
 		return {"level": lvl}
 	var d = _app.economy.daily
-	return {"level": lvl, "daily_claimable": not d.claimed_today(),
-		"tasks_claimable": d.is_welcome_task(0) and d.is_task_done(0) and not d.task_claimed(0)}
+	return {"level": lvl, "tasks_claimable": d.is_welcome_task(0) and d.is_task_done(0) and not d.task_claimed(0)}
 
 ## The single step for `surface` ("home" | "gameplay") given ctx {level, level_id, ...flags}.
 ## {} when nothing should show.
@@ -148,7 +147,7 @@ func acknowledge(step_id: String) -> bool:
 	_app.request_save()
 	return true
 
-## A real player action happened (e.g. "supply_placed", "shortcut:daily", "play"): completes
+## A real player action happened (e.g. "supply_placed", "shortcut:tasks", "play"): completes
 ## the CURRENT step only when that step is completed by exactly this action.
 func notify(event: String, surface: String, ctx: Dictionary) -> bool:
 	var st := current_step(surface, ctx)
@@ -169,9 +168,6 @@ func skip_tips() -> bool:
 func step_copy(step: Dictionary, ctx: Dictionary = {}) -> Dictionary:
 	var body := ""
 	match String(step.get("id", "")):
-		"home_daily":
-			var d = _app.economy.daily
-			body = UiText.t(String(step["body"]), [UiText.reward_text(d.login_reward_for(d.next_claim_cycle_day()))])
 		"home_tasks":
 			body = UiText.t(String(step["body"]), [UiText.num(_app.economy.daily.task_reward_sb(0))])
 		"ctx_result_lost":

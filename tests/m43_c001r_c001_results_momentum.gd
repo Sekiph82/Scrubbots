@@ -320,7 +320,7 @@ func _t33_responsive() -> void:
 		var safe: Rect2 = home.get_region("SafeAreaRoot").get_global_rect()
 		if not safe.grow(0.5).encloses(strip):
 			bad.append("home strip outside safe area")
-		for region in ["PlayButton", "GiftMeter", "AdBannerSlot", "TopCurrencyHUD", "SettingsButton", "RewardedAdsButton", "Shortcut_tasks", "Shortcut_daily"]:
+		for region in ["PlayButton", "GiftMeter", "AdBannerSlot", "TopCurrencyHUD", "SettingsButton", "RewardedAdsButton", "Shortcut_tasks"]:
 			var rr: Rect2 = home.get_region(region).get_global_rect()
 			if rr.intersects(strip):
 				bad.append("home strip x " + region)

@@ -773,7 +773,7 @@ func _nav_churn() -> void:
 	await _boot(30, 1000)
 	var home = _root.get_home()
 	var e = _e()
-	var tabs := ["ProfileButton", "Shortcut_tasks", "Shortcut_daily", "SettingsButton", "GiftMeterButton"]
+	var tabs := ["ProfileButton", "Shortcut_tasks", "SettingsButton", "GiftMeterButton"]
 	var cards: Array = e.collection.all_card_ids()
 	var lap: Array = []
 	for rep in range(2):

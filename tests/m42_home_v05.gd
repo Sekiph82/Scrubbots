@@ -145,22 +145,22 @@ func _panels(home) -> void:
 	for n in home.find_children("Shortcut_*", "Button", true, false):
 		names.append(String(n.name))
 	names.sort()
-	_ok(names == ["Shortcut_daily", "Shortcut_tasks"] and home.get_region("RewardedAdsButton") != null, "SB-TF-03: Tasks / Daily (+ Rewarded Ads) only, no Shop / Collection %s" % str(names))
+	_ok(names == ["Shortcut_tasks"] and home.get_region("RewardedAdsButton") != null, "SB-TF-03 / SB-TF-11: Tasks (+ Rewarded Ads) only, no Shop / Collection %s" % str(names))
 	var ok := true
-	for n in ["RewardedAdsButton", "Shortcut_tasks", "Shortcut_daily"]:
+	for n in ["RewardedAdsButton", "Shortcut_tasks"]:
 		var sb := home.get_region(n).get_theme_stylebox("normal") as StyleBoxFlat
 		ok = ok and sb.bg_color.a >= 0.24 and sb.bg_color.a <= 0.27 and sb.border_width_left >= 2 and sb.border_width_left <= 3 and sb.border_color.a >= 0.7
 	_ok(ok, "glass body alpha %.3f (SB-TF-03: half the V06 0.51), outline %d px visible" % [HS.PANEL_ALPHA, HS.PANEL_BORDER])
 	var d := {}
-	for id in ["tasks", "daily"]:
+	for id in ["tasks"]:
 		var tex: Texture2D = home.get_region("ShortcutIcon_" + id).texture
 		var a := float(tex.get_width()) / float(tex.get_height())
 		var box := Vector2(206, 164) * 0.7
 		d[id] = [home.get_region("Shortcut_" + id).get_icon_draw_size(), Vector2(box.y * a, box.y) if box.y * a <= box.x else Vector2(box.x, box.x / a)]
-	_ok(d["tasks"][0].is_equal_approx(d["tasks"][1]) and d["daily"][0].is_equal_approx(d["daily"][1]), "TASKS / DAILY icons 0.7x the V04 (= V03) size")
+	_ok(d["tasks"][0].is_equal_approx(d["tasks"][1]), "TASKS icon 0.7x the V04 (= V03) size")
 	var vp: Vector2 = home.get_viewport_rect().size
 	var margin_ok := true
-	for n in ["RewardedAdsButton", "Shortcut_tasks", "Shortcut_daily"]:
+	for n in ["RewardedAdsButton", "Shortcut_tasks"]:
 		var r: Rect2 = home.get_region(n).get_global_rect()
 		margin_ok = margin_ok and r.position.x >= 20.0 and vp.x - r.end.x >= 20.0
 	_ok(margin_ok, "outer screen margin preserved")

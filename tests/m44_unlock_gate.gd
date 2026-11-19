@@ -25,7 +25,7 @@ const OWNER_TABLE := {"hearts": 1, "gift_bar": 1, "daily": 1, "shop": 1, "tasks"
 const WALK := [1, 3, 4, 5, 6, 8, 11, 12, 16, 20, 21, 25, 30, 35, 39, 40]
 ## SB-TF-03: Home keeps the activity buttons; Robots / Ranks / Collection are Profile buttons
 ## (gated there), Events are per-event activity buttons (absent while locked).
-const HOME_ENTRIES := ["Shortcut_daily", "Shortcut_tasks", "RewardedAdsButton"]
+const HOME_ENTRIES := ["Shortcut_tasks", "RewardedAdsButton"]
 const PROFILE_ENTRIES := ["robots", "ranks", "collection"]
 const ProfileScreens = preload("res://scripts/ui/profile/profile_screens.gd")
 const ModalStack = preload("res://scripts/ui/popup/modal_stack.gd")
@@ -128,7 +128,7 @@ func _home_gating() -> void:
 	_ok(pen == {"robots": true, "ranks": true, "collection": false}, "fresh L1 Profile: robots / ranks blocked, collection open %s" % str(pen))
 	var pb: Button = _stack.top().get_action_button("robots")
 	_ok(pb.tooltip_text == "Unlocks at level 25" and _stack.top().get_action_button("ranks").tooltip_text == UiText.t("HOME_UNLOCKS_AT_LEVEL", [OWNER_TABLE["ranks"]]), "each locked Profile entry shows its table unlock level")
-	_ok(home.get_region("Shortcut_daily").badge.visible and home.get_region("Shortcut_tasks").badge.visible and not home.get_region("ProfileBadge").visible, "L1: DAILY / TASKS badges live (login + welcome task); locked ROBOTS adds nothing to the profile card")
+	_ok(home.get_region("Shortcut_tasks").badge.visible and home.get_region("ProfileBadge").text == "1", "L1: TASKS badge live (welcome task); profile card '1' = today's login reward (SB-TF-11), locked ROBOTS adds nothing")
 	_ok(not home.get_region("GiftMeterButton").disabled, "Gift Bar stays enabled at L1")
 	for id in ["robots", "events", "leaderboard", "event:x"]:
 		home._shortcut_pressed(id)
@@ -182,15 +182,12 @@ func _ftue_director() -> void:
 	a.bootstrap_new_profile()
 	var d = FtueDirector.new(a)
 	var ctx: Dictionary = d.home_context()
-	ctx["daily_claimable"] = true
 	ctx["tasks_claimable"] = true
-	_ok(String(d.current_step("home", ctx).get("id", "")) == "home_daily", "fresh L1 Home: DAILY tip (Daily open at L1)")
-	a.unlocks.cfg["unlocks"]["daily"] = 4
+	_ok(String(d.current_step("home", ctx).get("id", "")) == "home_tasks", "fresh L1 Home: TASKS tip (Tasks open at L1; SB-TF-11: no Daily tip)")
 	a.unlocks.cfg["unlocks"]["tasks"] = 12
-	_ok(String(d.current_step("home", ctx).get("id", "")) == "home_play", "a locked DAILY / TASKS shortcut is skipped -> PLAY tip")
-	_ok(not a.economy.ftue.is_seen("home_daily") and not a.economy.ftue.is_seen("home_tasks"), "skipped steps are not marked seen")
+	_ok(String(d.current_step("home", ctx).get("id", "")) == "home_play", "a locked TASKS shortcut is skipped -> PLAY tip")
+	_ok(not a.economy.ftue.is_seen("home_tasks"), "skipped steps are not marked seen")
 	_ok(d.notify("play", "home", ctx) and d.current_step("home", ctx).is_empty(), "PLAY tip completes; nothing locked offered after")
-	a.unlocks.cfg["unlocks"]["daily"] = 1
 	a.unlocks.cfg["unlocks"]["tasks"] = 1
 	_ok(String(d.current_step("gameplay", {"level": 1, "level_id": "m21_level_001_hazard_bot"}).get("id", "")) == "l1_tap_front", "L1 lesson runs")
 	a.progression.record_win(1)

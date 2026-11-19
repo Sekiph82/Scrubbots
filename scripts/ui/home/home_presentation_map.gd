@@ -55,7 +55,7 @@ const ENTRIES := {
 	"HOME-064": {"slug": "icon_shortcut_collection", "mode": "OWNER_RETIRED", "slot": "texture", "nodes": [], "reason": "SB-TF-03 (owner 2026-11-18): Home Collection tile removed (Collection opens from Profile)"},
 	"HOME-065": {"slug": "icon_shortcut_shop", "mode": "OWNER_RETIRED", "slot": "texture", "nodes": [], "reason": "SB-TF-03 (owner 2026-11-18): Home Shop tile removed (Shop opens from the HUD + popups)"},
 	"HOME-066": {"slug": "icon_shortcut_no_ads", "mode": "OWNER_RETIRED", "slot": "button_icon", "nodes": [], "reason": "V04 34-40: Home shortcut panel removed (service/data kept)"},
-	"HOME-067": {"slug": "icon_shortcut_daily", "mode": "STATIC", "slot": "texture", "nodes": ["ShortcutIcon_daily"]},
+	"HOME-067": {"slug": "icon_shortcut_daily", "mode": "OWNER_RETIRED", "slot": "texture", "nodes": [], "reason": "SB-TF-11 (owner 2026-11-19): Home Daily button removed (Daily opens from Profile Login Days)"},
 	"HOME-068": {"slug": "icon_shortcut_tasks", "mode": "STATIC", "slot": "texture", "nodes": ["ShortcutIcon_tasks"]},
 	"HOME-069": {"slug": "icon_shortcut_cards_exchange", "mode": "OWNER_RETIRED", "slot": "button_icon", "nodes": [], "reason": "V04 34-40: Home shortcut panel removed (service/data kept)"},
 	"HOME-078": {"slug": "play_button_frame", "mode": "OWNER_RETIRED", "slot": "texture", "nodes": [], "reason": "V03 H: native white play triangle replaces it"},

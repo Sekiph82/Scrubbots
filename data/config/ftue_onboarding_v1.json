@@ -31,7 +31,6 @@
       "surface": "home",
       "level": 1,
       "steps": [
-        {"id": "home_daily", "target": "shortcut:daily", "when": "daily_claimable", "complete_on": "shortcut:daily", "title": "FTUE_HOME_DAILY_TITLE", "body": "FTUE_HOME_DAILY_BODY"},
         {"id": "home_tasks", "target": "shortcut:tasks", "when": "tasks_claimable", "complete_on": "shortcut:tasks", "title": "FTUE_HOME_TASKS_TITLE", "body": "FTUE_HOME_TASKS_BODY"},
         {"id": "home_play", "target": "play", "complete_on": "play", "title": "FTUE_HOME_PLAY_TITLE", "body": "FTUE_HOME_PLAY_BODY"}
       ]

@@ -362,9 +362,10 @@ func _t12() -> void:
 	a.bootstrap_new_profile()
 	var d = FtueDirector.new(a)
 	# SB-M44-032: Daily / Tasks open at L1 (owner 2026-11-03), so the first-Home tips run at L1.
-	_ok(String(d.current_step("home", d.home_context()).get("id", "")) == "home_daily", "first Home: DAILY tip first")
+	# SB-TF-11: Daily moved to Profile Login Days, so there is no first-Home Daily tip.
+	_ok(String(d.current_step("home", d.home_context()).get("id", "")) == "home_tasks", "first Home: TASKS tip first (no Daily tip)")
 	a.actions.claim_daily_login()
-	_ok(String(d.current_step("home", d.home_context()).get("id", "")) == "home_tasks", "DAILY claimed -> its tip no longer applies; TASKS tip")
+	_ok(String(d.current_step("home", d.home_context()).get("id", "")) == "home_tasks", "a Daily claim does not change the Home tips; TASKS tip")
 	_ok(d.notify("shortcut:tasks", "home", d.home_context()) and String(d.current_step("home", d.home_context()).get("id", "")) == "home_play", "tapping TASKS completes the TASKS tip")
 	var g1 := {"level": 1, "level_id": L1}
 	_ok(String(d.current_step("gameplay", g1).get("id", "")) == "l1_tap_front", "L1: first tip = real front tap")
@@ -426,11 +427,11 @@ func _t14() -> void:
 	_ok(bool(app.last_bootstrap.get("ok", false)) and _total(app) == 8 and app.economy.wallet.scrub_bucks() == 1000, "fresh boot: starter 2 each, 1,000 SB")
 	_ok(_root.get_modal_stack().depth() == 0, "no forced popup / auto claim on first Home")
 	_root.refresh_coachmark()
-	var daily_b: Button = _root.get_home().get_region("Shortcut_daily")
 	var tasks_b: Button = _root.get_home().get_region("Shortcut_tasks")
-	# SB-M44-032: Daily / Tasks / Shop / Collection open at L1 (owner 2026-11-03).
-	_ok(cm.get_step_id() == "home_daily" and cm.get_target() == daily_b.get_global_rect(), "Scrubby tip points at the real DAILY panel")
-	_ok(not daily_b.disabled and not tasks_b.disabled and not _root.get_home().get_region("RewardedAdsButton").disabled, "all three Home activity buttons live at L1 (SB-TF-03)")
+	# SB-M44-032: Daily / Tasks / Shop / Collection open at L1 (owner 2026-11-03); SB-TF-11: Daily is
+	# Profile's Login Days card, so the first tip is TASKS.
+	_ok(cm.get_step_id() == "home_tasks" and cm.get_target() == tasks_b.get_global_rect(), "Scrubby tip points at the real TASKS panel")
+	_ok(not tasks_b.disabled and not _root.get_home().get_region("RewardedAdsButton").disabled and _root.get_home().get_region("Shortcut_daily") == null, "both Home activity buttons live at L1; no Daily button (SB-TF-11)")
 	tasks_b.pressed.emit()
 	await _frames(2)
 	_root.refresh_coachmark()
@@ -445,10 +446,12 @@ func _t14() -> void:
 	_root.get_modal_stack().clear("test")
 	await _frames(2)
 	_root.refresh_coachmark()
-	_ok(cm.get_step_id() == "home_daily", "back on Home: DAILY tip (tasks claimed)")
-	daily_b.pressed.emit()
+	_ok(cm.get_step_id() == "home_play", "back on Home: PLAY tip (tasks claimed; no Daily tip)")
+	_root.get_home().get_region("ProfileButton").pressed.emit()
 	await _frames(2)
-	_ok(_top_id() == "daily_login", "DAILY opens")
+	(_top().find_child("LoginDaysButton", true, false) as Button).pressed.emit()
+	await _frames(2)
+	_ok(_top_id() == "daily_login", "Profile Login Days opens the Daily ladder")
 	_top()._on_action("claim")
 	_root.get_home().get_reward_flight().finish()   # SB-TF-05: the claim's reward reveal lands (coach tips wait for it)
 	await _frames(2)
