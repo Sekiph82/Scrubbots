@@ -6,6 +6,7 @@ Completed items and older status history: docs/migration/legacy-task-trackers/TA
 
 ## Autonomous Queue
 <!-- Maintained by the factory loop (CLAUDE.md §0D). One row per item: `- READY|OWNER|DONE <TASK-ID> — <one line>`. First READY row is next. -->
+- DONE SB-TF-13 — TestFlight build 26 owner feedback (9 items): bigger Home buttons, whole event art card, event screens/tutorial above banner + single X, floor #4A3258 (Lab>=20), rewarded ads re-offer in place, new bow video, full-width gameplay shell; code d42620b8, CLAUDE_PEER_REVIEW PASS, LOCAL_PASS sb_tf13 7/7
 - DONE SB-TF-12 — SB-TF-12 — 24 Events rebuilt as native screens per event (own palette, scene, ribbon, logo) + 172 coach-mark tutorial steps EN/TR from data; added art 2.65 MiB lossy; code ccd0c36b; LOCAL_PASS sb_tf12 5/5 + CLAUDE_PEER_REVIEW.
 - DONE SB-TF-11 — SB-TF-11 — Home Daily button removed; consecutive-login rewards open from Profile Login Days card (badge when unclaimed), claim path unchanged; LOCAL_PASS sb_tf11 6/6 + CLAUDE_PEER_REVIEW.
 - DONE SB-TF-10 — SB-TF-10 — Board floor = rail-glow blue #0068D8 (owner pick, contrast floor waived), booster row centred under Supply; LOCAL_PASS 12 suites + CLAUDE_PEER_REVIEW.
