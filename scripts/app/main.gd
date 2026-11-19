@@ -92,6 +92,9 @@ static var boot_level_intro_override: int = -1
 ## SB-PHONE-2026-11-12-E win animation seam, same policy: -1 auto = ON for the canonical save
 ## path, OFF for an injected test save path (a WON goes Home at once); 0 never; 1 always.
 static var boot_win_animation_override: int = -1
+## SB-TF-07 test seam: an AdProvider installed at boot (before the boot / opening Home entry and
+## its App Open attempt). Production leaves it null (native AdMob or the null provider).
+static var boot_ad_provider_override = null
 
 var app_state = null
 ## M42 (SB-M42-001): the ONE app-root-owned navigation authority.
@@ -144,6 +147,8 @@ var _win_tip := false
 ## SB-TF-05: every request_reward_reveal call [source, key, shown] (evidence / tests).
 var reveal_log: Array = []
 var _reveal_seq := 0
+## SB-TF-07: the one App Open attempt of this cold boot was made.
+var _app_open_tried := false
 
 func _enter_tree() -> void:
 	_boot()
@@ -257,6 +262,7 @@ func _ready() -> void:
 	# M43-C012: a genuine absence opens a return window (summary shown once on Home).
 	if app_state != null and app_state.economy != null and not app_state.is_blocked:
 		_track_return_window(app_state.economy.returns.on_active())
+		app_state.economy.ads.note_launch()   # SB-TF-07: the install day, on the first launch only
 		app_state.mark_dirty()
 	# Every committed facade action (Gift / Daily claim, exchange, unlock, ...) may have
 	# completed a set / Master / robot event: show its ceremony once Home is quiet.
@@ -282,6 +288,7 @@ func _ready() -> void:
 		_start_opening()
 	else:
 		nav.go(NavigationController.Route.HOME, {"via": "boot"})
+		_try_app_open()
 
 ## CP04/CP05: one background remote refresh per cold launch, only when the runtime config
 ## names an HTTPS endpoint. Boot never waits on it: builtin + cached LKG are already live.
@@ -313,6 +320,7 @@ func _should_play_opening() -> bool:
 func _start_opening() -> void:
 	if not nav.go(NavigationController.Route.OPENING, {"via": "boot"}):
 		nav.go(NavigationController.Route.HOME, {"via": "boot"})
+		_try_app_open()
 		return
 	_opening = OpeningScreen.new()
 	add_child(_opening)
@@ -325,6 +333,19 @@ func _finish_opening(outcome: String) -> void:
 	if nav.current() != NavigationController.Route.OPENING:
 		return
 	nav.go(NavigationController.Route.HOME, {"via": "opening", "outcome": outcome})
+	_try_app_open()
+
+## SB-TF-07: the one App Open attempt of a cold boot, right after the Home entry that follows the
+## opening (or the direct boot Home). Never during the opening, over an FTUE coachmark or on a
+## blocked save; not on resume, gameplay or Results. AdService applies every policy gate.
+func _try_app_open() -> void:
+	if _app_open_tried or app_state == null or app_state.economy == null or app_state.is_blocked:
+		return
+	_app_open_tried = true
+	if nav.current() != NavigationController.Route.HOME or (coachmarks != null and coachmarks.is_showing()):
+		return
+	if app_state.economy.ads.try_app_open():
+		app_state.mark_dirty()   # the shown day is saved at the next boundary
 
 func get_opening():
 	return _opening
@@ -412,7 +433,8 @@ func _reveal_action(action: String, r: Dictionary) -> void:
 ## Verified rewarded grants (Heart / booster / Rewarded Ads daily slots). The win x2 shows inside
 ## the win's own reveal.
 func _reveal_rewarded(token: String, product: String, r: Dictionary) -> void:
-	if not bool(r.get("ok", false)) or product.begins_with(RewardedGrantService.WIN_DOUBLE_PREFIX):
+	# SB-TF-07: the event ad is event progress only (no reveal flight).
+	if not bool(r.get("ok", false)) or product.begins_with(RewardedGrantService.WIN_DOUBLE_PREFIX) or product.begins_with(RewardedGrantService.EVENT_AD_PREFIX):
 		return
 	var tx := String(r.get("tx", ""))
 	var rewards: Dictionary = app_state.economy.reward.applied_rewards(tx) if not tx.is_empty() else RewardedGrantService.rewards_for(product)
@@ -1046,9 +1068,9 @@ func retry_from_results() -> bool:
 	_show_level_intro(_gameplay_host)
 	return true
 
-## SB-M57-001: the every-5-plays interstitial, only at the next attempt (Home PLAY or Results
-## Retry; a win goes Home first), never during gameplay or between the win animation and Home. AdService
-## decides (No Ads, cadence); the null provider shows nothing.
+## SB-M57-001 / SB-TF-07: the interstitial (none before level 10, then every 4 finished plays), only
+## at the next attempt (Home PLAY or Results Retry; a win goes Home first), never during gameplay or
+## between the win animation and Home. AdService decides (No Ads, cadence); the null provider shows nothing.
 func _between_levels_ad() -> void:
 	if app_state != null and app_state.economy != null:
 		if app_state.economy.ads.try_interstitial():
@@ -1189,6 +1211,8 @@ func _install_native_providers(economy) -> void:
 		add_child(node)
 		economy.ads.set_provider(ads)
 		ads.start()
+	if boot_ad_provider_override != null:
+		economy.ads.set_provider(boot_ad_provider_override)
 
 func _notification(what: int) -> void:
 	match what:

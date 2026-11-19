@@ -94,7 +94,8 @@ var rewarded_daily: RewardedDailyService
 var ftue: FtueState
 ## SB-M57-012/013: real-money store (SB packs + No Ads entitlement; shipping provider = unavailable).
 var store: StoreService
-## SB-M57-001..011: ad policy (banner / every-5-plays interstitial / rewarded; shipping provider = none).
+## SB-M57-001..011 + SB-TF-07: ad policy (banner / interstitial every 4 plays from level 10 / App Open /
+## rewarded; data/config/ad_placements_v1.json; shipping provider = none).
 var ads: AdService
 
 ## local_day: Daily local-calendar ordinal provider (M39 V04, F-M39-V03-002).
@@ -130,10 +131,11 @@ func _init(config_path: String = EconomyConfig.DEFAULT_PATH, clock: Callable = C
 	exchange = CardsExchangeService.new(collection, reward, config)
 	streak = WinStreakService.new(reward, gift)
 	rewarded = RewardedGrantService.new(reward, hearts)
+	rewarded.events = events_v02   # SB-TF-07 event ad eligibility
 	rewarded_daily = RewardedDailyService.new(reward, rewarded, Callable(daily, "local_day"))
 	ftue = FtueState.new()
 	store = StoreService.new(reward)
-	ads = AdService.new(store, rewarded)
+	ads = AdService.new(store, rewarded, null, Callable(daily, "local_day"))
 	_register_handlers()
 
 func _register_handlers() -> void:
@@ -184,6 +186,10 @@ func _register_handlers() -> void:
 		reward.register_handler(RewardedGrantService.RES_BOOSTER_PREFIX + id, func(n):
 			boosters.add_charges(id, n))
 	reward.register_handler(StoreService.RES_NO_ADS, func(_n): store.grant_no_ads())
+	# SB-TF-07: the event ad's +1 progress; the instance id is in the parent tx
+	# (event_ad:<event_id>:<cycle>:<day>). Progress only, never a currency or reward step.
+	reward.register_handler(RewardedGrantService.RES_EVENT_AD, func(_n):
+		events_v02.add_ad_progress(RewardedGrantService.event_ad_iid(reward.current_tx())))
 
 ## M55-C001 (SB-M55-010): release a graph that is being discarded. The reward handlers
 ## (registered above and RewardGrantService's own defaults) are lambdas that capture

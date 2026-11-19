@@ -265,6 +265,8 @@ jobs:
           ADMOB_BANNER_ID: ${{ secrets.ADMOB_IOS_BANNER_ID }}
           ADMOB_INTERSTITIAL_ID: ${{ secrets.ADMOB_IOS_INTERSTITIAL_ID }}
           ADMOB_REWARDED_ID: ${{ secrets.ADMOB_IOS_REWARDED_ID }}
+          # SB-TF-07: optional; empty = a real-id build shows no App Open ad (ADS_APP_OPEN_NO_ID).
+          ADMOB_APP_OPEN_ID: ${{ secrets.ADMOB_IOS_APP_OPEN_ID }}
           ADS_TEST_MODE: ${{ inputs.ads_test_mode }}
         run: |
           set -e
@@ -283,8 +285,8 @@ jobs:
               [ -n "${!v}" ] || { echo "::error::ads_test_mode=false release build needs GitHub Secret ${v/ADMOB_/ADMOB_IOS_}"; exit 1; }
             done
             REAL=true; APP_ID="$ADMOB_APP_ID"
-            printf 'const IDS := {"banner": "%s", "interstitial": "%s", "rewarded": "%s"}\n' \
-              "$ADMOB_BANNER_ID" "$ADMOB_INTERSTITIAL_ID" "$ADMOB_REWARDED_ID" > addons/AdmobPlugin/scrubbots_real_ids.gd
+            printf 'const IDS := {"banner": "%s", "interstitial": "%s", "rewarded": "%s", "app_open": "%s"}\n' \
+              "$ADMOB_BANNER_ID" "$ADMOB_INTERSTITIAL_ID" "$ADMOB_REWARDED_ID" "$ADMOB_APP_OPEN_ID" > addons/AdmobPlugin/scrubbots_real_ids.gd
           fi
           printf '[General]\nis_real=%s\n\n[Debug]\napp_id="ca-app-pub-3940256099942544~1458002511"\n\n[Release]\napp_id="%s"\n\n[ATT]\natt_enabled=true\natt_text="ScrubBots uses this to show you more relevant ads."\n' \
             "$REAL" "$APP_ID" > addons/AdmobPlugin/ios_export.cfg

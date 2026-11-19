@@ -18,6 +18,9 @@ extends RefCounted
 ##   - Clock: a high-water mark stamped by every state change (receipt, join, claim); a clock moved
 ##     backwards never reopens a joined window or rewinds rivals. Reads never write it.
 ## The Level 30 gate is the caller's (`unlocked`, AppState.feature_unlocked("events")).
+## SB-TF-07: add_ad_progress(iid) = +1 progress from a verified rewarded "event ad" (granted only by
+## RewardedGrantService under event_ad:<iid>:<day>); joined + active instances, not quest / colors
+## (their progress is derived). It never touches receipts, rewards or claims.
 ## Economy section `events_v02`: absent = fresh (older saves), present = strict.
 
 const PATH := "res://data/config/events_v02_runtime.json"
@@ -34,6 +37,7 @@ const COUNT_METRICS := ["first_clear_new_level", "virtual_team_qualifying_level_
 	"virtual_team_sequential_clears", "seasonal_qualifying_level_progress"]
 const PIXEL_METRICS := ["cleaned_active_pixels", "cleaned_active_pixels_on_new_levels", "virtual_team_cleaned_active_pixels"]
 const OPPONENT_BASE := 100   ## team_versus opponent entrant indices start here
+const AD_EXCLUDED_KINDS := ["quest", "colors"]   ## SB-TF-07: derived progress, no event ad
 
 var config_ok := false
 var claims_enabled := false
@@ -352,11 +356,40 @@ func _apply(rec: Dictionary, r: Dictionary, t: int) -> bool:
 	var a := metric_amount(String(e["metric"]), r)
 	if a <= 0:
 		return false
+	_add(rec, e, a, t)
+	return true
+
+## The generic progress tail (receipts and the event ad).
+func _add(rec: Dictionary, e: Dictionary, a: int, t: int) -> void:
 	rec["progress"] = int(rec["progress"]) + a
+	if e["kind"] == "streak":
+		rec["best"] = maxi(int(rec["best"]), int(rec["progress"]))
 	rec["reach_t"] = t
 	(rec["log"] as Array).append(t)
 	if e["kind"] == "race" and int(rec["finish_t"]) == 0 and int(rec["progress"]) >= int(rec["params"]["goal"]):
 		rec["finish_t"] = t
+
+## SB-TF-07: why instance `iid` cannot take an event ad right now ("" = it can).
+func ad_refusal(iid: String) -> String:
+	var rec := _record(iid) if config_ok else {}
+	if rec.is_empty():
+		return "not_found"
+	if int(rec["joined_at"]) <= 0:
+		return "not_joined"
+	var t := now()
+	if t < int(rec["start"]) or t >= int(rec["end"]):
+		return "not_active"
+	if AD_EXCLUDED_KINDS.has(_defs[rec["id"]]["kind"]):
+		return "ineligible_kind"
+	return ""
+
+## SB-TF-07: +1 progress for a verified event ad (EconomyServices' event_ad_progress handler).
+## No-op (false) once the instance is no longer eligible (e.g. the window ended during the ad).
+func add_ad_progress(iid: String) -> bool:
+	if not ad_refusal(iid).is_empty():
+		return false
+	var rec: Dictionary = _inst[iid]
+	_add(rec, _defs[rec["id"]], 1, _stamp())
 	return true
 
 ## Master Cleaner Quest objective: another joined event earned a reward step (rank-only events:

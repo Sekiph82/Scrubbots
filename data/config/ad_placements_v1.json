@@ -1,0 +1,9 @@
+{
+  "schema": "scrubbots.ad_placements.v1",
+  "policy_version": 2,
+  "decision": "Owner chat 2026-11-18 (SB-TF-07, coordination/OWNER_ECONOMY_REWARDS_V01.md amendment 2026-11-18): no interstitial before level 10, then one every 4 finished plays; an App Open ad from level 20, at most once per local day, never on the install day, only after the opening video; a rewarded 'Watch ad, +1 progress' once per event per local day; No Ads removes App Open + interstitial, rewarded stays.",
+  "supersedes": "policy_version 1 = the owner 2026-10-22 behaviour (SB-M57-001..011): interstitial every 5 finished plays, no level gate, no App Open, no event ad.",
+  "interstitial": {"min_level": 10, "interval_plays": 4},
+  "app_open": {"min_level": 20, "max_per_day": 1, "skip_install_day": true},
+  "event_progress_ad": {"per_event_per_day": 1, "progress": 1}
+}

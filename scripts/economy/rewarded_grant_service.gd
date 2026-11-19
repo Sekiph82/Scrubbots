@@ -13,6 +13,10 @@ extends RefCounted
 ##                        win's SB only), placement "rewarded_win_double", committed under the
 ##                        DETERMINISTIC id "win_double:<receipt key>" (key = win:a<attempt>:L<level>),
 ##                        so a second request, a duplicate / late / relaunched callback grants nothing
+##   "event_ad:<iid>"     SB-TF-07: +1 progress on one joined, active V02 event instance (not quest /
+##                        colors), placement "rewarded_event_progress", once per instance per local
+##                        day under the DETERMINISTIC id "event_ad:<iid>:<day>"; a day below the
+##                        highest event_ad day ever granted is refused (clock_rollback)
 ##
 ## Flow: start(product) -> provider.request(...) -> resolve(token, result) exactly once.
 ## Only outcome "completed" with verified == true commits. Cancel / skip / fail / timeout /
@@ -42,9 +46,12 @@ const COMPLETED := "completed"
 const TX_PREFIX := "rewarded:"
 const WIN_DOUBLE_PREFIX := "win_double:"
 const WIN_DOUBLE_PLACEMENT := "rewarded_win_double"
+const EVENT_AD_PREFIX := "event_ad:"
+const EVENT_AD_PLACEMENT := "rewarded_event_progress"
 ## Reward resources registered on RewardGrantService by EconomyServices.
 const RES_HEART := "rewarded_heart"
 const RES_BOOSTER_PREFIX := "booster_charge_"
+const RES_EVENT_AD := "event_ad_progress"
 
 var _reward
 var _hearts
@@ -54,6 +61,8 @@ var _pending: Dictionary = {}    ## token -> product (unresolved this session)
 var _closed: Dictionary = {}     ## token -> final result (resolved/abandoned this session)
 var _seq := 0
 var _grants: Dictionary = {}    ## token -> {tx, rewards} for daily-slot requests (session-local)
+## SB-TF-07: EventsV02Service (event ad eligibility, ad_refusal); bound by EconomyServices.
+var events
 
 func _init(reward, hearts, provider = null) -> void:
 	_reward = reward
@@ -82,6 +91,8 @@ static func booster_product(id: String) -> String:
 static func placement(product: String) -> String:
 	if product.begins_with(WIN_DOUBLE_PREFIX):
 		return WIN_DOUBLE_PLACEMENT
+	if product.begins_with(EVENT_AD_PREFIX):
+		return EVENT_AD_PLACEMENT
 	return "rewarded_" + product.replace(":", "_")
 
 static func rewards_for(product: String) -> Dictionary:
@@ -169,6 +180,50 @@ func start_win_double(receipt_key: String, scrub_bucks: int, token: String = "")
 		_seq += 1
 		token = "rw_win_double_%d_%d" % [int(Time.get_unix_time_from_system()), _seq]
 	return _request_grant(win_double_tx(receipt_key), token, win_double_tx(receipt_key), {"scrub_bucks": scrub_bucks})
+
+static func event_ad_tx(iid: String, day: int) -> String:
+	return "%s%s:%d" % [EVENT_AD_PREFIX, iid, day]
+
+## The instance id of an event_ad:<iid>:<day> tx ("" when it is not one).
+static func event_ad_iid(tx: String) -> String:
+	var rest := tx.trim_prefix(EVENT_AD_PREFIX)
+	var i := rest.rfind(":")
+	return rest.substr(0, i) if tx.begins_with(EVENT_AD_PREFIX) and i > 0 else ""
+
+## Highest local day of any granted event ad (-1 = none), from the canonical ledger.
+func event_ad_high_water_day() -> int:
+	var hi := -1
+	for id in _reward.applied_ids():
+		var s := String(id)
+		var day := s.get_slice(":", s.get_slice_count(":") - 1)
+		if s.begins_with(EVENT_AD_PREFIX) and day.is_valid_int():
+			hi = maxi(hi, int(day))
+	return hi
+
+## SB-TF-07: may the event ad for instance `iid` be offered on local day `day` right now?
+func can_start_event_ad(iid: String, day: int) -> Dictionary:
+	if _reward.already_applied(event_ad_tx(iid, day)):
+		return {"ok": false, "reason": "already_claimed"}
+	if day < event_ad_high_water_day():
+		return {"ok": false, "reason": "clock_rollback"}
+	var refusal: String = events.ad_refusal(iid) if events != null else "not_found"
+	if not refusal.is_empty():
+		return {"ok": false, "reason": refusal}
+	if _pending.values().has(EVENT_AD_PREFIX + iid):
+		return {"ok": false, "reason": "pending"}
+	if _provider == null or not _provider.is_available(EVENT_AD_PLACEMENT):
+		return {"ok": false, "reason": "unavailable"}
+	return {"ok": true}
+
+## Begin the event ad: a verified completion grants +1 progress once under event_ad:<iid>:<day>.
+func start_event_ad(iid: String, day: int, token: String = "") -> Dictionary:
+	var c := can_start_event_ad(iid, day)
+	if not c["ok"]:
+		return c
+	if token.is_empty():
+		_seq += 1
+		token = "rw_event_ad_%d_%d" % [int(Time.get_unix_time_from_system()), _seq]
+	return _request_grant(EVENT_AD_PREFIX + iid, token, event_ad_tx(iid, day), {RES_EVENT_AD: 1})
 
 ## May this product be offered right now (provider policy + product state)?
 func can_start(product: String) -> Dictionary:

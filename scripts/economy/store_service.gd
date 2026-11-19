@@ -186,8 +186,8 @@ func grant_no_ads() -> void:
 func no_ads() -> bool:
 	return _no_ads
 
-## THE ad-decision seam: may an ad of `kind` ("banner" | "interstitial" | "rewarded") show?
-## No Ads removes the bottom banner and the every-5-plays interstitials; rewarded videos are
+## THE ad-decision seam: may an ad of `kind` ("banner" | "interstitial" | "app_open" | "rewarded") show?
+## No Ads removes the bottom banner, the interstitials and the App Open ad (SB-TF-07); rewarded videos are
 ## player-requested and stay. (No ad provider is built yet; Home's banner slot reads this.)
 func ads_allowed(kind: String) -> bool:
 	return kind == "rewarded" or not _no_ads

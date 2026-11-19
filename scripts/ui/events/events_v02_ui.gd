@@ -8,7 +8,10 @@ extends RefCounted
 ##     resident; textures are plain load()s released with the popup);
 ##   - open_details(stack, app, iid): hero, goal, computer-controlled note, live standings /
 ##     bracket / team / color state, reward steps (CLAIM through ProductionActionFacade), JOIN
-##     and HOW IT WORKS (EventTutorial; shown once automatically on the first visit).
+##     and HOW IT WORKS (EventTutorial; shown once automatically on the first visit);
+##   - SB-TF-07: WATCH AD · +1 while ProductionActionFacade.event_ad_available(iid) (joined, active,
+##     not quest / colors, once per event per local day, an ad ready); the verified grant and its
+##     save happen in RewardedGrantService, this screen only starts it and refreshes on `resolved`.
 ## Missing art falls back to an empty TextureRect tagged `art_fallback` (QA visible), never a
 ## crash. Every entry re-checks the Events unlock (Level 30, feature_unlocks_v1.json).
 
@@ -26,6 +29,7 @@ const PALETTE := "res://data/palettes/scrubbots_palette_v3.json"
 const TUTORIAL := "res://scripts/ui/events/event_tutorial.gd"   ## loaded on use (it preloads this file)
 const RIVAL_KINDS := ["race", "ranking", "royale", "bracket", "team_milestones", "team_versus"]
 const MAX_ROWS := 8   ## standings rows shown (Royale: top rows + You)
+const AD_TIMEOUT_S := 60.0   ## SB-TF-05 pattern: an unanswered event ad is abandoned (no grant)
 
 ## Texture for an event art path; null (fallback) when the file is missing.
 static func art_texture(path: String) -> Texture2D:
@@ -197,6 +201,7 @@ static func open_details(stack, app, iid: String) -> BasePopup:
 	scroll.add_child(list)
 	TouchScroll.enable(scroll)
 	p.add_action("join", UiText.t("EV2_JOIN"), "primary", false)
+	p.add_action("ad", UiText.t("EV2_WATCH_AD"), "secondary", false)
 	p.add_action("how", UiText.t("EV2_HOW"), "secondary", false, "foot")
 	p.add_action("close", UiText.t("SHOP_CLOSE"), "secondary", true, "foot")
 	p.action_selected.connect(func(id, _c):
@@ -206,6 +211,9 @@ static func open_details(stack, app, iid: String) -> BasePopup:
 			app.actions.claim_event_reward(iid, id.substr(3))
 		elif id == "how":
 			load(TUTORIAL).open(stack, app, iid)
+		elif id == "ad":
+			if _watch_ad(p, app, iid):
+				return   # refreshed + re-armed when the verified result arrives
 		else:
 			return
 		refresh_details(p, app)
@@ -214,11 +222,35 @@ static func open_details(stack, app, iid: String) -> BasePopup:
 	if not stack.push(p):
 		p.free()
 		return null
+	var on_resolved := func(token: String, _product: String, _r: Dictionary):
+		if is_instance_valid(p) and token == String(p.get_meta("ad_token", "")):
+			p.set_meta("ad_token", "")
+			refresh_details(p, app)
+			p.rearm_soon()
+	app.economy.rewarded.resolved.connect(on_resolved)
+	p.tree_exited.connect(func():
+		if app.economy.rewarded.resolved.is_connected(on_resolved):
+			app.economy.rewarded.resolved.disconnect(on_resolved))
 	var ev = app.economy.events_v02
 	var id := String(ev.view(iid)["id"])
 	if not ev.tutorial_seen(id):   # first visit: the walkthrough opens once on top
 		load(TUTORIAL).open(stack, app, iid)
 	return p
+
+## Start the event ad; true = a video is playing (the popup waits for `resolved`, abandoned after
+## AD_TIMEOUT_S). A refusal or a synchronous result refreshes at once.
+static func _watch_ad(p: BasePopup, app, iid: String) -> bool:
+	var r: Dictionary = app.actions.start_event_ad(iid)
+	app.analytics.track("ad_request", {"product": "event_progress", "ok": bool(r.get("ok", false)), "reason": String(r.get("reason", "ok"))})
+	if not bool(r.get("ok", false)) or not app.economy.rewarded.result_for(String(r["token"])).is_empty():
+		return false
+	var token := String(r["token"])
+	p.set_meta("ad_token", token)
+	if p.is_inside_tree():
+		p.get_tree().create_timer(AD_TIMEOUT_S).timeout.connect(func():
+			if app.economy.rewarded.is_pending(token):
+				app.actions.abandon_rewarded(token))
+	return true
 
 static func refresh_details(p: BasePopup, app) -> void:
 	var v: Dictionary = app.economy.events_v02.view(String(p.get_meta("iid")))
@@ -260,6 +292,8 @@ static func refresh_details(p: BasePopup, app) -> void:
 	list.add_child(rewards)
 	p.set_action_visible("join", v["phase"] == "active" and not v["joined"])
 	p.set_action_blocked("join", app.is_blocked)
+	p.set_action_visible("ad", app.actions.event_ad_available(String(v["iid"])))
+	p.set_action_blocked("ad", app.is_blocked)
 
 static func _when_overlay(v: Dictionary) -> Control:
 	var over := HBoxContainer.new()

@@ -2,7 +2,8 @@
 
 Filled answers for the four console questionnaires. They match `docs/privacy/index.html` and the
 build as it will ship with job 170 (Google Play Billing / StoreKit, AdMob rewarded + interstitial
-+ banner, Google UMP consent, iOS ATT prompt).
++ banner, Google UMP consent, iOS ATT prompt). The App Open ad (SB-TF-07) is one more AdMob format
+through the same SDK and consent; it collects nothing new, so no answer below changes.
 
 Facts these answers rest on (checked in the code, 2026-11-17):
 - No account, no login, no own server. `data/config/remote_content_runtime_v1.json` has an empty

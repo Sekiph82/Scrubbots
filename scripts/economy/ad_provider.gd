@@ -13,9 +13,14 @@ extends "res://scripts/economy/rewarded_ad_provider.gd"
 ##       below the board (never over it).
 ##   show_interstitial(placement) -> bool   true = a full-screen ad was shown. AdService
 ##       calls it only between levels (Results -> next attempt), never during gameplay.
+##   show_app_open(placement) -> bool   SB-TF-07: true = a loaded App Open ad was shown.
+##       AdService calls it once per cold boot after the opening video, never on resume.
 
 func set_banner(_visible: bool) -> void:
 	pass
 
 func show_interstitial(_placement: String) -> bool:
+	return false
+
+func show_app_open(_placement: String) -> bool:
 	return false

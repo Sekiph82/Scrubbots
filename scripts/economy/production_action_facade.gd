@@ -314,6 +314,20 @@ func claim_event_reward(iid: String, rid: String) -> Dictionary:
 		return _locked("claim_event_reward", "events")
 	return _finish_durable("claim_event_reward", func(): return _economy.events_v02.claim(iid, rid, _economy.reward, true))
 
+## SB-TF-07 (owner 2026-11-18): "Watch ad, +1 progress", once per event instance per local day.
+## A verified completion commits (+ saves) inside RewardedGrantService.resolve; No Ads keeps it.
+func event_ad_available(iid: String) -> bool:
+	return feature_unlocked("events") and _economy.ads.allowed("rewarded") 		and bool(_economy.rewarded.can_start_event_ad(iid, _economy.daily.local_day()).get("ok", false))
+
+func start_event_ad(iid: String, token: String = "") -> Dictionary:
+	if not feature_unlocked("events"):
+		return _locked("start_event_ad", "events")
+	if not _economy.ads.allowed("rewarded"):
+		return {"ok": false, "action": "start_event_ad", "reason": "ads_disallowed"}
+	var r: Dictionary = _economy.rewarded.start_event_ad(iid, _economy.daily.local_day(), token)
+	r["action"] = "start_event_ad"
+	return r
+
 func mark_event_tutorial_seen(event_id: String) -> Dictionary:
 	if not feature_unlocked("events"):
 		return _locked("mark_event_tutorial_seen", "events")

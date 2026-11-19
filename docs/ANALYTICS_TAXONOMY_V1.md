@@ -62,8 +62,9 @@ Definitions:
 | `shop_open` | 009, 010 | `main.gd` on `ShopHandoff.shop_requested` (every Shop entry; store page view, no purchases exist) | source (home_shop = shop deep link, home_sb_plus, home_heart_plus (SB-TF-03 Hearts + MORE IN SHOP), life, booster, speed, need_a_hand) |
 | `launch_failed` | 009 | `main.gd` `launch_gameplay` refusals | reason (APP_BLOCKED, CONTENT_MISSING, CATALOG_INVALID, LEVEL_DISABLED, BUILD_FAILED) |
 | `ad_offer_shown` | 010 | `AcquisitionFlow` Life / Booster / Need a Hand popup opened | placement, available (provider + product state allow a video now) |
-| `ad_request` | 010 | `AcquisitionFlow._start_rewarded`, `RewardedAdsScreen._watch` (player accepted the offer) | product (heart, booster_<id>, daily_slot), ok, reason (refusal reason) |
-| `ad_result` | 010 | `AppState` on `RewardedGrantService.resolved` (once per token; late duplicates are not resolved again) | product (heart, booster_<id>, daily_slot, win_double = SB-TF-05 win x2), outcome (granted = verified completion committed; cancelled, skipped, failed, timeout, unverified, already_full, duplicate) |
+| `ad_request` | 010 | `AcquisitionFlow._start_rewarded`, `RewardedAdsScreen._watch`, `EventsV02Ui._watch_ad` (player accepted the offer) | product (heart, booster_<id>, daily_slot, event_progress = SB-TF-07 event +1), ok, reason (refusal reason) |
+| `ad_result` | 010 | `AppState` on `RewardedGrantService.resolved` (once per token; late duplicates are not resolved again) | product (heart, booster_<id>, daily_slot, win_double = SB-TF-05 win x2, event_progress = SB-TF-07 event +1), outcome (granted = verified completion committed; cancelled, skipped, failed, timeout, unverified, already_full, duplicate) |
+| `ad_placement` | SB-TF-07 | `AdService.try_interstitial` / `try_app_open` (wired by `AppState`), only when the placement was due / eligible and the provider was asked | placement (app_open, interstitial), shown, reason (shown, no_fill) |
 | `notify_toggle` | 012 | `ProfileScreens.open_notifications` | category (all or one reminder category), on |
 | `notification_prompt` | 012 | explainer popup shown / Allow / Not now; `main.gd` on `SceneTree.on_request_permissions_result` | step (explainer_shown, allowed, declined, os_granted, os_denied) |
 | `deep_link_open` | 012 | `main.gd` `open_deep_link` | dest (the destination actually opened) |

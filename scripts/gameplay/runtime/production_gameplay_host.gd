@@ -753,9 +753,9 @@ func _drive_economy_terminal(status) -> void:
 		_economy.speed.on_level_completed(progression_level, false)
 		if progression_attempt:
 			_meta_terminal(false, ev_unlocked)
-	# SB-M57-001: any finished level (win or loss) is one play for the interstitial cadence.
+	# SB-M57-001: any finished level (win or loss) is one play for the interstitial cadence (SB-TF-07: the level just played gates it).
 	if _economy_terminal_done:
-		_economy.ads.on_play_finished()
+		_economy.ads.on_play_finished(progression_level)
 	# M40 V02 (F-M40-006): terminal is a defined safe save boundary (not per-frame).
 	var saved: Dictionary = request_save()
 	# M43-C001A: receipt = committed before/after truth. Built only by the latched

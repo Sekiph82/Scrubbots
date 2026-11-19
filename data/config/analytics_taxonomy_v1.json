@@ -26,7 +26,7 @@
     "amount": ["0", "1_10", "11_50", "51_100", "101_500", "501_1000", "1001_5000", "gt_5000"],
     "currency": ["scrub_bucks", "bot_parts"],
     "rarity": ["COMMON", "RARE", "EPIC", "LEGENDARY"],
-    "ad_product": ["heart", "booster_plus_one_slot", "booster_random", "booster_selector", "booster_tornado", "daily_slot", "win_double", "other"],
+    "ad_product": ["heart", "booster_plus_one_slot", "booster_random", "booster_selector", "booster_tornado", "daily_slot", "win_double", "event_progress", "other"],
     "screen": ["opening", "home", "gameplay", "results", "settings", "help", "robots", "events", "leaderboard", "shop", "collection", "tasks", "daily", "rewarded_ads", "gift_bar", "profile", "other"]
   },
   "events": {
@@ -224,6 +224,14 @@
       "params": {
         "product": {"type": "enum", "enum": "ad_product", "fallback": "other", "required": true},
         "outcome": {"type": "enum", "values": ["granted", "cancelled", "skipped", "failed", "timeout", "unverified", "already_full", "duplicate", "other"], "fallback": "other", "required": true}
+      }
+    },
+    "ad_placement": {
+      "task": "SB-TF-07",
+      "params": {
+        "placement": {"type": "enum", "values": ["app_open", "interstitial"], "required": true},
+        "shown": {"type": "bool", "required": true},
+        "reason": {"type": "enum", "values": ["shown", "no_fill"], "required": true}
       }
     },
     "notify_toggle": {

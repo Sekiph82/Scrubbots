@@ -26,10 +26,17 @@ extends "res://scripts/economy/ad_provider.gd"
 ## `schedule` (a SceneTree timer; tests inject a fake). A successful load resets the count;
 ## after the cap the ad reloads lazily on the next is_available / due interstitial, as before.
 ## ADS_INIT_DONE after the SDK init; consent / ATT failures are logged and still initialize.
+##
+## SB-TF-07 App Open (plugin v7.0 API: load_app_open_ad / show_app_open_ad, app_open_ad_* signals):
+## loaded once the SDK is ready like the other kinds (same retry), single use then reloaded after
+## it closes; never auto-shown on resume (auto_show_on_resume = false, AdService decides when).
+## TEST unit unless the release REAL_IDS file carries a non-empty "app_open" id; a real-id build
+## without one never loads or shows it (logs ADS_APP_OPEN_NO_ID).
 
 const NATIVE := "AdmobPlugin"
 const NODE_SCRIPT := "res://addons/AdmobPlugin/Admob.gd"
-## CI-generated in release billing_ads builds only: const IDS = {banner, interstitial, rewarded}.
+## CI-generated in release billing_ads builds only: const IDS = {banner, interstitial, rewarded, app_open}
+## (app_open optional / may be empty).
 const REAL_IDS := "res://addons/AdmobPlugin/scrubbots_real_ids.gd"
 ## LoadAdRequest.AdPosition.BOTTOM of the plugin.
 const POSITION_BOTTOM := 1
@@ -42,8 +49,10 @@ var _want_banner := false
 var _banner_loaded := false
 var _interstitial := "none"   ## none | loading | retry | ready
 var _rewarded := "none"       ## none | loading | retry | ready
+var _app_open := "none"       ## none | loading | retry | ready
+var _app_open_id := true      ## false = real-id build without an App Open unit (never loaded)
 var _rw := {}                 ## the open rewarded view: {token, deliver, earned}
-var _retries := {"interstitial": 0, "rewarded": 0}   ## consecutive automatic reloads
+var _retries := {"interstitial": 0, "rewarded": 0, "app_open": 0}   ## consecutive automatic reloads
 ## schedule.call(delay_s, callback): one deferred call (default: a SceneTree timer).
 var schedule := func(delay: float, cb: Callable) -> void:
 	(Engine.get_main_loop() as SceneTree).create_timer(delay).timeout.connect(cb)
@@ -57,9 +66,15 @@ func _init(node, ios: bool = OS.has_feature("ios"), real_ids: String = REAL_IDS)
 		_n.set("is_real", true)
 		for kind in ["banner", "interstitial", "rewarded"]:
 			_n.set("%s_real_%s_id" % ["ios" if ios else "android", kind], ids[kind])
+		_app_open_id = not String(ids.get("app_open", "")).is_empty()
+		if _app_open_id:
+			_n.set("%s_real_app_open_id" % ("ios" if ios else "android"), ids["app_open"])
+		else:
+			print("ADS_APP_OPEN_NO_ID")
 	_n.set("banner_position", POSITION_BOTTOM)
 	_n.set("banner_anchor_to_safe_area", true)
 	_n.set("remove_interstitial_ads_after_displayed", true)
+	_n.set("auto_show_on_resume", false)
 	_n.connect("consent_info_updated", _on_consent_info)
 	_n.connect("consent_info_update_failed", _on_consent_failed.bind("info"))
 	_n.connect("consent_form_loaded", func(): _n.show_consent_form())
@@ -78,6 +93,10 @@ func _init(node, ios: bool = OS.has_feature("ios"), real_ids: String = REAL_IDS)
 	_n.connect("rewarded_ad_user_earned_reward", func(_a, _r): if not _rw.is_empty(): _rw["earned"] = true)
 	_n.connect("rewarded_ad_dismissed_full_screen_content", _on_rewarded_closed.bind("").unbind(1))
 	_n.connect("rewarded_ad_failed_to_show_full_screen_content", _on_rewarded_closed.bind("failed").unbind(2))
+	_n.connect("app_open_ad_loaded", func(_a, _r): _on_loaded("app_open"))
+	_n.connect("app_open_ad_failed_to_load", func(_a, e): _on_load_failed("app_open", e))
+	_n.connect("app_open_ad_failed_to_show_full_screen_content", func(_a, _e): _load_app_open())
+	_n.connect("app_open_ad_dismissed_full_screen_content", _load_app_open.unbind(1))
 
 ## Call once the node is in the tree (its _ready picks the ad unit ids).
 func start() -> void:
@@ -123,6 +142,7 @@ func _on_initialized() -> void:
 	print("ADS_INIT_DONE test_units=%s" % str(not bool(_n.get("is_real"))))
 	_load_interstitial()
 	_load_rewarded()
+	_load_app_open()
 	set_banner(_want_banner)
 
 # ------------------------------------------------------------------ banner ----
@@ -159,6 +179,25 @@ func show_interstitial(_placement: String) -> bool:
 func _load_interstitial() -> void:
 	_interstitial = "loading"
 	_n.load_interstitial_ad()
+
+# ---------------------------------------------------------------- app open ----
+
+func show_app_open(_placement: String) -> bool:
+	if not _sdk_ready or not _app_open_id:
+		return false
+	if _app_open != "ready":
+		if _app_open == "none":
+			_load_app_open()
+		return false
+	_app_open = "none"
+	_n.show_app_open_ad()
+	return true
+
+func _load_app_open() -> void:
+	if not _app_open_id:
+		return
+	_app_open = "loading"
+	_n.load_app_open_ad()
 
 # ---------------------------------------------------------------- rewarded ----
 
@@ -209,10 +248,14 @@ func _retry(kind: String) -> void:
 		_load_rewarded()
 	elif kind == "interstitial" and _interstitial == "retry":
 		_load_interstitial()
+	elif kind == "app_open" and _app_open == "retry":
+		_load_app_open()
 
 func _set_state(kind: String, s: String) -> void:
 	if kind == "rewarded":
 		_rewarded = s
+	elif kind == "app_open":
+		_app_open = s
 	else:
 		_interstitial = s
 

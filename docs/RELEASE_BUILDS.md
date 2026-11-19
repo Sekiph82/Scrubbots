@@ -129,6 +129,9 @@ missing. It writes them only into the CI workspace (`android_export.cfg` / `ios_
 `is_real=true`, and `addons/AdmobPlugin/scrubbots_real_ids.gd`, which `AdmobAdProvider` loads to switch
 the node to the real units). Nothing is printed; the post-build check only asserts that the Google
 sample app id is absent, and a scrub step replaces the real app id in the uploaded logs.
+The App Open unit (SB-TF-07) is optional: `ADMOB_{ANDROID,IOS}_APP_OPEN_ID` goes into the same file as
+`app_open` when set; without it a real-id build shows no App Open ad and prints `ADS_APP_OPEN_NO_ID`
+(no build failure). Test-mode builds always use Google's TEST App Open unit.
 
 Diagnosing a store or ad failure on a device (SB-TF-01): the providers print one line per problem
 to the device log (Xcode > Devices > Open Console, or Console.app filtered on the app; Android

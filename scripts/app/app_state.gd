@@ -127,6 +127,9 @@ func _init(save_path: String = CANONICAL_SAVE_PATH, clock: Callable = Callable()
 	economy.wallet.changed.connect(_on_wallet_changed)
 	economy.reward.granted.connect(_on_reward_granted)
 	economy.rewarded.resolved.connect(_on_rewarded_resolved)
+	# SB-TF-07: App Open level gate (frontier) + ad_placement analytics (consent-gated in track).
+	economy.ads.bind_level(Callable(progression, "current_level"))
+	economy.ads.on_placement(Callable(analytics, "track"))
 	actions.action_committed.connect(_on_action_committed)
 	unlocks = FeatureUnlocks.new()
 	unlocks.load_config()
@@ -195,7 +198,7 @@ func _on_reward_granted(tx_id: String) -> void:
 
 ## SB-M56-010: rewarded video result (granted = verified completion committed).
 func _on_rewarded_resolved(_token: String, product: String, r: Dictionary) -> void:
-	var p := "daily_slot" if product.begins_with("daily_slot:") else "win_double" if product.begins_with("win_double:") else product.replace(":", "_")
+	var p := "daily_slot" if product.begins_with("daily_slot:") else "win_double" if product.begins_with("win_double:") 		else "event_progress" if product.begins_with("event_ad:") else product.replace(":", "_")
 	analytics.track("ad_result", {"product": p,
 		"outcome": "granted" if bool(r.get("ok", false)) else String(r.get("reason", ""))})
 
