@@ -1023,6 +1023,11 @@ class Track extends VBoxContainer:
 			dot.custom_minimum_size = Vector2(64, 64) if values.size() <= 8 else Vector2(44, 44)
 			dot.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 			n.set_meta("state", dot.state)
+			if dot.state == "current":   # the storyboards' gold star marks where you are
+				var star := HomeStyle.art("Star")
+				star.texture = load(KIT % "star")
+				star.set_anchors_preset(Control.PRESET_FULL_RECT)
+				dot.add_child(star)
 			n.add_child(dot)
 			var l := HomeStyle.label(UiText.num(int(values[i])), 24 if values.size() <= 8 else 18, Color.WHITE, 6)
 			l.name = "Value"
