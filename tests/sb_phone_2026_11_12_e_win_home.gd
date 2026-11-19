@@ -243,7 +243,8 @@ func _results_won_branch_removed() -> void:
 	var res = ResultsScreen.new()
 	_ok(not res.has_method("reward_rows") and not res.has_method("set_ceremony_barrier") and not res.has_method("is_victory_layout"), "no WON rows / barrier / Victory layout API")
 	res.free()
-	var t := FileAccess.get_file_as_string("res://scripts/ui/home/home_reward_flight.gd") + FileAccess.get_file_as_string("res://scripts/ui/win_overlay.gd") 		+ FileAccess.get_file_as_string("res://scripts/ui/components/reward_reveal.gd")
+	var t := FileAccess.get_file_as_string("res://scripts/ui/home/home_reward_flight.gd") + FileAccess.get_file_as_string("res://scripts/ui/win_overlay.gd") \
+		+ FileAccess.get_file_as_string("res://scripts/ui/components/reward_reveal.gd")
 	var bad: Array = []
 	for needle in [".grant(", ".credit(", ".claim(", "record_win", "request_save", "mark_seen"]:
 		if t.find(needle) != -1:

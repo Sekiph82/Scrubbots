@@ -49,7 +49,7 @@ const PACK_GROW := 1.35
 ## Backdrop dim behind the shown rewards (fades out as they fly to the HUD).
 const DIM_ALPHA := 0.45
 ## Upper bound on one rewarded video while the hold is paused (then: no grant, fly at once).
-const AD_TIMEOUT_S := 30.0
+const AD_TIMEOUT_S := 60.0
 ## Above ModalStack.LAYER (64): the reveal covers the popup that claimed the reward.
 const LAYER := 70
 

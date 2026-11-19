@@ -70,7 +70,7 @@ func buy_charge(id: String) -> Dictionary:
 	if not _wallet.debit(EconomyWallet.SCRUB_BUCKS, price, "booster_buy"):
 		return {"ok": false, "reason": "insufficient_sb", "price": price}
 	_charges[id] = charges(id) + 1
-	return {"ok": true, "booster": id, "price": price, "charges": charges(id)}
+	return {"ok": true, "booster": id, "price": price, "charges": charges(id), "added": 1}
 
 ## Refund a reservation when the booster effect fails (atomicity).
 func refund(id: String, reservation: Dictionary) -> void:

@@ -106,9 +106,7 @@ func buy_booster_charge(id: String) -> Dictionary:
 	var lk := _locked("buy_booster_charge", id)
 	if not lk.is_empty():
 		return lk
-	var r: Dictionary = _economy.boosters.buy_charge(id)
-	r["booster"] = id   # presentation identity copied from the input (SB-TF-05 reward reveal)
-	return _finish("buy_booster_charge", r)
+	return _finish("buy_booster_charge", _economy.boosters.buy_charge(id))
 
 func _booster_done(action: String, r: Dictionary) -> Dictionary:
 	if r.get("ok", false):
@@ -167,7 +165,8 @@ func start_rewarded_daily(slot: int, token: String = "") -> Dictionary:
 ## wallet_delta.scrub_bucks once more under win_double:<receipt_key> (commit + save inside
 ## RewardedGrantService.resolve); never twice for one win.
 func win_double_available(receipt_key: String, receipt: Dictionary) -> bool:
-	return _win_double_sb(receipt) > 0 and _economy.ads.allowed("rewarded") 		and bool(_economy.rewarded.can_start_win_double(receipt_key).get("ok", false))
+	return _win_double_sb(receipt) > 0 and _economy.ads.allowed("rewarded") \
+		and bool(_economy.rewarded.can_start_win_double(receipt_key).get("ok", false))
 
 func start_win_double(receipt_key: String, receipt: Dictionary, token: String = "") -> Dictionary:
 	if not _economy.ads.allowed("rewarded"):

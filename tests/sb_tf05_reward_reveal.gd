@@ -23,7 +23,7 @@ const R := NavigationController.Route
 var EXPECTED_CASES := [
 	"timeline", "input_lock", "empty_entries", "reduced_effects", "one_shot_finish", "win_entries",
 	"x2_visibility", "x2_granted_once", "x2_not_granted", "hold_pauses_during_ad", "x2_only_scrub_bucks",
-	"no_ads_and_test_mode", "routing_all_sources", "card_pack_handoff", "presenter_source_clean",
+	"no_ads_and_test_mode", "routing_all_sources", "card_pack_handoff", "presenter_source_clean", "play_label_gap",
 ]
 
 ## Minimal Home: named HUD regions + the counter seam the reveal calls.
@@ -88,6 +88,7 @@ func _initialize() -> void:
 	await _routing_all_sources()
 	await _card_pack_handoff()
 	_presenter_source_clean()
+	await _play_label_gap()
 	_cleanup()
 	_done()
 
@@ -345,13 +346,18 @@ func _x2_not_granted() -> void:
 		r.advance(0.3)
 		r.get_double_button().pressed.emit()
 		if c[1] == null:
-			r.advance(RewardReveal.AD_TIMEOUT_S + 0.1)
+			r.advance(RewardReveal.AD_TIMEOUT_S - 1.0)
+			_ok(r.is_ad_pending() and r.is_running(), "timeout: still waiting after %.0f s (bound %.0f s)" % [RewardReveal.AD_TIMEOUT_S - 1.0, RewardReveal.AD_TIMEOUT_S])
+			r.advance(1.1)
 		else:
 			ads.deliver_last(c[1])
 		var late: Dictionary = ads.deliver_last({"outcome": "completed", "verified": true}) if c[1] == null else {}
 		_ok(app.economy.wallet.scrub_bucks() == sb0 and app.economy.reward.applied_transaction_count() == tx0 and not bool(late.get("ok", false)), "%s: wallet / ledger unchanged" % c[0])
 		_ok(not r.is_ad_pending() and is_equal_approx(r.elapsed(), r.fly_at()) and r.get_double_button() == null, "%s: flight starts at once, button removed" % c[0])
 		_ok((r.get_bursts()[0].hero.get_node("Amount") as Label).text == "+30", "%s: normal amount" % c[0])
+		for _k in range(40):
+			r.advance(0.05)
+		_ok(not r.is_running() and r.get_layer() == null, "%s: the input lock releases after the flight" % c[0])
 		r.finish()
 	_shutdown(root)
 	_completed["x2_not_granted"] = true
@@ -369,9 +375,9 @@ func _hold_pauses_during_ad() -> void:
 	r.advance(RewardReveal.APPEAR_S + 0.5)
 	r.get_double_button().pressed.emit()
 	var t0: float = r.elapsed()
-	for _i in range(20):
-		r.advance(1.0)   # 20 s of ad
-	_ok(is_equal_approx(r.elapsed(), t0) and r.is_running() and _copies(r) == 0, "20 s of ad: clock stands still at %.2f, nothing flies" % r.elapsed())
+	for _i in range(59):
+		r.advance(1.0)   # a 59 s rewarded video (below the 60 s bound)
+	_ok(is_equal_approx(r.elapsed(), t0) and r.is_running() and r.is_ad_pending() and _copies(r) == 0, "59 s of ad: clock stands still at %.2f, nothing flies" % r.elapsed())
 	ads.deliver_last({"outcome": "completed", "verified": true})
 	_ok(is_equal_approx(r.fly_at() - r.elapsed(), 1.0), "granted: the remaining hold (1.0 s) continues")
 	r.advance(0.99)
@@ -526,6 +532,31 @@ func _presenter_source_clean() -> void:
 			bad.append(needle)
 	_ok(bad.is_empty(), "reward_reveal.gd has no wallet / grant / save / wall-clock timer %s" % str(bad))
 	_completed["presenter_source_clean"] = true
+
+## Review fix: the fitted PLAY label (incl. outline) stays >= 8 px left of the PlayTriangle.
+func _play_label_gap() -> void:
+	print("[PLAY label clear of the triangle]")
+	var root = await _boot(_uniq("play"))
+	var home = root.get_home()
+	var play: Button = home.get_region("PlayButton")
+	var tri: Control = home.get_region("PlayTriangle")
+	var sb: StyleBox = play.get_theme_stylebox("normal")
+	var loc0 := UiText.locale
+	for loc in ["en", "tr"]:
+		UiText.locale = loc
+		for lvl in [2, 99, 999, 9999]:
+			var text := UiText.t("HOME_PLAY_LEVEL", [lvl])
+			home.fit_play_text(play, text)
+			var fs: int = play.get_theme_font_size("font_size")
+			var w: float = play.get_theme_font("font").get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
+			var left: float = sb.get_margin(SIDE_LEFT)
+			var right: float = play.size.x - sb.get_margin(SIDE_RIGHT)
+			var text_right: float = (left + right + w) * 0.5 + play.get_theme_constant("outline_size")
+			var gap: float = tri.position.x - text_right
+			_ok(gap >= 8.0 and w <= right - left, "%s level %d: \"%s\" %d px, right edge %.1f, triangle %.1f, gap %.1f >= 8" % [loc, lvl, text, fs, text_right, tri.position.x, gap])
+	UiText.locale = loc0
+	_shutdown(root)
+	_completed["play_label_gap"] = true
 
 # ---------------------------------------------------------------- helpers ----
 

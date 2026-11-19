@@ -1163,7 +1163,7 @@ func _build_play(parent: VBoxContainer) -> void:
 	for st in ["normal", "hover", "pressed", "disabled"]:
 		var sb: StyleBoxFlat = play.get_theme_stylebox(st)
 		sb.content_margin_bottom = 22   # one centred line above the bottom bevel
-		sb.content_margin_right = 96
+		sb.content_margin_right = PLAY_TEXT_RIGHT
 		sb.content_margin_left = 24
 	play.pressed.connect(func():
 		if not play.disabled:
@@ -1670,17 +1670,15 @@ func get_view_model() -> Dictionary:
 ## is shown honestly and disabled (no fallback, no picker).
 const PLAY_FONT := 76
 const PLAY_FONT_MIN := 30
+## SB-TF-05 review: the label's content area ends 120 px from the right edge, i.e. 16 px left of
+## the PlayTriangle (offset_left -104), so the fitted text (incl. outline) keeps >= 8 px clear.
+const PLAY_TEXT_RIGHT := 120
 func _render_play(play: Button, status: Label) -> void:
 	_launch = GameplayLaunchResolver.resolve(_app)
 	var level := int(_launch.get("level", _app.progression.current_level()))
 	var text := UiText.t("HOME_PLAY_LEVEL", [level])
 	if play.text != text:
-		var avail: float = PLAY_SIZE.x - play.get_theme_stylebox("normal").get_minimum_size().x - 2.0 * play.get_theme_constant("outline_size")
-		var fs := PLAY_FONT
-		while fs > PLAY_FONT_MIN and play.get_theme_font("font").get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > avail:
-			fs -= 1
-		play.add_theme_font_size_override("font_size", fs)   # before the text: never a wider frame
-		play.text = text
+		fit_play_text(play, text)
 	if _launch.get("ok", false):
 		play.disabled = false
 		status.text = ""
@@ -1697,6 +1695,15 @@ func _render_play(play: Button, status: Label) -> void:
 	else:
 		play.disabled = true
 		status.text = UiText.t("HOME_LEVELS_UNAVAILABLE", [String(_launch.get("reason", ""))])
+
+## Font-fit `text` into PLAY's content area (between the left margin and PLAY_TEXT_RIGHT).
+func fit_play_text(play: Button, text: String) -> void:
+	var avail: float = PLAY_SIZE.x - play.get_theme_stylebox("normal").get_minimum_size().x - 2.0 * play.get_theme_constant("outline_size")
+	var fs := PLAY_FONT
+	while fs > PLAY_FONT_MIN and play.get_theme_font("font").get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > avail:
+		fs -= 1
+	play.add_theme_font_size_override("font_size", fs)   # before the text: never a wider frame
+	play.text = text
 
 ## M43-C001R: the shared ResultsMomentum journey for the current frontier (Home semantics).
 func set_momentum_config(cfg: Dictionary) -> void:

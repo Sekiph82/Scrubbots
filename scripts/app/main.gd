@@ -402,12 +402,10 @@ func _reveal_action(action: String, r: Dictionary) -> void:
 			rewards = {"random_any_booster_charges": int(r.get("random_any_booster_charges", 0))}
 		"claim_gift":
 			rewards = r.get("rewards", {})
-		"buy_heart":
-			rewards = {"hearts": 1}
-		"refill_hearts":
+		"buy_heart", "refill_hearts":
 			rewards = {"hearts": int(r.get("added", 0))}
 		"buy_booster_charge":
-			rewards = {"booster_charge_" + String(r.get("booster", "")): 1}
+			rewards = {"booster_charge_" + String(r.get("booster", "")): int(r.get("added", 0))}
 	if typeof(rewards) == TYPE_DICTIONARY:
 		request_reward_reveal(REVEAL_ACTIONS[action], rewards, _reveal_key(action, String(r.get("tx", r.get("occurrence_id", "")))))
 

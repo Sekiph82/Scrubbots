@@ -96,7 +96,7 @@ func purchase_plus_one() -> Dictionary:
 	_hearts += 1
 	if _hearts >= _max:
 		_anchor = _now()
-	return {"ok": true, "hearts": _hearts, "spent": _plus_one_sb}
+	return {"ok": true, "hearts": _hearts, "spent": _plus_one_sb, "added": 1}
 
 ## M43-C003: +1 Heart from a verified rewarded grant (RewardGrantService handler only;
 ## RewardedGrantService pre-checks fullness). Never exceeds max; no SB involved.
