@@ -30,9 +30,8 @@ const SNAPSHOT_VERSION := 1
 const RECEIPT_MEMORY := 64
 const KINDS := ["milestones", "streak", "colors", "quest", "race", "ranking", "royale", "bracket", "team_milestones", "team_versus"]
 const PROFILES := ["casual", "average", "strong", "expert"]
-## Canonical robot roster ids / names (data/config/robot_roster_v1.json): rival + teammate avatars.
+## Canonical robot roster ids (data/config/robot_roster_v1.json): rival + teammate avatars; display name = id.capitalize().
 const ROBOTS := ["scrubby", "moppy", "bubbles", "spark", "squeegee", "dusty", "rinse", "polly", "clippy", "atlas"]
-const ROBOT_NAMES := ["Scrubby", "Moppy", "Bubbles", "Spark", "Squeegee", "Dusty", "Rinse", "Polly", "Clippy", "Atlas"]
 const COUNT_METRICS := ["first_clear_new_level", "virtual_team_qualifying_level_wins", "virtual_team_cleaning_points",
 	"virtual_team_sequential_clears", "seasonal_qualifying_level_progress"]
 const PIXEL_METRICS := ["cleaned_active_pixels", "cleaned_active_pixels_on_new_levels", "virtual_team_cleaned_active_pixels"]
@@ -432,7 +431,7 @@ func _rival(rec: Dictionary, idx: int) -> Dictionary:
 		steps.append([int(t), total])
 	var off := absi(String(rec["iid"]).hash()) % ROBOTS.size()
 	var r := {"profile": prof, "steps": steps, "robot": ROBOTS[(idx + off) % ROBOTS.size()],
-		"name": "%s %d" % [ROBOT_NAMES[(idx + off) % ROBOTS.size()], idx % OPPONENT_BASE + 1]}
+		"name": "%s %d" % [String(ROBOTS[(idx + off) % ROBOTS.size()]).capitalize(), idx % OPPONENT_BASE + 1]}
 	_cache[key] = r
 	return r
 

@@ -1,6 +1,6 @@
 extends SceneTree
 ## SB-M22-028 — Collection card texture LRU + single-card thumbnails on the real main.tscn
-## (1080x2400, throw-away save, all 135 cards owned). Checks: 135 thumbnails 440x660, lossless,
+## (1080x2400, throw-away save, all 135 cards owned). Checks: 135 thumbnails 440x660, lossy WebP,
 ## the whole card scaled (no crop); album rows and the 9-card set grid draw thumbnails only, the
 ## full art loads only in the card detail; a sweep of all 135 card details through the 15 sets and
 ## back keeps the album LRU <= 24 full cards / <= 96 MiB and the ResourceLoader-resident card art
@@ -60,7 +60,7 @@ func _initialize() -> void:
 	print("M22-028 COLLECTION CARD LRU: %s" % ("PASS" if _fail == 0 else "FAIL (%d)" % _fail))
 	quit(0 if _fail == 0 else 1)
 
-## 135 separate thumbnails: 440x660 with alpha, lossless import without size_limit / mipmaps, and the
+## 135 separate thumbnails: 440x660 with alpha, lossy WebP import without size_limit / mipmaps, and the
 ## whole source card scaled (one card per set compared against a fresh Lanczos downscale).
 func _thumb_files() -> void:
 	print("[thumbnail files]")
@@ -70,10 +70,10 @@ func _thumb_files() -> void:
 		var c := ConfigFile.new()
 		var tex := load(t) as Texture2D
 		if t == art or tex == null or Vector2i(tex.get_size()) != THUMB_SIZE or tex.get_image().get_format() != Image.FORMAT_RGBA8 \
-				or c.load(t + ".import") != OK or int(c.get_value("params", "compress/mode", -1)) != 0 \
+				or c.load(t + ".import") != OK or int(c.get_value("params", "compress/mode", -1)) != 1 \
 				or int(c.get_value("params", "process/size_limit", -1)) != 0 or bool(c.get_value("params", "mipmaps/generate", true)):
 			bad.append(t)
-	_ok(bad.is_empty(), "135 thumbnails 440x660 RGBA8, lossless, no size_limit / mipmaps %s" % str(bad.slice(0, 3)))
+	_ok(bad.is_empty(), "135 thumbnails 440x660 RGBA8, lossy WebP (AAB size, b3d68b14), no size_limit / mipmaps %s" % str(bad.slice(0, 3)))
 	var worst := 0.0
 	for i in range(0, 135, 9):
 		var src := Image.load_from_file(ProjectSettings.globalize_path(_arts[i]))

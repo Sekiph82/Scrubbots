@@ -6,7 +6,7 @@ extends SceneTree
 const ROOT := "res://assets/ui/final/boosters/"
 const BOOSTER_TEXTURE_MAX_DIM := 512
 const BOOSTER_TEXTURE_BUDGET_BYTES := 12 * 1024 * 1024
-const EXPECTED_COUNT := 10
+const EXPECTED_COUNT := 9  ## booster_tutorial_pointer.png deleted as unused (SB-ASSET-PURGE-2026-11-17)
 const GAMEPLAY_SCREEN := "res://scripts/ui/gameplay_screen.gd"
 const ACQUISITION_FLOW := "res://scripts/ui/popup/acquisition_flow.gd"
 
