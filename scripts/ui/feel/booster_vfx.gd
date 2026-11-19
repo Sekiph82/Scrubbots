@@ -49,6 +49,8 @@ const TORNADO_CLIP_S := 32.0 / 24.0   # also the code-only duration when the cli
 const COLLAPSE_S := 0.25
 const BURST_S := 0.25
 const STRETCH_MAX := 1.25             # max(sx, sy) / min(sx, sy) of the video layer
+const PULL_FROM := 0.6                # clip fraction at which the cells start into the tornado
+const PULL_TURNS := 0.75              # turns the ghost swirls around the tornado while converging
 ## Measured tornado per clip frame: [frame, centre x, centre y, diameter] in clip pixels (bbox
 ## of pixels brighter than 40/255). Key 0 = at the button, last key = end of travel.
 const TORNADO_TRACK := [
@@ -246,7 +248,7 @@ func _draw() -> void:
 
 func _draw_tornado() -> void:
 	var c: Vector2 = tornado_pos()
-	var s: float = _t * 0.85 / _clip   # the SB-POLISH-003 0.85 s timeline, stretched over the clip
+	var s: float = _pull() * 0.85   # the SB-POLISH-003 0.85 s timeline over the pull window
 	# The colour's supply / slot tiles and sampled board cells spiral into the moving tornado.
 	for tile in _d["tiles"]:
 		_spiral_rect(c, tile["rect"], tile["color"], clampf((s - 0.05) / 0.6, 0.0, 1.0), 2.4)
@@ -342,11 +344,17 @@ func tornado_phase() -> String:
 func get_video_player() -> VideoStreamPlayer:
 	return _video
 
+## Pull progress 0..1: the cells wait on the board until PULL_FROM of the clip (the tornado has
+## grown onto the board), then are sucked in, reaching the eye as the clip ends.
+func _pull() -> float:
+	return clampf((_t / _clip - PULL_FROM) / (1.0 - PULL_FROM), 0.0, 1.0)
+
 func _tick_tornado() -> void:
 	var c: Vector2 = tornado_pos()
 	if _ghost.visible:   # every purged cell (one texture) is pulled toward the tornado as it is now
-		var u: float = _ease_in(clampf(_t / _clip, 0.0, 1.0))   # reaches the eye as the clip ends
-		_ghost.position = (_d["board_rect"] as Rect2).position - global_position + (c - _d["center"]) * u
+		var u: float = _ease_in(_pull())   # starts once the tornado nears the board, eye at clip end
+		var off: Vector2 = (_d["center"] - c).rotated(-TAU * PULL_TURNS * u) * (1.0 - u)   # swirl in
+		_ghost.position = (_d["board_rect"] as Rect2).position - global_position + c + off - _d["center"]
 		_ghost.rotation = -TAU * 0.9 * u
 		_ghost.scale = Vector2.ONE * (1.0 - u)
 		_ghost.modulate.a = 1.0 - u * u

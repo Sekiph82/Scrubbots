@@ -358,6 +358,8 @@ func _timeline() -> void:
 	var center: Vector2 = d["center"]
 	var phases: Array = []
 	var moving := true
+	var waiting := 0
+	var swirl := 0.0
 	var positions: Array = []
 	var collapse_ok := false
 	var burst_ok := false
@@ -366,15 +368,20 @@ func _timeline() -> void:
 		var ph: String = _vfx.tornado_phase()
 		if phases.is_empty() or phases[-1] != ph:
 			phases.append(ph)
-		if ph == "VIDEO":
+		if ph == "VIDEO" and _vfx._t > 0.0:   # ghost state of this tick (set by the last _process)
 			var tp: Vector2 = _vfx.tornado_pos()
 			positions.append(tp)
 			var g: TextureRect = _vfx._ghost
-			if g.visible and g.scale.x < 0.999 and g.scale.x > 0.01:
-				var gp: Vector2 = g.get_global_transform() * g.pivot_offset
-				var a: Vector2 = gp - center
-				var b: Vector2 = tp - center
-				moving = moving and absf(a.cross(b)) <= 0.01 * b.length() * maxf(a.length(), 1.0) + 0.5 and a.length() <= b.length() + 0.5
+			var gp: Vector2 = g.get_global_transform() * g.pivot_offset
+			if _vfx._t / clip <= BoosterVfx.PULL_FROM:
+				waiting += 1   # the cells stay on the board until the tornado has grown onto it
+				moving = moving and gp.distance_to(center) <= 0.5 and g.scale.x == 1.0 and g.modulate.a == 1.0
+			elif g.scale.x > 0.01:
+				var u: float = 1.0 - g.scale.x
+				var want: Vector2 = tp + (center - tp).rotated(-TAU * BoosterVfx.PULL_TURNS * u) * (1.0 - u)
+				moving = moving and gp.distance_to(want) <= 1.5   # swirling into the CURRENT tornado
+				if u > 0.2 and u < 0.8:
+					swirl = maxf(swirl, absf((gp - tp).angle_to(center - tp)))
 		if ph == "COLLAPSE" and _vfx._t + dt >= clip + BoosterVfx.COLLAPSE_S:
 			var v: VideoStreamPlayer = _vfx.get_video_player()
 			var sc: Vector2 = _vfx._map["scale"]
@@ -386,8 +393,9 @@ func _timeline() -> void:
 	await process_frame
 	var travel: float = positions[0].distance_to(positions[-1]) if positions.size() > 1 else 0.0
 	_ok(phases == ["VIDEO", "COLLAPSE", "BURST"], "phases in order %s" % str(phases))
-	_ok(moving and travel > 100.0 and positions[-1].distance_to(d["board_center"]) <= 1.5,
-		"the ghost is pulled toward the tornado's current position (travels %.0f px, ends on the board centre)" % travel)
+	_ok(moving and waiting > 10 and swirl > 0.5 and travel > 100.0 and positions[-1].distance_to(d["board_center"]) <= 1.5,
+		"the ghost waits on the board for %d ticks (<= %.0f%% of the clip), then swirls (up to %.2f rad off the straight line) into the tornado's current position (travels %.0f px, ends on the board centre)" %
+		[waiting, BoosterVfx.PULL_FROM * 100.0, swirl, travel])
 	_ok(collapse_ok, "collapse: layer paused on the last frame, scale -> ~0.15, ~1.5 turns")
 	_ok(burst_ok, "burst: the player is hidden and freed (queue_free)")
 	_ok(absf(clip - _clip_len(BoosterVfx.tornado_video)) < 0.01 and total - clip >= 0.4 and total - clip <= 0.6,
