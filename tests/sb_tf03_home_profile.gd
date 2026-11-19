@@ -198,6 +198,8 @@ func _t07() -> void:
 		var v: Dictionary = real[0]
 		var b: Button = _home().get_region("Shortcut_event_" + String(v["id"]))
 		_ok(b != null and b.visible and b.text == EventsV02Ui.title(String(v["id"])), "active event -> a button titled %s" % (b.text if b != null else "<none>"))
+		var tex: Texture2D = b.icon_rect.texture if b != null else null   # SB-TF-12: the Events PNG icon (256 px)
+		_ok(tex != null and tex.resource_path == EventsV02Ui.ICON % String(v["id"]) and tex.get_width() == 256, "its icon is the event's own icon %s" % (tex.resource_path if tex != null else "<none>"))
 		if b != null:
 			b.pressed.emit()
 			await _frames(3)

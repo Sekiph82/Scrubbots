@@ -3,9 +3,10 @@ extends SceneTree
 ## clock, throw-away saves): Level 29 locked / Level 30 unlocked on fresh and pre-V02 saves
 ## (Home tab, deep link, details, tutorial, join, claim, host receipts), the host's
 ## authoritative receipt (pixels by canonical color reconcile), the Events page (3..5 live
-## cards by event id, upcoming previews icon-only), details for all 24 events (join + one real
-## claim), all 72 tutorial states in English and Turkish on the REAL level board, Reduced
-## Effects, and the no-extra-gameplay boundary.
+## cards by event id with their own scene, upcoming previews icon-only), details for all 24 events
+## (join + one real claim), the SB-TF-12 coach-mark walkthrough over the REAL details screen (first
+## visit, every step, Reduced Effects; all 24 x EN/TR in tests/sb_tf12_events_art_ui.gd), and the
+## no-extra-gameplay boundary.
 ##
 ## Run: godot --headless --path . -s res://tests/ev02_events_ui.gd
 
@@ -23,7 +24,7 @@ const UiText = preload("res://scripts/ui/ui_text.gd")
 const CompletionEvaluator = preload("res://scripts/gameplay/completion/completion_evaluator.gd")
 
 var EXPECTED_CASES := [
-	"u01_gate_l29_l30", "u02_host_receipt", "u03_events_page", "u04_details_24", "u05_tutorials_72", "u06_no_extra_gameplay",
+	"u01_gate_l29_l30", "u02_host_receipt", "u03_events_page", "u04_details_24", "u05_tutorial_coach", "u06_no_extra_gameplay",
 ]
 
 var _fail := 0
@@ -129,9 +130,9 @@ func _u03() -> void:
 		await _frames(2)
 		var live: Array = p.find_children("EventV2_*", "PanelContainer", true, false).filter(func(c): return c.get_meta("phase") == "active")
 		var up: Array = p.find_children("EventV2_*", "PanelContainer", true, false).filter(func(c): return c.get_meta("phase") == "upcoming")
-		var heroes_ok := live.all(func(c): return c.find_child("EventHero", true, false).texture != null and not c.find_child("EventHero", true, false).get_meta("art_fallback"))
-		_ok(live.size() == app.economy.events_v02.active_count() and live.size() >= 3 and live.size() <= 5 and heroes_ok, "%d active cards (service %d), each with its own hero art" % [live.size(), app.economy.events_v02.active_count()])
-		_ok(up.all(func(c): return c.find_child("EventHero", true, false) == null and c.find_child("EventIcon", true, false).texture != null), "%d upcoming previews: icon only (no extra hero texture)" % up.size())
+		var art_ok := live.all(func(c): return c.find_child("EventScene", true, false).texture != null and not c.find_child("EventScene", true, false).get_meta("art_fallback") 			and c.find_child("EventIcon", true, false).texture != null)
+		_ok(live.size() == app.economy.events_v02.active_count() and live.size() >= 3 and live.size() <= 5 and art_ok, "%d active cards (service %d), each with its own scene + icon" % [live.size(), app.economy.events_v02.active_count()])
+		_ok(up.all(func(c): return c.find_child("EventScene", true, false) == null and c.find_child("EventIcon", true, false).texture != null), "%d upcoming previews: icon only (no extra scene texture)" % up.size())
 		_ok(live.all(func(c): return c.name == "EventV2_" + String(c.get_meta("iid")).get_slice(":", 0)), "cards named and drawn by event id")
 	var p = _root.get_modal_stack().top()
 	var first: Control = p.find_children("EventV2_*", "PanelContainer", true, false)[0]
@@ -140,11 +141,12 @@ func _u03() -> void:
 	await _frames(2)
 	var st = _root.get_modal_stack()
 	_ok(_top_id() == "event_tutorial" and st.depth() == 3, "DETAILS opens the details with its tutorial on top (first visit)")
-	for a in ["tut_next", "tut_next", "tut_close"]:   # a step tap latches the popup until rearm
+	var n_steps: int = EventTutorial.steps(String(app_view(iid)["id"])).size()
+	for _i in range(n_steps):   # a step tap latches the popup until rearm; the last one is Start
 		st.top().rearm()
-		st.top()._on_action(a)
+		st.top()._on_action("tut_next")
 	await _frames(2)
-	_ok(_top_id() == "event_details", "GOT IT returns to the details")
+	_ok(_top_id() == "event_details", "%d steps, Start on the last returns to the details" % n_steps)
 	st.top()._on_action("close")
 	await _frames(2)
 	p.rearm()
@@ -152,6 +154,9 @@ func _u03() -> void:
 	await _frames(2)
 	_ok(_top_id() == "event_details", "second visit: no automatic tutorial (seen flag saved)")
 	_complete("u03_events_page")
+
+func app_view(iid: String) -> Dictionary:
+	return _root.get_app_state().economy.events_v02.view(iid)
 
 func _u04() -> void:
 	print("[u04 details for all 24 events: art, goal, CPU note, live state, reward steps, JOIN; one real claim]")
@@ -170,7 +175,7 @@ func _u04() -> void:
 		var d = EventsV02Ui.open_details(_root.get_modal_stack(), app, x["iid"])
 		await _frames(1)
 		var v: Dictionary = ev.view(x["iid"])
-		var hero: TextureRect = d.find_child("EventHero", true, false)
+		var hero: TextureRect = d.find_child("EventBackground", true, false)
 		var rival := EventsV02Ui.RIVAL_KINDS.has(v["kind"])
 		var ok: bool = hero.texture != null and _txt(d, "Goal") == EventsV02Ui.goal(v) and (d.find_child("CpuNote", true, false) != null) == rival \
 			and d.find_children("Step_*", "", true, false).size() == v["steps"].size() and d.get_action_button("join").visible
@@ -194,69 +199,44 @@ func _u04() -> void:
 	_complete("u04_details_24")
 
 func _u05() -> void:
-	print("[u05 72 tutorial states x EN/TR: hero/icon/robot, REAL board, gain + live diagram, reward path; Reduced Effects]")
+	print("[u05 coach-mark walkthrough on the REAL details: first visit, every step focused, Start; Reduced Effects]")
 	await _boot_at("u05", 30, false)
 	var app = _root.get_app_state()
 	var ev = app.economy.events_v02
-	var lvl = LevelLoader.load_from_path(EventTutorial.LEVEL).level_data
-	var epoch: int = int(JSON.parse_string(FileAccess.get_file_as_string(EventsV02.PATH))["schedule"]["epoch_utc"])
-	var states := {}
-	for lang in ["en", "tr"]:
-		UiText.locale = lang
-		var good := 0
-		for id in ev.event_ids():
-			var x: Dictionary = ev.scheduled(epoch, epoch + 672 * 3600).filter(func(a): return a["id"] == id)[0]
-			_root.get_modal_stack().clear("test")
-			var p = EventTutorial.open(_root.get_modal_stack(), app, x["iid"])
-			for step in range(1, 4):
-				EventTutorial.show_step(p, app, step)
-				await _frames(1)
-				var st: Dictionary = p.get_meta("state")
-				var focus: Control = p.find_child({"hero": "HeroBlock", "board": "BoardBlock", "rewards": "RewardBlock"}[st["focus"]], true, false)
-				var ok: bool = focus != null and focus.get_meta("focus", false) and _txt(p.find_child("Bubble", true, false), "Text").begins_with(String(st["bubble"]))
-				match step:
-					1:
-						var robot: TextureRect = p.find_child("Robot", true, false)
-						ok = ok and p.find_child("EventHero", true, false).texture != null and p.find_child("EventIcon", true, false).texture != null \
-							and robot.texture != null and EventsV02.ROBOTS.has(robot.get_meta("robot"))
-					2:
-						var b = p.find_child("Board", true, false)
-						var rb = b.get("_board")
-						ok = ok and b.get_script() == BoardRenderer and b.texture != null and rb.get_width() == lvl.width and rb.get_height() == lvl.height \
-							and rb.count_cells_by_state(BoardState.CellState.CLEARED) == rb.get_artwork_cell_count() / 2 + lvl.get_void_cell_count() \
-							and _txt(p, "Gain") == st["gain"] and p.find_child("Meter", true, false) != null
-					3:
-						ok = ok and p.find_child("RewardPath", true, false).get_child_count() == ev.view(x["iid"])["steps"].size() \
-							and p.get_action_button("tut_join").visible == bool(st["join"]) and p.find_child("WhenPill", true, false) != null
-				ok = ok and p.text_fits()
-				states["%s:%s:%d" % [lang, id, step]] = "|".join([st["bubble"], st.get("gain", ""), "|".join(st.get("lines", [])), JSON.stringify(st.get("rewards", []))])
-				if ok:
-					good += 1
-				else:
-					_ok(false, "%s %s step %d state broken" % [lang, id, step])
-		_ok(good == 72, "%s: %d/72 tutorial states render (one component, per-event data)" % [lang, good])
-	UiText.locale = "en"
-	var distinct := {}
-	for k in states:
-		if k.begins_with("en:"):
-			distinct[states[k]] = true
-	_ok(distinct.size() == 72, "all 72 English states carry event-specific content (%d distinct)" % distinct.size())
-	var tr_diff := 0
-	for k in states:
-		if k.begins_with("en:") and states[k] != states["tr:" + k.substr(3)]:
-			tr_diff += 1
-	_ok(tr_diff == 72, "every Turkish state has its own copy (%d/72 differ from English)" % tr_diff)
-	var x2: Dictionary = ev.scheduled(_now[0], _now[0] + 1)[0]
-	_root.get_modal_stack().clear("test")
-	var p2 = EventTutorial.open(_root.get_modal_stack(), app, x2["iid"])
-	EventTutorial.show_step(p2, app, 2)
-	var animated: bool = p2.find_child("Meter", true, false).get_meta("animated")
+	var x: Dictionary = ev.scheduled(_now[0], _now[0] + 1)[0]
+	var id := String(x["id"])
+	var st = _root.get_modal_stack()
+	var d = EventsV02Ui.open_details(st, app, x["iid"])
+	await _frames(2)
+	_ok(st.ids() == ["event_details", "event_tutorial"] and ev.tutorial_seen(id), "first visit: the walkthrough opens over the details (seen flag set)")
+	var t = st.top()
+	var steps: Array = EventTutorial.steps(id)
+	var good := 0
+	for i in range(steps.size()):
+		EventTutorial.show_step(t, app, i + 1)
+		await _frames(3)
+		var target: Control = EventsV02Ui.target(d, String(steps[i]["target"]))
+		var coach = t.get_node("Coach")
+		var r: Rect2 = target.get_global_rect() if target != null else Rect2()
+		if target != null and target.is_visible_in_tree() and coach.hole.position.distance_to(r.position - coach.global_position) < 1.0 				and _txt(t, "Text") == EventTutorial.text(steps[i], "bubble") and t.get_action_button("tut_next").text == EventTutorial.text(steps[i], "button") 				and Rect2(Vector2.ZERO, coach.size).encloses(coach.hole):
+			good += 1
+		else:
+			_ok(false, "%s step %d (%s) not focused" % [id, i + 1, steps[i]["target"]])
+	_ok(good == steps.size(), "%s: %d/%d steps focus their real target on screen with the data text" % [id, good, steps.size()])
+	var board = d.find_child("Board", true, false)
+	_ok(board != null and board.get_script() == BoardRenderer and board.texture != null, "the Board target is the real BoardRenderer level")
+	var animated: bool = t.get_node("Coach").get_meta("pulse")
 	app.effects.set_reduced(true)
-	EventTutorial.show_step(p2, app, 2)
-	var reduced: bool = p2.find_child("Meter", true, false).get_meta("animated")
+	EventTutorial.show_step(t, app, 1)
+	EventsV02Ui.refresh_details(d, app)
+	var calm: bool = not t.get_node("Coach").get_meta("pulse") and not d.find_child("Meter", true, false).get_meta("animated")
 	app.effects.set_reduced(false)
-	_ok(animated and not reduced, "the step-2 meter animates normally and jumps under Reduced Effects")
-	_complete("u05_tutorials_72")
+	_ok(animated and calm, "the focus glow pulses normally; Reduced Effects: no pulse, the meter jumps")
+	st.top().rearm()
+	st.top()._on_action("tut_close")
+	await _frames(2)
+	_ok(st.ids() == ["event_details"], "X skips back to the details")
+	_complete("u05_tutorial_coach")
 
 func _u06() -> void:
 	print("[u06 no extra gameplay: events code never drives the gameplay pipeline or level data]")
@@ -265,8 +245,8 @@ func _u06() -> void:
 		var src := FileAccess.get_file_as_string(path)
 		var hits: Array = forbidden.filter(func(w): return src.contains(w))
 		_ok(hits.is_empty(), "%s touches no gameplay system %s" % [path.get_file(), str(hits)])
-	var tut := FileAccess.get_file_as_string("res://scripts/ui/events/event_tutorial.gd")
-	_ok(tut.count("set_cell_state") == 1 and tut.contains("BoardState.from_level_data"), "the tutorial clears cells only on its own fresh BoardState copy")
+	var ui := FileAccess.get_file_as_string("res://scripts/ui/events/events_v02_ui.gd")
+	_ok(ui.count("set_cell_state") == 1 and ui.contains("BoardState.from_level_data") and not FileAccess.get_file_as_string("res://scripts/ui/events/event_tutorial.gd").contains("set_cell_state"), "the Board clears cells only on its own fresh BoardState copy")
 	var host := FileAccess.get_file_as_string("res://scripts/gameplay/runtime/production_gameplay_host.gd")
 	var at := host.find("func _event_receipt(")
 	var body := host.substr(at, host.find("\nfunc ", at + 1) - at)
