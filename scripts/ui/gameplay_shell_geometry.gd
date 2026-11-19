@@ -6,7 +6,7 @@ extends RefCounted
 ## masters (852x1846), all built from the ONE owner plaza image by
 ## tools/gameplay_shell_masters.py (Scrubby x1.25, bucket + Caution sign x0.75 beside the Supply
 ## panel, speech bubble widened behind the slot strip and Supply panel, navy board field lifted to
-## BoardPresentation.BOARD_FLOOR_TONES[0]), and their MEASURED reference coordinates.
+## BoardPresentation.BOARD_FLOOR, SB-TF-10), and their MEASURED reference coordinates.
 ## Pure data. Every rect is [x0, y0, x1, y1] in master pixels, measured by pixel analysis of the
 ## committed masters (factory/jobs/159-gameplay-shell-plaza/measure.py):
 ##   rail      — centrelines of the baked Railway loop (left/right x, top/bottom y): the measured
@@ -17,7 +17,7 @@ extends RefCounted
 ##   connector_x — centre x of the glow cap of each baked slot->bottom-rail pipe;
 ##   cols/rows — Batch Supply cell interiors (navy components; x ranges per column, y ranges per row);
 ## plus the shared top-bar boxes, the speech-bubble text area to mask, and the booster band
-## on the floor right of Scrubby, below the supply panel (the bottom banner is screen space,
+## centred under the supply panel (the bottom banner is screen space,
 ## HomeStyle.ad_banner, not part of the master).
 ## Selection is by the two authoritative runtime facts: supply column count (3/4/5) and
 ## execution-slot capacity (5/6). Anything else fails closed ("").
@@ -25,14 +25,14 @@ extends RefCounted
 const SIZE := Vector2(852.0, 1846.0)
 const DIR := "res://assets/ui/final/gameplay/master/"
 
-## Locked SHA-256 of each master (coordination/OWNER_GAMEPLAY_345_STATIC_MASTER_SHELL_V01.md).
+## Locked SHA-256 of each master (coordination/OWNER_GAMEPLAY_345_STATIC_MASTER_SHELL_V01.md §12).
 const SHA256 := {
-	"5slot_3col": "44abe4991856b6ae4074e1d320f28227bfe60ae729d0bb89eca24324206f734a",
-	"5slot_4col": "4c5dc02f2b12b45da66683871557c4e90fca02e055d6b011ce77c1321675207f",
-	"5slot_5col": "1a2ad824b32c31470eccbadc28e18ab94df585b70bea96728a964c6b19658779",
-	"6slot_3col": "3eee34daa553de609646e8b0737860fb7ffe6961a83d8b8df128bbef34d79b70",
-	"6slot_4col": "41080173a490a06671411f5412fa10158e4715cd5c5ac75ca121af06984f3ef6",
-	"6slot_5col": "3b2a1cb6f9f1daa23a3913450ae170402e7ce151fe389d837f541c77b4857f28",
+	"5slot_3col": "2943dd0b10b666436f73a3149813da37b2e8ef48ec53b15085ce2c5ffac7d834",
+	"5slot_4col": "4bddd3a2ed90bb8d16651bcf0e28afde0f61aab5ec9e9f4cb7827b01c4c2c131",
+	"5slot_5col": "24b324317a6a2735881679ce2583a8ff2719b2948ab91d1a73264b6b7d498bf9",
+	"6slot_3col": "e2518ad4db2c6ad0c16ec582fb465774081ca98d567918018f850db16473e4a9",
+	"6slot_4col": "d5b27f3b7adb1075950af576502ceca1d5a0cdbc8dd65fb89b08891a0f3aca3c",
+	"6slot_5col": "8a5ef202fc313266fa82de6abc23bd479bf83d5c02133b429f9e2b5aa4f89902",
 }
 
 ## The rail is the same baked loop in all six masters.
@@ -64,9 +64,10 @@ const SPEED := [717, 112, 821, 211]
 ## (the baked sentence is erased in the masters; masked in the bubble fill all the same).
 const BUBBLE_TEXT := [28, 1174, 208, 1310]
 const BUBBLE_FILL := Color8(253, 247, 231)
-## SB-TF-04: the four boosters on the floor right of Scrubby, below the supply panel and above
-## the tallest bottom banner (112 px) at every required viewport.
-const BOOSTERS := [332, 1528, 840, 1648]
+## SB-TF-10 (owner 2026-11-19): the four boosters directly under the Supply panel (its baked
+## shadow ends at y 1515), centred on the master (= screen) width, same 508x120 band as SB-TF-04;
+## they may draw over Scrubby and stay above the tallest bottom banner (112 px) at every viewport.
+const BOOSTERS := [172, 1516, 680, 1636]
 
 ## "<5|6>slot_<3|4|5>col" or "" (fail closed) for the two authoritative facts.
 static func shell_id(columns: int, capacity: int) -> String:

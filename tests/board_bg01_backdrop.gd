@@ -5,7 +5,7 @@ extends SceneTree
 ## aperture bevel the outer cells of a >31-cell board overhang (C08 vs bevel 1.07:1), instead
 ## of BG01 Midnight Slate (CLAUDE.md §7/§8). BoardPresentation now puts one backdrop rect exactly
 ## under the board rect. SB-TF-04 (owner 2026-11-18): its colour is the selected board floor tone
-## (BOARD_FLOOR_TONES[BOARD_FLOOR_TONE], brighter than BG01); BG01 stays the palette constant.
+## (BOARD_FLOOR, SB-TF-10 owner rail-glow blue #0068D8, brighter than BG01); BG01 stays the palette constant.
 ##
 ## Run: godot --headless --path . -s res://tests/board_bg01_backdrop.gd
 
@@ -108,7 +108,7 @@ func _check(s, label: String) -> void:
 	_ok(bgs == 1, "%s: exactly one backdrop node (never per cell)" % label)
 
 func _floor() -> Color:
-	return BoardPresentation.BOARD_FLOOR_TONES[BoardPresentation.BOARD_FLOOR_TONE]
+	return BoardPresentation.BOARD_FLOOR
 
 func _near(a: Rect2, b: Rect2) -> bool:
 	return a.position.distance_to(b.position) < 0.5 and a.end.distance_to(b.end) < 0.5

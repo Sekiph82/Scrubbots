@@ -26,13 +26,11 @@ const BoardRenderer = preload("res://scripts/gameplay/board/board_renderer.gd")
 const BG01 := Color8(32, 37, 51)
 ## Board floor: one rect under exactly the board rect so CLEARED cells and the edge rows show the
 ## floor rather than the baked aperture bevel the outer cells overhang on large boards
-## (SB-PHONE-2026-11-12-D). SB-TF-04 (owner 2026-11-18 "brighter, like the rail glow"): four
-## candidates sampled from the rail glow (deep halo, mid glow, cyan core, deep blue), each at the
-## brightest level where every C01..C16 keeps >= 1.3:1 contrast (C14 / C08 cap it at ~0.052
-## luminance; BG01 is 0.019). Picking a tone = changing the selector below; the masters' navy field
-## is baked to tone 0 (tools/gameplay_shell_masters.py TONE0).
-const BOARD_FLOOR_TONES: Array[Color] = [Color8(0, 66, 116), Color8(4, 68, 104), Color8(16, 70, 85), Color8(0, 61, 140)]
-const BOARD_FLOOR_TONE := 0
+## (SB-PHONE-2026-11-12-D). SB-TF-10 (owner 2026-11-19): the owner-picked rail-glow blue, the
+## dominant colour of the baked tube lights (#0068D8; cyan core #00A8F8). OWNER WAIVER: the
+## SB-TF-04 rule "every C01..C16 keeps >= 1.3:1 contrast against the floor" does not apply to this
+## owner-picked tone. The masters' navy field is baked to it (tools/gameplay_shell_masters.py FLOOR).
+const BOARD_FLOOR := Color8(0, 104, 216)
 
 var _background: ColorRect  # BoardBackground: created once, first child, never per cell
 var _renderer  # BoardRenderer (Control)
@@ -79,7 +77,7 @@ func configure(board, palette: PackedStringArray, available_size: Vector2) -> vo
 	if _background == null or not is_instance_valid(_background):
 		_background = ColorRect.new()
 		_background.name = "BoardBackground"
-		_background.color = BOARD_FLOOR_TONES[BOARD_FLOOR_TONE]
+		_background.color = BOARD_FLOOR
 		_background.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		add_child(_background)
 		move_child(_background, 0)

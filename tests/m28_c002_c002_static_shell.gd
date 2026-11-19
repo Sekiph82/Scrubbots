@@ -437,12 +437,12 @@ func _timed_2x_wallclock() -> void:
 
 ## SB-TF-02: booster icons >= 1.35x the pre-change icon (0.76 x the button), button still a
 ## >= TOUCH_MIN square in the BOOSTERS band; the icon stays in its band column (it may pass the
-## band's top/bottom edge by <= 2.5% of the button) and clear of the supply panel, Scrubby,
-## props, speech bubble and the AD region; the count badge draws above the icon.
+## band's top/bottom edge by <= 2.5% of the button) and clear of the supply panel, props, speech
+## bubble and the AD region (SB-TF-10: it may draw over Scrubby); the count badge draws above the icon.
 func _booster_icons_ok(scr) -> void:
 	var band: Rect2 = scr.ref_rect_to_global(Shell.rect(Shell.BOOSTERS))
 	var ad: Rect2 = scr.get_ad_region_rect()   # SB-TF-04 bottom banner area
-	var avoid: Array = [scr.get_supply_panel_rect(), scr.get_scrubby_anchor_rect(), scr.get_props_anchor_rect(), scr.get_speech_anchor_rect(), ad]
+	var avoid: Array = [scr.get_supply_panel_rect(), scr.get_props_anchor_rect(), scr.get_speech_anchor_rect(), ad]
 	var ok := true
 	var ratio := 0.0
 	for id in scr.get_booster_ids():
@@ -456,7 +456,7 @@ func _booster_icons_ok(scr) -> void:
 		for r in avoid:
 			ok = ok and not icon.intersects(r)
 		ok = ok and b.get_node("Badge").get_index() > b.get_node("Icon").get_index()
-	_ok(ok, "%s: booster icons %.2fx the old icon, inside the BOOSTERS band column, clear of supply / Scrubby / props / bubble / AD" % [scr.get_shell_id(), ratio])
+	_ok(ok, "%s: booster icons %.2fx the old icon, inside the BOOSTERS band column, clear of supply / props / bubble / AD" % [scr.get_shell_id(), ratio])
 
 func _boosters_and_ad_region() -> void:
 	print("[boosters + ad region]")

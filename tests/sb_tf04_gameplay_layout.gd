@@ -3,6 +3,8 @@ extends SceneTree
 ## (No Ads collapses it), boosters higher and bigger right of Scrubby, bucket + Caution sign 25%
 ## smaller beside the Supply panel, Scrubby 25% bigger, the speech bubble behind the slot strip
 ## and Supply panel with its live text clear of everything, and the brighter board floor tone.
+## SB-TF-10 (owner 2026-11-19): boosters directly under the Supply panel, centred on screen, drawn
+## over Scrubby but clear of Supply / slots / banner; board floor = the owner-picked rail-glow blue.
 ## Six shells x the required viewport matrix on the real GameplayScreen.
 ##
 ## Run: godot --headless --path . -s res://tests/sb_tf04_gameplay_layout.gd
@@ -85,15 +87,18 @@ func _hits(a: Rect2, b: Rect2) -> bool:
 
 func _geometry_constants() -> void:
 	print("[geometry constants]")
-	_ok(Shell.BOOSTERS == [332, 1528, 840, 1648], "Shell.BOOSTERS == [332,1528,840,1648] (top -112 ref, height 98 -> 120)")
+	var bb: Rect2 = Shell.rect(Shell.BOOSTERS)
+	_ok(Shell.BOOSTERS == [172, 1516, 680, 1636] and bb.size == Vector2(508, 120) and bb.get_center().x == Shell.SIZE.x / 2.0,
+		"Shell.BOOSTERS == [172,1516,680,1636]: SB-TF-04 508x120 band, centred on the master width (SB-TF-10)")
 	_ok(not (Shell as Script).get_script_constant_map().has("AD"), "Shell.AD removed (the banner is screen space)")
 	var props: Rect2 = Shell.rect(GameplayScreen.PROPS_ANCHOR)
 	var scrub: Rect2 = Shell.rect(GameplayScreen.SCRUBBY_ANCHOR)
 	_ok(GameplayScreen.PROPS_ANCHOR == [661, 1204, 845, 1500] and absf(props.size.x - 245.0 * 0.75) <= 1.0 and absf(props.size.y - 395.0 * 0.75) <= 1.0,
 		"PROPS_ANCHOR [661,1204,845,1500] = 0.75 x the old 245x395 (%s)" % str(props.size))
 	_ok(GameplayScreen.SCRUBBY_ANCHOR == [14, 1310, 324, 1654] and absf(scrub.size.x - 248.0 * 1.25) <= 1.0 and absf(scrub.size.y - 275.0 * 1.25) <= 1.0,
-		"SCRUBBY_ANCHOR [14,1310,324,1654] = 1.25 x the old 248x275, left of the booster band (%s)" % str(scrub.size))
-	_ok(scrub.end.x < Shell.rect(Shell.BOOSTERS).position.x, "Scrubby rect ends left of the booster band")
+		"SCRUBBY_ANCHOR [14,1310,324,1654] = 1.25 x the old 248x275 (%s)" % str(scrub.size))
+	_ok(scrub.intersects(bb) and bb.position.y >= 1515.0 and not bb.intersects(props),
+		"booster band overlaps Scrubby (allowed), starts below the Supply panel's baked shadow (y 1515), clear of the props")
 	_completed["geometry_constants"] = true
 
 func _shell_viewport_matrix() -> void:
@@ -134,12 +139,35 @@ func _check_layout(s, label: String, vp: Vector2i) -> void:
 		var in_x: bool = r.position.x >= band.position.x - 0.5 and r.end.x <= band.end.x + 0.5
 		var in_y: bool = absf(r.position.y - band.position.y) < 0.5 and (r.end.y <= band.end.y + 0.5 or r.size.y == UiTokens.TOUCH_MIN)
 		ok = ok and in_x and in_y and r.position.x > prev_x and r.end.y + 2.0 <= ad.position.y
+		ok = ok and absf(r.size.x - maxf(floorf(band.size.y), UiTokens.TOUCH_MIN)) < 0.5   # size unchanged
 		prev_x = r.position.x
 	ok = ok and s.get_booster_button("tornado").get_global_rect().position.x == prev_x
 	_ok(ok, "%s: 4 boosters plus_one_slot..tornado (rightmost), %.1f px squares >= %d and >= 1.2x old, inside the band, >= 2 px above the banner" % [label, side, UiTokens.TOUCH_MIN])
 	var supply: Rect2 = s.get_supply_panel_rect()
 	_ok(band.end.y + 2.0 <= ad.position.y and band.position.y >= supply.end.y,
 		"%s: band %.1f..%.1f below the Supply panel (%.1f), >= 2 px above the banner (%.1f)" % [label, band.position.y, band.end.y, supply.end.y, ad.position.y])
+	# SB-TF-10: the row (and the four buttons) centred on screen; the only later ScreenContent child is
+	# the board-sized magnifier touch area (its loupe is hidden until the board is held).
+	var row: Rect2 = s.get_booster_row_rect()
+	var first: Rect2 = s.get_booster_button(ids[0]).get_global_rect()
+	var last: Rect2 = s.get_booster_button(ids[ids.size() - 1]).get_global_rect()
+	var node: Control = s.get_booster_button(ids[0]).get_parent()
+	var after: Array = node.get_parent().get_children().slice(node.get_index() + 1)
+	# <= 1.5 px: the shell origin is floored to whole px and the row separation is a whole px
+	_ok(absf(row.get_center().x - vp.x / 2.0) <= 1.5 and absf((first.position.x + last.end.x) / 2.0 - vp.x / 2.0) <= 1.5
+		and after.size() == 1 and after[0] == s.get_board_magnifier() and not _hits(row, s.get_board_magnifier().get_global_rect())
+		and not s.get_board_magnifier().is_inspecting(),
+		"%s: booster row centred on screen (row %.1f, buttons %.1f, screen %.1f); nothing draws over it" % [label, row.get_center().x, (first.position.x + last.end.x) / 2.0, vp.x / 2.0])
+	# Never over a Supply cell / front tap target (5-column case included) or an execution slot.
+	var covered := []
+	var sp = s.get_supply_panel()
+	for c in range(sp.get_column_count()):
+		if _hits(row, sp.get_front_hit_rect(c)):
+			covered.append("front%d" % c)
+	for v in s.get_five_slot_strip().get_slot_views():
+		if _hits(row, v.get_global_rect()):
+			covered.append("slot")
+	_ok(covered.is_empty() and not _hits(row, supply), "%s: boosters cover no Supply column / front tap target / slot %s" % [label, str(covered)])
 	# d / e. no overlaps among the lower-screen elements; live text inside the visible bubble.
 	var strip: Rect2 = s.get_five_slot_strip_rect()
 	var scrub: Rect2 = s.get_scrubby_anchor_rect()
@@ -153,6 +181,8 @@ func _check_layout(s, label: String, vp: Vector2i) -> void:
 	var clash := []
 	for i in range(keys.size()):
 		for j in range(i + 1, keys.size()):
+			if keys[i] == "band" and keys[j] == "scrubby":
+				continue   # SB-TF-10: the boosters may draw over Scrubby
 			if _hits(named[keys[i]], named[keys[j]]):
 				clash.append("%s/%s" % [keys[i], keys[j]])
 	for k in ["band", "strip", "top"]:
@@ -162,7 +192,7 @@ func _check_layout(s, label: String, vp: Vector2i) -> void:
 		for o in [["supply", supply], ["props", props], ["top", top]]:
 			if _hits(named[k], o[1]):
 				clash.append("%s/%s" % [k, o[0]])
-	_ok(clash.is_empty(), "%s: band / strip / Scrubby / props / banner / both bubble lines never overlap %s" % [label, str(clash)])
+	_ok(clash.is_empty(), "%s: band / strip / Scrubby / props / banner / both bubble lines never overlap (band over Scrubby allowed) %s" % [label, str(clash)])
 	var bubble: Rect2 = s.get_speech_anchor_rect()
 	var mask: Rect2 = s.get_bubble_mask().get_global_rect()
 	_ok(s.bubble_text_fits() and bubble.encloses(head) and bubble.encloses(body) and mask.grow(0.5).encloses(head) and mask.grow(0.5).encloses(body),
@@ -252,33 +282,33 @@ func _region_hash(img: Image, rects: Array, inset: int) -> String:
 
 func _board_floor_tone() -> void:
 	print("[board floor tone]")
-	var tones: Array = BoardPresentation.BOARD_FLOOR_TONES
-	var tone: Color = tones[BoardPresentation.BOARD_FLOOR_TONE]
+	var tone: Color = BoardPresentation.BOARD_FLOOR
 	var sub := _sub(Vector2i(1080, 2400))
 	var scr = await _screen(sub, 4, 5)
-	_ok(scr.get_presentation().get_background().color == tone, "BoardBackground.color == BOARD_FLOOR_TONES[BOARD_FLOOR_TONE] %s" % tone.to_html(false))
+	_ok(scr.get_presentation().get_background().color == tone, "BoardBackground.color == BOARD_FLOOR %s" % tone.to_html(false))
 	scr.free()
 	sub.free()
-	var distinct := true
-	for i in range(tones.size()):
-		for j in range(i + 1, tones.size()):
-			distinct = distinct and tones[i] != tones[j]
-	_ok(tones.size() == 4 and distinct, "4 distinct candidate tones")
+	_ok(tone == Color8(0, 104, 216), "BOARD_FLOOR == #0068D8, the owner-picked rail-glow blue (SB-TF-10)")
+	var consts: Dictionary = (BoardPresentation as Script).get_script_constant_map()
+	_ok(not consts.has("BOARD_FLOOR_TONES") and not consts.has("BOARD_FLOOR_TONE"), "the four SB-TF-04 candidate tones and their selector are gone")
+	_ok(_lum(tone) > _lum(BoardPresentation.BG01), "floor brighter than BG01 (%.4f > %.4f)" % [_lum(tone), _lum(BoardPresentation.BG01)])
 	var pal: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/palettes/scrubbots_palette_v3.json"))
 	var no_equal := true
 	var min_cr := INF
-	for t in tones:
-		_ok(_lum(t) > _lum(BoardPresentation.BG01), "tone %s brighter than BG01 (%.4f > %.4f)" % [t.to_html(false), _lum(t), _lum(BoardPresentation.BG01)])
 	for c in pal["colors"]:
 		var rgb: Array = c["rgb"]
 		var pc := Color8(int(rgb[0]), int(rgb[1]), int(rgb[2]))
-		for t in tones:
-			no_equal = no_equal and t != pc
+		no_equal = no_equal and tone != pc
 		var hi := maxf(_lum(pc), _lum(tone))
 		var lo := minf(_lum(pc), _lum(tone))
 		min_cr = minf(min_cr, (hi + 0.05) / (lo + 0.05))
-	_ok(no_equal and pal["colors"].size() == 16, "no tone equals a C01..C16 colour")
-	_ok(min_cr >= 1.3, "every C01..C16 vs the selected tone >= 1.3:1 (min %.3f)" % min_cr)
+	_ok(no_equal and pal["colors"].size() == 16, "floor equals no C01..C16 colour")
+	# Owner waiver (SB-TF-10): the SB-TF-04 1.3:1 floor-contrast rule does not apply; reported only.
+	print("  info: min C01..C16 contrast vs the floor %.3f:1 (1.3:1 rule waived by the owner)" % min_cr)
+	# The masters bake the same floor into the board field (centre of the rail opening).
+	var img := Image.load_from_file(ProjectSettings.globalize_path(Shell.texture_path("5slot_4col")))
+	var px := img.get_pixel(426, 630)
+	_ok(absi(px.r8 - 0) <= 6 and absi(px.g8 - 104) <= 6 and absi(px.b8 - 216) <= 6, "masters' board field baked to the floor (centre %s)" % px.to_html(false))
 	_completed["board_floor_tone"] = true
 
 ## WCAG relative luminance of an sRGB colour.

@@ -3,8 +3,9 @@
 Only the owner's own pixels are used (no generation, no new characters):
   * clean plate  = owner image with Scrubby (+ shadow) and the bucket / Caution sign / puddle
                    lifted out (Poisson fill guided by the same floor row one tile period away),
-                   the slot-strip corner the bubble used to cover mirrored from the right corner,
-                   and the navy board interior lifted to BOARD_FLOOR_TONE 0.
+                   the slot-strip corner the bubble used to cover mirrored from the right corner.
+  * per variant, after the cut-joins below: the navy board interior lifted to
+                   BoardPresentation.BOARD_FLOOR (SB-TF-10).
   * 6 slots / 3 / 5 columns = the job-159 cut-joins (5 columns as re-tuned by job 163), applied
                    to the clean plate (unchanged code).
   * then, per variant, three owner layers composited back BEHIND the slot strip and Supply panel:
@@ -48,10 +49,10 @@ PROPS_OLD = (600, 1230, 845, 1625)
 PROPS_SCALE, PROPS_FOOT = 0.75, (845, 1625, 845, 1500)
 BUBBLE_SEAM, BUBBLE_WIDEN = 188, 90  # straight body column right of the tail; extra width
 STRIP_MIRROR = 857                   # strip is symmetric: x <-> 857 - x (192+665, 269+588)
-# Board floor: BoardPresentation.BOARD_FLOOR_TONES[0]; the baked navy field is lifted onto it.
+# Board floor: BoardPresentation.BOARD_FLOOR (SB-TF-10 owner rail-glow blue); the baked navy field is lifted onto it.
 BOARD_FIELD = (105, 318, 746, 946)
 NAVY = np.array([0, 55, 123])
-TONE0 = np.array([0, 66, 116])
+FLOOR = np.array([0, 104, 216])
 # One-point floor grid (vertical grout lines meet at y FLOOR_YH; period U per px below it).
 FLOOR_YH, FLOOR_U, FLOOR_GUIDE_Y0 = 1241.0, 0.304, 1500
 
@@ -276,12 +277,12 @@ def poisson_fill(a, hole, src_ok):
 
 
 def brighten_board(p):
-    """Lift the baked navy board field onto TONE0 (vignette and bevel kept)."""
+    """Lift the baked navy board field onto FLOOR (vignette and bevel kept)."""
     x0, y0, x1, y1 = BOARD_FIELD
     reg = p[y0:y1, x0:x1].astype(float)
     d = np.sqrt(((reg - np.array([1, 50, 112])) ** 2).sum(axis=2))
     wgt = np.clip(1.0 - (d - 25.0) / 25.0, 0.0, 1.0)[..., None]
-    p[y0:y1, x0:x1] = (reg + wgt * (TONE0 - NAVY)).clip(0, 255)
+    p[y0:y1, x0:x1] = (reg + wgt * (FLOOR - NAVY)).clip(0, 255)
     return p
 
 
@@ -401,7 +402,7 @@ def clean_plate(a):
     hull = bubble | scrubby | props
     p = poisson_fill(a, hull, floorish(a) & ~ndimage.binary_dilation(hull, iterations=6))
     p = mirror_strip_corner(p, a)
-    return brighten_board(p), bubble, scrubby, props
+    return p, bubble, scrubby, props
 
 
 def main(src_path, out_dir):
@@ -424,6 +425,8 @@ def main(src_path, out_dir):
         for cols, fn in supply.items():
             o = base if fn is None else fn(base)
             f = base_fg if fn is None else fn(base_fg)
+            # After the cut-joins, so the 6-slot seam search never sees the lifted field (SB-TF-10).
+            o = brighten_board(o.astype(float)).round().astype(np.uint8)
             behind = ndimage.gaussian_filter((f[..., 0] > 127).astype(float), 0.6)
             o = o.copy()
             put_item(o, scrubby, behind)   # the bubble overlaps the tip of his leaf
