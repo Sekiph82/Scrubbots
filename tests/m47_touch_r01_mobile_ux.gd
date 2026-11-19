@@ -441,6 +441,8 @@ func _c05() -> void:
 	for cid in e.collection.all_card_ids().slice(0, 40):
 		e.collection.add_card(cid)
 		e.collection.add_card(cid)   # duplicates -> a long Exchange list
+	while _root.get_home().get_reward_flight().is_running():   # SB-TF-05: completed sets' reward reveals land (they lock touch)
+		_root.get_home().get_reward_flight().finish()
 	var app = _root.get_app_state()
 	var stack = _root.get_modal_stack()
 	var CollectionScreen = load("res://scripts/ui/collection/collection_screen.gd")

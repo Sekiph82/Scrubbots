@@ -250,6 +250,7 @@ func _popup_reopen(r: Dictionary) -> void:
 	for k in range(9):
 		if e.collection.owned("s1_c%d" % k) == 0:
 			e.collection.add_card("s1_c%d" % k)
+	_root.get_home().get_reward_flight().finish()   # SB-TF-05: the set reward's reveal lands first (quietly), then the ceremony
 	_root.request_home_ceremonies()
 	await _frames(14)
 	var p = _top()
@@ -284,12 +285,19 @@ func _provider_dup(r: Dictionary) -> void:
 	await _frames(4)
 	var tk: String = prov.last_token()
 	var first: Dictionary = prov.deliver(tk, {"outcome": "completed", "verified": true})
+	_land_reveal()
 	await _frames(14)
 	var d1: Dictionary = prov.deliver(tk, {"outcome": "completed", "verified": true})
 	var d2: Dictionary = prov.deliver(tk, {"outcome": "completed", "verified": true})
 	await _frames(14)
 	r["rewarded"] = [bool(first.get("ok", false)), bool(d1.get("ok", false)), bool(d2.get("ok", false)), e.hearts.hearts() - h0]
 	r["life_popup"] = p
+
+## SB-TF-05: a committed grant shows the shared reward reveal (1.5 s hold + flight); land it
+## quietly so every arm makes the same requests at the same point.
+func _land_reveal() -> void:
+	while _root.get_home().get_reward_flight().is_running():
+		_root.get_home().get_reward_flight().finish()
 
 ## Heart +1 purchase on the still-open Life popup: one committed Heart.
 func _acquisition(r: Dictionary) -> void:
@@ -300,6 +308,7 @@ func _acquisition(r: Dictionary) -> void:
 	var h0: int = e.hearts.hearts()
 	await create_timer(0.45).timeout
 	p.get_action_button("heart_plus_one").pressed.emit()
+	_land_reveal()
 	await _frames(14)
 	r["heart_buy"] = e.hearts.hearts() - h0
 	p.close("test")

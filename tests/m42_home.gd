@@ -537,6 +537,7 @@ func _gift_bar_claims() -> void:
 	var again: Dictionary = app.actions.claim_gift(String(occ["id"]))
 	_ok(not again.get("ok", true) and e.wallet.scrub_bucks() == sb0 + int(reward.get("scrub_bucks", 0)), "second claim of the same occurrence refused, no double reward")
 	_ok(AppState.new(path).economy.gift.claimable().size() == 1, "claim persisted canonically")
+	root.get_home().get_reward_flight().finish()   # SB-TF-05: Back waits for the claim's reward reveal
 	_ok(root.handle_back() == "close_popup" and not popup.visible and root.get_navigation().current() == NavigationController.Route.HOME, "back closes the popup first")
 	_shutdown(root)
 	var src := FileAccess.get_file_as_string("res://scripts/ui/home/home_screen.gd")

@@ -83,7 +83,7 @@ const REDUCED_LEDGER := {
 	"scripts/ui/feel/character_motion.gd": "sb_polish_011_character_motion",
 	"scripts/ui/results_screen.gd": "sb_polish_011_character_motion",
 	"scripts/ui/win_overlay.gd": "sb_phone_2026_11_12_e_win_home",
-	"scripts/ui/home/home_reward_flight.gd": "sb_phone_2026_11_12_e_win_home",
+	"scripts/ui/components/reward_reveal.gd": "sb_tf05_reward_reveal",
 	"scripts/ui/components/reveal_sequencer.gd": "m43_c005_c005_reward_reveal_sequencer",
 	"scripts/ui/ceremony/meta_ceremonies.gd": "m43_master_c005_meta_ceremonies",
 	"scripts/ui/ceremony/ceremony_presenter.gd": "m43_master_c005_meta_ceremonies",

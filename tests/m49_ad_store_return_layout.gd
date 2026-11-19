@@ -279,6 +279,11 @@ func _return_check(pre: Dictionary, outcome: String) -> void:
 ## off down to the pre-request depth, where the layout equals `pre` again (the Home banner region
 ## excepted when the result legitimately collapsed it).
 func _result_check(pre: Dictionary, outcome: String, close_to: int, banner_changed := false) -> void:
+	# SB-TF-05: a granted result shows the shared reward reveal over everything (taps / Back locked
+	# until its last arrival); land it, then check the surfaces it returns to.
+	while _root.get_home().get_reward_flight().is_running():
+		_root.get_home().get_reward_flight().finish()
+	await _frames(4)   # what waited for the reveal (an earned pack) opens now
 	var top = _top()
 	_ok(top != null and not top.is_busy(), "%s: top popup %s not busy after the result" % [_tag(outcome), str(_modals().ids())])
 	var out := _outside(_layout())

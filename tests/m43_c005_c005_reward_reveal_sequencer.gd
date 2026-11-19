@@ -224,7 +224,7 @@ func _s08_no_authority_source() -> void:
 # ------------------------------------------------------------ Results (real) ----
 
 func _results_cases() -> void:
-	print("[r01-r04 the Home reward flight on the shared sequencer]")
+	print("[r01-r04 the Home win reward reveal (SB-TF-05 shared RewardReveal)]")
 	var path := _uniq("fl")
 	var root = await _boot_main(path)
 	var app = root.get_app_state()
@@ -233,17 +233,15 @@ func _results_cases() -> void:
 	var rc: Dictionary = h.get_terminal_receipt()
 	var home = root.get_home()
 	var flight = home.get_reward_flight()
-	var seq: RevealSequencer = flight._seq
-	var steps: Array = seq.get_steps()
 	var plan: Array = HomeRewardFlight.plan(rc, home.get_view_model())
 	var shape := true
-	# SB-HOME-FLIGHT-LOCK-2026-11-17: per reward a "+N" fade, then one burst of min(N, 5) copies.
+	# SB-TF-05: every reward appears together, holds 1.5 s, then one burst of min(N, 5) copies each.
 	var bursts: Array = flight.get_bursts()
 	for k in range(plan.size()):
-		shape = shape and steps[2 * k]["property"] == "modulate:a" and steps[2 * k + 1]["property"] == "t" and steps[2 * k + 1]["target"] == bursts[k] \
-			and bursts[k].from == int(plan[k]["from"]) and bursts[k].from + bursts[k].n == int(plan[k]["to"])
-	_ok(seq.is_running() and seq.current_key() == "win:a1:L1" and steps.size() == 2 * plan.size() and plan.size() == 4 and shape,
-		"one key per win; per reward: fade, burst counting from the receipt (%d rewards)" % plan.size())
+		shape = shape and bursts[k].kind == plan[k]["kind"] and bursts[k].from == int(plan[k]["from"]) \
+			and (int(plan[k]["to"]) == int(plan[k]["from"]) or bursts[k].from + bursts[k].n == int(plan[k]["to"]))
+	_ok(flight.is_running() and flight.current_key() == "win:a1:L1" and bursts.size() == plan.size() and plan.size() == 3 and shape,   # SB, Bot Parts, Gift Meter (no streak since SB-TF-03)
+		"one key per win; per reward one burst counting from the receipt (%d rewards)" % plan.size())
 	_complete("r01_flight_plan")
 	var e0 := _econ(app.economy)
 	var tx0: int = app.economy.reward.applied_transaction_count()
@@ -251,9 +249,9 @@ func _results_cases() -> void:
 		home.refresh()
 		_ok(not home.play_reward_flight(rc, "win:a1:L1"), "same win key refused")
 	var t0 := Time.get_ticks_msec()
-	while seq.is_running() and Time.get_ticks_msec() - t0 < 10000:
+	while flight.is_running() and Time.get_ticks_msec() - t0 < 10000:
 		await process_frame
-	_ok(not seq.is_active() and flight.get_layer() == null and _econ(app.economy) == e0 and app.economy.reward.applied_transaction_count() == tx0,
+	_ok(not flight.is_running() and flight.get_layer() == null and _econ(app.economy) == e0 and app.economy.reward.applied_transaction_count() == tx0,
 		"natural end: layer freed; refresh x3 + replays changed no economy / ledger")
 	_complete("r02_flight_authority_idempotency")
 	_shutdown(root)
@@ -274,9 +272,15 @@ func _results_cases() -> void:
 	h = await _play(root)
 	_drain(h)
 	home = root.get_home()
+	# SB-TF-05: Reduced keeps the 1.5 s hold, then lands the final HUD without flying copies.
+	var red_copies := 0
+	for b in home.get_reward_flight().get_bursts():
+		red_copies += b.copies.size()
+	_ok(home.is_reward_flight_running() and red_copies == 0, "Reduced: the reveal holds, no flying copies")
+	home.get_reward_flight().finish()
 	var chip: String = home.get_region("ScrubBucksChip").value_label.text
 	_ok(not home.is_reward_flight_running() and home.get_reward_flight().has_played("win:a1:L1") and home.get_reward_flight().get_layer() == null
-		and chip == UiText.num(root.get_app_state().economy.wallet.scrub_bucks()), "Reduced: the same key lands the final HUD at once (SB %s)" % chip)
+		and chip == UiText.num(root.get_app_state().economy.wallet.scrub_bucks()), "Reduced: the same key lands the final HUD (SB %s)" % chip)
 	_complete("r04_flight_reduced_parity")
 	_shutdown(root)
 

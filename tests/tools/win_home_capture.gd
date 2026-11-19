@@ -42,10 +42,9 @@ func _run() -> void:
 			await _shot("01_win_animation_end")
 			shot_end = true
 		await process_frame
-	var seq = _root.get_home().get_reward_flight()._seq
-	while seq.is_running() and seq.current_step() < 4:   # the 2nd reward (Bot Parts) is in the air
+	var rv = _root.get_home().get_reward_flight()
+	while rv.is_running() and rv.elapsed() < rv.fly_at() + 0.25:   # SB-TF-05: after the 1.5 s hold, icons in the air
 		await process_frame
-	await create_timer(0.3).timeout
 	await _shot("02_home_mid_flyin")
 	while _root.get_home().is_reward_flight_running():
 		await process_frame

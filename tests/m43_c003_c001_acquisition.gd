@@ -177,6 +177,7 @@ func _press(p, id: String) -> void:
 
 func _clear() -> void:
 	_stack().clear("t")
+	_root.get_home().get_reward_flight().finish()   # SB-TF-05: land the previous case's reward reveal (it locks taps / Back)
 	await _settle()
 
 func _life():

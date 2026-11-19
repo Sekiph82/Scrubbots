@@ -130,7 +130,14 @@ func _press(id: String, p = null) -> void:
 	var pp = p if p != null else _top()
 	await create_timer(0.45).timeout   # popups re-arm their CTAs shortly after open / an action
 	pp.get_action_button(id).pressed.emit()
+	_land_reveal()
 	await _frames(14)
+
+## SB-TF-05: a committed reward shows the shared reward reveal first (1.5 s hold + flight, locked);
+## land it quietly so the ceremony / pack that waits for it follows and its pickups add no feel.
+func _land_reveal() -> void:
+	while _root.get_home().get_reward_flight().is_running():   # a queued reveal (set + Master) follows
+		_root.get_home().get_reward_flight().finish()
 
 func _econ() -> String:
 	return JSON.stringify(_e().snapshot())
@@ -140,6 +147,7 @@ func _complete_set(n: int) -> void:
 		var cid := "s%d_c%d" % [n, k]
 		if _e().collection.owned(cid) == 0:
 			_e().collection.add_card(cid)
+	_land_reveal()
 
 # ---------------------------------------------------------------- F006 ----
 

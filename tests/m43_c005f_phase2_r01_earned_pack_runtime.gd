@@ -137,7 +137,13 @@ func _claim_gift_ui(occ: String) -> void:
 	var gb = _top()
 	await create_timer(0.45).timeout   # the popup re-arms its CTAs shortly after opening / a claim
 	gb.get_action_button("gift:" + occ).pressed.emit()
+	_land_reveal()
 	await _frames(4)
+
+## SB-TF-05: a committed claim shows the shared reward reveal first (1.5 s hold + flight); land it
+## so the earned pack / ceremony that waits for it follows at once.
+func _land_reveal() -> void:
+	_root.get_home().get_reward_flight().finish()
 
 func _cards_delta(before: Dictionary, after: Dictionary) -> Dictionary:
 	var out := {}
@@ -355,6 +361,7 @@ func _g04() -> void:
 	var e = a.economy
 	var d0: int = _day[0]
 	a.actions.claim_daily_login()   # day 1 (100 SB)
+	_land_reveal()
 	await _frames(3)
 	var kinds: Array = []
 	for day in [2, 3, 4, 5]:
@@ -365,6 +372,7 @@ func _g04() -> void:
 		var dp = _top()
 		await create_timer(0.45).timeout
 		dp.get_action_button("claim").pressed.emit()
+		_land_reveal()
 		await _frames(4)
 		var conf = _top()
 		var pack_waiting: bool = String(conf.popup_id) == "ceremony_daily" and _pack_count_in_stack() == 0

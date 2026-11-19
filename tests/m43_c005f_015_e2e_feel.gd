@@ -326,6 +326,7 @@ func _path_gift() -> String:
 			await _frames(4)
 		await create_timer(0.45).timeout
 		_top().get_action_button("gift:" + by[m]).pressed.emit()
+		_land()
 		await _frames(4)
 		var p = _top()
 		var want := "standard_pack" if m == 10 else "premium_pack"
@@ -346,6 +347,7 @@ func _path_meta() -> String:
 			var cid := "s%d_c%d" % [n, k]
 			if _e().collection.owned(cid) == 0:
 				_e().collection.add_card(cid)
+	_land()
 	for n in range(2, 16):
 		_e().meta_ui.mark_seen("set:%d" % n)
 	_root.request_home_ceremonies()
@@ -383,11 +385,13 @@ func _path_acq() -> String:
 	var h0: int = _e().hearts.hearts()
 	await create_timer(0.45).timeout
 	p.get_action_button("heart_plus_one").pressed.emit()
+	_land()
 	await _frames(14)
 	if _e().hearts.hearts() != h0 + 1:
 		return "Heart +1 not committed"
 	await create_timer(0.45).timeout
 	p.get_action_button("heart_refill").pressed.emit()
+	_land()
 	await _frames(14)
 	if _e().hearts.hearts() != _e().hearts.max_hearts():
 		return "refill not committed"
@@ -398,6 +402,8 @@ func _path_acq() -> String:
 ## Acknowledge every ceremony the app shows, by its first CTA (Continue / Got it / Equip).
 func _drain_ceremonies(shown: Array = []) -> String:
 	for _i in range(40):
+		_land()
+		await _frames(2)
 		var p = _top()
 		if p == null:
 			return ""
@@ -409,6 +415,12 @@ func _drain_ceremonies(shown: Array = []) -> String:
 		p.get_action_button(p.get_action_ids()[0]).pressed.emit()
 		await _frames(14)
 	return "ceremony drain did not end"
+
+## SB-TF-05: a committed reward shows the shared reward reveal first (1.5 s hold + flight, input
+## locked); land it quietly (no pickup feel, same in every feel mode) so what waits for it follows.
+func _land() -> void:
+	while _root.get_home().get_reward_flight().is_running():
+		_root.get_home().get_reward_flight().finish()
 
 ## Real taps on a pack ceremony: open (video in FULL), skip the video after ~0.5 s like a
 ## player, wait for the reveal, route, until closed.

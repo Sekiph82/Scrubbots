@@ -306,6 +306,8 @@ func _r10() -> void:
 	p.get_action_button("slot:2").pressed.emit()
 	await _frames(2)
 	tp.fire(String(tp.requests[-1][1]), "completed", true)
+	while _root.get_home().get_reward_flight().is_running():   # SB-TF-05: the reward reveals (slot 1, slot 2) land first, then the pack
+		_root.get_home().get_reward_flight().finish()
 	await _frames(4)
 	# M43-C005F-PHASE2-R01: slot 2's reward is a Standard Card Pack, so the earned pack now opens
 	# in the shipping pack ceremony over Rewarded Ads; finishing it returns to this popup.

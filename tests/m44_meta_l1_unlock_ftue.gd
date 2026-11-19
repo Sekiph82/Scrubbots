@@ -86,6 +86,7 @@ func _first_home() -> void:
 	var cm = _root.get_coachmarks()
 	_ok(cm.get_step_id() == "home_daily" and cm.get_target() == home.get_region("Shortcut_daily").get_global_rect(), "first-Home coach: DAILY tip on the real panel at L1")
 	app.actions.claim_daily_login()
+	_root.get_home().get_reward_flight().finish()   # SB-TF-05: the claim's reward reveal lands (coach tips wait for it)
 	_root.refresh_coachmark()
 	_ok(cm.get_step_id() == "home_tasks" and cm.get_target() == home.get_region("Shortcut_tasks").get_global_rect(), "then the TASKS (Welcome) tip on the real panel")
 	_complete("first_home_l1_meta_open")

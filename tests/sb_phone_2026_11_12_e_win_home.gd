@@ -111,7 +111,8 @@ func _flight_and_ceremony() -> void:
 	var want := {"Fly_scrub_bucks": "ScrubBucksChip", "Fly_bot_parts": "ProfileBotParts", "Fly_gift_meter": "GiftMeterBar"}
 	var got := {}
 	for c in flight.get_layer().get_children():
-		got[String(c.name)] = String(c.get_meta("target"))
+		if c.has_meta("target"):   # SB-TF-05: the layer also holds the backdrop dim
+			got[String(c.name)] = String(c.get_meta("target"))
 	_ok(got == want, "icons -> HUD targets %s" % str(got))
 	var plan: Array = HomeRewardFlight.plan(rc, home.get_view_model())
 	var sb_plan: Dictionary = plan[0]
@@ -122,7 +123,7 @@ func _flight_and_ceremony() -> void:
 	var icon: Control = flight.get_layer().get_node("Fly_scrub_bucks/Copy0")
 	var dest: Vector2 = home.get_region("ScrubBucksChip").get_global_rect().get_center()
 	var t1 := Time.get_ticks_msec()
-	while flight._seq.current_step() < 2 and Time.get_ticks_msec() - t1 < 3000:
+	while int(flight.get_bursts()[0].arrived) < 1 and Time.get_ticks_msec() - t1 < 4000:
 		await process_frame
 	_ok(not icon.visible and icon.get_global_rect().get_center().distance_to(dest) < 2.0, "SB icon flew to the SB chip centre, then handed over to the count-up")
 	_ok(root.get_ceremonies().presented_log().is_empty() and root.get_modal_stack().depth() == 0, "no ceremony while the rewards fly")
@@ -184,7 +185,7 @@ func _loss_results_unchanged() -> void:
 	_complete("loss_results_unchanged")
 
 func _reduced_effects() -> void:
-	print("[Reduced Effects: still, short hold, rewards land at once]")
+	print("[Reduced Effects: still, short hold, reveal holds 1.5 s, rewards land without flight]")
 	var root = await _boot_main(_uniq("red"), 1, 8)
 	var app = root.get_app_state()
 	app.set_reduced_effects(true)
@@ -199,7 +200,17 @@ func _reduced_effects() -> void:
 	var secs := (Time.get_ticks_msec() - t0) / 1000.0
 	_ok(nav.current() == R.HOME and secs < 2.5, "Home after the short Reduced hold (%.1f s)" % secs)
 	var home = root.get_home()
-	_ok(not home.is_reward_flight_running() and home.get_reward_flight().has_played("win:a1:L1") and home.get_reward_flight().get_layer() == null, "no flight: final state landed at once, no input lock")
+	# SB-TF-05: Reduced keeps the 1.5 s reveal hold (locked), then lands the final values with no flying copies.
+	var flight = home.get_reward_flight()
+	var copies := 0
+	for b in flight.get_bursts():
+		copies += b.copies.size()
+	_ok(home.is_reward_flight_running() and flight.has_played("win:a1:L1") and flight.get_layer() != null and copies == 0, "Reduced: the reveal shows and holds, no flying copies")
+	var t1 := Time.get_ticks_msec()
+	while home.is_reward_flight_running() and Time.get_ticks_msec() - t1 < 5000:
+		await process_frame
+	var held := (Time.get_ticks_msec() - t1) / 1000.0
+	_ok(not home.is_reward_flight_running() and flight.get_layer() == null and held >= 1.3 and held < 3.0, "Reduced: final state landed after the hold (%.2f s), lock freed" % held)
 	_ok(_chip(home) == UiText.num(app.economy.wallet.scrub_bucks()), "HUD at the final values")
 	await _frames(3)
 	_ok(root.get_ceremonies().presented_log().size() == 1, "ceremony follows at once")
@@ -232,7 +243,7 @@ func _results_won_branch_removed() -> void:
 	var res = ResultsScreen.new()
 	_ok(not res.has_method("reward_rows") and not res.has_method("set_ceremony_barrier") and not res.has_method("is_victory_layout"), "no WON rows / barrier / Victory layout API")
 	res.free()
-	var t := FileAccess.get_file_as_string("res://scripts/ui/home/home_reward_flight.gd") + FileAccess.get_file_as_string("res://scripts/ui/win_overlay.gd")
+	var t := FileAccess.get_file_as_string("res://scripts/ui/home/home_reward_flight.gd") + FileAccess.get_file_as_string("res://scripts/ui/win_overlay.gd") 		+ FileAccess.get_file_as_string("res://scripts/ui/components/reward_reveal.gd")
 	var bad: Array = []
 	for needle in [".grant(", ".credit(", ".claim(", "record_win", "request_save", "mark_seen"]:
 		if t.find(needle) != -1:

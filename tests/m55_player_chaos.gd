@@ -507,6 +507,7 @@ func _ceremony_pack_spam() -> void:
 	await create_timer(0.45).timeout
 	for _k in range(20):
 		gb.get_action_button("gift:" + m10).pressed.emit()
+	_root.get_home().get_reward_flight().finish()   # SB-TF-05: the claim's reward reveal lands first, then the pack
 	await _frames(4)
 	var pk = _top()
 	_ok(pk != null and String(pk.popup_id) == "standard_pack" and _stack().depth() == 2, "Gift claim x20 -> one standard pack ceremony over the Gift Bar %s" % str(_stack().ids()))
@@ -648,6 +649,7 @@ func _bg_pack_robot() -> void:
 	_open("gift_bar")
 	await create_timer(0.45).timeout
 	_top().get_action_button("gift:" + String(occ.filter(func(o): return int(o["milestone"]) == 10)[0]["id"])).pressed.emit()
+	_root.get_home().get_reward_flight().finish()   # SB-TF-05: the claim's reward reveal lands first, then the pack
 	await _frames(4)
 	var pk = _top()
 	var why := "no pack"
