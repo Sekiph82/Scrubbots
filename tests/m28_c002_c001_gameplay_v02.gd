@@ -142,8 +142,10 @@ func _responsive_matrix() -> void:
 		var speed: Rect2 = s.get_speed_control_rect()
 		_ok(absf(board.size.x / board.size.y - float(bw) / float(bh)) < 0.01, "%s: board aspect preserved" % tag)
 		_ok(board.get_area() > strip.get_area() + supply.get_area() and board.get_area() > boosters.get_area() * 4.0, "%s: board is the dominant region (board %d, slots+supply %d, boosters %d)" % [tag, int(board.get_area()), int(strip.get_area() + supply.get_area()), int(boosters.get_area())])
-		_ok(_inside(env, safe) and _inside(top, safe) and _inside(strip, safe) and _inside(supply, safe) and _inside(boosters, safe),
-			"%s: rail envelope, HUD, slots, supply, boosters inside safe rect" % tag)
+		# SB-TF-13: the full-width shell's top region keeps sky above the HUD boxes (it may run under
+		# the notch); the HUD controls themselves stay inside the safe rect.
+		_ok(_inside(env, safe) and _inside(pause, safe) and _inside(speed, safe) and top.end.y > safe.position.y and _inside(strip, safe) and _inside(supply, safe) and _inside(boosters, safe),
+			"%s: rail envelope, HUD controls, slots, supply, boosters inside safe rect" % tag)
 		_ok(top.end.y <= env.position.y + 1.0 and env.end.y < strip.position.y and strip.end.y < supply.position.y and supply.end.y < boosters.position.y,
 			"%s: vertical hierarchy HUD > board+rail > slots > supply > boosters" % tag)
 		_ok(pause.size.x >= UiTokens.TOUCH_MIN and pause.size.y >= UiTokens.TOUCH_MIN and speed.size.x >= UiTokens.TOUCH_MIN and speed.size.y >= UiTokens.TOUCH_MIN,
