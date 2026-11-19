@@ -122,6 +122,20 @@
       },
       "notes": "Full 720x1280 (9:16) Home background with only Scrubby moving, pixel-aligned to home_background.png (940x1672). Runtime copies re-encoded from the trimmed H.264 masters with ffmpeg libtheora -q:v 4, no audio, 24 fps, 185 frames (~3.3 MB each). home_scrubby_still.png = frame 0 of the turn master (the four frame 0s differ only by codec noise: raw mean diff 5.1-5.5/255, blurred 1.7-1.9/255). No art changes. The masters stay in the owner's local flow_videos folder (not committed).",
       "ships": true
+    },
+    "tornado_booster_video_v1": {
+      "repository_path": "assets/ui/final/boosters/videos/tornado_additive.ogv",
+      "sha256": "2a4630c764db90ca27209ab539d25b06f3a437ce73a6d0c03f9eeea53fec8edd",
+      "status": "OWNER_CHOSEN",
+      "provider": "google_flow",
+      "tool": "tools/build_tornado_booster_video.py (ffmpeg libtheora -q:v 5, numpy)",
+      "date": "2026-11-19",
+      "owner_decision": "owner chose Blue_tornado_spinning_and_growing_6bafdac1.mp4 (black background) as the Tornado booster video (SB-TF-06, flow_videos/FLOW_TORNADO_BOOSTER_VIDEO.md v3)",
+      "source_masters": {
+        "Blue_tornado_spinning_and_growing_6bafdac1.mp4": "8819802409023aff02c9a794e4f52ce9a6052a0c1ef28d4d6970aae72a2c6a59"
+      },
+      "notes": "Source frames 7-38 (idle start and spinning tail dropped), cropped to 544x1008, Theora, 24 fps, no audio, 149835 bytes. Played additively (CanvasItemMaterial BLEND_MODE_ADD) from the Tornado button to the board centre; the tornado track is in assets/ui/final/boosters/videos/PROVENANCE.md. The master stays in owner Downloads, not committed.",
+      "ships": true
     }
   },
   "output_roots": {
