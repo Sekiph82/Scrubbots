@@ -6,6 +6,7 @@ Completed items and older status history: docs/migration/legacy-task-trackers/TA
 
 ## Autonomous Queue
 <!-- Maintained by the factory loop (CLAUDE.md §0D). One row per item: `- READY|OWNER|DONE <TASK-ID> — <one line>`. First READY row is next. -->
+- DONE SB-TF-09 — SB-TF-09 — Fixed 5 pre-existing failing suites on main (Spark plugin-name guard in events_v02_service, m22_025 booster count 9, m22_028 lossy card thumbs); LOCAL_PASS + CLAUDE_PEER_REVIEW.
 - DONE SB-TF-08 — Achievements open earned-first (claimable, claimed, in progress; catalogue order inside); Collection READ ALL / TUMUNU OKU marks all owned unread cards seen in one durable save, badges clear (factory 188, peer review PASS)
 - DONE SB-TF-07 — New ad placements: event Watch ad +1 progress once per event per day (not quest/colors), App Open after L20 max 1/day never install day after opening video, interstitial none before L10 then every 4 plays, No Ads removes App Open + interstitial; ad_placements_v1.json policy 2 + owner amendment (factory 187, peer review PASS)
 - DONE SB-TF-06 — Tornado booster video: owner clip trimmed (1.33 s, 150 KB ogv) plays additively from the Tornado button to the board centre; purged cells swirl into the funnel; spin-collapse + burst; old arms removed; Reduced Effects no video (factory 186, peer review round 2 PASS)
