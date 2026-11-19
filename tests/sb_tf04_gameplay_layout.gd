@@ -4,7 +4,8 @@ extends SceneTree
 ## smaller beside the Supply panel, Scrubby 25% bigger, the speech bubble behind the slot strip
 ## and Supply panel with its live text clear of everything, and the brighter board floor tone.
 ## SB-TF-10 (owner 2026-11-19): boosters directly under the Supply panel, centred on screen, drawn
-## over Scrubby but clear of Supply / slots / banner; board floor = the owner-picked rail-glow blue.
+## over Scrubby but clear of Supply / slots / banner. SB-TF-13: board floor = the owner-chosen dark
+## purple-grey #4A3258 (Lab distance >= 20 is asserted in tests/sb_tf13_feedback.gd).
 ## Six shells x the required viewport matrix on the real GameplayScreen.
 ##
 ## Run: godot --headless --path . -s res://tests/sb_tf04_gameplay_layout.gd
@@ -288,7 +289,7 @@ func _board_floor_tone() -> void:
 	_ok(scr.get_presentation().get_background().color == tone, "BoardBackground.color == BOARD_FLOOR %s" % tone.to_html(false))
 	scr.free()
 	sub.free()
-	_ok(tone == Color8(0, 104, 216), "BOARD_FLOOR == #0068D8, the owner-picked rail-glow blue (SB-TF-10)")
+	_ok(tone == Color8(74, 50, 88), "BOARD_FLOOR == #4A3258, the owner-chosen dark purple-grey (SB-TF-13)")
 	var consts: Dictionary = (BoardPresentation as Script).get_script_constant_map()
 	_ok(not consts.has("BOARD_FLOOR_TONES") and not consts.has("BOARD_FLOOR_TONE"), "the four SB-TF-04 candidate tones and their selector are gone")
 	_ok(_lum(tone) > _lum(BoardPresentation.BG01), "floor brighter than BG01 (%.4f > %.4f)" % [_lum(tone), _lum(BoardPresentation.BG01)])
@@ -308,7 +309,7 @@ func _board_floor_tone() -> void:
 	# The masters bake the same floor into the board field (centre of the rail opening).
 	var img := Image.load_from_file(ProjectSettings.globalize_path(Shell.texture_path("5slot_4col")))
 	var px := img.get_pixel(426, 630)
-	_ok(absi(px.r8 - 0) <= 6 and absi(px.g8 - 104) <= 6 and absi(px.b8 - 216) <= 6, "masters' board field baked to the floor (centre %s)" % px.to_html(false))
+	_ok(absi(px.r8 - 74) <= 6 and absi(px.g8 - 50) <= 6 and absi(px.b8 - 88) <= 6, "masters' board field baked to the floor (centre %s)" % px.to_html(false))
 	_completed["board_floor_tone"] = true
 
 ## WCAG relative luminance of an sRGB colour.

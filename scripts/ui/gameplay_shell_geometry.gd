@@ -6,7 +6,7 @@ extends RefCounted
 ## masters (852x1846), all built from the ONE owner plaza image by
 ## tools/gameplay_shell_masters.py (Scrubby x1.25, bucket + Caution sign x0.75 beside the Supply
 ## panel, speech bubble widened behind the slot strip and Supply panel, navy board field lifted to
-## BoardPresentation.BOARD_FLOOR, SB-TF-10), and their MEASURED reference coordinates.
+## BoardPresentation.BOARD_FLOOR, SB-TF-10 / SB-TF-13), and their MEASURED reference coordinates.
 ## Pure data. Every rect is [x0, y0, x1, y1] in master pixels, measured by pixel analysis of the
 ## committed masters (factory/jobs/159-gameplay-shell-plaza/measure.py):
 ##   rail      — centrelines of the baked Railway loop (left/right x, top/bottom y): the measured
@@ -25,14 +25,14 @@ extends RefCounted
 const SIZE := Vector2(852.0, 1846.0)
 const DIR := "res://assets/ui/final/gameplay/master/"
 
-## Locked SHA-256 of each master (coordination/OWNER_GAMEPLAY_345_STATIC_MASTER_SHELL_V01.md §12).
+## Locked SHA-256 of each master (coordination/OWNER_GAMEPLAY_345_STATIC_MASTER_SHELL_V01.md §13).
 const SHA256 := {
-	"5slot_3col": "2943dd0b10b666436f73a3149813da37b2e8ef48ec53b15085ce2c5ffac7d834",
-	"5slot_4col": "4bddd3a2ed90bb8d16651bcf0e28afde0f61aab5ec9e9f4cb7827b01c4c2c131",
-	"5slot_5col": "24b324317a6a2735881679ce2583a8ff2719b2948ab91d1a73264b6b7d498bf9",
-	"6slot_3col": "e2518ad4db2c6ad0c16ec582fb465774081ca98d567918018f850db16473e4a9",
-	"6slot_4col": "d5b27f3b7adb1075950af576502ceca1d5a0cdbc8dd65fb89b08891a0f3aca3c",
-	"6slot_5col": "8a5ef202fc313266fa82de6abc23bd479bf83d5c02133b429f9e2b5aa4f89902",
+	"5slot_3col": "29f17d564d21d3303c1176d88d9177658facd69e4ab6e66c311a03ce56510c74",
+	"5slot_4col": "c8faaaba2d1e23a8f7766bdd30d2387fe57575b35e3b4c6573927a4a49ed5d9a",
+	"5slot_5col": "0b92b540389ee2b3ea6fff6c083ee65319ea50c6bf0aab1b0c168badd89e646b",
+	"6slot_3col": "f004aa2a61f7bcfda19014c99cbc9d06fc130ee1772adcfb383bbabcf42405f4",
+	"6slot_4col": "5b59ea9172ce232e7e7d0df5ee88d50086f3a7c286e085603e80eb6c523dbf09",
+	"6slot_5col": "f1ddc4a7ceef9ddb5f8292240f7141635f324d46831fe40d56d12532343b5539",
 }
 
 ## The rail is the same baked loop in all six masters.

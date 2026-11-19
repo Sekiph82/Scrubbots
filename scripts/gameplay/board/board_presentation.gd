@@ -26,11 +26,12 @@ const BoardRenderer = preload("res://scripts/gameplay/board/board_renderer.gd")
 const BG01 := Color8(32, 37, 51)
 ## Board floor: one rect under exactly the board rect so CLEARED cells and the edge rows show the
 ## floor rather than the baked aperture bevel the outer cells overhang on large boards
-## (SB-PHONE-2026-11-12-D). SB-TF-10 (owner 2026-11-19): the owner-picked rail-glow blue, the
-## dominant colour of the baked tube lights (#0068D8; cyan core #00A8F8). OWNER WAIVER: the
-## SB-TF-04 rule "every C01..C16 keeps >= 1.3:1 contrast against the floor" does not apply to this
-## owner-picked tone. The masters' navy field is baked to it (tools/gameplay_shell_masters.py FLOOR).
-const BOARD_FLOOR := Color8(0, 104, 216)
+## (SB-PHONE-2026-11-12-D). SB-TF-13 (owner 2026-11-19, TestFlight 26): the SB-TF-10 rail-glow
+## blue #0068D8 hid the C07 / C08 blue cells; the owner chose a colour outside the 16 palette
+## colours, dark purple-grey #4A3258: CIE76 Lab distance >= 20 from every C01..C16 and from BG01
+## (nearest BG01 21.8, C14 28.5, C08 32.8, C16 36.6). The masters' navy field is baked to it
+## (tools/gameplay_shell_masters.py FLOOR).
+const BOARD_FLOOR := Color8(74, 50, 88)
 
 var _background: ColorRect  # BoardBackground: created once, first child, never per cell
 var _renderer  # BoardRenderer (Control)

@@ -5,7 +5,7 @@ extends SceneTree
 ## aperture bevel the outer cells of a >31-cell board overhang (C08 vs bevel 1.07:1), instead
 ## of BG01 Midnight Slate (CLAUDE.md §7/§8). BoardPresentation now puts one backdrop rect exactly
 ## under the board rect. SB-TF-04 (owner 2026-11-18): its colour is the selected board floor tone
-## (BOARD_FLOOR, SB-TF-10 owner rail-glow blue #0068D8, brighter than BG01); BG01 stays the palette constant.
+## (BOARD_FLOOR, SB-TF-13 owner dark purple-grey #4A3258, brighter than BG01); BG01 stays the palette constant.
 ##
 ## Run: godot --headless --path . -s res://tests/board_bg01_backdrop.gd
 

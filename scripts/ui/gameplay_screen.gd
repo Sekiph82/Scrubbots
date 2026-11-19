@@ -40,6 +40,14 @@ const BoosterVfx = preload("res://scripts/ui/feel/booster_vfx.gd")
 const BoardState = preload("res://scripts/gameplay/board/board_state.gd")
 
 const FILL := Color(0.035, 0.055, 0.11)   # surround outside the aspect-fitted shell
+## SB-TF-13 (owner TestFlight 26): the shell fills the width. Only the master rows CRIT_TOP (the
+## profile box top, the highest baked HUD box) .. the booster band bottom must fit the safe height
+## above the banner reservation + SPACE_LG air; the sky above and the plaza floor below may run
+## under the notch / banner / screen edge. A screen too short for that at full width scales the
+## shell down to it; GameplayBackdrop then stretches the master's own outermost EDGE_PX columns /
+## rows over any gap beside, above or below it (sky, bushes, floor continue; no FILL bars).
+const CRIT_TOP := 106.0
+const EDGE_PX := 3
 ## Rail envelope pad in logical cells beyond the board (outer rail edge = +3.0 cells).
 const RAIL_PAD_CELLS := 3.0
 ## Geometry used for layout when the shell fails closed (no valid column/capacity pair).
@@ -112,6 +120,7 @@ var _shell_tex_cache: Dictionary = {}
 
 # --- node handles ---
 var _background: ColorRect
+var _backdrop: Control   # GameplayBackdrop: EdgeLeft / EdgeRight / EdgeTop / EdgeBottom
 var _safe_root
 var _content: Control
 var _screen_content: Control
@@ -230,6 +239,7 @@ func _apply_shell_selection() -> void:
 		_shell_error = "unsupported:%dcol/%dslot" % [_supply_snapshot.size(), cap]
 		_shell.texture = null
 		_shell.visible = false
+		_backdrop.visible = false
 		_geom_id = FALLBACK_SHELL
 		return
 	_shell_error = ""
@@ -238,6 +248,9 @@ func _apply_shell_selection() -> void:
 		_shell_tex_cache[id] = load(Shell.texture_path(id)) as Texture2D
 	_shell.texture = _shell_tex_cache[id]
 	_shell.visible = _shell.texture != null
+	_backdrop.visible = _shell.visible
+	for e in _backdrop.get_children():
+		(e.texture as AtlasTexture).atlas = _shell.texture
 
 func get_shell_id() -> String:
 	return _shell_id
@@ -260,6 +273,22 @@ func _build_tree() -> void:
 	_background.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_background.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_background)
+	_backdrop = Control.new()
+	_backdrop.name = "GameplayBackdrop"
+	_backdrop.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_backdrop)
+	for spec in [["EdgeLeft", Rect2(0, 0, EDGE_PX, Shell.SIZE.y)], ["EdgeRight", Rect2(Shell.SIZE.x - EDGE_PX, 0, EDGE_PX, Shell.SIZE.y)],
+			["EdgeTop", Rect2(0, 0, Shell.SIZE.x, EDGE_PX)], ["EdgeBottom", Rect2(0, Shell.SIZE.y - EDGE_PX, Shell.SIZE.x, EDGE_PX)]]:
+		var e := TextureRect.new()
+		e.name = spec[0]
+		var at := AtlasTexture.new()
+		at.region = spec[1]
+		e.texture = at
+		e.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		e.stretch_mode = TextureRect.STRETCH_SCALE
+		e.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_backdrop.add_child(e)
 
 	_safe_root = SafeAreaRootScene.instantiate()
 	add_child(_safe_root)
@@ -627,11 +656,15 @@ func relayout() -> void:
 	if s.x <= 0.0 or s.y <= 0.0:
 		return
 	_layout_mode = ResponsiveLayout.get_layout_mode(get_viewport_rect().size)
-	# Safe-area-aware uniform aspect-fit of the 852×1846 master (never stretched).
-	_scale = minf(s.x / Shell.SIZE.x, s.y / Shell.SIZE.y)
-	_origin = ((s - Shell.SIZE * _scale) * 0.5).floor()
+	# Uniform scale (never stretched): full width, capped so CRIT_TOP..booster bottom fits the safe
+	# height above the banner reservation; that band is centred in it (SB-TF-13).
+	var avail: float = s.y - HomeStyle.ad_slot_height(get_viewport_rect().size.x) - UiTokens.SPACE_LG
+	var crit: float = float(Shell.BOOSTERS[3]) - CRIT_TOP
+	_scale = minf(s.x / Shell.SIZE.x, avail / crit)
+	_origin = Vector2((s.x - Shell.SIZE.x * _scale) * 0.5, (avail - crit * _scale) * 0.5 - CRIT_TOP * _scale).floor()
 	_place_rect(_shell, Rect2(Vector2.ZERO, Shell.SIZE))
 	_place_rect(_shell_prev, Rect2(Vector2.ZERO, Shell.SIZE))
+	_layout_backdrop()
 	_place_ref(_bubble_mask, Shell.BUBBLE_TEXT)
 	_bubble_mask.add_theme_stylebox_override("panel", HomeStyle.box(Shell.BUBBLE_FILL, Shell.BUBBLE_FILL, 0, int(18.0 * _scale), 0))
 	_layout_bubble_text()
@@ -658,6 +691,20 @@ func relayout() -> void:
 	_place_ref(_booster_row, Shell.BOOSTERS)
 	_layout_ad_banner()
 	_queue_connector_update()
+
+## Edge stretches over the screen outside the shell rect (zero size where the shell reaches the edge).
+func _layout_backdrop() -> void:
+	var vp := size
+	var r := get_shell_rect()
+	r.position -= global_position
+	var top := maxf(r.position.y, 0.0)
+	var bottom := minf(r.end.y, vp.y)
+	for spec in [["EdgeLeft", Rect2(0, top, maxf(r.position.x, 0.0), bottom - top)], ["EdgeRight", Rect2(r.end.x, top, maxf(vp.x - r.end.x, 0.0), bottom - top)],
+			["EdgeTop", Rect2(0, 0, vp.x, top)], ["EdgeBottom", Rect2(0, bottom, vp.x, maxf(vp.y - bottom, 0.0))]]:
+		var e: TextureRect = _backdrop.get_node(spec[0])
+		e.position = spec[1].position
+		e.size = spec[1].size
+		e.visible = spec[1].has_area()
 
 func _layout_ad_banner() -> void:
 	_ad_banner.visible = _ad_slot_enabled

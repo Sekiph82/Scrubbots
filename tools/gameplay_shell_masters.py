@@ -49,10 +49,10 @@ PROPS_OLD = (600, 1230, 845, 1625)
 PROPS_SCALE, PROPS_FOOT = 0.75, (845, 1625, 845, 1500)
 BUBBLE_SEAM, BUBBLE_WIDEN = 188, 90  # straight body column right of the tail; extra width
 STRIP_MIRROR = 857                   # strip is symmetric: x <-> 857 - x (192+665, 269+588)
-# Board floor: BoardPresentation.BOARD_FLOOR (SB-TF-10 owner rail-glow blue); the baked navy field is lifted onto it.
+# Board floor: BoardPresentation.BOARD_FLOOR (SB-TF-13 owner dark purple-grey #4A3258); the baked navy field is lifted onto it.
 BOARD_FIELD = (105, 318, 746, 946)
 NAVY = np.array([0, 55, 123])
-FLOOR = np.array([0, 104, 216])
+FLOOR = np.array([74, 50, 88])
 # One-point floor grid (vertical grout lines meet at y FLOOR_YH; period U per px below it).
 FLOOR_YH, FLOOR_U, FLOOR_GUIDE_Y0 = 1241.0, 0.304, 1500
 

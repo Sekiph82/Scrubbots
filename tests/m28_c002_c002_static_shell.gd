@@ -208,8 +208,8 @@ func _no_duplicate_chrome() -> void:
 	_ok(not (s.get_node("SafeAreaRoot") if s.has_node("SafeAreaRoot") else s).find_children("*", "Panel", true, false).any(func(p): return p.name == "ProfileChip" or p.name == "SlotTray" or p.name == "SupplyTray"), "no native profile / slot-tray / supply-tray chrome")
 	var tex_nodes: Array = s.find_children("*", "TextureRect", true, false).filter(func(t): return t.texture != null and t.is_visible_in_tree())
 	var names: Array = tex_nodes.map(func(t): return String(t.name))
-	_ok(names.count("GameplayShell") == 1 and not names.has("VictoryRobot") and tex_nodes.all(func(t): return ["GameplayShell", "BoardRenderer", "Portrait", "Icon", "SelectedRing", "UnavailableOverlay"].has(String(t.name))),
-		"only the shell + live overlays carry textures %s" % str(names))
+	_ok(names.count("GameplayShell") == 1 and not names.has("VictoryRobot") and tex_nodes.all(func(t): return ["GameplayShell", "EdgeLeft", "EdgeRight", "EdgeTop", "EdgeBottom", "BoardRenderer", "Portrait", "Icon", "SelectedRing", "UnavailableOverlay"].has(String(t.name))),
+		"only the shell (+ its SB-TF-13 edge stretches) + live overlays carry textures %s" % str(names))
 	var pb = s.get_pause_button()
 	_ok(pb.get_theme_stylebox("normal") is StyleBoxEmpty, "Pause adds no outer chrome over the baked box")
 	_complete("no_duplicate_chrome")
@@ -466,7 +466,7 @@ func _boosters_and_ad_region() -> void:
 	var row: Rect2 = s.get_booster_row_rect()
 	_ok(s.get_booster_count() == 4 and s.get_booster_ids() == ["plus_one_slot", "random", "selector", "tornado"], "exactly four canonical boosters")
 	var vp: Vector2 = s.get_viewport_rect().size
-	_ok(s.has_ad_region() and absf(ad.end.y - vp.y) < 0.5 and absf(ad.size.x - vp.x) < 0.5 and ad.end.y >= shell.end.y - 1.0, "banner area flush with the screen bottom, full width (SB-TF-04)")
+	_ok(s.has_ad_region() and absf(ad.end.y - vp.y) < 0.5 and absf(ad.size.x - vp.x) < 0.5 and shell.end.y >= ad.position.y, "banner area flush with the screen bottom, full width, over the shell's floor (SB-TF-04 / SB-TF-13)")
 	_ok(row.end.y <= ad.position.y + 1.0 and row.position.y >= s.get_supply_panel_rect().end.y, "boosters above the ad region, below the supply")
 	_ok(not s.has_ad_placeholder(), "legacy C001-era bottom Pause/ad/speed row absent")
 	_complete("boosters_and_ad_region")
@@ -488,9 +488,12 @@ func _responsive_transform() -> void:
 		var s = _screen()
 		var sh: Rect2 = s.get_shell_node_rect()   # the REAL shell TextureRect on screen
 		var safe: Rect2 = s.get_safe_rect()
-		var ok: bool = absf(sh.size.x / sh.size.y - Shell.SIZE.x / Shell.SIZE.y) < 0.002 and safe.grow(1.0).encloses(sh)
+		# SB-TF-13: full width (or the CRIT_TOP..booster band fills the height above the banner),
+		# never wider than the safe rect; that band lies inside the safe rect.
+		var crit: Rect2 = s.ref_rect_to_global(Rect2(0, GameplayScreen.CRIT_TOP, Shell.SIZE.x, Shell.BOOSTERS[3] - GameplayScreen.CRIT_TOP))
+		var ok: bool = absf(sh.size.x / sh.size.y - Shell.SIZE.x / Shell.SIZE.y) < 0.002 and sh.size.x <= safe.size.x + 1.0 and safe.grow(1.0).encloses(crit)
 		ok = ok and _near(sh, s.get_shell_rect(), 1.0)   # image and overlays share one transform
-		ok = ok and (absf(sh.size.x - safe.size.x) < 1.5 or absf(sh.size.y - safe.size.y) < 1.5)
+		ok = ok and (absf(sh.size.x - safe.size.x) < 1.5 or (absf(crit.position.y - safe.position.y) < 2.0 and absf(safe.end.y - s.get_ad_region_rect().size.y - 24.0 - crit.end.y) < 2.0))
 		ok = ok and _near(s.get_pause_rect(), s.ref_rect_to_global(Shell.rect(Shell.PAUSE)), _tol())
 		# Booster row keeps its reference band after shrinking from a larger size.
 		ok = ok and _near(s.get_booster_row_rect(), s.ref_rect_to_global(Shell.rect(Shell.BOOSTERS)), _tol())
@@ -501,13 +504,13 @@ func _responsive_transform() -> void:
 		var rt := 0.0
 		for p in [Vector2i(0, 0), Vector2i(31, 31), Vector2i(16, 9)]:
 			rt = maxf(rt, s.global_to_board_local(s.cell_center_to_global(p.x, p.y)).distance_to(Vector2(p.x + 0.5, p.y + 0.5)))
-		_ok(ok and rt < 1e-3, "%dx%d: uniform 852:1846 aspect-fit (scale %.3f) inside safe rect; overlays follow the same transform; coord round-trip %.6f" % [size.x, size.y, s.get_shell_scale(), rt])
+		_ok(ok and rt < 1e-3, "%dx%d: uniform 852:1846 width fit (scale %.3f), top bar..boosters inside the safe rect; overlays follow the same transform; coord round-trip %.6f" % [size.x, size.y, s.get_shell_scale(), rt])
 	var s2 = _screen()
 	await _resize(Vector2i(1170, 2532))
 	s2.set_synthetic_safe_insets(0, 141, 0, 102)
 	await _settle()
 	var inner := Rect2(0, 141, 1170, 2532 - 141 - 102)
-	_ok(inner.grow(1.0).encloses(s2.get_shell_rect()) and inner.encloses(s2.get_pause_rect()) and inner.encloses(s2.get_booster_row_rect()), "notch 141 / gesture 102: whole shell + controls inside the safe rect")
+	_ok(absf(s2.get_shell_rect().size.x - 1170.0) < 1.5 and inner.encloses(s2.get_pause_rect()) and inner.encloses(s2.get_booster_row_rect()), "notch 141 / gesture 102: shell full width, controls inside the safe rect (SB-TF-13)")
 	s2.set_synthetic_safe_insets(0, 0, 0, 0)
 	await _resize(Vector2i(1080, 2160))
 	_complete("responsive_transform")
