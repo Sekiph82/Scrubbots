@@ -340,7 +340,9 @@ jobs:
           mkdir -p "$OUT_DIR"
           "$GODOT" --headless --export-release "iOS" "${OUT_DIR}/${APP_NAME}.ipa" > out/export.log 2>&1 \
             || { grep -iE "error|fail|invalid|missing" out/export.log | tail -25 | sed 's/^/::error::/'; exit 1; }
-          if grep -nE "Error loading|ERR_FILE_CORRUPT|SCRIPT ERROR|Failed loading resource" out/export.log; then
+          # Only the export itself counts: stop at the editor-shutdown plugin teardown (its GameFeelFlow parse noise is post-export).
+          # The ScrubbotsNotify GDExtension has only an iOS library, so its macOS load error is expected (same as the import gate).
+          if sed '/Game Feel Flow: Plugin disabled/q' out/export.log | grep -nE "Error loading|ERR_FILE_CORRUPT|SCRIPT ERROR|Failed loading resource" | grep -v scrubbots_notify; then
             echo "::error::export reported failed resources"; exit 1
           fi
           ls -la "$OUT_DIR"

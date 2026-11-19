@@ -740,7 +740,13 @@ jobs:
           grep -qx 'gradle_build/use_gradle_build=true' export_presets.cfg
           sed -i 's#^enabled=PackedStringArray(#enabled=PackedStringArray("res://addons/scrubbots_notify/plugin.cfg", #' project.godot
           grep -q 'addons/scrubbots_notify/plugin.cfg' project.godot
-          "$GODOT" --headless --path . --install-android-build-template
+          # What --install-android-build-template does (that flag alone starts the editor and never exits).
+          if [ ! -f android/build/build.gradle ]; then
+            mkdir -p android/build
+            unzip -q "$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable/android_source.zip" -d android/build
+            touch android/build/.gdignore
+            echo "${GODOT_VERSION}.stable" > android/.build_version
+          fi
           test -f android/build/build.gradle
 
       # SB-RELEASE-SIGNING-2026-11-17: Google Play takes an AAB, which only the Gradle build exports.
