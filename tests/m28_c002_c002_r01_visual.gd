@@ -267,7 +267,8 @@ func _short_phone_hitboxes() -> void:
 			ok = ok and not hits[c].intersects(hits[c + 1])
 		_ok(ok and worst >= UiTokens.TOUCH_MIN - 0.01, "%s @1080x1920: painted cell ~%.0f px, invisible front hitbox >= %d px (min %.1f), no overlap, previews untouched, visuals on the baked cells" % [id, sp.get_column_row_panels(0)[0].size.x, UiTokens.TOUCH_MIN, worst])
 	# A press/release in the expanded margin (outside the painted tile) activates that front.
-	await _boot_main(2, Vector2i(1080, 1920))
+	# SB-TF-13: at 1080x1920 the full-width shell paints ~89 px cells (no margin left), so 720x1280.
+	await _boot_main(2, Vector2i(720, 1280))
 	var sp2 = _screen().get_supply_panel()
 	var hit_node: Control = sp2.get_column_row_panels(1)[0].get_node("HitArea")
 	var tile2: Rect2 = sp2.get_column_row_panels(1)[0].get_global_rect()
