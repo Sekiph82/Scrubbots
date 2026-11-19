@@ -381,7 +381,7 @@ static func open_achievements(stack, app) -> BasePopup:
 	list.add_theme_constant_override("separation", UiTokens.SPACE_SM)
 	scroll.add_child(list)
 	TouchScroll.enable(scroll)   # M47-TOUCH-R01: finger swipe scrolls over rows / buttons
-	for a in ach:
+	for a in Achievements.sort_for_display(ach):   # SB-TF-08: earned on top; claims never reorder
 		var card := _ach_card(a)
 		list.add_child(card)
 		if a["claimable"]:

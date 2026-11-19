@@ -235,6 +235,14 @@ func _finish_durable(action: String, op: Callable) -> Dictionary:
 func claim_achievement(app, id: String) -> Dictionary:
 	return _finish_durable("claim_achievement", func(): return Achievements.claim(app, id))
 
+## SB-TF-08 Collection Read all: mark every owned, not-yet-viewed card (meta_ui card:<id>, the
+## Collection NEW badge) seen in one durable save. Presentation marks only. {ok, marked}.
+func mark_all_cards_seen() -> Dictionary:
+	return _finish_durable("mark_all_cards_seen", func():
+		var col = _economy.collection
+		var keys: Array = col.all_card_ids().filter(func(c): return col.owned(c) > 0).map(func(c): return "card:" + String(c))
+		return {"ok": true, "marked": _economy.meta_ui.mark_all_seen(keys)})
+
 func claim_daily_all_tasks() -> Dictionary:
 	if not feature_unlocked("tasks"):
 		return _locked("claim_daily_all_tasks", "tasks")

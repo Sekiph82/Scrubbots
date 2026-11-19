@@ -30,6 +30,14 @@ func mark_seen(key: String) -> bool:
 	_seen[key] = true
 	return true
 
+## Mark every key in `keys` (SB-TF-08 Collection Read all). Returns how many were newly marked.
+func mark_all_seen(keys: Array) -> int:
+	var n := 0
+	for k in keys:
+		if mark_seen(String(k)):
+			n += 1
+	return n
+
 func seen_keys() -> Array:
 	var k: Array = _seen.keys()
 	k.sort()

@@ -92,6 +92,14 @@ static func evaluate(app, defs: Array = []) -> Array:
 			"claimed": claimed, "claimable": done and not claimed})
 	return out
 
+## SB-TF-08: popup order — claimable, then claimed, then in progress; catalogue order inside
+## each group. Returns a new Array (the input is not mutated).
+static func sort_for_display(list: Array) -> Array:
+	var out: Array = list.filter(func(a): return a["claimable"])
+	out.append_array(list.filter(func(a): return a["done"] and not a["claimable"]))
+	out.append_array(list.filter(func(a): return not a["done"]))
+	return out
+
 static func claimable_count(app) -> int:
 	return evaluate(app).filter(func(a): return a["claimable"]).size()
 

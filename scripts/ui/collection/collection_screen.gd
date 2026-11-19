@@ -6,7 +6,8 @@ extends RefCounted
 ##
 ##   album        15 canonical sets x 9 cards (135): per set N/9, rarity burden (owned / total per
 ##                rarity), exact set reward + its claimed state, Master Collection reward + state,
-##                red badge = owned cards of the set not yet viewed (SB-COL-NAV-001)
+##                red badge = owned cards of the set not yet viewed (SB-COL-NAV-001); READ ALL
+##                (only while one exists) marks them all viewed via the facade (SB-TF-08)
 ##   set detail   9 slots: owned -> canonical art, name, rarity, NEW (not yet viewed) / EXTRAS xN;
 ##                not owned -> the approved unknown-card silhouette + rarity only (no art leak);
 ##                < / > page through the 15 sets in place, wrapping (SB-COL-NAV-001)
@@ -72,6 +73,10 @@ static func open_album(stack, app, open_packs: Callable = Callable()) -> BasePop
 	pl.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	packs.add_child(pl)
 	p.add_action("packs", UiText.t("COLLECTION_PACKS_OPEN"), "primary", false, "", packs).custom_minimum_size = Vector2(220, UiTokens.TOUCH_MIN)
+	# SB-TF-08: own header row above the set list (shown only while a NEW card exists).
+	var read_all := p.add_action("read_all", UiText.t("COLLECTION_READ_ALL"), "secondary", false, "", p.get_content())
+	read_all.name = "ReadAll"
+	read_all.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	p.set_meta("open_packs", open_packs)
 	p.add_action("exchange", UiText.t("COLLECTION_OPEN_EXCHANGE"), "primary", false)
 	var scroll := ScrollContainer.new()
@@ -168,6 +173,11 @@ static func _refresh_album(p: BasePopup, e) -> void:
 	var waiting: int = e.pending_packs.size()
 	(p.find_child("Packs", true, false) as Label).text = UiText.t("COLLECTION_PACKS", [e.pending_packs.count_of("standard"), e.pending_packs.count_of("premium")]) if waiting > 0 else UiText.t("COLLECTION_PACKS_EMPTY")
 	p.set_action_blocked("packs", waiting == 0 or not (p.get_meta("open_packs") as Callable).is_valid())
+	# READ ALL takes its height from the set list, so the album frame never grows.
+	var read_all := p.get_action_button("read_all")
+	read_all.visible = not unseen_cards(e).is_empty()
+	var list_h := LIST_H - (read_all.get_combined_minimum_size().y + UiTokens.SPACE_SM if read_all.visible else 0.0)
+	(p.find_child("SetList", true, false) as Control).custom_minimum_size.y = list_h
 	for row in e.config.collection_config().get("set_rewards", []):
 		var n := int(row["set"])
 		var card = p.find_child("Set_%d" % n, true, false)
@@ -222,6 +232,9 @@ static func _on_album_action(stack, app, p: BasePopup, id: String) -> void:
 	if id == "packs":
 		(p.get_meta("open_packs") as Callable).call()   # the C005 ceremony draws + acknowledges
 		p.rearm_soon()
+	elif id == "read_all":   # SB-TF-08: every NEW card seen at once, through the facade (one save)
+		app.actions.mark_all_cards_seen()
+		back.call()
 	elif id == "exchange":
 		if open_exchange(stack, app, back) == null:
 			p.rearm()
