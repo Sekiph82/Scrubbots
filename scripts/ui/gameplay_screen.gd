@@ -1019,8 +1019,10 @@ func capture_booster_fx(id: String, target = null) -> Dictionary:
 				var snap = _slot_snapshots[i]
 				if snap is Dictionary and snap.get("occupied", false) and int(snap.get("color_id", -1)) == cid:
 					tiles.append({"rect": views[i].get_global_rect(), "color": col})
+			# SB-TF-06: the tornado video runs from the Tornado button to the board centre.
 			return {"ghost": img if not cells.is_empty() else null, "board_rect": br, "center": center, "cell": cell,
-				"radius": maxf(br.size.x, br.size.y) * 0.5, "samples": samples, "tiles": tiles}
+				"radius": maxf(br.size.x, br.size.y) * 0.5, "samples": samples, "tiles": tiles,
+				"button_center": _booster_buttons["tornado"].get_global_rect().get_center(), "board_center": br.get_center()}
 	return {}
 
 ## Visible supply tiles whose batch dict passes `pred`: [{rect (global), color, batch_id}].

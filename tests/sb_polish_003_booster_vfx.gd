@@ -3,7 +3,8 @@ extends SceneTree
 ## Selector reticle) in the REAL app (main.tscn, 1080x2160 SubViewport, save override):
 ##   - every committed booster plays its own BoosterVfx effect, which ends by itself <= 0.9 s;
 ##   - +1 Slot from the booster row (request_booster) plays too, with the master crossfade;
-##   - Tornado: the ghost image holds exactly the purged colour's cells; one ghost node only;
+##   - Tornado: the ghost image holds exactly the purged colour's cells; ghost + one video player only
+##     (SB-TF-06), ending after its clip + 0.5 s;
 ##   - the overlay never takes input; Reduced Effects -> no effect, same committed result;
 ##   - gameplay truth is the action's own (cells CLEARED, batch in its slot, 6 slots);
 ##   - SB-POLISH-012: a slot batch that finishes in real play pops (lift + burst + stars) every
@@ -113,7 +114,7 @@ func _tornado() -> void:
 			if img.get_pixel(x, y).a > 0.0:
 				lit += 1
 	_ok(_vfx.get_kind() == "tornado" and lit == n and n > 0, "vortex playing; ghost holds exactly the %d purged cells (%d)" % [n, lit])
-	_ok((_vfx._d["samples"] as Array).size() <= 48 and _vfx.get_child_count() == 1, "<= 48 spiral samples drawn, no per-cell nodes")
+	_ok((_vfx._d["samples"] as Array).size() <= 48 and _vfx.get_child_count() <= 2, "<= 48 spiral samples drawn, ghost + at most one video player, no per-cell nodes")
 	await _settle("tornado")
 
 func _reduced() -> void:
@@ -183,7 +184,7 @@ func _batch_pop() -> void:
 	_ok(_vfx.get_child_count() == 1, "no nodes created by pops (overlay children %d, tree nodes %d -> %d)" % [_vfx.get_child_count(), nodes0, get_node_count()])
 	_host.get_runtime().set_process(false)
 
-## Effect ends by itself within 0.9 s. Evidence runs instead step the effect to 4 fixed moments
+## Effect ends by itself within 0.9 s (Tornado: its clip + 0.5 s). Evidence runs instead step the effect to 4 fixed moments
 ## (PNG saves are slower than a frame) and save one 1080x2160 still at each.
 func _settle(id: String) -> void:
 	if _evidence != "":
@@ -193,11 +194,12 @@ func _settle(id: String) -> void:
 			await _frames(2)
 			_sub.get_texture().get_image().save_png(_evidence.path_join("%s_%d.png" % [id, k + 1]))
 		_vfx.set_process(true)
+	var extra: float = (_vfx._dur - 0.85) * 1000.0 if id == "tornado" else 0.0   # SB-TF-06: clip + 0.5 s
 	var t0 := Time.get_ticks_msec()
-	while _vfx.is_playing() and Time.get_ticks_msec() - t0 < 2000:
+	while _vfx.is_playing() and Time.get_ticks_msec() - t0 < 2000 + extra:
 		await process_frame
 	var ms := Time.get_ticks_msec() - t0
-	_ok(not _vfx.is_playing() and (ms <= 1200 or _evidence != ""), "%s effect ended by itself (%d ms)" % [id, ms])
+	_ok(not _vfx.is_playing() and (ms <= 1200 + extra or _evidence != ""), "%s effect ended by itself (%d ms)" % [id, ms])
 
 func _frames(n: int) -> void:
 	for _i in range(n):

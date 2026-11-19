@@ -86,7 +86,8 @@ a ceremony. Each row's REDUCED arm is tested by the suite in `REDUCED_LEDGER`
 | character_motion.gd | robot pose bounce / wave / slide tweens | static pose |
 | cleaning_effects_controller.gd | clear sparkle, <= 24 live, 0.30 s | <= 8 live, 0.18 s single cue |
 | gameplay_screen.gd | booster activation burst + BoosterVfx, batch-complete pop | burst fade only, no BoosterVfx / pops |
-| booster_vfx.gd | tornado vortex 0.85 s, +1 slot glow 0.7 s, random dice flicker 0.6 s, selector reticle 0.8 s, batch pop 1.6 s | not played |
+| booster_vfx.gd (SB-TF-06 Tornado) | tornado video (additive, Tornado button -> board centre) + the purged cells spiralling in by code, spin-collapse + burst, clip + 0.5 s | none: no video, no ghost / cells (button burst flash only) |
+| booster_vfx.gd | +1 slot glow 0.7 s, random dice flicker 0.6 s, selector reticle 0.8 s, batch pop 1.6 s | not played |
 | five_slot_strip.gd, batch_slot_view.gd | WAITING slot pulse | static tile at full alpha |
 | results_screen.gd (LOST / ERROR only) | lose robot video | still pose |
 | win_overlay.gd | level-complete win video (or victory pose motion) + WIN confetti, then Home | keyed still for 1.0 s, then Home |

@@ -2,17 +2,20 @@ extends Control
 ## BoosterVfx — preload (res://scripts/ui/feel/booster_vfx.gd).
 ##
 ## SB-POLISH-003 (owner playtest 2026-10-31): the short activation effect of each booster,
-##   tornado       — a swirling vortex; the purged colour's board cells (one ghost ImageTexture)
-##                   and its supply / slot tiles spiral into it, then a burst at the centre;
+##   tornado       — SB-TF-06: the owner's tornado video (additive, one VideoStreamPlayer) grows
+##                   from the Tornado button to the board centre; the purged colour's board cells
+##                   (one ghost ImageTexture) and its supply / slot tiles spiral into the moving
+##                   tornado; then the layer spin-collapses and a burst pops at the board centre;
 ##   plus_one_slot — glow + burst pop + sparkles on the new sixth slot (the screen crossfades
 ##                   the 5-slot master into the 6-slot master and fades the new slot in);
 ##   random        — dice-pip colour flicker over every visible supply tile, then sparkles;
 ##   selector      — a reticle locks onto the picked batch, flashes, and the tile flies into
 ##                   its slot (the real slot tile fades in as it lands).
-## ONE Control draws everything (plus one ghost TextureRect for Tornado): never a Node per
-## board cell. Presentation only: GameplayScreen feeds detached global rects / colours AFTER the
-## action committed; nothing here reads or writes gameplay truth, and input passes through
-## (mouse_filter IGNORE). Each effect is <= 0.85 s; Reduced Effects -> no effect at all.
+## ONE Control draws everything (plus one ghost TextureRect and, while Tornado plays, its one
+## VideoStreamPlayer): never a Node per board cell. Presentation only: GameplayScreen feeds
+## detached global rects / colours AFTER the action committed; nothing here reads or writes
+## gameplay truth, and input passes through (mouse_filter IGNORE). Each effect is <= 0.85 s
+## (Tornado: clip + 0.5 s); Reduced Effects -> no effect at all.
 ## SB-POLISH-012 (owner 2026-10-31): every slot batch that finishes (slot empties) gets a short
 ## lift + pop + star burst (pop_batch). Pops are plain dict entries drawn here (no nodes made, so
 ## nothing to pool or leak) and run alongside a booster effect. SB-PHONE-2026-11-12-F: the host
@@ -24,9 +27,9 @@ extends Control
 
 const BURST_ART := "res://assets/ui/final/boosters/states/booster_activated_burst.png"
 const GLOW_ART := "res://assets/ui/final/boosters/states/booster_reward_glow.png"
-const DURATION := {"tornado": 0.85, "plus_one_slot": 0.7, "random": 0.6, "selector": 0.8}
+## Tornado: nominal clip + collapse + burst; play() uses the opened clip's real length.
+const DURATION := {"tornado": 1.833, "plus_one_slot": 0.7, "random": 0.6, "selector": 0.8}
 const SPARKLE := Color(1.0, 0.97, 0.78)
-const VORTEX := Color(0.78, 0.93, 1.0)
 const RETICLE := Color(1.0, 0.36, 0.3)
 ## Seconds per phase; total = lift + burst + stars.
 const POP_PRESETS := {
@@ -37,6 +40,36 @@ const POP_PRESETS := {
 const POP_DEFAULT := "C"   # owner picked C (1.60 s) 2026-11-06
 const POP_GAP := 0.25      # clear gap under the lifted tile, x slot height
 const POP_MAX := 6         # live pops bounded: one per slot; the oldest gives way
+## SB-TF-06: the Tornado clip (assets/ui/final/boosters/videos/PROVENANCE.md, built by
+## tools/build_tornado_booster_video.py): 544x1008, 32 frames at 24 fps, black background.
+const TORNADO_VIDEO := "res://assets/ui/final/boosters/videos/tornado_additive.ogv"
+const TORNADO_SIZE := Vector2(544, 1008)
+const TORNADO_FPS := 24.0
+const TORNADO_CLIP_S := 32.0 / 24.0   # also the code-only duration when the clip cannot play
+const COLLAPSE_S := 0.25
+const BURST_S := 0.25
+const STRETCH_MAX := 1.25             # max(sx, sy) / min(sx, sy) of the video layer
+## Measured tornado per clip frame: [frame, centre x, centre y, diameter] in clip pixels (bbox
+## of pixels brighter than 40/255). Key 0 = at the button, last key = end of travel.
+const TORNADO_TRACK := [
+	[0, 397.5, 957.0, 83.0],
+	[2, 397.5, 956.0, 81.0],
+	[5, 399.5, 954.5, 87.0],
+	[7, 400.0, 942.0, 104.0],
+	[10, 387.5, 896.5, 153.0],
+	[12, 375.5, 845.5, 195.0],
+	[14, 361.0, 784.5, 236.0],
+	[17, 339.0, 677.5, 296.0],
+	[19, 324.5, 597.5, 339.0],
+	[21, 312.5, 520.0, 381.0],
+	[24, 293.5, 400.5, 431.0],
+	[26, 287.0, 331.5, 456.0],
+	[29, 277.0, 249.0, 484.0],
+	[31, 272.5, 217.0, 493.0],
+]
+
+## Injectable for tests (null / broken = the code-only effect, as on failure).
+static var tornado_video: VideoStream = load(TORNADO_VIDEO)
 
 var _kind := ""
 var _t := 0.0
@@ -47,6 +80,10 @@ var _ghost: TextureRect
 var _pops: Array = []             # live batch-complete pops: {rect (global), color, t}
 var _tile := StyleBoxFlat.new()   # rounded batch-tile silhouette (one reused style)
 var _pop_timing: Dictionary = POP_PRESETS[POP_DEFAULT]
+var _dur := 0.0                   # running effect's length (Tornado: clip + collapse + burst)
+var _video: VideoStreamPlayer     # Tornado only; freed at the burst / stop()
+var _clip := 0.0                  # Tornado clip seconds
+var _map := {}                    # Tornado layer: scale (Vector2), base (local), drift (x px)
 
 func _init() -> void:
 	name = "BoosterVfx"
@@ -62,7 +99,7 @@ func _init() -> void:
 	_ghost.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST   # crisp logical pixels
 	_ghost.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	_ghost.stretch_mode = TextureRect.STRETCH_SCALE
-	_ghost.show_behind_parent = true   # under the vortex arms
+	_ghost.show_behind_parent = true   # under the spiral tiles and the video
 	_ghost.visible = false
 	add_child(_ghost)
 
@@ -74,6 +111,7 @@ func play(kind: String, data: Dictionary) -> void:
 	_kind = kind
 	_d = data
 	_t = 0.0
+	_dur = float(DURATION[kind])
 	if data.get("fade_in") is CanvasItem:
 		data["fade_in"].modulate.a = 0.0
 	if kind == "tornado" and data.get("ghost") is Image:
@@ -86,6 +124,9 @@ func play(kind: String, data: Dictionary) -> void:
 		_ghost.scale = Vector2.ONE
 		_ghost.modulate = Color.WHITE
 		_ghost.visible = true
+	if kind == "tornado":
+		_start_video()
+		_dur = _clip + COLLAPSE_S + BURST_S
 	set_process(true)
 	queue_redraw()
 
@@ -97,6 +138,7 @@ func stop() -> void:
 		view.modulate.a = 1.0
 	_kind = ""
 	_d = {}
+	_free_video()
 	_ghost.visible = false
 	_ghost.texture = null
 	set_process(not _pops.is_empty())
@@ -173,18 +215,15 @@ func _process(delta: float) -> void:
 		queue_redraw()
 		return
 	_t += delta
-	if _t >= float(DURATION[_kind]):
+	if _t >= _dur:
 		stop()
 		return
 	var view = _d.get("fade_in")
 	if is_instance_valid(view) and view is CanvasItem:
 		var start: float = float(_d.get("fade_from", 0.0))
 		view.modulate.a = clampf((_t - start) / 0.15, 0.0, 1.0)
-	if _kind == "tornado" and _ghost.visible:
-		var u: float = _ease_in(clampf((_t - 0.08) / 0.62, 0.0, 1.0))
-		_ghost.rotation = -TAU * 0.9 * u
-		_ghost.scale = Vector2.ONE * (1.0 - u)
-		_ghost.modulate.a = 1.0 - u * u
+	if _kind == "tornado":
+		_tick_tornado()
 	queue_redraw()
 
 func _draw() -> void:
@@ -206,36 +245,122 @@ func _draw() -> void:
 # ------------------------------------------------------------------ effects --
 
 func _draw_tornado() -> void:
-	var c: Vector2 = _d["center"]
-	var radius: float = float(_d["radius"])
-	var a: float = clampf(_t / 0.15, 0.0, 1.0) * clampf((0.85 - _t) / 0.15, 0.0, 1.0)
-	var spin: float = -_t * 9.0
-	var shrink: float = 1.0 - 0.75 * _ease_in(clampf((_t - 0.55) / 0.3, 0.0, 1.0))
-	# Three spiral arms + two dashed rings, all rotating inward.
-	for arm in range(3):
-		var pts := PackedVector2Array()
-		for i in range(25):
-			var f: float = float(i) / 24.0
-			var ang: float = spin + arm * TAU / 3.0 + f * TAU * 1.1
-			pts.append(c + Vector2.from_angle(ang) * radius * shrink * (1.0 - f * 0.92))
-		draw_polyline(pts, Color(VORTEX, 0.55 * a), maxf(radius * 0.035, 2.0), true)
-	for k in range(2):
-		var rr: float = radius * shrink * (0.45 + 0.4 * k)
-		for s in range(6):
-			var st: float = spin * (1.4 - 0.5 * k) + s * TAU / 6.0
-			draw_arc(c, rr, st, st + TAU / 10.0, 8, Color(1, 1, 1, 0.45 * a), maxf(radius * 0.02, 1.5), true)
-	# The colour's supply / slot tiles and sampled board cells spiral into the eye.
+	var c: Vector2 = tornado_pos()
+	var s: float = _t * 0.85 / _clip   # the SB-POLISH-003 0.85 s timeline, stretched over the clip
+	# The colour's supply / slot tiles and sampled board cells spiral into the moving tornado.
 	for tile in _d["tiles"]:
-		_spiral_rect(c, tile["rect"], tile["color"], clampf((_t - 0.05) / 0.6, 0.0, 1.0), 2.4)
+		_spiral_rect(c, tile["rect"], tile["color"], clampf((s - 0.05) / 0.6, 0.0, 1.0), 2.4)
 	var cell: float = float(_d["cell"])
 	for p in _d["samples"]:
-		var u: float = clampf((_t - float(p["delay"])) / 0.55, 0.0, 1.0)
+		var u: float = clampf((s - float(p["delay"])) / 0.55, 0.0, 1.0)
 		_spiral_rect(c, Rect2(p["pos"] - Vector2.ONE * cell * 0.5, Vector2.ONE * cell), p["color"], u, 3.2)
-	# Collapse: burst at the eye.
-	var bu: float = clampf((_t - 0.6) / 0.25, 0.0, 1.0)
+	# After the spin-collapse: burst at the board centre.
+	var bu: float = clampf((_t - _clip - COLLAPSE_S) / BURST_S, 0.0, 1.0)
 	if bu > 0.0 and _burst != null:
-		var sz: float = radius * (0.5 + 0.9 * bu)
+		var sz: float = float(_d["radius"]) * (0.5 + 0.9 * bu)
 		draw_texture_rect(_burst, Rect2(c - Vector2.ONE * sz * 0.5, Vector2.ONE * sz), false, Color(1, 1, 1, 1.0 - bu))
+
+# ------------------------------------------------------------------ tornado --
+
+## SB-TF-06: one additive VideoStreamPlayer, mapped so track key 0 sits on the Tornado button
+## centre and the last key on the board centre. Axis-wise scale, no rotation: sy = screen / clip
+## travel on y; sx follows the x travel but stays within STRETCH_MAX of sy, and the x travel the
+## stretch cannot cover (the real layout is wider than the clip's path) drifts in with the
+## tornado's travel progress. A stream that is missing or does not start leaves the code-only
+## effect (cells into the board centre) over TORNADO_CLIP_S.
+func _start_video() -> void:
+	_clip = TORNADO_CLIP_S
+	_map = {}
+	if tornado_video == null or not (_d.get("button_center") is Vector2) or not (_d.get("board_center") is Vector2):
+		return
+	var v := VideoStreamPlayer.new()
+	v.name = "TornadoVideo"
+	v.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	v.expand = true
+	var mat := CanvasItemMaterial.new()
+	mat.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD   # black adds nothing over the board
+	v.material = mat
+	v.stream = tornado_video
+	add_child(v)
+	v.play()
+	if not v.is_playing() or v.get_stream_length() <= 0.0:
+		remove_child(v)
+		v.free()
+		return
+	_video = v
+	_clip = v.get_stream_length()
+	var k0 := _track_key(0.0)
+	var kn := _track_key(INF)
+	var dt: Vector2 = kn - k0
+	var ds: Vector2 = _d["board_center"] - _d["button_center"]
+	var sy: float = ds.y / dt.y
+	var sc := Vector2(clampf(ds.x / dt.x, sy / STRETCH_MAX, sy * STRETCH_MAX), sy)
+	_map = {"scale": sc, "drift": ds.x - sc.x * dt.x,
+		"base": _d["button_center"] - global_position - kn - sc * (k0 - kn)}
+	v.size = TORNADO_SIZE
+	v.pivot_offset = kn   # the collapse spins around the end-of-travel tornado
+	v.scale = sc
+	v.position = _map["base"]
+
+func _free_video() -> void:
+	if _video == null:
+		return
+	_video.visible = false
+	_video.queue_free()   # the decoder teardown (~3 ms on the dev PC) runs at the frame's delete flush
+	_video = null
+
+## Clip-pixel tornado centre at clip time `t` (linear between the track keys, clamped).
+func _track_key(t: float) -> Vector2:
+	var f: float = t * TORNADO_FPS
+	for i in range(1, TORNADO_TRACK.size()):
+		var a: Array = TORNADO_TRACK[i - 1]
+		var b: Array = TORNADO_TRACK[i]
+		if f < float(b[0]):
+			var u: float = clampf((f - float(a[0])) / float(b[0] - a[0]), 0.0, 1.0)
+			return Vector2(a[1], a[2]).lerp(Vector2(b[1], b[2]), u)
+	return Vector2(TORNADO_TRACK[-1][1], TORNADO_TRACK[-1][2])
+
+## Travel progress 0..1 at clip time `t` (along y; the x drift follows it).
+func _travel(t: float) -> float:
+	var y0: float = TORNADO_TRACK[0][2]
+	return clampf((_track_key(t).y - y0) / (float(TORNADO_TRACK[-1][2]) - y0), 0.0, 1.0)
+
+## Global position of the tornado now (the board centre when no clip plays).
+func tornado_pos() -> Vector2:
+	if _map.is_empty():
+		return _d.get("board_center", _d.get("center", Vector2.ZERO))
+	return _d["button_center"] + _map["scale"] * (_track_key(_t) - _track_key(0.0)) + Vector2(_map["drift"] * _travel(_t), 0.0)
+
+## "VIDEO" -> "COLLAPSE" -> "BURST" while Tornado plays, else "".
+func tornado_phase() -> String:
+	if _kind != "tornado":
+		return ""
+	if _t < _clip:
+		return "VIDEO"
+	return "COLLAPSE" if _t < _clip + COLLAPSE_S else "BURST"
+
+func get_video_player() -> VideoStreamPlayer:
+	return _video
+
+func _tick_tornado() -> void:
+	var c: Vector2 = tornado_pos()
+	if _ghost.visible:   # every purged cell (one texture) is pulled toward the tornado as it is now
+		var u: float = _ease_in(clampf(_t / _clip, 0.0, 1.0))   # reaches the eye as the clip ends
+		_ghost.position = (_d["board_rect"] as Rect2).position - global_position + (c - _d["center"]) * u
+		_ghost.rotation = -TAU * 0.9 * u
+		_ghost.scale = Vector2.ONE * (1.0 - u)
+		_ghost.modulate.a = 1.0 - u * u
+	if _video == null:
+		return
+	if _t >= _clip + COLLAPSE_S:
+		_free_video()   # the burst takes over: no decoder while it is not seen
+		return
+	if _t >= _clip:
+		_video.paused = true   # hold the last frame
+		var cu: float = _ease_in(clampf((_t - _clip) / COLLAPSE_S, 0.0, 1.0))
+		_video.rotation = -TAU * 1.5 * cu
+		_video.scale = _map["scale"] * (1.0 - 0.85 * cu)
+	_video.position = _map["base"] + Vector2(_map["drift"] * _travel(_t), 0.0)
 
 func _draw_plus_one() -> void:
 	var r: Rect2 = _d["slot_rect"]
