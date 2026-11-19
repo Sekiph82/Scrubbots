@@ -1,0 +1,2 @@
+# Decision 192-events-art-ui
+APPROVE. Orchestrator visual review round 1 REWORK (generic look, bubble over header) -> fixed in round 2; CLAUDE_PEER_REVIEW code PASS; merge conflict in CI workflow resolved keeping SB-TF-11 + SB-TF-12; post-merge LOCAL_PASS sb_tf11 6/6, sb_tf03 11/11, sb_tf12 5/5, ev02_events_ui 6/6, sb_tf04 7/7. Native screens match reference layout/palette, not pixel-identical (painted bracket diagrams approximated). Added art 2.65 MiB.
