@@ -246,7 +246,7 @@ func _u06() -> void:
 		var hits: Array = forbidden.filter(func(w): return src.contains(w))
 		_ok(hits.is_empty(), "%s touches no gameplay system %s" % [path.get_file(), str(hits)])
 	var ui := FileAccess.get_file_as_string("res://scripts/ui/events/events_v02_ui.gd")
-	_ok(ui.count("set_cell_state") == 1 and ui.contains("BoardState.from_level_data") and not FileAccess.get_file_as_string("res://scripts/ui/events/event_tutorial.gd").contains("set_cell_state"), "the Board clears cells only on its own fresh BoardState copy")
+	_ok(ui.count("set_cell_state") == 0 and ui.contains("BoardState.from_level_data") and not FileAccess.get_file_as_string("res://scripts/ui/events/event_tutorial.gd").contains("set_cell_state"), "the Board shows its own fresh BoardState copy, whole artwork, no cell changed (SB-TF-13)")
 	var host := FileAccess.get_file_as_string("res://scripts/gameplay/runtime/production_gameplay_host.gd")
 	var at := host.find("func _event_receipt(")
 	var body := host.substr(at, host.find("\nfunc ", at + 1) - at)
