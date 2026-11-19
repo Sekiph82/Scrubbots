@@ -36,6 +36,7 @@ const HERO := "res://assets/ui/final/events/heroes/%s.png"
 const ICON := "res://assets/ui/final/events/icons/%s.png"
 const SCENE := "res://assets/ui/final/events/scenes/%s.webp"
 const PROP := "res://assets/ui/final/events/props/%s_%s.webp"
+const KIT := "res://assets/ui/final/events/kit/%s.webp"   ## logo, laurel, checkered flags, sparkle lines, star
 const TUTORIALS := "res://data/config/events_v02_tutorials.json"
 const PALETTE := "res://data/palettes/scrubbots_palette_v3.json"
 const TUTORIAL := "res://scripts/ui/events/event_tutorial.gd"   ## loaded on use (it preloads this file)
@@ -44,7 +45,8 @@ const LEVEL := "res://data/levels/level_004_orange_cat.json"
 const RIVAL_KINDS := ["race", "ranking", "royale", "bracket", "team_milestones", "team_versus"]
 const STANDING_KINDS := ["race", "ranking", "royale", "bracket", "colors"]
 const TEAM_KINDS := ["team_milestones", "team_versus"]
-const MAX_ROWS := 8   ## standings rows shown (Royale: top rows + You)
+const MAX_ROWS := 5   ## standings rows shown (top rows + You)
+const RACE_KINDS := ["race", "royale"]   ## checkered flags beside the title
 const AD_TIMEOUT_S := 60.0   ## SB-TF-05 pattern: an unanswered event ad is abandoned (no grant)
 const GOLD := Color(1.0, 0.788, 0.243)
 const GOLD_DARK := Color(0.690, 0.400, 0.039)
@@ -63,6 +65,10 @@ static func data(id: String) -> Dictionary:
 
 static func accent(id: String) -> Color:
 	return Color(String(data(id).get("accent", "#1b5dc9")))
+
+## Panel fill sampled from the event's reference storyboards.
+static func panel_color(id: String) -> Color:
+	return Color(String(data(id).get("panel", data(id).get("accent", "#1b5dc9"))))
 
 ## Texture for an event art path; null (fallback) when the file is missing.
 static func art_texture(path: String) -> Texture2D:
@@ -353,7 +359,7 @@ static func open_details(stack, app, iid: String, auto_tutorial := true) -> Base
 	start.set_meta("coach", "start_button")
 	start.add_theme_constant_override("separation", UiTokens.SPACE_SM)
 	list.add_child(start)
-	p.add_action("join", UiText.t("EV2_JOIN"), "primary", false, "", start)
+	style_go(p.add_action("join", UiText.t("EV2_JOIN"), "primary", false, "", start))
 	p.add_action("ad", UiText.t("EV2_WATCH_AD"), "secondary", false, "", start)
 	var joined := _label("Joined", "", 30, HomeStyle.TEXT)
 	joined.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -364,7 +370,7 @@ static func open_details(stack, app, iid: String, auto_tutorial := true) -> Base
 		elif aid.begins_with("rw:"):
 			app.actions.claim_event_reward(iid, aid.substr(3))
 		elif aid == "how":
-			load(TUTORIAL).open(stack, app, iid)
+			open_info(stack, app, iid)
 		elif aid == "ad":
 			if _watch_ad(p, app, iid):
 				return   # refreshed + re-armed when the verified result arrives
@@ -387,6 +393,34 @@ static func open_details(stack, app, iid: String, auto_tutorial := true) -> Base
 			app.economy.rewarded.resolved.disconnect(on_resolved))
 	if auto_tutorial and not app.economy.events_v02.tutorial_seen(id):   # first visit: the walkthrough opens once on top
 		load(TUTORIAL).open(stack, app, iid)
+	return p
+
+## (i): the event's full rules (long text kept off the main screen) + HOW IT WORKS (replays the tutorial).
+static func open_info(stack, app, iid: String) -> BasePopup:
+	var v: Dictionary = app.economy.events_v02.view(iid)
+	if not app.feature_unlocked("events") or v.is_empty():
+		return null
+	var p := BasePopup.new("event_info")
+	p.set_frame("large")
+	p.set_title(UiText.t("EV2_RULES"))
+	var lines := [goal(v), "%s · %s" % [UiText.t("EV2_FAMILY_" + String(v["family"]).to_upper()), participants(v)], gain_text(v)]
+	if TEAM_KINDS.has(v["kind"]):
+		lines.append(UiText.t("EV2_YOUR_PART", [UiText.num(int(v["progress"])), UiText.num(int(v["min_player_contribution"]))]))
+	if v["kind"] == "team_versus":
+		lines.append(UiText.t("EV2_OPP_TOTAL", [UiText.num(int(v["opponent_total"]))]))
+	if RIVAL_KINDS.has(v["kind"]):
+		lines.append(UiText.t("EV2_CPU_NOTE"))
+	for i in range(lines.size()):
+		var l := _ink("Rule_%d" % i, String(lines[i]), 28)
+		p.get_content().add_child(l)
+	p.add_action("tutorial", UiText.t("EV2_HOW"), "primary", true)
+	p.add_action("close", UiText.t("SHOP_CLOSE"), "secondary", true)
+	p.action_selected.connect(func(aid, _c):
+		if aid == "tutorial":
+			load(TUTORIAL).open(stack, app, iid))
+	if not stack.push(p):
+		p.free()
+		return null
 	return p
 
 ## Round (i) / X button: native circle with a gold rim.
@@ -458,21 +492,30 @@ static func refresh_details(p: BasePopup, app) -> void:
 	for b in stash.get_children():
 		p.set_action_blocked(b.get_meta("aid"), true)
 	var a := accent(id)
+	var pc := panel_color(id)
 	var head := VBoxContainer.new()
 	head.name = "Head"
-	head.add_theme_constant_override("separation", UiTokens.SPACE_SM)
+	head.add_theme_constant_override("separation", UiTokens.SPACE_XS)
 	list.add_child(head)
-	head.add_child(Ribbon.make(title(id), a))
-	var when := CenterContainer.new()
-	when.name = "When"
-	head.add_child(when)
+	var logo := _art("Logo", KIT % "logo", 130)   # the ScrubBots logo over the title, as in the storyboards
+	logo.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	head.add_child(logo)
+	var title_row := HBoxContainer.new()
+	title_row.name = "TitleRow"
+	head.add_child(title_row)
+	var race: bool = RACE_KINDS.has(v["kind"])
+	if race:
+		title_row.add_child(_kit("FlagLeft", "flag_left", 96))
+	var rib := Ribbon.make(title(id), a)
+	rib.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	title_row.add_child(rib)
+	if race:
+		title_row.add_child(_kit("FlagRight", "flag_right", 96))
 	var pill := _when_pill(v, 34)
 	pill.set_meta("coach", "timer")
-	when.add_child(pill)
-	var banner := PanelContainer.new()
-	banner.name = "GoalBanner"
-	banner.add_theme_stylebox_override("panel", HomeStyle.pad(HomeStyle.box(CREAM, GOLD_DARK, 4, 30, 8, 2), UiTokens.SPACE_LG, UiTokens.SPACE_SM))
-	var g := _ink("Goal", goal(v), 28)
+	head.add_child(_flanked("When", pill, "sparkle_left", "sparkle_right", 64))
+	var banner := Glossy.make("GoalBanner", CREAM, GOLD, 34)
+	var g := _ink("Goal", goal(v), 30)
 	g.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	banner.add_child(g)
 	head.add_child(banner)
@@ -481,15 +524,15 @@ static func refresh_details(p: BasePopup, app) -> void:
 	stage.name = "Stage"
 	stage.add_theme_constant_override("separation", UiTokens.SPACE_SM)
 	list.add_child(stage)
-	stage.add_child(_board(v, a))
+	stage.add_child(_board(v, pc))
 	stage.add_child(_hero(v, ev))
-	list.add_child(_team(v, a))
+	list.add_child(_team(v, pc))
 	if keys.has("ranking"):
-		list.add_child(_ranking(v, ev, a))
+		list.add_child(_ranking(v, ev, pc))
 	if keys.has("map"):
-		list.add_child(_map(v, a))
-	list.add_child(_progress(v, a, app))
-	list.add_child(_rewards(p, stash, v, a, app))
+		list.add_child(_map(v, pc))
+	list.add_child(_progress(v, pc, app))
+	list.add_child(_rewards(p, stash, v, pc, app))
 	list.move_child(start, list.get_child_count() - 1)
 	p.set_action_visible("join", v["phase"] == "active" and not v["joined"])
 	p.set_action_blocked("join", app.is_blocked)
@@ -499,27 +542,63 @@ static func refresh_details(p: BasePopup, app) -> void:
 	joined.text = UiText.t("EV2_JOINED") if v["joined"] else (UiText.t("EV2_PREVIEW") if v["phase"] != "active" else "")
 	joined.visible = not joined.text.is_empty()
 
-## Section panel: accent body, gold rim, a header tab with its native title.
+## Section panel: glossy body in the event's panel colour, bright gold rim, and a glossy header
+## tab between two laurels with its native title.
 static func _panel(n: String, coach: String, header: String, a: Color) -> PanelContainer:
-	var s := PanelContainer.new()
-	s.name = n
+	var s := Glossy.make(n, a, GOLD, 34)
 	s.set_meta("coach", coach)
-	s.add_theme_stylebox_override("panel", HomeStyle.pad(HomeStyle.box(Color(a.darkened(0.35), 0.92), GOLD, 5, 30, 8, 2), UiTokens.SPACE_MD, UiTokens.SPACE_SM))
 	var box := VBoxContainer.new()
 	box.name = "Box"
 	box.add_theme_constant_override("separation", UiTokens.SPACE_SM)
 	s.add_child(box)
 	if not header.is_empty():
-		var c := CenterContainer.new()
-		box.add_child(c)
-		var tab := PanelContainer.new()
-		tab.name = "Header"
-		tab.add_theme_stylebox_override("panel", HomeStyle.pad(HomeStyle.box(a.lightened(0.1), GOLD, 4, 26, 4, 2), UiTokens.SPACE_LG, 2))
-		var l := HomeStyle.label(header, 30, HomeStyle.TEXT, 8)
+		var tab := Glossy.make("Header", a.darkened(0.25), GOLD, 30)
+		var l := HomeStyle.label(header, 34, HomeStyle.TEXT, 10)
 		l.name = "HeaderText"
 		tab.add_child(l)
-		c.add_child(tab)
+		box.add_child(_flanked("HeaderRow", tab, "laurel", "laurel", 56))
 	return s
+
+## Shared kit piece (lossy WebP, a few KB) as a fixed-height TextureRect.
+static func _kit(n: String, piece: String, h: int) -> TextureRect:
+	var t := _art(n, KIT % piece, h)
+	t.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	t.custom_minimum_size = Vector2(h, h)
+	t.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	return t
+
+## `c` centred between two kit pieces (the right one mirrored when both are the same piece).
+static func _flanked(n: String, c: Control, left: String, right: String, h: int) -> HBoxContainer:
+	var row := HBoxContainer.new()
+	row.name = n
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_theme_constant_override("separation", UiTokens.SPACE_XS)
+	row.add_child(_kit("KitLeft", left, h))
+	c.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row.add_child(c)
+	var r := _kit("KitRight", right, h)
+	r.flip_h = left == right
+	row.add_child(r)
+	return row
+
+## Big glossy green button (native): white bold label, gloss band and a play arrow.
+static func style_go(b: Button) -> void:
+	var bodies := {"normal": Color("#4cc415"), "hover": Color("#5ad21f"), "pressed": Color("#3fa810"), "disabled": HomeStyle.GREEN_DISABLED}
+	for st in bodies:
+		b.add_theme_stylebox_override(st, HomeStyle.pad(HomeStyle.box(bodies[st], Color("#1f6b07"), 6, 60, 10, 8), 90, 12))
+	b.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
+	for c in ["font_color", "font_hover_color", "font_pressed_color", "font_hover_pressed_color", "font_focus_color"]:
+		b.add_theme_color_override(c, Color.WHITE)
+	b.add_theme_color_override("font_outline_color", Color("#1f5d07"))
+	b.add_theme_constant_override("outline_size", 14)
+	b.add_theme_font_size_override("font_size", 58)
+	b.custom_minimum_size = Vector2(620, 132)
+	b.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	var g := GoShine.new()
+	g.name = "Shine"
+	g.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	g.set_anchors_preset(Control.PRESET_FULL_RECT)
+	b.add_child(g)
 
 ## Host robot (approved roster art) with the event's key prop.
 static func _hero(v: Dictionary, ev) -> Control:
@@ -527,21 +606,21 @@ static func _hero(v: Dictionary, ev) -> Control:
 	var h := Control.new()
 	h.name = "Hero"
 	h.set_meta("coach", "hero")
-	h.custom_minimum_size = Vector2(0, 440)
+	h.custom_minimum_size = Vector2(0, 520)
 	h.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var robot_id := host_robot(v, ev)
 	var robot := _art("Robot", RobotRoster.asset(robot_id, "home_pose"), 0)
 	robot.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	robot.set_meta("robot", robot_id)
 	robot.set_anchors_preset(Control.PRESET_FULL_RECT)
-	robot.offset_bottom = -40
+	robot.offset_bottom = -10
 	h.add_child(robot)
 	var props: Array = data(id).get("props", [])
 	var prop := _art("Prop", PROP % [id, props[0]] if not props.is_empty() else ICON % id, 0)
 	prop.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	prop.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
-	prop.offset_top = -180
-	prop.offset_left = -180
+	prop.offset_top = -160
+	prop.offset_left = -160
 	h.add_child(prop)
 	return h
 
@@ -550,12 +629,12 @@ static func _board(v: Dictionary, a: Color) -> PanelContainer:
 	var s := _panel("BoardPanel", "board", "", a)
 	s.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	var box: VBoxContainer = s.get_node("Box")
-	box.add_child(board_view(380.0))
-	var gain := HomeStyle.label(gain_text(v), 26, HomeStyle.SUBTITLE, 6)
+	box.add_child(board_view(430.0))
+	var gain := HomeStyle.label(gain_text(v), 30, HomeStyle.SUBTITLE, 8)
 	gain.name = "Gain"
 	gain.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	gain.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	gain.custom_minimum_size.x = 380
+	gain.custom_minimum_size.x = 430
 	box.add_child(gain)
 	return s
 
@@ -605,18 +684,16 @@ static func _team(v: Dictionary, a: Color) -> PanelContainer:
 		var badge := PanelContainer.new()
 		badge.name = "SizeBadge"
 		badge.custom_minimum_size = Vector2(180, 0)
-		badge.add_theme_stylebox_override("panel", HomeStyle.pad(HomeStyle.box(a.darkened(0.15), GOLD, 4, 26, 4, 2), UiTokens.SPACE_SM, UiTokens.SPACE_XS))
+		badge.add_theme_stylebox_override("panel", HomeStyle.pad(HomeStyle.box(a.darkened(0.3), GOLD, 5, 26, 4, 2), UiTokens.SPACE_SM, UiTokens.SPACE_XS))
 		var bl := _info("Size", UiText.t("EV2_SIZE_BADGE", [UiText.num(int(v.get("team_size", v.get("entrants", 1))))]))
 		bl.add_theme_font_size_override("font_size", 28)
 		bl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		badge.add_child(bl)
 		h.add_child(badge)
-	if team:
-		box.add_child(_info("Part", UiText.t("EV2_YOUR_PART", [UiText.num(int(v["progress"])), UiText.num(int(v["min_player_contribution"]))])))
-		if v["kind"] == "team_versus":
-			box.add_child(_info("Opponent", UiText.t("EV2_OPP_TOTAL", [UiText.num(int(v["opponent_total"]))])))
-	if RIVAL_KINDS.has(v["kind"]):
-		box.add_child(_info("CpuNote", UiText.t("EV2_CPU_NOTE")))
+	if v["kind"] == "team_versus":
+		rows.add_child(_row("Opponent", UiText.t("EV2_OPPONENT"), UiText.num(int(v["opponent_total"]))))
+	if RIVAL_KINDS.has(v["kind"]):   # one short line; the full note is in the (i) rules
+		box.add_child(_info("CpuNote", UiText.t("EV2_CPU_SHORT")))
 	return s
 
 ## Cream row: name left, value right.
@@ -626,17 +703,17 @@ static func _row(n: String, left: String, right: String) -> PanelContainer:
 	r.add_theme_stylebox_override("panel", HomeStyle.pad(HomeStyle.box(CREAM, GOLD_DARK, 2, 22, 0), UiTokens.SPACE_MD, 6))
 	var h := HBoxContainer.new()
 	r.add_child(h)
-	var l := _ink("Name", left, 26)
+	var l := _ink("Name", left, 30)
 	l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	h.add_child(l)
-	var x := _ink("Score", right, 26)
+	var x := _ink("Score", right, 30)
 	x.autowrap_mode = TextServer.AUTOWRAP_OFF
 	x.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	h.add_child(x)
 	return r
 
 static func _info(n: String, text: String) -> Label:
-	var l := _label(n, text, 22, HomeStyle.TEXT)
+	var l := _label(n, text, 26, HomeStyle.TEXT)
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	return l
 
@@ -799,16 +876,16 @@ static func _reward_chip(p: BasePopup, stash: Control, v: Dictionary, s: Diction
 	var chip := PanelContainer.new()
 	chip.name = "Step_" + String(s["rid"])
 	chip.custom_minimum_size = Vector2(230, 0)
-	chip.add_theme_stylebox_override("panel", HomeStyle.pad(HomeStyle.box(CREAM, GOLD_DARK, 3, 24, 4, 2), UiTokens.SPACE_SM, UiTokens.SPACE_XS))
+	chip.add_theme_stylebox_override("panel", HomeStyle.pad(HomeStyle.box(CREAM, GOLD, 5, 26, 6, 2), UiTokens.SPACE_SM, UiTokens.SPACE_XS))
 	var col := VBoxContainer.new()
 	col.alignment = BoxContainer.ALIGNMENT_CENTER
 	col.add_theme_constant_override("separation", 2)
 	chip.add_child(col)
 	var icon := HomeStyle.art("Icon")
 	icon.texture = load(UiEventCard.F + "rewards/%s.png" % UiEventCard.reward_icon(s["reward"]))
-	icon.custom_minimum_size = Vector2(0, 84)
+	icon.custom_minimum_size = Vector2(0, 110)
 	col.add_child(icon)
-	var t := _ink("Text", step_label(v, s), 22)
+	var t := _ink("Text", step_label(v, s), 24)
 	t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	col.add_child(t)
 	var r := _ink("Reward", UiText.reward_text(s["reward"]), 18)
@@ -836,7 +913,8 @@ static func _reward_chip(p: BasePopup, stash: Control, v: Dictionary, s: Diction
 		col.add_child(lock)
 	return chip
 
-## Title ribbon drawn natively: accent band with a glossy top half, gold rims, notched tails.
+## Title ribbon drawn natively like the storyboards: a glossy band with a bright gold rim, and
+## curled ends (tails behind the band, folded under it) with notched tips.
 class Ribbon extends Container:
 	var accent := Color.BLUE
 
@@ -844,39 +922,81 @@ class Ribbon extends Container:
 		var r := Ribbon.new()
 		r.name = "TitleRibbon"
 		r.accent = a
-		r.custom_minimum_size = Vector2(0, 170)
-		var l := HomeStyle.label(text, 72, HomeStyle.SUBTITLE, 16)
+		r.custom_minimum_size = Vector2(0, 200)
+		var l := HomeStyle.label(text, 84, HomeStyle.SUBTITLE, 20)
 		l.name = "Title"
 		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		l.add_theme_color_override("font_outline_color", a.darkened(0.6))
-		HomeStyle.fit_on_resize(l, 72)
+		l.add_theme_color_override("font_outline_color", a.darkened(0.7))
+		l.add_theme_constant_override("shadow_offset_y", 6)
+		HomeStyle.fit_on_resize(l, 84)
 		r.add_child(l)
 		return r
 
 	func _notification(what: int) -> void:
 		if what == NOTIFICATION_SORT_CHILDREN:
 			for c in get_children():
-				fit_child_in_rect(c, Rect2(Vector2(110, 16), size - Vector2(220, 44)))
+				fit_child_in_rect(c, Rect2(Vector2(100, 8), size - Vector2(200, 56)))
 
 	func _draw() -> void:
 		var w := size.x
 		var h := size.y
-		for side in [-1.0, 1.0]:   # notched tails behind the band
-			var x0: float = 0.0 if side < 0 else w
-			var x1: float = 130.0 if side < 0 else w - 130.0
-			var tail := PackedVector2Array([Vector2(x0, 46), Vector2(x1, 46), Vector2(x1, h - 6), Vector2(x0, h - 6), Vector2(x0 - side * 46.0, (h + 40) / 2.0)])
-			draw_colored_polygon(tail, accent.darkened(0.45))
+		var band := Rect2(60, 0, w - 120, h - 44)
+		for side in [-1.0, 1.0]:
+			var x0: float = 0.0 if side < 0 else w   # outer tip
+			var x1: float = 150.0 if side < 0 else w - 150.0   # inner end, under the band
+			var xb: float = band.position.x if side < 0 else band.end.x
+			var tail := PackedVector2Array([Vector2(x1, 44), Vector2(x0, 44), Vector2(x0 - side * 44.0, (h + 44) / 2.0), Vector2(x0, h), Vector2(x1, h)])
+			draw_colored_polygon(tail, accent.darkened(0.3))
+			draw_colored_polygon(PackedVector2Array([Vector2(x1, 44), Vector2(x0, 44), Vector2(x0, 64), Vector2(x1, 64)]), Color(1, 1, 1, 0.14))
 			var rim := tail.duplicate()
 			rim.append(tail[0])
-			draw_polyline(rim, GOLD, 4.0, true)
-		var band := Rect2(70, 6, w - 140, h - 28)
-		var sb := HomeStyle.box(accent, GOLD, 7, 30, 10)
-		draw_style_box(sb, band)
-		var hi := StyleBoxFlat.new()   # glossy upper half
-		hi.bg_color = Color(1, 1, 1, 0.16)
-		hi.set_corner_radius_all(24)
-		draw_style_box(hi, Rect2(band.position + Vector2(10, 9), Vector2(band.size.x - 20, band.size.y * 0.42)))
+			draw_polyline(rim, GOLD, 5.0, true)
+			var fold := PackedVector2Array([Vector2(xb, h - 44), Vector2(x1, h - 44), Vector2(x1, h)])   # the curl under the band
+			draw_colored_polygon(fold, accent.darkened(0.65))
+		draw_style_box(HomeStyle.box(accent, GOLD, 8, 34, 12), band)
+		var hi := StyleBoxFlat.new()   # gloss on the upper half
+		hi.bg_color = Color(1, 1, 1, 0.22)
+		hi.set_corner_radius_all(26)
+		draw_style_box(hi, Rect2(band.position + Vector2(12, 10), Vector2(band.size.x - 24, band.size.y * 0.42)))
+		var low := StyleBoxFlat.new()   # deeper lower edge
+		low.bg_color = Color(0, 0, 0, 0.16)
+		low.set_corner_radius_all(26)
+		draw_style_box(low, Rect2(band.position + Vector2(10, band.size.y * 0.66), Vector2(band.size.x - 20, band.size.y * 0.3)))
+
+## Glossy panel: fill + bright rim from the stylebox, then a light top band and a darker lower band
+## drawn over the fill (under the children), like the storyboards' candy panels.
+class Glossy extends PanelContainer:
+	var radius := 30
+
+	static func make(n: String, fill: Color, rim: Color, r: int) -> Glossy:
+		var g := Glossy.new()
+		g.name = n
+		g.radius = r
+		var sb := HomeStyle.pad(HomeStyle.box(fill, rim, 6, r, 10, 2), UiTokens.SPACE_MD, UiTokens.SPACE_SM)
+		g.add_theme_stylebox_override("panel", sb)
+		return g
+
+	func _draw() -> void:
+		var hi := StyleBoxFlat.new()
+		hi.bg_color = Color(1, 1, 1, 0.2)
+		hi.set_corner_radius_all(maxi(4, radius - 8))
+		draw_style_box(hi, Rect2(Vector2(8, 8), Vector2(size.x - 16, minf(size.y * 0.4, 90.0))))
+		var lo := StyleBoxFlat.new()
+		lo.bg_color = Color(0, 0, 0, 0.14)
+		lo.set_corner_radius_all(maxi(4, radius - 8))
+		var lh := minf(size.y * 0.3, 80.0)
+		draw_style_box(lo, Rect2(Vector2(8, size.y - lh - 8), Vector2(size.x - 16, lh)))
+
+## Gloss band + white play arrow over a green button (drawn, no texture).
+class GoShine extends Control:
+	func _draw() -> void:
+		var hi := StyleBoxFlat.new()
+		hi.bg_color = Color(1, 1, 1, 0.28)
+		hi.set_corner_radius_all(40)
+		draw_style_box(hi, Rect2(Vector2(18, 12), Vector2(size.x - 36, size.y * 0.36)))
+		var c := Vector2(size.x - 70.0, size.y / 2.0)
+		draw_colored_polygon(PackedVector2Array([c + Vector2(-16, -24), c + Vector2(22, 0), c + Vector2(-16, 24)]), Color.WHITE)
 
 ## Target track: a rail with one node per target (done = green check, current = gold, open = cream).
 class Track extends VBoxContainer:

@@ -8,8 +8,10 @@ extends SceneTree
 ##   t03 details x 24 x EN/TR: every texture present (no art_fallback), native title ribbon text,
 ##       every coach section of the event visible;
 ##   t04 tutorials x 24 x EN/TR: step count == data, every step focuses its target (visible, on
-##       screen, the frame on its real rect), bubble + button text from data in the locale;
-##   t05 lazy art: the Events page loads scenes only for live cards, details only its own scene.
+##       screen, the frame on its real rect), bubble + button text from data in the locale, and the
+##       bubble never covers the focused target or any section header / title text;
+##   t05 lazy art: the Events page loads scenes only for live cards, details only its own scene;
+##       the (i) rules popup carries the long rule text and replays the walkthrough.
 ##
 ## Run: godot --headless --path . -s res://tests/sb_tf12_events_art_ui.gd
 
@@ -94,10 +96,17 @@ func _t02() -> void:
 				_ok(false, "%s missing or not lossy" % p)
 				continue
 			bytes += FileAccess.get_file_as_bytes(p).size()
+		for k in ["panel", "accent"]:
+			ok_all = ok_all and Color.html_is_valid(String(d[id][k]))
 		var icon: Texture2D = load(EventsV02Ui.ICON % id)
 		var scene: Texture2D = load(EventsV02Ui.SCENE % id)
 		ok_all = ok_all and icon.get_width() == 256 and scene.get_width() == 640
-	_ok(ok_all, "every event has its 640 px scene, 256 px icon and listed props (scenes / props lossy)")
+	for k in ["logo", "laurel", "flag_left", "flag_right", "sparkle_left", "sparkle_right", "star"]:
+		var kp: String = EventsV02Ui.KIT % k
+		var kt = load(kp) if ResourceLoader.exists(kp) else null
+		ok_all = ok_all and kt != null and FileAccess.get_file_as_string(kp + ".import").contains("compress/mode=1")
+		bytes += FileAccess.get_file_as_bytes(kp).size()
+	_ok(ok_all, "every event has its 640 px scene, 256 px icon, listed props and sampled colours; 7 shared kit pieces (all lossy)")
 	_ok(bytes < ART_BUDGET, "added Events art %.2f MiB (< %.0f MiB)" % [bytes / 1048576.0, ART_BUDGET / 1048576.0])
 	var shipped := _files("res://assets/ui/final/events")
 	_ok(not shipped.any(func(f): return f.get_file().begins_with("tutorial_") or f.get_file() == "background.png"), "no tutorial storyboard / raw kit PNG shipped (%d files)" % shipped.size())
@@ -155,7 +164,8 @@ func _t03_t04() -> void:
 					and coach.hole.position.distance_to(target.get_global_rect().position - coach.global_position) < 1.0 \
 					and Rect2(Vector2.ZERO, coach.size).encloses(coach.hole) \
 					and _txt(t, "Text") == String(steps[i]["bubble_" + lang]) and t.get_action_button("tut_next").text == String(steps[i]["button_" + lang]) \
-					and _txt(t, "StepText") == "%s / %s" % [UiText.num(i + 1), UiText.num(steps.size())]
+					and _txt(t, "StepText") == "%s / %s" % [UiText.num(i + 1), UiText.num(steps.size())] \
+					and _bubble_clear(coach)
 				if ok:
 					steps_ok += 1
 				else:
@@ -188,9 +198,26 @@ func _t05() -> void:
 	var other: Array = paths.filter(func(p): return p.contains("/events/scenes/") and p != EventsV02Ui.SCENE % x["id"])
 	_ok(other.is_empty() and paths.has(EventsV02Ui.SCENE % x["id"]), "details: only its own scene is loaded (%d textures)" % paths.size())
 	_ok(not paths.any(func(p): return p.contains("/events/heroes/")), "the details screen needs no hero PNG")
+	d.rearm()
+	d._on_action("how")
+	await _frames(2)
+	var info = st.top()
+	var v: Dictionary = ev.view(x["iid"])
+	_ok(info.popup_id == "event_info" and _txt(info, "Rule_0") == EventsV02Ui.goal(v), "(i) opens the rules popup with the full goal text")
+	info._on_action("tutorial")
+	await _frames(2)
+	_ok(st.ids() == ["events", "event_details", "event_tutorial"], "rules -> HOW IT WORKS replays the walkthrough over the details %s" % str(st.ids()))
 	_complete("t05_lazy_art")
 
 # ---------------------------------------------------------------- helpers ----
+
+## The bubble (coach space) intersects neither the focused rect nor an on-screen header / title label.
+func _bubble_clear(coach) -> bool:
+	var b: Control = coach.get_node("Bubble")
+	var r := Rect2(b.position, b.size)
+	if r.intersects(coach.hole):
+		return false
+	return not coach.header_rects().any(func(x): return (x as Rect2).intersects(r))
 
 func _files(dir: String) -> Array:
 	var out: Array = []

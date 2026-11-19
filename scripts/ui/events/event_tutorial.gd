@@ -75,17 +75,14 @@ static func open(stack, app, iid: String) -> BasePopup:
 	ctrl.custom_minimum_size.x = 640
 	ctrl.add_theme_constant_override("separation", UiTokens.SPACE_SM)
 	coach.add_child(ctrl)
-	var next := p.add_action("tut_next", "", "primary", false, "", ctrl)
-	next.add_theme_font_size_override("font_size", 52)
-	var pc := CenterContainer.new()
-	ctrl.add_child(pc)
+	EventsV02Ui.style_go(p.add_action("tut_next", "", "primary", false, "", ctrl))
 	var pill := PanelContainer.new()
 	pill.name = "StepPill"
-	pill.add_theme_stylebox_override("panel", HomeStyle.pad(HomeStyle.box(Color(0.039, 0.204, 0.651), GLOW, 4, 30, 4, 2), UiTokens.SPACE_LG, 2))
-	pc.add_child(pill)
-	var pl := HomeStyle.label("", 30, Color.WHITE, 6)
+	pill.add_theme_stylebox_override("panel", HomeStyle.pad(HomeStyle.box(Color(0.039, 0.204, 0.651), GLOW, 5, 32, 6, 2), UiTokens.SPACE_LG, 2))
+	var pl := HomeStyle.label("", 34, Color.WHITE, 8)
 	pl.name = "StepText"
 	pill.add_child(pl)
+	ctrl.add_child(EventsV02Ui._flanked("StepRow", pill, "sparkle_left", "sparkle_right", 56))
 	var skip := p.add_action("tut_close", "X", "secondary", true, "", coach)
 	EventsV02Ui._round_button(skip, Color(0.85, 0.16, 0.18), UiText.t("POPUP_CLOSE"))
 	coach.skip = skip
@@ -122,7 +119,8 @@ static func show_step(p: BasePopup, app, step: int) -> void:
 	(coach.find_child("Text", true, false) as Label).text = text(s, "bubble")
 	p.get_action_button("tut_next").text = text(s, "button")
 	(coach.find_child("StepText", true, false) as Label).text = "%s / %s" % [UiText.num(step), UiText.num(all.size())]
-	coach.aim(EventsV02Ui.target(d, String(s["target"])), app.effects != null and app.effects.is_reduced())
+	var headers: Array = d.find_children("HeaderText", "Label", true, false) + d.find_children("Title", "Label", true, false)
+	coach.aim(EventsV02Ui.target(d, String(s["target"])), app.effects != null and app.effects.is_reduced(), headers)
 
 static func _pointer(n: String, up: bool) -> Control:
 	var tip := Control.new()
@@ -140,6 +138,7 @@ static func _pointer(n: String, up: bool) -> Control:
 ## every frame (layout / scroll), so the frame always matches the real section.
 class Coach extends Control:
 	var target: Control = null
+	var headers: Array = []   ## section header / title labels the bubble must never cover
 	var hole := Rect2()
 	var skip: Button
 	var _focus: Panel
@@ -164,8 +163,9 @@ class Coach extends Control:
 		add_child(_focus)
 
 	## Focus `t` (null = no target: the whole screen stays dim). Reduced Effects: no pulse.
-	func aim(t: Control, reduced: bool) -> void:
+	func aim(t: Control, reduced: bool, header_labels: Array = []) -> void:
 		target = t
+		headers = header_labels
 		hole = Rect2()
 		_scroll = true
 		_focus.set_meta("target", t)
@@ -190,7 +190,8 @@ class Coach extends Control:
 				sc.scroll_vertical = int(y - (sc.size.y - target.size.y) * 0.5)
 		var r := target.get_global_rect()
 		r.position -= global_position
-		if r != hole or skip.size.x <= 0.0:
+		var bh: float = (get_node("Bubble") as Control).get_combined_minimum_size().y
+		if r != hole or skip.size.x <= 0.0 or not is_equal_approx(bh, (get_node("Bubble") as Control).size.y):
 			hole = r
 			_place()
 			queue_redraw()
@@ -221,17 +222,52 @@ class Coach extends Control:
 		up_tip.visible = true
 		down_tip.visible = false
 		var bs := bubble.get_combined_minimum_size()
-		var below := hole.end.y + 24.0 + bs.y <= hi
+		var bx := (w - BUBBLE_W) / 2.0
+		var at := _free_y(Rect2(bx, 0, BUBBLE_W, bs.y), lo, hi)
+		var below: bool = at.x > 0.5
 		up_tip.visible = below
 		down_tip.visible = not below
-		bs = bubble.get_combined_minimum_size()
 		bubble.size = Vector2(BUBBLE_W, bs.y)
-		var by := hole.end.y + 24.0 if below else hole.position.y - 24.0 - bs.y
-		bubble.position = Vector2((w - BUBBLE_W) / 2.0, clampf(by, lo, maxf(lo, hi - bs.y)))
+		bubble.position = Vector2(bx, at.y)
 		var tx := clampf(hole.get_center().x - bubble.position.x, 80.0, BUBBLE_W - 80.0)
 		for tip in [up_tip, down_tip]:
 			(tip.get_child(0) as Polygon2D).position.x = tx
 		skip.position = Vector2(w - skip.size.x - 24.0, 24.0)
+
+	## Header / title label rects (coach space) currently on screen.
+	func header_rects() -> Array:
+		var out: Array = []
+		for l in headers:
+			if is_instance_valid(l) and (l as Control).is_visible_in_tree():
+				var r := (l as Control).get_global_rect()
+				r.position -= global_position
+				if r.intersects(Rect2(Vector2.ZERO, size)):
+					out.append(r)
+		return out
+
+	## Bubble y next to the target that covers neither the target nor any header: tries below
+	## and above, sliding away in 8 px steps inside [lo, hi]; returns (1 = below / 0 = above, y),
+	## the nearest free spot winning. Falls back to the side with more room.
+	func _free_y(b: Rect2, lo: float, hi: float) -> Vector2:
+		var blocks: Array = header_rects()
+		blocks.append(hole.grow(6.0))
+		var best := Vector2(-1, 0)
+		var best_d := INF
+		for side in [1.0, 0.0]:
+			var y0: float = hole.end.y + 24.0 if side > 0.5 else hole.position.y - 24.0 - b.size.y
+			var y := y0
+			while y >= lo - 0.5 and y + b.size.y <= hi + 0.5:
+				var r := Rect2(b.position.x, y, b.size.x, b.size.y)
+				if not blocks.any(func(x): return (x as Rect2).intersects(r)):
+					if absf(y - y0) < best_d:
+						best_d = absf(y - y0)
+						best = Vector2(side, y)
+					break
+				y += 8.0 if side > 0.5 else -8.0
+		if best.x >= 0.0:
+			return best
+		var room_below := hi - hole.end.y
+		return Vector2(1.0, clampf(hole.end.y + 24.0, lo, hi - b.size.y)) if room_below > hole.position.y - lo else Vector2(0.0, clampf(hole.position.y - 24.0 - b.size.y, lo, hi - b.size.y))
 
 	func _draw() -> void:
 		var r := hole.grow(10.0) if hole.size != Vector2.ZERO else Rect2(size / 2.0, Vector2.ZERO)
