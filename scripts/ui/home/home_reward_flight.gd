@@ -15,7 +15,7 @@ extends RefCounted
 ##
 ## SB-TF-05 (owner 2026-11-18): the flight itself moved into the shared RewardReveal
 ## (res://scripts/ui/components/reward_reveal.gd: all rewards appear together, hold 1.5 s, then
-## fly; one input lock; Reduced keeps the hold). This file keeps only the receipt -> entries map.
+## fly; one input lock). This file keeps only the receipt -> entries map.
 ## PRESENTATION ONLY: plan() reads nothing but the committed receipt and the Home view model.
 
 const ICONS := {
