@@ -136,6 +136,20 @@
       },
       "notes": "Source frames 7-38 (idle start and spinning tail dropped), cropped to 544x1008, Theora, 24 fps, no audio, 149835 bytes. Played additively (CanvasItemMaterial BLEND_MODE_ADD) from the Tornado button to the board centre; the tornado track is in assets/ui/final/boosters/videos/PROVENANCE.md. The master stays in owner Downloads, not committed.",
       "ships": true
+    },
+    "home_scrubby_bow_keyed_v3": {
+      "repository_path": "assets/ui/final/home/videos/home_scrubby_bow_keyed.ogv",
+      "sha256": "35ceb28b11be845bb74d0493a254c848419d645a9fbb3e53bf761238e3246f5e",
+      "status": "OWNER_CHOSEN",
+      "provider": "google_flow",
+      "tool": "tools/key_home_scrubby_video.py (per-frame sampled-background magenta key, ffmpeg libtheora -q:v 8, numpy / scipy)",
+      "date": "2026-11-19",
+      "owner_decision": "owner TestFlight 26 feedback (SB-TF-13): the previous bow lost the broom; owner supplied Robot_Scrubby_bowing_c77edbed.mp4 as the new bow. Wave, turn, full turn and sweep confirmed unchanged.",
+      "source_masters": {
+        "Robot_Scrubby_bowing_c77edbed.mp4": "6557fb5d63e8c47acedefd6da3a286e239a820e4f67e0b24134988f8c70de0e0"
+      },
+      "notes": "720x1280, frames 0..184 of 190, background unmixed to exact #FF00FF, 24 fps, 185 frames, no audio, 2519927 bytes (old bow 2959386). Keyed at runtime by chroma_key_magenta.gdshader; pinned in assets/ui/HOME_ASSET_MANIFEST.json video_sets.home_scrubby_videos_keyed_v2.bow. The master stays outside the repo.",
+      "ships": true
     }
   },
   "output_roots": {
