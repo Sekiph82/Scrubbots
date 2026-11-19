@@ -239,6 +239,8 @@ Completed items and older status history: docs/migration/legacy-task-trackers/TA
 
 ## Questions for Şekip
 <!-- One line per question the loop truly cannot decide (CLAUDE.md §0D.5). Empty = nothing needed. -->
+- SB-TF-07 App Open: create AdMob "App Open" ad units (Android + iOS) and add GitHub Secrets ADMOB_ANDROID_APP_OPEN_ID / ADMOB_IOS_APP_OPEN_ID; until then release builds show no App Open (test builds use Google test units).
+- SB-TF-04 floor: pick the board floor tone (factory/jobs/184-tf04-gameplay-layout/evidence/floor_tones_side_by_side.png; default tone 0), or allow brighter tones by relaxing the 1.3:1 contrast floor for C08/C14.
 
 ## Owner TestFlight Feedback + Redesign 2026-11-18
 <!-- Owner TestFlight build 0.1.0 (24) feedback (8 items, fetched via ASC API into factory/jobs/179-testflight-feedback/) plus the owner's Home/Profile/Gameplay redesign and ad decisions, all stated in chat 2026-11-18. Queued as SB-TF-01..07 in the Autonomous Queue, in this order. Owner: "durmadan kodlamaya basla ve hepsini bitir". APK/IPA builds only with owner OK, batched. -->
