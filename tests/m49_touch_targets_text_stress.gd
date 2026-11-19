@@ -96,7 +96,7 @@ func _matrix(tag: String, check: Callable) -> void:
 			var ra: int = _root.get_home().get_region("RewardedAdsButton").get_theme_font_size("font_size")
 			var rab: Button = _root.get_home().get_region("RewardedAdsButton")
 			var fits: bool = rab.get_theme_font("font").get_string_size(rab.text, HORIZONTAL_ALIGNMENT_LEFT, -1, ra).x <= rab.size.x - rab.get_theme_stylebox("normal").get_minimum_size().x + 0.5
-			_ok(ra <= 20 and ra >= 12 and fits, "%s: English REWARDED ADS fitted on one line inside the SB-TF-03 0.7x panel (20 px floor 12; %d)" % [str(phys), ra])
+			_ok(ra <= 28 and ra >= 12 and fits, "%s: English REWARDED ADS fitted on one line inside the SB-TF-13 0.98x panel (28 px floor 12; %d)" % [str(phys), ra])
 		for d in POPUPS:
 			var top = await _open(d)
 			if top == null:

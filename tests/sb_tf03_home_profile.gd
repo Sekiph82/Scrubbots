@@ -1,7 +1,7 @@
 extends SceneTree
 ## SB-TF-03 (owner 2026-11-18) — Home + Profile redesign: no bottom nav / Shop & Collection tiles /
 ## win-streak strip; Settings icon in the top HUD; persistent 320x50 banner area (No Ads collapses
-## it); 0.7x see-through activity buttons (Rewarded Ads, Tasks, one per active Event; SB-TF-11 moved
+## it); see-through activity buttons (0.7x, SB-TF-13 0.98x) (Rewarded Ads, Tasks, one per active Event; SB-TF-11 moved
 ## Daily to Profile Login Days) in two
 ## columns of at most 4 that hide themselves when done; Bot Parts icon on the profile card badge;
 ## PLAY · LEVEL N; Profile hosts Robots / Ranks / Collection (+ new-card badge), Settings hosts
@@ -121,20 +121,20 @@ func _t03() -> void:
 	_complete("t03_banner_area")
 
 func _t04() -> void:
-	print("[t04 activity buttons: 0.7x tile (147x109), half glass alpha, legible label]")
+	print("[t04 activity buttons: 0.98x tile (206x153, SB-TF-13), half glass alpha, legible label]")
 	await _boot("t04")
 	var h = _home()
 	var ok := true
 	for n in ["RewardedAdsButton", "Shortcut_tasks"]:
 		var b: Button = h.get_region(n)
 		var sb: StyleBoxFlat = b.get_theme_stylebox("normal")
-		var one: bool = b.custom_minimum_size.distance_to(Vector2(147, 109)) <= 1.0 and absf(b.size.x - 147) <= 1.0 and absf(b.size.y - 109) <= 1.0 \
-			and absf(sb.bg_color.a - 0.255) <= 0.02 and sb.border_color.a >= 0.8 and b.get_theme_font_size("font_size") <= 20
+		var one: bool = b.custom_minimum_size.distance_to(Vector2(206, 153)) <= 1.0 and absf(b.size.x - 206) <= 1.0 and absf(b.size.y - 153) <= 1.0 \
+			and absf(sb.bg_color.a - 0.255) <= 0.02 and sb.border_color.a >= 0.8 and b.get_theme_font_size("font_size") <= 28
 		ok = ok and one
 		if not one:
 			print("    %s size %s min %s alpha %.3f border %.2f font %d" % [n, str(b.size), str(b.custom_minimum_size), sb.bg_color.a, sb.border_color.a, b.get_theme_font_size("font_size")])
-	_ok(ok, "Rewarded Ads / Tasks: 147x109 +-1, panel alpha 0.255 +-0.02, opaque border, font <= 20")
-	_ok(HomeScreen.PANEL_SIZE == (Vector2(210, 156) * 0.7).round() and is_equal_approx(HomeScreen.PANEL_ALPHA, 0.51 * 0.5), "constants = 0.7 x V06 size, 0.5 x V06 alpha")
+	_ok(ok, "Rewarded Ads / Tasks: 206x153 +-1, panel alpha 0.255 +-0.02, opaque border, font <= 28")
+	_ok(HomeScreen.PANEL_SIZE == (Vector2(210, 156) * 0.98).round() and is_equal_approx(HomeScreen.PANEL_ALPHA, 0.51 * 0.5), "constants = 0.98 x V06 size (SB-TF-13: SB-TF-03 0.7x + 40%), 0.5 x V06 alpha")
 	_complete("t04_activity_size_glass")
 
 func _t05() -> void:

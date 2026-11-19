@@ -99,17 +99,17 @@ const ACTIVITY_PER_COLUMN := 4
 const ACTIVITY_MAX := 8
 ## SB-M44-031: Home entry -> feature id (owned by HomeBadges, which also derives SB-M44-013 NEW).
 const GATED_ENTRIES := HomeBadges.GATED_ENTRIES
-## One panel size for every activity button. SB-TF-03 ("30% smaller"): 0.7x the V06 210x156
-## panel, the V03 206x164 icon box, its label band and font. Icons stand on the label band and
-## may rise above the panel.
-const PANEL_SCALE := 0.7
-const PANEL_SIZE := Vector2(147, 109)
+## One panel size for every activity button. SB-TF-03 ("30% smaller") made them 0.7x the V06
+## 210x156 panel, the V03 206x164 icon box, its label band and font; SB-TF-13 (owner TestFlight 26,
+## "too small"): +40% = 0.98x. Icons stand on the label band and may rise above the panel.
+const PANEL_SCALE := 0.98
+const PANEL_SIZE := Vector2(206, 153)
 ## SB-TF-03 panel glass: half the V06 body alpha 0.51 (outline and label stay opaque).
 const PANEL_ALPHA := 0.255
 const PANEL_BORDER := 3
 const V03_ICON_BOX := Vector2(206, 164)
-const PANEL_LABEL_BAND := 34   # 0.7 x 46, +2 so a 20 px label line still fits the 109 px panel
-const PANEL_FONT := 20
+const PANEL_LABEL_BAND := 47   # 0.98 x 46, +2 so a 28 px label line still fits the 153 px panel
+const PANEL_FONT := 28
 const PANEL_EDGE_MARGIN := 26
 ## SB-TF-03 banner area (HomeStyle.ad_banner, shared with gameplay since SB-TF-04).
 const AD_SLOT_RATIO := HomeStyle.AD_SLOT_RATIO
@@ -935,24 +935,27 @@ func _layout_area_label() -> void:
 
 ## Panels must not cover the baked helper bots. When a panel overlaps a bot's mapped
 ## rect: 1) that column's gap tightens (never below the icon pop-out clearance); 2) if
-## that is not enough (short/wide screens), the column shifts inward just past the bot
-## (panels stay clear of Scrubby's visible rect). The top margin stays fixed so enlarged
+## that is not enough (short/wide screens), the column shifts inward just past the bot, unless
+## that would put it over Scrubby's visible rect (SB-TF-13: four 0.98x panels in a column; the
+## column then stays at the edge over the decorative bot). The top margin stays fixed so enlarged
 ## icons never reach the Gift Meter. _apply_layout_mode restores the defaults on resize.
-## SB-TF-03: the V06 gaps x PANEL_SCALE (icon pop-out: a 115 px icon on a 77 px floor = 38 px).
-const PANEL_GAP := 50
-const PANEL_TOP := 64
-const PANEL_GAP_MIN := 38
+## The V06 gaps x PANEL_SCALE (icon pop-out: a 161 px icon on a 106 px floor = 55 px).
+const PANEL_GAP := 70
+const PANEL_TOP := 90
+const PANEL_GAP_MIN := 55
 func _avoid_helper_bots() -> void:
 	for side in ["LeftShortcutColumn", "RightShortcutColumn"]:
 		var col: VBoxContainer = _nodes[side]
 		var sep: int = col.get_theme_constant("separation")
 		var over := 0.0
 		var shift := 0.0
+		var span := Rect2()
 		for b in col.get_children():
 			if not (b as Control).visible:
 				continue
 			var r: Rect2 = (b as Control).get_global_rect()
 			r.position -= global_position
+			span = r if not span.has_area() else span.merge(r)
 			for bot in _world["helper_bot_rects"]:
 				var br := Rect2(world_to_screen(bot.position), bot.size * _world_scale)
 				if r.intersects(br):
@@ -962,7 +965,9 @@ func _avoid_helper_bots() -> void:
 			continue
 		var new_sep: int = maxi(PANEL_GAP_MIN, sep - int(ceil(over)))
 		col.add_theme_constant_override("separation", new_sep)
-		if over - float(sep - new_sep) > 0.0:
+		var moved := span
+		moved.position.x += -ceilf(shift) if side == "RightShortcutColumn" else ceilf(shift)
+		if over - float(sep - new_sep) > 0.0 and not moved.intersects(get_scrubby_canonical()["visible_rect"]):
 			col.custom_minimum_size.x = PANEL_SIZE.x + ceilf(shift)
 
 ## Feathered navy radial gradient: peak HERO_SHADE_ALPHA at the centre, eased to 0 at
@@ -1002,7 +1007,7 @@ func get_scrubby_canonical() -> Dictionary:
 # ------------------------------------------------------------ shortcuts ----
 
 ## SB-TF-03 activity button: the UiShortcutButton glass panel (HomeStyle.style_light_panel) at
-## 0.7x size / icon box / label band / font and half the glass alpha. Intent only:
+## PANEL_SCALE size / icon box / label band / font and half the glass alpha. Intent only:
 ## shortcut_requested(id) (an Event button: "event:<instance id>").
 func _make_activity_button(id: String, label: String) -> UiShortcutButton:
 	var b := UiShortcutButton.new(id, label)
@@ -1016,7 +1021,7 @@ func _make_activity_button(id: String, label: String) -> UiShortcutButton:
 	b.set_icon_box(V03_ICON_BOX * PANEL_SCALE)
 	return b
 
-## Label fitted to the 0.7x panel: one line from PANEL_FONT down to PANEL_FONT_MIN (long locales /
+## Label fitted to the panel: one line from PANEL_FONT down to PANEL_FONT_MIN (long locales /
 ## event names); still wider at the floor, it wraps to two lines in the label band (never cut).
 const PANEL_FONT_MIN := 10
 func _fit_label(b: Button) -> void:

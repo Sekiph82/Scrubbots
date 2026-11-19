@@ -155,9 +155,9 @@ func _panels(home) -> void:
 	for id in ["tasks"]:
 		var tex: Texture2D = home.get_region("ShortcutIcon_" + id).texture
 		var a := float(tex.get_width()) / float(tex.get_height())
-		var box := Vector2(206, 164) * 0.7
+		var box := Vector2(206, 164) * HS.PANEL_SCALE
 		d[id] = [home.get_region("Shortcut_" + id).get_icon_draw_size(), Vector2(box.y * a, box.y) if box.y * a <= box.x else Vector2(box.x, box.x / a)]
-	_ok(d["tasks"][0].is_equal_approx(d["tasks"][1]), "TASKS icon 0.7x the V04 (= V03) size")
+	_ok(d["tasks"][0].is_equal_approx(d["tasks"][1]), "TASKS icon PANEL_SCALE (SB-TF-13 0.98x) the V04 (= V03) size")
 	var vp: Vector2 = home.get_viewport_rect().size
 	var margin_ok := true
 	for n in ["RewardedAdsButton", "Shortcut_tasks"]:

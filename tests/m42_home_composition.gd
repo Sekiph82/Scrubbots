@@ -127,7 +127,7 @@ func _inactive(home) -> void:
 func _labels(home) -> void:
 	print("[labels full]")
 	var bad: Array = []
-	# SB-TF-03: one-line labels font-fitted to the 0.7x panel (never trimmed in EN / TR).
+	# SB-TF-03 / SB-TF-13: one-line labels font-fitted to the 0.98x panel (never trimmed in EN / TR).
 	for n in ["RewardedAdsButton", "Shortcut_tasks"]:
 		var b: Button = home.get_region(n)
 		var avail: float = b.size.x - b.get_theme_stylebox("normal").get_minimum_size().x

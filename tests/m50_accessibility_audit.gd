@@ -311,8 +311,8 @@ func _a06() -> void:
 		price.text = UiText.t("BOOSTER_PRICE_SB", [UiText.num(9999)])
 		HomeStyle.fit_font(price, 20, price_w)
 		got[price.text] = price.get_theme_font_size("font_size")
-		# SB-TF-03 (owner 2026-11-18): the activity buttons and their labels are 0.7x (24 -> 16.8 px), so the
-		# REWARDED ADS label floor is 16 px; the HUD level and booster price keep FONT_FLOOR.
+		# SB-TF-03 (owner 2026-11-18) made the activity buttons and labels 0.7x, SB-TF-13 0.98x (28 px); the
+		# REWARDED ADS label floor stays 16 px; the HUD level and booster price keep FONT_FLOOR.
 		var ra_px: int = got[ra.text]
 		got.erase(ra.text)
 		_ok(ra_px >= 16 and got.values().all(func(v): return v >= FONT_FLOOR), "%s: REWARDED ADS >= 16 px (%d), HUD level / booster Price stay >= %d px %s" % [loc, ra_px, FONT_FLOOR, str(got)])

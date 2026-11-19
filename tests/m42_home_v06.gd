@@ -164,15 +164,15 @@ func _panels(home) -> void:
 		var b: Button = home.get_region(n)
 		var sb := b.get_theme_stylebox("normal") as StyleBoxFlat
 		ok = ok and is_equal_approx(sb.bg_color.a, 0.51 * 0.5) and sb.border_width_left == 3 and sb.shadow_size == 8
-		geo = geo and b.size.is_equal_approx((V05_PANEL * 0.7).round())
+		geo = geo and b.size.is_equal_approx((V05_PANEL * HS.PANEL_SCALE).round())
 	_ok(ok, "SB-TF-03 normal body alpha %.3f = half the V06 0.51, 3 px outline + restrained 8 px glow" % HS.PANEL_ALPHA)
-	_ok(geo, "SB-TF-03 panel geometry 0.7x the V06 210x156 = 147x109")
+	_ok(geo, "SB-TF-13 panel geometry 0.98x the V06 210x156 = 206x153")
 	for id in ["tasks"]:
 		var tex: Texture2D = home.get_region("ShortcutIcon_" + id).texture
 		var a := float(tex.get_width()) / float(tex.get_height())
-		var box := Vector2(206.0, 164.0) * 0.7
+		var box := Vector2(206.0, 164.0) * HS.PANEL_SCALE
 		var v := Vector2(box.y * a, box.y) if box.y * a <= box.x else Vector2(box.x, box.x / a)
-		_ok(home.get_region("Shortcut_" + id).get_icon_draw_size().is_equal_approx(v), "%s icon 0.7x the V06 size %s" % [id.to_upper(), str(v)])
+		_ok(home.get_region("Shortcut_" + id).get_icon_draw_size().is_equal_approx(v), "%s icon PANEL_SCALE x the V06 size %s" % [id.to_upper(), str(v)])
 	_complete("panels")
 
 func _pills(home) -> void:

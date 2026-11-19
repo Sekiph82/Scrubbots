@@ -289,10 +289,10 @@ func _icons(home) -> void:
 		var b = home.get_region("RewardedAdsButton" if id == "rewarded_ads" else "Shortcut_" + id)
 		var tex: Texture2D = home.get_region("ShortcutIcon_" + id).texture
 		var a := float(tex.get_width()) / float(tex.get_height())
-		var box := V03_ICON_BOX * 0.7
+		var box := V03_ICON_BOX * HomeScreenScript.PANEL_SCALE
 		var v03 := Vector2(box.y * a, box.y) if box.y * a <= box.x else Vector2(box.x, box.x / a)
 		d[id] = {"now": b.get_icon_draw_size(), "v03": v03, "rect": home.get_region("ShortcutIcon_" + id).size}
-	_ok(d["rewarded_ads"]["now"].is_equal_approx(d["rewarded_ads"]["v03"]) and d["tasks"]["now"].is_equal_approx(d["tasks"]["v03"]), "SB-TF-03: icons at 0.7x the V03 box (%s / %s)" % [str(d["rewarded_ads"]), str(d["tasks"])])
+	_ok(d["rewarded_ads"]["now"].is_equal_approx(d["rewarded_ads"]["v03"]) and d["tasks"]["now"].is_equal_approx(d["tasks"]["v03"]), "SB-TF-13: icons at PANEL_SCALE (0.98x) the V03 box (%s / %s)" % [str(d["rewarded_ads"]), str(d["tasks"])])
 	var ok := true
 	for id in d:
 		ok = ok and (d[id]["rect"] as Vector2).is_equal_approx(d[id]["now"])
@@ -313,7 +313,7 @@ func _panel_style(home) -> void:
 		var r: Rect2 = b.get_global_rect()
 		margin_ok = margin_ok and r.position.x >= 20.0 and vp.x - r.end.x >= 20.0
 	_ok(sizes.size() == 1, "one panel size system for every activity button (%s)" % str(sizes.keys()))
-	_ok(sizes.keys()[0].is_equal_approx(Vector2(147, 109)), "SB-TF-03 panels 0.7x the V06 210x156 (%s)" % str(sizes.keys()[0]))
+	_ok(sizes.keys()[0].is_equal_approx(Vector2(206, 153)), "SB-TF-13 panels 0.98x the V06 210x156 (%s)" % str(sizes.keys()[0]))
 	_ok(alpha_ok, "see-through glass body (SB-TF-03: half the V06 0.51 = 0.255) with 2-3 px outline")
 	_ok(margin_ok, "visible outer margin from the screen edges (>= 20 px)")
 	var sc: Rect2 = home.get_region("Art_scrubby").get_global_rect()
