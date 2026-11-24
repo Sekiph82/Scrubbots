@@ -11,7 +11,23 @@
 		"C14": 23,
 		"C16": 311
 	},
+	"challengeScore": 38.767100801544,
+	"challengeVector": {
+		"A": 0.490132037584153,
+		"B": 0.293965517241379,
+		"C": 0.657759199297009,
+		"R": 0.305191337116373,
+		"S": 0.457394193666932,
+		"U": 0.198802567689902,
+		"W": 0.3086682640154
+	},
 	"difficulty": "EASY",
+	"dominantProfile": "FLOW",
+	"fileDigests": {
+		"level": "ba3794fce0de72ebc0e2581bd2d8b30f4f885b526363d3eacda3de850b64545e",
+		"preview": "daaa146666ce4819548b02713141d9d3aaed27ef2c07ecc5727ee01ca9a61beb",
+		"supply_plan": "54e7b645bc23c0a004d3b0f73a4e9ee3b0b49ea8732b58714a51d2290ad7f10e"
+	},
 	"firstSeenColorOrder": [
 		"C16",
 		"C12",
@@ -21,6 +37,7 @@
 		"C01",
 		"C02"
 	],
+	"frustrationRisk": null,
 	"height": 56,
 	"normalizedColorOrder": [
 		"C01",
@@ -31,9 +48,104 @@
 		"C14",
 		"C16"
 	],
+	"noveltySignature": {
+		"dimensions": [
+			56,
+			56
+		],
+		"paletteSet": [
+			"C01",
+			"C02",
+			"C03",
+			"C11",
+			"C12",
+			"C14",
+			"C16"
+		],
+		"silhouetteHash": "a772942038bae39f9ccc3839dbc63f14780c41dca557eb617897bc3d87b04e88"
+	},
+	"official_difficulty_v1": {
+		"B": {
+			"B": 0.293965517241379,
+			"decisionStates": 58,
+			"forcedFraction": 0.224137931034483,
+			"forcedStreakNorm": 0.189655172413793,
+			"longestForcedStreak": 11,
+			"lowChoiceFraction": 0.448275862068966,
+			"productiveActionHistogram": {
+				"1": 13,
+				"2": 13,
+				"3": 21,
+				"4": 11
+			},
+			"reachableAlternativesTotal": 12794,
+			"zeroProductiveStates": 0
+		},
+		"S": {
+			"S": 0.457394193666932,
+			"colorDemandImbalance": 0.150266429840142,
+			"noWorkSlotFraction": 0.793103448275862,
+			"singleProductiveSlotFraction": 0.293103448275862
+		},
+		"U": {
+			"U": 0.198802567689902,
+			"initiallyLockedFraction": 0.713603818615752,
+			"maxWave": 7,
+			"meanNorm": 0.0529997531067402,
+			"meanWave": 1.53699284009547,
+			"p95Norm": 0.137931034482759,
+			"p95Wave": 4
+		},
+		"challengeScore": 38.767100801544,
+		"levelSha256": "ba3794fce0de72ebc0e2581bd2d8b30f4f885b526363d3eacda3de850b64545e",
+		"ok": true,
+		"path": {
+			"dispatchWaves": 749,
+			"finalActive": 0,
+			"maxParallelClaims": 3,
+			"productivityMismatches": 0,
+			"routeFailures": 0,
+			"solved": true,
+			"steps": 58,
+			"totalClears": 838
+		},
+		"profile": {
+			"dominant": "FLOW",
+			"runnerUp": "COLOR",
+			"scores": {
+				"COLOR": 0.557576696481971,
+				"FLOW": 0.672366625828188,
+				"FORTRESS": 0.246384042465641,
+				"MARATHON": 0.0622842215497597,
+				"ROUTE": 0.397661687350263
+			}
+		},
+		"sessionLoad": 26.7072307764526,
+		"targetChallenge": 20.0,
+		"vector": {
+			"A": 0.490132037584153,
+			"B": 0.293965517241379,
+			"C": 0.657759199297009,
+			"R": 0.305191337116373,
+			"S": 0.457394193666932,
+			"U": 0.198802567689902,
+			"W": 0.3086682640154
+		}
+	},
 	"outputPath": "res://data/levels/level_064_amber_dragonfly.json",
 	"paletteAuthority": "res://data/palettes/scrubbots_palette_v3.json",
 	"previewPath": "res://assets/art/levels/previews/level_064_amber_dragonfly.png",
+	"progression": {
+		"class": "EASY",
+		"cycle": 6,
+		"level": 64,
+		"modifier": -1.0,
+		"novelty_target": 0.6,
+		"p": 0.2591817793182821,
+		"role": "recovery",
+		"slot": 4,
+		"target_challenge": 22.62854491045595
+	},
 	"releasePool": {
 		"artworkSha256": "6f9ccdcae8ec53d99d61ec537d9e7267cbe62053ae6c15ca66095d01de287ab0",
 		"candidateId": "candidate-owner-daaa146666ce4819548b02713141d9d3aaed27ef2c07ecc5",
@@ -51,6 +163,7 @@
 		"studioSolverStatus": "WON_CANONICAL",
 		"supplyPlanSha256": "31dc17a9e0de233f5a951add3a780ff82ed2b88e272b8f15981102ccc31cd8c5"
 	},
+	"sessionLoad": 26.7072307764526,
 	"sourcePath": "data/Level Factory/Workspace/Candidates/candidate-owner-daaa146666ce4819548b02713141d9d3aaed27ef2c07ecc5/artwork.png",
 	"sourceSha256": "6f9ccdcae8ec53d99d61ec537d9e7267cbe62053ae6c15ca66095d01de287ab0",
 	"usedColorCount": 7,

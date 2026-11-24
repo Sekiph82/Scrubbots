@@ -11,7 +11,23 @@
 		"C15": 2,
 		"C16": 295
 	},
+	"challengeScore": 44.9117737608123,
+	"challengeVector": {
+		"A": 0.651986057167492,
+		"B": 0.327215189873418,
+		"C": 0.59194449821344,
+		"R": 0.314882073608117,
+		"S": 0.473440555680366,
+		"U": 0.283507631430187,
+		"W": 0.453127837467103
+	},
 	"difficulty": "MEDIUM",
+	"dominantProfile": "BALANCED",
+	"fileDigests": {
+		"level": "96e8321407d263b0c98351597a3b2e9bc1ffdfbc6ce363bfd8a376cf13a17de6",
+		"preview": "b677f870bdd0919fbc955dff9863a9bc0e8544502f8c5072eb149eb28785f762",
+		"supply_plan": "ae7e889d28266ef92164b48d2921ca97087ba0d1ddf8176b6a15441e0bde2bd5"
+	},
 	"firstSeenColorOrder": [
 		"C16",
 		"C11",
@@ -21,6 +37,7 @@
 		"C15",
 		"C07"
 	],
+	"frustrationRisk": null,
 	"height": 56,
 	"normalizedColorOrder": [
 		"C04",
@@ -31,9 +48,105 @@
 		"C15",
 		"C16"
 	],
+	"noveltySignature": {
+		"dimensions": [
+			56,
+			56
+		],
+		"paletteSet": [
+			"C04",
+			"C05",
+			"C07",
+			"C11",
+			"C14",
+			"C15",
+			"C16"
+		],
+		"silhouetteHash": "3db963c5344d2c6757831ec73c6a4a09ace3c1276906dd4a24882f67ea6b8ece"
+	},
+	"official_difficulty_v1": {
+		"B": {
+			"B": 0.327215189873418,
+			"decisionStates": 79,
+			"forcedFraction": 0.341772151898734,
+			"forcedStreakNorm": 0.177215189873418,
+			"longestForcedStreak": 14,
+			"lowChoiceFraction": 0.417721518987342,
+			"productiveActionHistogram": {
+				"1": 27,
+				"2": 6,
+				"3": 11,
+				"4": 19,
+				"5": 16
+			},
+			"reachableAlternativesTotal": 18560,
+			"zeroProductiveStates": 0
+		},
+		"S": {
+			"S": 0.473440555680366,
+			"colorDemandImbalance": 0.172243235379692,
+			"noWorkSlotFraction": 0.721518987341772,
+			"singleProductiveSlotFraction": 0.405063291139241
+		},
+		"U": {
+			"U": 0.283507631430187,
+			"initiallyLockedFraction": 0.816939890710383,
+			"maxWave": 9,
+			"meanNorm": 0.0940267571132467,
+			"meanWave": 2.72677595628415,
+			"p95Norm": 0.241379310344828,
+			"p95Wave": 7
+		},
+		"challengeScore": 44.9117737608123,
+		"levelSha256": "96e8321407d263b0c98351597a3b2e9bc1ffdfbc6ce363bfd8a376cf13a17de6",
+		"ok": true,
+		"path": {
+			"dispatchWaves": 1062,
+			"finalActive": 0,
+			"maxParallelClaims": 3,
+			"productivityMismatches": 0,
+			"routeFailures": 0,
+			"solved": true,
+			"steps": 79,
+			"totalClears": 1098
+		},
+		"profile": {
+			"dominant": "BALANCED",
+			"runnerUp": "COLOR",
+			"scores": {
+				"COLOR": 0.532692526946903,
+				"FLOW": 0.579097040509635,
+				"FORTRESS": 0.305361410651802,
+				"MARATHON": 0.147766426815301,
+				"ROUTE": 0.483434065387804
+			}
+		},
+		"sessionLoad": 34.3641367159432,
+		"targetChallenge": 20.0,
+		"vector": {
+			"A": 0.651986057167492,
+			"B": 0.327215189873418,
+			"C": 0.59194449821344,
+			"R": 0.314882073608117,
+			"S": 0.473440555680366,
+			"U": 0.283507631430187,
+			"W": 0.453127837467103
+		}
+	},
 	"outputPath": "res://data/levels/level_063_sea_serpent.json",
 	"paletteAuthority": "res://data/palettes/scrubbots_palette_v3.json",
 	"previewPath": "res://assets/art/levels/previews/level_063_sea_serpent.png",
+	"progression": {
+		"class": "MEDIUM",
+		"cycle": 6,
+		"level": 63,
+		"modifier": 0.0,
+		"novelty_target": 0.45,
+		"p": 0.2591817793182821,
+		"role": "first_tension",
+		"slot": 3,
+		"target_challenge": 43.36936313113767
+	},
 	"releasePool": {
 		"artworkSha256": "efdb4a73c5125d992b26b5825cf74c154cc9bd2bd0541ce576b8727b0af32963",
 		"candidateId": "candidate-owner-b677f870bdd0919fbc955dff9863a9bc0e8544502f8c5072",
@@ -51,6 +164,7 @@
 		"studioSolverStatus": "WON_CANONICAL",
 		"supplyPlanSha256": "ed6b50d9939b9377c0b24680e766b3374641f472340484659ae16ee95f22f88b"
 	},
+	"sessionLoad": 34.3641367159432,
 	"sourcePath": "data/Level Factory/Workspace/Candidates/candidate-owner-b677f870bdd0919fbc955dff9863a9bc0e8544502f8c5072/artwork.png",
 	"sourceSha256": "efdb4a73c5125d992b26b5825cf74c154cc9bd2bd0541ce576b8727b0af32963",
 	"usedColorCount": 7,
