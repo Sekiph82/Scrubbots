@@ -1,0 +1,544 @@
+{
+	"schema": "scrubbots.level_supply_plan.v1",
+	"version": 1,
+	"levelId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d",
+	"ownerInput": "PixelArtStudio supply pipeline (solver-proven)",
+	"ownerInputSha256": "95be3969f0201ab867b74303d98833b0100289a06f3f8d4ea40af24c79650db9",
+	"columnCount": 4,
+	"visiblePreviewDepth": 3,
+	"maxRobotsPerBatch": 25,
+	"intendedColumnClicks": [
+		1,
+		1,
+		1,
+		1,
+		1,
+		1,
+		1,
+		2,
+		2,
+		3,
+		1,
+		1,
+		1,
+		1,
+		1,
+		1,
+		1,
+		1,
+		1,
+		1,
+		1,
+		2,
+		2,
+		2,
+		2,
+		3,
+		3,
+		3,
+		3,
+		3,
+		3,
+		2,
+		2,
+		2,
+		2,
+		3,
+		3,
+		3,
+		3,
+		3,
+		3,
+		3,
+		3,
+		3,
+		3,
+		3,
+		3,
+		3,
+		3,
+		4,
+		4,
+		4,
+		4,
+		2,
+		2,
+		2,
+		2,
+		2,
+		4,
+		4,
+		4,
+		4,
+		4,
+		4,
+		4,
+		4,
+		4,
+		4,
+		4,
+		4,
+		4,
+		4,
+		4,
+		4,
+		2,
+		2,
+		2,
+		2,
+		2,
+		2,
+		2,
+		4,
+		4,
+		4,
+		4,
+		4,
+		4
+	],
+	"columns": [
+		[
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K1-01",
+				"cid": "C16",
+				"robots": 15
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K1-02",
+				"cid": "C10",
+				"robots": 25
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K1-03",
+				"cid": "C16",
+				"robots": 14
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K1-04",
+				"cid": "C10",
+				"robots": 25
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K1-05",
+				"cid": "C16",
+				"robots": 7
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K1-06",
+				"cid": "C10",
+				"robots": 11
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K1-07",
+				"cid": "C07",
+				"robots": 8
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K1-08",
+				"cid": "C10",
+				"robots": 24
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K1-09",
+				"cid": "C16",
+				"robots": 14
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K1-10",
+				"cid": "C10",
+				"robots": 12
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K1-11",
+				"cid": "C14",
+				"robots": 8
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K1-12",
+				"cid": "C10",
+				"robots": 14
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K1-13",
+				"cid": "C11",
+				"robots": 17
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K1-14",
+				"cid": "C10",
+				"robots": 21
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K1-15",
+				"cid": "C16",
+				"robots": 13
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K1-16",
+				"cid": "C11",
+				"robots": 13
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K1-17",
+				"cid": "C13",
+				"robots": 4
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K1-18",
+				"cid": "C10",
+				"robots": 19
+			}
+		],
+		[
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K2-01",
+				"cid": "C16",
+				"robots": 5
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K2-02",
+				"cid": "C11",
+				"robots": 9
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K2-03",
+				"cid": "C01",
+				"robots": 17
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K2-04",
+				"cid": "C16",
+				"robots": 14
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K2-05",
+				"cid": "C10",
+				"robots": 24
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K2-06",
+				"cid": "C01",
+				"robots": 12
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K2-07",
+				"cid": "C15",
+				"robots": 10
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K2-08",
+				"cid": "C10",
+				"robots": 12
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K2-09",
+				"cid": "C16",
+				"robots": 10
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K2-10",
+				"cid": "C11",
+				"robots": 11
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K2-11",
+				"cid": "C02",
+				"robots": 19
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K2-12",
+				"cid": "C10",
+				"robots": 14
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K2-13",
+				"cid": "C14",
+				"robots": 13
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K2-14",
+				"cid": "C16",
+				"robots": 11
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K2-15",
+				"cid": "C10",
+				"robots": 15
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K2-16",
+				"cid": "C07",
+				"robots": 11
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K2-17",
+				"cid": "C10",
+				"robots": 15
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K2-18",
+				"cid": "C15",
+				"robots": 9
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K2-19",
+				"cid": "C10",
+				"robots": 19
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K2-20",
+				"cid": "C01",
+				"robots": 15
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K2-21",
+				"cid": "C11",
+				"robots": 12
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K2-22",
+				"cid": "C10",
+				"robots": 19
+			}
+		],
+		[
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K3-01",
+				"cid": "C11",
+				"robots": 18
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K3-02",
+				"cid": "C16",
+				"robots": 14
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K3-03",
+				"cid": "C10",
+				"robots": 8
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K3-04",
+				"cid": "C11",
+				"robots": 9
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K3-05",
+				"cid": "C10",
+				"robots": 7
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K3-06",
+				"cid": "C16",
+				"robots": 6
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K3-07",
+				"cid": "C10",
+				"robots": 24
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K3-08",
+				"cid": "C11",
+				"robots": 18
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K3-09",
+				"cid": "C10",
+				"robots": 24
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K3-10",
+				"cid": "C10",
+				"robots": 9
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K3-11",
+				"cid": "C10",
+				"robots": 24
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K3-12",
+				"cid": "C16",
+				"robots": 14
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K3-13",
+				"cid": "C10",
+				"robots": 11
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K3-14",
+				"cid": "C16",
+				"robots": 13
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K3-15",
+				"cid": "C10",
+				"robots": 23
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K3-16",
+				"cid": "C10",
+				"robots": 22
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K3-17",
+				"cid": "C16",
+				"robots": 11
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K3-18",
+				"cid": "C10",
+				"robots": 16
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K3-19",
+				"cid": "C16",
+				"robots": 12
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K3-20",
+				"cid": "C10",
+				"robots": 17
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K3-21",
+				"cid": "C16",
+				"robots": 12
+			}
+		],
+		[
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K4-01",
+				"cid": "C14",
+				"robots": 14
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K4-02",
+				"cid": "C16",
+				"robots": 6
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K4-03",
+				"cid": "C11",
+				"robots": 18
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K4-04",
+				"cid": "C16",
+				"robots": 6
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K4-05",
+				"cid": "C10",
+				"robots": 7
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K4-06",
+				"cid": "C10",
+				"robots": 9
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K4-07",
+				"cid": "C10",
+				"robots": 9
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K4-08",
+				"cid": "C16",
+				"robots": 8
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K4-09",
+				"cid": "C11",
+				"robots": 10
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K4-10",
+				"cid": "C16",
+				"robots": 13
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K4-11",
+				"cid": "C10",
+				"robots": 23
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K4-12",
+				"cid": "C15",
+				"robots": 8
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K4-13",
+				"cid": "C10",
+				"robots": 21
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K4-14",
+				"cid": "C10",
+				"robots": 13
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K4-15",
+				"cid": "C11",
+				"robots": 16
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K4-16",
+				"cid": "C10",
+				"robots": 13
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K4-17",
+				"cid": "C11",
+				"robots": 14
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K4-18",
+				"cid": "C16",
+				"robots": 11
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K4-19",
+				"cid": "C10",
+				"robots": 20
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K4-20",
+				"cid": "C16",
+				"robots": 13
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K4-21",
+				"cid": "C10",
+				"robots": 16
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K4-22",
+				"cid": "C16",
+				"robots": 12
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K4-23",
+				"cid": "C10",
+				"robots": 16
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K4-24",
+				"cid": "C16",
+				"robots": 12
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K4-25",
+				"cid": "C10",
+				"robots": 18
+			},
+			{
+				"batchId": "candidate-owner-9fb097fbdd6858a4ea06142f39d12700cb0bdf928e8c610d-K4-26",
+				"cid": "C10",
+				"robots": 18
+			}
+		]
+	]
+}
