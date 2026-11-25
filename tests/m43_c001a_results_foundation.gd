@@ -200,24 +200,27 @@ func _won_never_starts_level() -> void:
 	_shutdown(root)
 	_complete("won_never_starts_level")
 
-## Last builtin level (200 since SB-CAMPAIGN-L31-L200) -> frontier 201 CONTENT_MISSING: the win goes
+## Last builtin level (the production catalog's last order) -> next frontier CONTENT_MISSING: the win goes
 ## Home, which shows the honest coming-soon state (no level starts).
 func _level30_won_home_only() -> void:
-	print("[level 200 won home only]")
+	var catalog = load("res://scripts/data/level_catalog.gd").new()
+	catalog.load_manifest()
+	var last := int(catalog.size())
+	print("[level %d won home only]" % last)
 	var root = await _boot_main(_uniq("l10"))
 	var app = root.get_app_state()
 	var nav = root.get_navigation()
-	app.progression.debug_set_current_level(200)
+	app.progression.debug_set_current_level(last)
 	var h = await _play(root)
-	_ok(int(h.progression_level) == 200, "frontier Level 200 launched")
+	_ok(int(h.progression_level) == last, "frontier last level launched")
 	h.get_completion().terminal_reached.emit(&"WON", {})
 	var rc: Dictionary = h.get_terminal_receipt()
-	_ok(rc["first_clear"] and rc["frontier"] == {"before": 200, "after": 201} and rc["rewards"]["first_clear_sb"] == app.economy.config.first_clear_sb(app.progression.class_for(200)), "Level 200 first clear committed")
+	_ok(rc["first_clear"] and rc["frontier"] == {"before": last, "after": last + 1} and rc["rewards"]["first_clear_sb"] == app.economy.config.first_clear_sb(app.progression.class_for(last)), "last level first clear committed")
 	var e0: Dictionary = _econ(app.economy)
 	var p0: Dictionary = app.progression.snapshot()
 	await process_frame
 	_ok(nav.current() == R.HOME and not root.get_results_screen().visible and _hosts(root) == 0, "WON -> HOME, no Results")
-	_ok(root.get_home().get_region("PlayButton").disabled and not root.play_current_frontier().get("ok", true), "frontier 201 has no content: PLAY disabled, nothing starts")
+	_ok(root.get_home().get_region("PlayButton").disabled and not root.play_current_frontier().get("ok", true), "frontier after the last level has no content: PLAY disabled, nothing starts")
 	_ok(_econ(app.economy) == e0 and app.progression.snapshot() == p0, "Home: no mutation")
 	_shutdown(root)
 	_complete("level30_won_home_only")
