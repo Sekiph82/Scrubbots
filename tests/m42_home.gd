@@ -152,16 +152,17 @@ func _continue_cta_frontier() -> void:
 	# M52-C001: Level 2 (Apple) now exists — no coming-soon state at frontier 2.
 	_ok(not play.disabled and String(home.get_region("StatusLabel").text).find("coming soon") == -1, "frontier 2 has real content: enabled, no coming-soon message")
 	_shutdown(root)
-	# First frontier without content (201 since SB-CAMPAIGN-L31-L200) keeps the honest coming-soon state.
+	# First frontier without content (one past the catalog) keeps the honest coming-soon state.
+	var missing := _first_missing_level()
 	var path11 := _uniq("cont11")
 	var app11 = AppState.new(path11)
-	for n in range(1, 201):
+	for n in range(1, missing):
 		app11.progression.record_win(n)
 	app11.request_save()
 	var root11 = await _boot_main(path11)
 	var home11 = root11.get_home()
 	var play11: Button = home11.get_region("PlayButton")
-	_ok(home11.get_region("PlayButton").text == "PLAY · LEVEL 201", "PLAY reflects the real frontier 201")
+	_ok(home11.get_region("PlayButton").text == "PLAY · LEVEL %d" % missing, "PLAY reflects the real first frontier without content")
 	_ok(play11.disabled and String(home11.get_region("StatusLabel").text).find("coming soon") != -1, "frontier without content: disabled + honest message")
 	play11.pressed.emit()
 	var r: Dictionary = root11.play_current_frontier()
@@ -747,3 +748,10 @@ func _done() -> void:
 	print("M42 home cases completed: %d/%d" % [EXPECTED_CASES.size() - missing.size(), EXPECTED_CASES.size()])
 	print("M42 home evidence: %s" % ("PASS" if _fail == 0 else "FAIL (%d)" % _fail))
 	quit(0 if _fail == 0 else 1)
+
+
+## First frontier order without content: one past the production catalog's last level.
+func _first_missing_level() -> int:
+	var catalog = load("res://scripts/data/level_catalog.gd").new()
+	catalog.load_manifest()
+	return int(catalog.size()) + 1

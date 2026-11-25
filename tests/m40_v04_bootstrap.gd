@@ -138,21 +138,22 @@ func _frontier_resolves_catalog() -> void:
 
 func _frontier_missing_content() -> void:
 	# M52-C001: frontier 2 is real content (Apple). SB-CAMPAIGN-L11-L30: the catalog now
-	# holds orders 1..200 (SB-CAMPAIGN-L31-L200), so the first frontier without content is 201.
-	print("[frontier 2 -> Apple; frontier 201 -> CONTENT_MISSING]")
+	# grows with releases, so the first frontier without content is one past its last level.
+	var missing := _first_missing_level()
+	print("[frontier 2 -> Apple; frontier %d -> CONTENT_MISSING]" % missing)
 	var path := _uniq("f11")
 	var root = await _boot(path)
 	var app = root.get_app_state()
 	_ok(app.progression.record_win(1), "frontier advanced to 2")
 	var r2: Dictionary = GameplayLaunchResolver.resolve(app)
 	_ok(r2["ok"] and r2["level"] == 2 and r2["entry_id"] == "level_002_apple", "frontier 2 resolves level_002_apple (no level-1 fallback)")
-	for n in range(2, 201):
+	for n in range(2, missing):
 		app.progression.record_win(n)
-	_ok(app.progression.current_level() == 201, "frontier advanced to 201")
+	_ok(app.progression.current_level() == missing, "frontier advanced to the first level without content")
 	_ok(app.request_save()["ok"], "saved")
 	_shutdown(root)
 	var root2 = await _boot(path)
-	_ok(root2.get_app_state().progression.current_level() == 201, "relaunch frontier 201")
+	_ok(root2.get_app_state().progression.current_level() == missing, "relaunch frontier without content")
 	var r = root2.launch_gameplay()
 	_ok(not r["ok"] and r["reason"] == GameplayLaunchResolver.CONTENT_MISSING, "launch refuses: CONTENT_MISSING")
 	_ok(root2.get_gameplay_host() == null, "no gameplay host created for missing content")
@@ -160,7 +161,7 @@ func _frontier_missing_content() -> void:
 	h.app_state = root2.get_app_state()
 	h.auto_build = false
 	root2.add_child(h)
-	_ok(not h.build() and h.get_build_error() == GameplayLaunchResolver.CONTENT_MISSING, "direct host build also fails CONTENT_MISSING (never runs level-1 content as level 201)")
+	_ok(not h.build() and h.get_build_error() == GameplayLaunchResolver.CONTENT_MISSING, "direct host build also fails CONTENT_MISSING (never runs level-1 content as a missing level)")
 	_shutdown(root2)
 
 func _durable_action_relaunch() -> void:
@@ -300,3 +301,10 @@ func _ok(cond: bool, msg: String) -> void:
 func _done() -> void:
 	print("M40 V04 bootstrap evidence: %s" % ("PASS" if _fail == 0 else "FAIL (%d)" % _fail))
 	quit(0 if _fail == 0 else 1)
+
+
+## First frontier order without content: one past the production catalog's last level.
+func _first_missing_level() -> int:
+	var catalog = load("res://scripts/data/level_catalog.gd").new()
+	catalog.load_manifest()
+	return int(catalog.size()) + 1

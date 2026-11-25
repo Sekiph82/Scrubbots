@@ -148,7 +148,7 @@ func _r06() -> void:
 	_set_catalog(app, 150)
 	_ok(not app.catalog_has_level(151) and pr.world_events().is_empty(), "catalog 1..150 (L151 absent) -> nothing triggers")
 	app._catalog_orders = []
-	_ok(app.catalog_has_level(151) and app._catalog_orders.size() == 200, "shipped catalog (%d levels) has L151" % app._catalog_orders.size())
+	_ok(app.catalog_has_level(151) and app._catalog_orders.size() >= 200, "shipped catalog (%d levels) has L151" % app._catalog_orders.size())
 	var ev: Array = pr.world_events()
 	_ok(ev.size() == 1 and ev[0]["key"] == "world:world_02" and ev[0]["title"] == "Bubble District" and ev[0]["subtitle"] == UiText.t("HOME_AREA_NUMBER", [2]) and ev[0]["art"] == WorldService.load_table()["fallback_art"], "one event: Bubble District, AREA 2, World 01 fallback art %s" % str(ev))
 	var before := _truth(app)

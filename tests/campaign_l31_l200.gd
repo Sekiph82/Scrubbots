@@ -84,7 +84,7 @@ func _initialize() -> void:
 	_done()
 
 func _new_entries() -> Array:
-	return _cat.get_entries_ordered().slice(30)
+	return _cat.get_entries_ordered().slice(30, 200)  # L31..L200 only; later releases follow
 
 func _level(e):
 	return LevelLoader.load_from_path(e.level_path).level_data
@@ -96,7 +96,7 @@ func _catalog() -> void:
 	_ok(r.ok, "production catalog validates %s" % r.summary())
 	var orders: Array = _cat.get_entries_ordered().map(func(e): return e.order)
 	var ids: Array = _new_entries().map(func(e): return e.id)
-	_ok(_cat.size() == 200 and orders == range(1, 201) and ids == NEW_LEVELS, "200 entries, orders 1..200, L31..L200 ids in order")
+	_ok(_cat.size() >= 200 and orders == range(1, _cat.size() + 1) and ids == NEW_LEVELS, "orders 1..N contiguous, L31..L200 ids in order")
 	for e in _new_entries():
 		_ok(e.supply_plan_path == "res://data/levels/supply/%s_supply_v1.json" % e.id and e.preview_exists
 			and e.metadata_path == "res://data/levels/metadata/%s.metadata.json" % e.id, "%s: plan, preview and metadata paths" % e.id)
@@ -190,7 +190,7 @@ func _frontier() -> void:
 	app.economy.ftue.mark_new()
 	var all: Array = _cat.get_entries_ordered().map(func(e): return e.id)
 	var order_ok := true
-	for n in range(1, 201):
+	for n in range(1, all.size() + 1):
 		var r: Dictionary = GameplayLaunchResolver.resolve(app)
 		if not (r["ok"] and int(r["level"]) == n and r["entry_id"] == all[n - 1]):
 			order_ok = false
@@ -198,8 +198,8 @@ func _frontier() -> void:
 		if n == 39 or n == 40:
 			_ok(app.feature_unlocked("ranks") == (n == 40), "frontier %d: RANKS unlocked == %s" % [n, str(n == 40)])
 		app.progression.record_win(n)
-	_ok(order_ok, "fresh profile resolves L1..L200 to the catalog entries in order")
-	_ok(GameplayLaunchResolver.resolve(app)["reason"] == GameplayLaunchResolver.CONTENT_MISSING, "frontier 201 -> CONTENT_MISSING (end of builtin catalog)")
+	_ok(order_ok, "fresh profile resolves every catalog level to its entry in order")
+	_ok(GameplayLaunchResolver.resolve(app)["reason"] == GameplayLaunchResolver.CONTENT_MISSING, "frontier after the last catalog level -> CONTENT_MISSING (end of builtin catalog)")
 	_ok(int(WorldService.world_for_level(150)["number"]) == 1 and int(WorldService.world_for_level(151)["number"]) == 2
 		and int(WorldService.world_for_level(200)["number"]) == 2, "worlds_v1: L150 world 1, L151..L200 world 2")
 	_completed["frontier"] = true

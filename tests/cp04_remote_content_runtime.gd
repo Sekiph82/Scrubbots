@@ -537,19 +537,20 @@ func _app_with_remote(tag: String) -> Array:
 	return [app, save]
 
 func _c25() -> void:
-	print("[c25 GameplayLaunchResolver: builtin 1..200 then remote 201+]")
+	var b := _builtin_count()
+	print("[c25 GameplayLaunchResolver: builtin 1..%d then remote %d+]" % [b, b + 1])
 	var x: Array = _app_with_remote("c25")
 	var app = x[0]
 	var r: Dictionary = await app.content.refresh()
 	_ok(r["ok"], "remote set activated through AppState.content (%s)" % r["reason"])
-	app.progression.debug_set_current_level(200)
+	app.progression.debug_set_current_level(b)
 	var l30 := GameplayLaunchResolver.resolve(app)
-	_ok(l30["ok"] and l30["entry_id"] == "level_200_sea_wyrm" and String(l30["level_path"]).begins_with("res://"), "frontier 200 -> builtin")
-	app.progression.debug_set_current_level(201)
+	_ok(l30["ok"] and l30["entry_id"] == _last_builtin_id() and String(l30["level_path"]).begins_with("res://"), "last builtin frontier -> builtin")
+	app.progression.debug_set_current_level(b + 1)
 	var l31 := GameplayLaunchResolver.resolve(app)
-	_ok(l31["ok"] and l31["entry_id"] == "fam_l011" and String(l31["level_path"]).begins_with(app.content.root) and String(l31["supply_plan_path"]).ends_with("fam_l011/supply-plan.json"), "frontier 201 -> first remote fam_l011 under user://content root")
-	app.progression.debug_set_current_level(202)
-	_ok(GameplayLaunchResolver.resolve(app)["entry_id"] == "fam_l012", "frontier 202 -> remote fam_l012")
+	_ok(l31["ok"] and l31["entry_id"] == "fam_l011" and String(l31["level_path"]).begins_with(app.content.root) and String(l31["supply_plan_path"]).ends_with("fam_l011/supply-plan.json"), "first frontier after builtin -> first remote fam_l011 under user://content root")
+	app.progression.debug_set_current_level(b + 2)
+	_ok(GameplayLaunchResolver.resolve(app)["entry_id"] == "fam_l012", "second remote frontier -> remote fam_l012")
 	DirAccess.remove_absolute(x[1])
 	ProjectSettings.set_setting("application/config/version", null)
 	_case("c25_resolver_builtin_then_remote")
@@ -558,13 +559,14 @@ func _c26() -> void:
 	print("[c26 frontier past available content stays CONTENT_MISSING]")
 	var x: Array = _app_with_remote("c26")
 	var app = x[0]
-	app.progression.debug_set_current_level(201)
+	var b := _builtin_count()
+	app.progression.debug_set_current_level(b + 1)
 	var before := GameplayLaunchResolver.resolve(app)
-	_ok(not before["ok"] and before["reason"] == GameplayLaunchResolver.CONTENT_MISSING, "no remote yet: frontier 201 -> CONTENT_MISSING (never builtin under a wrong number)")
+	_ok(not before["ok"] and before["reason"] == GameplayLaunchResolver.CONTENT_MISSING, "no remote yet: first frontier after builtin -> CONTENT_MISSING (never builtin under a wrong number)")
 	await app.content.refresh()
-	app.progression.debug_set_current_level(203)
+	app.progression.debug_set_current_level(b + 3)
 	var after := GameplayLaunchResolver.resolve(app)
-	_ok(not after["ok"] and after["reason"] == GameplayLaunchResolver.CONTENT_MISSING, "frontier 203 beyond remote 201..202 -> CONTENT_MISSING")
+	_ok(not after["ok"] and after["reason"] == GameplayLaunchResolver.CONTENT_MISSING, "frontier beyond the two remote levels -> CONTENT_MISSING")
 	DirAccess.remove_absolute(x[1])
 	ProjectSettings.set_setting("application/config/version", null)
 	_case("c26_missing_remote_frontier")
@@ -573,10 +575,10 @@ func _c27() -> void:
 	print("[c27 AppState.orders_context sees the composite playable order set]")
 	var x: Array = _app_with_remote("c27")
 	var app = x[0]
-	app.progression.debug_set_current_level(200)
-	_ok(app.orders_context()["playable_ahead"] == 1, "before remote: only builtin level 200 ahead")
+	app.progression.debug_set_current_level(_builtin_count())
+	_ok(app.orders_context()["playable_ahead"] == 1, "before remote: only the last builtin level ahead")
 	await app.content.refresh()
-	_ok(app.orders_context()["playable_ahead"] == 3, "after activation: 200 + remote 201, 202 playable ahead (cache invalidated)")
+	_ok(app.orders_context()["playable_ahead"] == 3, "after activation: last builtin + two remote levels playable ahead (cache invalidated)")
 	DirAccess.remove_absolute(x[1])
 	ProjectSettings.set_setting("application/config/version", null)
 	_case("c27_orders_context_composite")
@@ -596,3 +598,16 @@ func _c28() -> void:
 	DirAccess.remove_absolute(x[1])
 	ProjectSettings.set_setting("application/config/version", null)
 	_case("c28_install_never_mutates_save")
+
+
+## The builtin production catalog grows with releases; remote fixtures follow its last level.
+func _builtin_count() -> int:
+	var catalog = load("res://scripts/data/level_catalog.gd").new()
+	catalog.load_manifest()
+	return int(catalog.size())
+
+func _last_builtin_id() -> String:
+	var catalog = load("res://scripts/data/level_catalog.gd").new()
+	catalog.load_manifest()
+	var entries: Array = catalog.get_entries_ordered()
+	return String(entries.back().id)
